@@ -67,6 +67,7 @@ export function DataView() {
               hideOnSinglePage: true,
               position: ['bottomLeft'],
             }}
+            scroll={{ y: 'max(calc(100dvh - 16rem), calc(480px - 16rem))' }}
           />
         </div>
       ) : (
