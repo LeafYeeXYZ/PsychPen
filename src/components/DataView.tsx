@@ -3,11 +3,9 @@ import { useZustand } from '../lib/useZustand'
 import { Upload, Button, Tag, Table, Popconfirm } from 'antd'
 import { SlidersOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
 
-const ACCEPT_FILE_TYPES: string[] = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers']
-
 export function DataView() {
 
-  const { data, setData, dataCols, dataRows } = useZustand()
+  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES } = useZustand()
   
   return (
     <div className='w-full h-full overflow-hidden'>
@@ -54,20 +52,23 @@ export function DataView() {
           </div>
           {/* 数据表格 */}
           <Table
-            className='w-full overflow-auto'
+            className='w-full overflow-auto text-nowrap'
             bordered
             dataSource={dataRows}
             columns={dataCols.map((col) => ({
               title: col.name,
               dataIndex: col.name,
               key: col.name,
+              width: col.name.length * 12,
             }))}
             pagination={{
-              pageSize: 20,
-              hideOnSinglePage: true,
+              hideOnSinglePage: false,
               position: ['bottomLeft'],
             }}
-            scroll={{ y: 'max(calc(100dvh - 16rem), calc(480px - 16rem))' }}
+            scroll={{ 
+              y: 'max(calc(100dvh - 16rem), calc(480px - 16rem))',
+              x: 'max-content',
+            }}
           />
         </div>
       ) : (

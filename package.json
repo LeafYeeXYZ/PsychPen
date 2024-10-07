@@ -24,6 +24,7 @@
     "@ant-design/icons": "^5.3.7",
     "@ant-design/plots": "^2.3.2",
     "antd": "^5.18.3",
+    "mathjs": "^13.2.0",
     "react": "rc",
     "react-dom": "rc",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
