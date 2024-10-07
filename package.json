@@ -1,0 +1,44 @@
+{
+  "name": "psych-pen",
+  "version": "1.0.0",
+  "description": "Draw charts for psychological papers online.",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/LeafYeeXYZ/PsychPen.git"
+  },
+  "author": "LeafYeeXYZ",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/LeafYeeXYZ/PsychPen/issues"
+  },
+  "homepage": "https://github.com/LeafYeeXYZ/PsychPen#readme",
+  "scripts": {
+    "dev": "bunx --bun vite",
+    "build": "bunx --bun vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "bunx --bun vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.3.7",
+    "antd": "^5.18.3",
+    "react": "rc",
+    "react-dom": "rc"
+  },
+  "devDependencies": {
+    "@types/react": "npm:types-react@rc",
+    "@types/react-dom": "npm:types-react-dom@rc",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1"
+  }
+}
