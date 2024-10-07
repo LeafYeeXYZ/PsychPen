@@ -10,9 +10,9 @@
 
 ## 路线图
 
-- [ ] 数据导入 (基于 `sheet.js`)
-  - [ ] 在线数据编辑 (数据量较大时基于 `DuckDB on WebAssembly` 和 `SQL` 语句; 数据量较小时直接在前端处理)
+- [x] 数据导入 (基于 `sheet.js`)
+- [ ] 在线数据编辑
 - [ ] 基础绘图 (基于 `antv`)
-  - [ ] 图像导出 (基于 `html2canvas`)
+- [ ] 图像导出 (基于 `html2canvas`)
 - [ ] 统计功能 (基于 `WebAssembly`)
-  - [ ] 输出统计表和对应 `LaTeX` 代码
+- [ ] 输出统计表和对应 `LaTeX` 代码
