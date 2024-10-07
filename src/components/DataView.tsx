@@ -26,6 +26,8 @@ export function DataView() {
                 reader.readAsArrayBuffer(file)
                 return false
               }}
+              fileList={[]}
+              maxCount={0}
             >
               <Button
                 icon={<SlidersOutlined />}
@@ -86,6 +88,8 @@ export function DataView() {
               reader.readAsArrayBuffer(file)
               return false
             }}
+            fileList={[]}
+            maxCount={0}
           >
             <Button
               icon={<SlidersOutlined />}
