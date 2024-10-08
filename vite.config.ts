@@ -12,9 +12,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'antd': ['antd'],
+          'antd': ['antd', '@ant-design/icons'],
           'xlsx': ['xlsx', 'dta'],
           'plot': ['@ant-design/plots'],
+          'utils': ['html2canvas', 'mathjs', 'simple-statistics'],
         }
       }
     }

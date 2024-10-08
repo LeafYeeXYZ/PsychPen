@@ -26,6 +26,7 @@
     "@stdlib/stdlib": "^0.3.0",
     "antd": "^5.18.3",
     "dta": "https://cdn.sheetjs.com/dta-0.0.2/dta-0.0.2.tgz",
+    "html2canvas": "^1.4.1",
     "mathjs": "^13.2.0",
     "react": "rc",
     "react-dom": "rc",
