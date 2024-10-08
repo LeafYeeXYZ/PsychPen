@@ -15,9 +15,6 @@ export function VariableView() {
       const cols = dataCols.map((col) => {
         // 原始数据
         const data = dataRows.map((row) => row[col.name])
-        const numData: number[] = data
-          .filter((v) => v && !isNaN(Number(v)))
-          .map((v) => Number(v))
         // 基础统计量
         const count = data.length
         const missing = data.filter((v) => v === undefined).length
@@ -25,11 +22,18 @@ export function VariableView() {
         const unique = new Set(data).size
         // 判断数据类型, 并计算描述统计量
         let type: '称名或等级数据' | '等距或等比数据' = '称名或等级数据'
-        if (
-          numData.length > 0
-          // 不是等差数列
-          && !numData.every((v, i, arr) => i === 0 || v - arr[i - 1] === arr[1] - arr[0])
-        ) {
+        if ( data.every((v) => !v || !isNaN(Number(v)))) {
+          const numData: number[] = data
+            .filter((v) => v && !isNaN(Number(v)))
+            .map((v) => Number(v))
+          if (
+            // 不全是缺失值
+            numData.length > 0
+            // 不是等差数列
+            && !numData.every((v, i, arr) => i === 0 || v - arr[i - 1] === arr[1] - arr[0])
+          ) {
+            return { ...col, count, missing, valid, unique, type }
+          }
           type = '等距或等比数据'
           const min = +Math.min(...numData).toFixed(4)
           const max = +Math.max(...numData).toFixed(4)
@@ -46,7 +50,11 @@ export function VariableView() {
       })
       setDataCols(cols)
       messageApi?.destroy()
-      messageApi?.success('数据处理完成')
+      messageApi?.open({
+        type: 'success',
+        content: '数据处理完成',
+        duration: 0.5,
+      })
     } catch (error) {
       messageApi?.destroy()
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
