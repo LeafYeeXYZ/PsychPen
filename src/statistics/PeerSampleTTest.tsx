@@ -17,7 +17,7 @@ type Option = {
   alternative: 'two-sided' | 'less' | 'greater'
 }
 type Result = {
-  [key: string]: any
+  [key: string]: unknown
 } & Option
 
 export function PeerSampleTTest() {
@@ -31,8 +31,8 @@ export function PeerSampleTTest() {
       messageApi?.loading('正在处理数据...')
       const data1 = dataRows.map((row) => +row[values.variable1] as number)
       const data2 = dataRows.map((row) => +row[values.variable2] as number)
-      const result = ttest(data1, data2, { mu: values.expect, alpha: values.alpha, alternative: values.alternative })
-      setResult({ variable1: values.variable1, variable2: values.variable2, expect: values.expect, ...result } as Result)
+      const result = ttest(data1, data2, { mu: +values.expect, alpha: +values.alpha, alternative: values.alternative })
+      setResult({ variable1: values.variable1, variable2: values.variable2, expect: +values.expect, ...result } as Result)
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {

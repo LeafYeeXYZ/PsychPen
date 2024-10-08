@@ -15,7 +15,7 @@ type Option = {
   alternative: 'two-sided' | 'less' | 'greater'
 }
 type Result = {
-  [key: string]: any
+  [key: string]: unknown
 } & Option
 
 export function OneSampleTTest() {
@@ -28,8 +28,8 @@ export function OneSampleTTest() {
     try {
       messageApi?.loading('正在处理数据...')
       const data = dataRows.map((row) => +row[values.variable] as number)
-      const result = ttest(data, { mu: values.expect, alpha: values.alpha, alternative: values.alternative })
-      setResult({ variable: values.variable, expect: values.expect, ...result } as Result)
+      const result = ttest(data, { mu: +values.expect, alpha: +values.alpha, alternative: values.alternative })
+      setResult({ variable: values.variable, expect: +values.expect, ...result } as Result)
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
