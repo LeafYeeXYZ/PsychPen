@@ -67,7 +67,7 @@ export const useZustand = create<State>()((set) => ({
     }
   },
   setDataCols: (cols) => set({ dataCols: cols }),
-  ACCEPT_FILE_TYPES: ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers'],
+  ACCEPT_FILE_TYPES: ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta'],
   messageApi: null,
   setMessageApi: (api) => set({ messageApi: api }),
 }))

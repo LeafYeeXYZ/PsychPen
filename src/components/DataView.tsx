@@ -1,9 +1,10 @@
-import { read } from 'xlsx'
+import { read, utils } from 'xlsx'
 import { useZustand } from '../lib/useZustand'
 import { Upload, Button, Tag, Table, Popconfirm } from 'antd'
 import { SlidersOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import * as ss from 'simple-statistics'
+import { parse, set_utils } from 'dta'
 
 export function DataView() {
 
@@ -56,8 +57,12 @@ export function DataView() {
     }
   }
   useEffect(() => {
-    data && !dataCols[0].type && handleCalculate()
+    if (data && !dataCols[0].type) {
+      handleCalculate()
+    }
   }, [data])
+  // 上传状态
+  const [uploading, setUploading] = useState<boolean>(false)
   
   return (
     <div className='w-full h-full overflow-hidden'>
@@ -66,25 +71,6 @@ export function DataView() {
         <div className='flex flex-col justify-start items-center w-full h-full p-4'>
           {/* 上方工具栏 */}
           <div className='w-full flex justify-start items-center gap-3 mb-4'>
-            <Upload
-              accept={ACCEPT_FILE_TYPES.join(',')}
-              beforeUpload={(file) => {
-                const reader = new FileReader()
-                reader.onload = (e) => {
-                  e.target?.result && setData(read(e.target.result))
-                }
-                reader.readAsArrayBuffer(file)
-                return false
-              }}
-              fileList={[]}
-              maxCount={0}
-            >
-              <Button
-                icon={<SlidersOutlined />}
-              >
-                导入数据
-              </Button>
-            </Upload>
             <Popconfirm
               title={<span>确定清除数据吗？<br />本地数据不受影响</span>}
               onConfirm={() => setData(null)}
@@ -107,11 +93,11 @@ export function DataView() {
             className='w-full overflow-auto text-nowrap'
             bordered
             dataSource={dataRows}
-            columns={dataCols.map((col) => ({
+            columns={dataCols.map((col, index) => ({
               title: col.name,
               dataIndex: col.name,
-              key: col.name,
-              width: col.name.length * 12,
+              key: col.name + index,
+              width: `max(5rem, ${col.name.length}rem)`,
             }))}
             pagination={{
               hideOnSinglePage: false,
@@ -135,18 +121,40 @@ export function DataView() {
           <Upload
             accept={ACCEPT_FILE_TYPES.join(',')}
             beforeUpload={(file) => {
-              const reader = new FileReader()
-              reader.onload = (e) => {
-                e.target?.result && setData(read(e.target.result))
+              try {
+                setUploading(true)
+                const reader = new FileReader()
+                const ext = file.name.split('.').pop()?.toLowerCase()
+                reader.onload = (e) => {
+                  try {
+                    if (!e.target?.result) {
+                      messageApi?.error('文件读取失败, 请检查文件是否损坏')
+                    } else if (ext === 'dta') {
+                      set_utils(utils)
+                      setData(parse(new Uint8Array(e.target.result as ArrayBuffer)))
+                    } else {
+                      setData(read(e.target.result))
+                    }
+                  } catch (error) {
+                    messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+                  } finally {
+                    setUploading(false)
+                  }
+                }
+                reader.readAsArrayBuffer(file)
+              } catch (error) {
+                messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+                setUploading(false)
               }
-              reader.readAsArrayBuffer(file)
               return false
             }}
             fileList={[]}
             maxCount={0}
           >
-            <Button
-              icon={<SlidersOutlined />}
+            <Button 
+              icon={<SlidersOutlined />} 
+              loading={uploading}
+              disabled={uploading}
             >
               点击导入数据
             </Button>

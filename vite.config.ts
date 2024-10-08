@@ -9,7 +9,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'antd': ['antd'],
-          'xlsx': ['xlsx'],
+          'xlsx': ['xlsx', 'dta'],
           'plot': ['@ant-design/plots'],
         }
       }

@@ -25,6 +25,7 @@
     "@ant-design/plots": "^2.3.2",
     "@stdlib/stdlib": "^0.3.0",
     "antd": "^5.18.3",
+    "dta": "https://cdn.sheetjs.com/dta-0.0.2/dta-0.0.2.tgz",
     "mathjs": "^13.2.0",
     "react": "rc",
     "react-dom": "rc",
