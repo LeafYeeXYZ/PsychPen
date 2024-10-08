@@ -24,13 +24,14 @@ export function OneSampleTTest() {
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = (values: Option) => {
+    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       const data = dataRows.map((row) => +row[values.variable] as number)
       const result = ttest(data, { mu: values.expect, alpha: values.alpha, alternative: values.alternative })
       setResult({ variable: values.variable, expect: values.expect, ...result } as Result)
       messageApi?.destroy()
-      messageApi?.success('数据处理完成')
+      messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)

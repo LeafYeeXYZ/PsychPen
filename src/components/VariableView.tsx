@@ -11,6 +11,7 @@ export function VariableView() {
   const [calculating, setCalculating] = useState<boolean>(false)
   const handleCalculate = () => { // 和 DataView.tsx 中的 handleCalculate 函数相同
     try {
+      messageApi?.loading('正在处理数据...')
       const cols = dataCols.map((col) => {
         // 原始数据
         const data = dataRows.map((row) => row[col.name])
@@ -44,8 +45,10 @@ export function VariableView() {
         }
       })
       setDataCols(cols)
-      messageApi?.success('数据计算成功')
+      messageApi?.destroy()
+      messageApi?.success('数据处理完成')
     } catch (error) {
+      messageApi?.destroy()
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }

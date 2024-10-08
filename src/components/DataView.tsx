@@ -10,6 +10,7 @@ export function DataView() {
   const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, setDataCols, messageApi } = useZustand()
   const handleCalculate = () => { // 和 VariableView.tsx 中的 handleCalculate 函数相同
     try {
+      messageApi?.loading('正在处理数据...')
       const cols = dataCols.map((col) => {
         // 原始数据
         const data = dataRows.map((row) => row[col.name])
@@ -43,12 +44,19 @@ export function DataView() {
         }
       })
       setDataCols(cols)
+      messageApi?.destroy()
+      messageApi?.open({
+        type: 'success',
+        content: '数据处理完成',
+        duration: 0.5,
+      })
     } catch (error) {
+      messageApi?.destroy()
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }
   useEffect(() => {
-    data && handleCalculate()
+    data && !dataCols[0].type && handleCalculate()
   }, [data])
   
   return (
