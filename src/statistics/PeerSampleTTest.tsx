@@ -29,14 +29,19 @@ export function PeerSampleTTest() {
     const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
-      const data1 = dataRows
-        .map((row) => row[values.variable1])
-        .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
-        .map((v) => Number(v))
-      const data2 = dataRows
-        .map((row) => row[values.variable2])
-        .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
-        .map((v) => Number(v))
+      const data1: number[] = []
+      const data2: number[] = []
+      for (const row of dataRows) {
+        if (
+          typeof row[values.variable1] !== 'undefined' 
+          && !isNaN(Number(row[values.variable1]))
+          && typeof row[values.variable2] !== 'undefined'
+          && !isNaN(Number(row[values.variable2]))
+        ) {
+          data1.push(Number(row[values.variable1]))
+          data2.push(Number(row[values.variable2]))
+        }
+      }
       const result = ttest(data1, data2, { mu: +values.expect, alpha: +values.alpha, alternative: values.alternative })
       setResult({ variable1: values.variable1, variable2: values.variable2, expect: +values.expect, ...result } as Result)
       messageApi?.destroy()
