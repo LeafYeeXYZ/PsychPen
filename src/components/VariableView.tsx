@@ -7,7 +7,7 @@ import * as ss from 'simple-statistics'
 
 export function VariableView() {
 
-  const { dataCols, setDataCols, dataRows } = useZustand()
+  const { dataCols, setDataCols, dataRows, messageApi } = useZustand()
   const [calculating, setCalculating] = useState<boolean>(false)
   const handleCalculate = () => { // 和 DataView.tsx 中的 handleCalculate 函数相同
     try {
@@ -45,7 +45,7 @@ export function VariableView() {
       })
       setDataCols(cols)
     } catch (error) {
-      console.error(error)
+      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }
 

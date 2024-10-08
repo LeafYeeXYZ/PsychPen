@@ -25,7 +25,7 @@ type Config = {
 
 export function BasicBoxPlot() {
 
-  const { dataCols, dataRows } = useZustand()
+  const { dataCols, dataRows, messageApi } = useZustand()
   const [config, setConfig] = useState<Config | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleFinish = (values: Option) => {
@@ -43,7 +43,7 @@ export function BasicBoxPlot() {
         },
       })
     } catch (error) {
-      console.error(error)
+      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }
 

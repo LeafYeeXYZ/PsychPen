@@ -22,7 +22,7 @@ type Result = {
 
 export function PeerSampleTTest() {
 
-  const { dataCols, dataRows } = useZustand()
+  const { dataCols, dataRows, messageApi } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = (values: Option) => {
@@ -32,7 +32,7 @@ export function PeerSampleTTest() {
       const result = ttest(data1, data2, { mu: values.expect, alpha: values.alpha, alternative: values.alternative })
       setResult({ variable1: values.variable1, variable2: values.variable2, expect: values.expect, ...result } as Result)
     } catch (error) {
-      console.error(error)
+      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, ConfigProvider, ThemeConfig } from 'antd'
+import { Button, ConfigProvider, ThemeConfig, message } from 'antd'
 import { LinkOutlined, BarChartOutlined } from '@ant-design/icons'
 import { DataView } from './components/DataView'
 import { PaintView } from './components/PaintView'
@@ -22,7 +22,12 @@ export function App() {
   }, [])
   // 页面切换
   const [page, setPage] = useState<React.ReactElement>(<DataView />)
-  const { activePage, setActivePage, data } = useZustand()
+  const { activePage, setActivePage, data, setMessageApi } = useZustand()
+  // 消息实例
+  const [messageApi, contextHolder] = message.useMessage()
+  useEffect(() => {
+    setMessageApi(messageApi)
+  }, [messageApi])
 
   return (
     <ConfigProvider theme={ANTD_THEME}>
@@ -86,6 +91,7 @@ export function App() {
         </header>
         {page}
       </main>
+      {contextHolder}
     </ConfigProvider>
   )
 }
