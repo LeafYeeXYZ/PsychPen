@@ -44,6 +44,7 @@ export function VariableView() {
         }
       })
       setDataCols(cols)
+      messageApi?.success('数据计算成功')
     } catch (error) {
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }

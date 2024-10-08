@@ -30,6 +30,7 @@ export function BasicBoxPlot() {
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleFinish = (values: Option) => {
     try {
+      messageApi?.loading('正在处理数据...')
       const data = dataRows
         .map((row) => ({ [values.groupVar]: row[values.groupVar], [values.dataVar]: +row[values.dataVar] }))
         .sort((a, b) => a[values.groupVar] - b[values.groupVar])
@@ -42,7 +43,10 @@ export function BasicBoxPlot() {
           point: values.showOutliers,
         },
       })
+      messageApi?.destroy()
+      messageApi?.success('数据处理完成')
     } catch (error) {
+      messageApi?.destroy()
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }
