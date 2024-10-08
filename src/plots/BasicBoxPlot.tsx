@@ -19,7 +19,7 @@ type Option = {
 }
 
 type Config = {
-  data: { [key: string]: any }[]
+  data: { [key: string]: unknown }[]
   boxType: 'boxplot'
   xField: string
   yField: string
@@ -41,8 +41,9 @@ export function BasicBoxPlot() {
     try {
       messageApi?.loading('正在处理数据...')
       const data = dataRows
-        .map((row) => ({ [values.groupVar]: row[values.groupVar], [values.dataVar]: +row[values.dataVar] }))
-        .sort((a, b) => a[values.groupVar] - b[values.groupVar])
+        .filter((row) => row[values.dataVar] && !isNaN(Number(row[values.dataVar])))
+        .map((row) => ({ [values.groupVar]: row[values.groupVar], [values.dataVar]: Number(row[values.dataVar]) }))
+        .sort((a, b) => Number(a[values.groupVar]) - Number(b[values.groupVar]))
       setConfig({ 
         data,
         boxType: 'boxplot',

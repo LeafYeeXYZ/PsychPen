@@ -16,8 +16,8 @@ export function VariableView() {
         // 原始数据
         const data = dataRows.map((row) => row[col.name])
         const numData: number[] = data
-          .filter((v) => typeof +v === 'number' && !isNaN(+v))
-          .map((v) => +v)
+          .filter((v) => v && !isNaN(Number(v)))
+          .map((v) => Number(v))
         // 基础统计量
         const count = data.length
         const missing = data.filter((v) => v === undefined).length

@@ -42,7 +42,7 @@ type State = {
   // 数据
   data: WorkBook | null
   setData: (data: WorkBook | null) => void
-  dataRows: { [key: string]: any }[]
+  dataRows: { [key: string]: unknown }[]
   dataCols: Variable[]
   setDataCols: (cols: Variable[]) => void
   // 可打开的文件类型
@@ -61,7 +61,7 @@ export const useZustand = create<State>()((set) => ({
   setData: (data) => {
     if (data) {
       const sheet = data.Sheets[data.SheetNames[0]]
-      const rows = utils.sheet_to_json(sheet) as { [key: string]: any }[]
+      const rows = utils.sheet_to_json(sheet) as { [key: string]: unknown }[]
       const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
       set({ data, dataRows: rows, dataCols: cols })
     } else {

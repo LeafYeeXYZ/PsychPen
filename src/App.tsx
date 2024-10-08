@@ -27,7 +27,7 @@ export function App() {
   const [messageApi, contextHolder] = message.useMessage()
   useEffect(() => {
     setMessageApi(messageApi)
-  }, [messageApi])
+  }, [messageApi, setMessageApi])
 
   return (
     <ConfigProvider theme={ANTD_THEME}>

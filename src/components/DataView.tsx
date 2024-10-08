@@ -16,8 +16,8 @@ export function DataView() {
         // 原始数据
         const data = dataRows.map((row) => row[col.name])
         const numData: number[] = data
-          .filter((v) => typeof +v === 'number' && !isNaN(+v))
-          .map((v) => +v)
+          .filter((v) => v && !isNaN(Number(v)))
+          .map((v) => Number(v))
         // 基础统计量
         const count = data.length
         const missing = data.filter((v) => v === undefined).length
@@ -57,9 +57,10 @@ export function DataView() {
     }
   }
   useEffect(() => {
-    if (data && !dataCols[0].type) {
+    if (data && dataCols[0] && !dataCols[0].type) {
       handleCalculate()
     }
+  // eslint-disable-next-line
   }, [data])
   // 上传状态
   const [uploading, setUploading] = useState<boolean>(false)
