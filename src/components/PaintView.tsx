@@ -10,36 +10,6 @@ type Option = {
 }
 const CASCADER_OPTIONS: Option[] = [
   {
-    value: 'Line',
-    label: '折线图',
-    disabled: true,
-  },
-  {
-    value: 'Area',
-    label: '面积图',
-    disabled: true,
-  },
-  {
-    value: 'Histogram',
-    label: '直方图',
-    disabled: true,
-  },
-  {
-    value: 'Heatmap',
-    label: '热力图',
-    disabled: true,
-  },
-  {
-    value: 'Pie',
-    label: '饼图',
-    disabled: true,
-  },
-  {
-    value: 'Scatter',
-    label: '散点图',
-    disabled: true,
-  },
-  {
     value: 'Box',
     label: '箱线图',
     children: [
@@ -52,21 +22,6 @@ const CASCADER_OPTIONS: Option[] = [
   {
     value: 'Dot',
     label: '散点图',
-    disabled: true,
-  },
-  {
-    value: 'Treemap',
-    label: '矩阵树图',
-    disabled: true,
-  },
-  {
-    value: 'WordCloud',
-    label: '词云图',
-    disabled: true,
-  },
-  {
-    value: 'FlowGraph',
-    label: '中介/调节模型图',
     disabled: true,
   },
 ]

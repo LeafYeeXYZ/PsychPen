@@ -138,7 +138,7 @@ export function OneSampleTTest() {
                 <span>{
                   typeof result[key] === 'number' ? result[key].toFixed(4) :
                   typeof result[key] === 'string' ? result[key] :
-                  typeof result[key] === 'boolean' ? result[key] ? 'true' : 'false' :
+                  typeof result[key] === 'boolean' ? result[key] ? '是' : '否' :
                   result[key] instanceof Array ? result[key].map((v) => +v.toFixed(4)).join(', ') :
                   ''
                 }</span>

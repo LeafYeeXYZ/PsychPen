@@ -50,41 +50,6 @@ const CASCADER_OPTIONS: Option[] = [
       },
     ],
   },
-  {
-    value: 'Nonparametric',
-    label: '非参数检验',
-    disabled: true,
-  },
-  {
-    value: 'Correlation',
-    label: '相关分析',
-    disabled: true,
-  },
-  {
-    value: 'Regression',
-    label: '回归分析',
-    disabled: true,
-  },
-  {
-    value: 'Factor',
-    label: '因子分析',
-    disabled: true,
-  },
-  {
-    value: 'Reliability',
-    label: '信度分析',
-    disabled: true,
-  },
-  {
-    value: 'Validity',
-    label: '效度分析',
-    disabled: true,
-  },
-  {
-    value: 'Other',
-    label: '其他',
-    disabled: true,
-  },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
