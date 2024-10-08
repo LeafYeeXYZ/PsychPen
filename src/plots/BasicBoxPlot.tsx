@@ -104,13 +104,13 @@ export function BasicBoxPlot() {
             </Select>
           </Form.Item>
           <Form.Item
-            label='是否显示异常点'
+            label='异常点处理方式'
             name='showOutliers'
-            rules={[{ required: true, message: '请选择是否显示异常点' }]}
+            rules={[{ required: true, message: '请选择异常点处理方式' }]}
           >
             <Radio.Group block>
-              <Radio.Button value={true}>标注并排除异常点</Radio.Button>
-              <Radio.Button value={false}>不特殊处理异常点</Radio.Button>
+              <Radio.Button value={true}>标注并排除</Radio.Button>
+              <Radio.Button value={false}>不特殊处理</Radio.Button>
             </Radio.Group>
           </Form.Item>
           <div
