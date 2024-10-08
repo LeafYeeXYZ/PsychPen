@@ -72,7 +72,7 @@ export function DataView() {
           {/* 上方工具栏 */}
           <div className='w-full flex justify-start items-center gap-3 mb-4'>
             <Popconfirm
-              title={<span>确定清除数据吗？<br />本地数据不受影响</span>}
+              title={<span>是否确认清除数据<br />本地数据不受影响</span>}
               onConfirm={() => setData(null)}
               okText='确定'
               cancelText='取消'

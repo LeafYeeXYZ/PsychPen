@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import { type WorkBook, utils } from 'xlsx'
 import type { MessageInstance } from 'antd/es/message/interface'
 
+const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta']
+
 type Variable = {
   /** 变量名 */
   name: string
@@ -67,7 +69,7 @@ export const useZustand = create<State>()((set) => ({
     }
   },
   setDataCols: (cols) => set({ dataCols: cols }),
-  ACCEPT_FILE_TYPES: ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta'],
+  ACCEPT_FILE_TYPES,
   messageApi: null,
   setMessageApi: (api) => set({ messageApi: api }),
 }))
