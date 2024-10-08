@@ -6,6 +6,7 @@ import { useState } from 'react'
 type Option = {
   value: string
   label: string
+  disabled?: boolean
   children?: Option[]
 }
 const CASCADER_OPTIONS: Option[] = [
@@ -56,7 +57,7 @@ export function StatisticsView() {
             onChange={(value) => CASCADER_ONCHANGE(value, setPage)}
           />
         </div>
-        {/* 画图界面 */}
+        {/* 统计界面 */}
         <div className='w-full h-full overflow-auto border rounded-md'>
           {page}
         </div>
