@@ -1,15 +1,15 @@
 import { useZustand } from '../lib/useZustand'
 import { Button, Table } from 'antd'
 import { CalculatorOutlined } from '@ant-design/icons'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import * as math from 'mathjs'
+import * as ss from 'simple-statistics'
 
 export function VariableView() {
 
   const { dataCols, setDataCols, dataRows } = useZustand()
   const [calculating, setCalculating] = useState<boolean>(false)
-  const handleCalculate = () => {
+  const handleCalculate = () => { // 和 DataView.tsx 中的 handleCalculate 函数相同
     try {
       const cols = dataCols.map((col) => {
         // 原始数据
@@ -32,14 +32,12 @@ export function VariableView() {
           type = '等距或等比数据'
           const min = +Math.min(...numData).toFixed(4)
           const max = +Math.max(...numData).toFixed(4)
-          const mean = +math.mean(numData).toFixed(4)
-          let mode: string = ''
-          const rawMode = math.mode(numData).map((v) => v.toFixed(4))
-          rawMode.length <= 3 && (mode = rawMode.join('/'))
-          const q1 = +math.quantileSeq(numData, 0.25).toFixed(4)
-          const q2 = +math.quantileSeq(numData, 0.5).toFixed(4)
-          const q3 = +math.quantileSeq(numData, 0.75).toFixed(4)
-          const std = +(+math.std(numData, 0)).toFixed(4)
+          const mean = +ss.mean(numData).toFixed(4)
+          const mode = +ss.mode(numData).toFixed(4)
+          const q1 = +ss.quantile(numData, 0.25).toFixed(4)
+          const q2 = +ss.quantile(numData, 0.5).toFixed(4)
+          const q3 = +ss.quantile(numData, 0.75).toFixed(4)
+          const std = +ss.standardDeviation(numData).toFixed(4)
           return { ...col, count, missing, valid, unique, min, max, mean, mode, q1, q2, q3, std, type }
         } else {
           return { ...col, count, missing, valid, unique, type }
@@ -48,13 +46,8 @@ export function VariableView() {
       setDataCols(cols)
     } catch (error) {
       console.error(error)
-    } finally {
-      setCalculating(false)
     }
   }
-  useEffect(() => {
-    handleCalculate()
-  }, [])
 
   return (
     <div className='w-full h-full overflow-hidden'>
@@ -68,6 +61,7 @@ export function VariableView() {
             onClick={() => {
               flushSync(() => setCalculating(true))
               handleCalculate()
+              flushSync(() => setCalculating(false))
             }}
           >
             重新计算描述统计量

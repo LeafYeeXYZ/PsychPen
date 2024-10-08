@@ -2,10 +2,54 @@ import { read } from 'xlsx'
 import { useZustand } from '../lib/useZustand'
 import { Upload, Button, Tag, Table, Popconfirm } from 'antd'
 import { SlidersOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
+import { useEffect } from 'react'
+import * as ss from 'simple-statistics'
 
 export function DataView() {
 
-  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES } = useZustand()
+  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, setDataCols } = useZustand()
+  const handleCalculate = () => { // 和 VariableView.tsx 中的 handleCalculate 函数相同
+    try {
+      const cols = dataCols.map((col) => {
+        // 原始数据
+        const data = dataRows.map((row) => row[col.name])
+        const numData: number[] = data
+          .filter((v) => typeof +v === 'number' && !isNaN(+v))
+          .map((v) => +v)
+        // 基础统计量
+        const count = data.length
+        const missing = data.filter((v) => v === undefined).length
+        const valid = count - missing
+        const unique = new Set(data).size
+        // 判断数据类型, 并计算描述统计量
+        let type: '称名或等级数据' | '等距或等比数据' = '称名或等级数据'
+        if (
+          numData.length > 0
+          // 不是等差数列
+          && !numData.every((v, i, arr) => i === 0 || v - arr[i - 1] === arr[1] - arr[0])
+        ) {
+          type = '等距或等比数据'
+          const min = +Math.min(...numData).toFixed(4)
+          const max = +Math.max(...numData).toFixed(4)
+          const mean = +ss.mean(numData).toFixed(4)
+          const mode = +ss.mode(numData).toFixed(4)
+          const q1 = +ss.quantile(numData, 0.25).toFixed(4)
+          const q2 = +ss.quantile(numData, 0.5).toFixed(4)
+          const q3 = +ss.quantile(numData, 0.75).toFixed(4)
+          const std = +ss.standardDeviation(numData).toFixed(4)
+          return { ...col, count, missing, valid, unique, min, max, mean, mode, q1, q2, q3, std, type }
+        } else {
+          return { ...col, count, missing, valid, unique, type }
+        }
+      })
+      setDataCols(cols)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  useEffect(() => {
+    data && handleCalculate()
+  }, [data])
   
   return (
     <div className='w-full h-full overflow-hidden'>

@@ -39,7 +39,7 @@
   - [ ] 箱线图
   - [ ] ...
   - [ ] 图像导出 (基于 `html2canvas`)
-- 统计功能 (近期基于 `math.js`, 远期基于 `WebAssembly`)
+- 统计功能 (近期基于 `simple-statistics`, 远期基于 `WebAssembly`)
   - [ ] t 检验
     - [ ] 单样本 t 检验
     - [ ] 独立样本 t 检验

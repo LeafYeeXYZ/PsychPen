@@ -20,8 +20,8 @@ type Variable = {
   max?: number
   /** 均值 */
   mean?: number
-  /** 众数, 用“/”分隔 */
-  mode?: string
+  /** 众数 */
+  mode?: number
   /** 25%分位数 */
   q1?: number
   /** 50%分位数 */
