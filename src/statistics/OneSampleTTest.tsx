@@ -29,7 +29,7 @@ export function OneSampleTTest() {
       messageApi?.loading('正在处理数据...')
       const data = dataRows
         .map((row) => row[values.variable])
-        .filter((v) => v && !isNaN(Number(v)))
+        .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
         .map((v) => Number(v))
       const result = ttest(data, { mu: +values.expect, alpha: +values.alpha, alternative: values.alternative })
       setResult({ variable: values.variable, expect: +values.expect, ...result } as Result)

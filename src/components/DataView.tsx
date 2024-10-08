@@ -22,18 +22,13 @@ export function DataView() {
         const unique = new Set(data).size
         // 判断数据类型, 并计算描述统计量
         let type: '称名或等级数据' | '等距或等比数据' = '称名或等级数据'
-        if ( data.every((v) => !v || !isNaN(Number(v)))) {
+        if ( 
+          data.every((v) => typeof v === 'undefined' || !isNaN(Number(v))) &&
+          data.some((v) => !isNaN(Number(v)))
+        ) {
           const numData: number[] = data
-            .filter((v) => v && !isNaN(Number(v)))
+            .filter((v) => typeof v !== 'undefined')
             .map((v) => Number(v))
-          if (
-            // 不全是缺失值
-            numData.length > 0
-            // 不是等差数列
-            && !numData.every((v, i, arr) => i === 0 || v - arr[i - 1] === arr[1] - arr[0])
-          ) {
-            return { ...col, count, missing, valid, unique, type }
-          }
           type = '等距或等比数据'
           const min = +Math.min(...numData).toFixed(4)
           const max = +Math.max(...numData).toFixed(4)
