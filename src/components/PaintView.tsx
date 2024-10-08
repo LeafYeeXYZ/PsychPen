@@ -97,6 +97,7 @@ export function PaintView() {
             defaultValue={CASCADER_DEFAULT_VALUE}
             options={CASCADER_OPTIONS}
             onChange={(value) => CASCADER_ONCHANGE(value, setPage)}
+            expandTrigger='hover'
           />
         </div>
         {/* 画图界面 */}

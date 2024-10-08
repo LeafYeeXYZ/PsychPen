@@ -1,7 +1,8 @@
 import { Box } from '@ant-design/plots'
-import { Select, Button, Form } from 'antd'
+import { Select, Button, Form, Radio } from 'antd'
 import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
+import { flushSync } from 'react-dom'
 
 type Option = {
   /** 分组变量 */
@@ -26,6 +27,7 @@ export function BasicBoxPlot() {
 
   const { dataCols, dataRows } = useZustand()
   const [config, setConfig] = useState<Config | null>(null)
+  const [disabled, setDisabled] = useState<boolean>(false)
   const handleFinish = (values: Option) => {
     try {
       const data = dataRows
@@ -53,11 +55,16 @@ export function BasicBoxPlot() {
         <Form<Option>
           className='w-full'
           layout='vertical'
-          onFinish={handleFinish}
+          onFinish={(values) => {
+            flushSync(() => setDisabled(true))
+            handleFinish(values)
+            flushSync(() => setDisabled(false))
+          }}
           autoComplete='off'
           initialValues={{
             showOutliers: true,
           }}
+          disabled={disabled}
         >
           <Form.Item
             label='选择分组变量'
@@ -96,13 +103,10 @@ export function BasicBoxPlot() {
             name='showOutliers'
             rules={[{ required: true, message: '请选择是否显示异常点' }]}
           >
-            <Select
-              className='w-full'
-              placeholder='请选择是否显示异常点'
-            >
-              <Select.Option value={true}>是</Select.Option>
-              <Select.Option value={false}>否</Select.Option>
-            </Select>
+            <Radio.Group block>
+              <Radio.Button value={true}>标注并排除异常点</Radio.Button>
+              <Radio.Button value={false}>不特殊处理异常点</Radio.Button>
+            </Radio.Group>
           </Form.Item>
           <div
             className='flex flex-row flex-nowrap justify-center items-center gap-4'

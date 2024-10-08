@@ -2,6 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Input, Button, Form } from 'antd'
 import { useState } from 'react'
 import { ttest } from '@stdlib/stats'
+import { flushSync } from 'react-dom'
 
 type Option = {
   /** 变量名1 */
@@ -23,6 +24,7 @@ export function PeerSampleTTest() {
 
   const { dataCols, dataRows } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
+  const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = (values: Option) => {
     try {
       const data1 = dataRows.map((row) => +row[values.variable1] as number)
@@ -42,13 +44,18 @@ export function PeerSampleTTest() {
         <Form<Option>
           className='w-full'
           layout='vertical'
-          onFinish={handleCalculate}
+          onFinish={(values) => {
+            flushSync(() => setDisabled(true))
+            handleCalculate(values)
+            flushSync(() => setDisabled(false))
+          }}
           autoComplete='off'
           initialValues={{
             expect: 0,
             alpha: 0.05,
             alternative: 'two-sided',
           }}
+          disabled={disabled}
         >
           <Form.Item
             label='选择配对变量'
