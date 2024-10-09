@@ -1,21 +1,23 @@
-import { Box } from '@ant-design/plots'
-import { Select, Button, Form, Radio, Input } from 'antd'
+import { Scatter } from '@ant-design/plots'
+import { Select, Button, Form, Input, Space } from 'antd'
 import { useZustand } from '../lib/useZustand'
 import { useState, useRef } from 'react'
 import { flushSync } from 'react-dom'
 import html2canvas from 'html2canvas'
 
 type Option = {
-  /** 分组变量 */
-  groupVar: string
-  /** 数据变量 */
-  dataVar: string
-  /** 是否显示异常点 */
-  showOutliers: boolean
+  /** X轴变量 */
+  xVar: string
+  /** Y轴变量 */
+  yVar: string
+  /** Z轴(分组)变量 */
+  zVar?: string
   /** 自定义 x轴 标签 */
   xLabel?: string
   /** 自定义 y轴 标签 */
   yLabel?: string
+  /** 自定义 z轴 标签 */
+  zLabel?: string
 }
 
 type Config = {
@@ -23,12 +25,10 @@ type Config = {
   boxType: 'boxplot'
   xField: string
   yField: string
-  style: {
-    point: boolean
-  }
+  colorField?: string
 }
 
-export function BasicBoxPlot() {
+export function BasicScatterPlot() {
 
   const { dataCols, dataRows, messageApi } = useZustand()
   // 图形设置相关
@@ -36,29 +36,36 @@ export function BasicBoxPlot() {
   const [disabled, setDisabled] = useState<boolean>(false)
   const [customXLabel, setCustomXLabel] = useState<string>('')
   const [customYLabel, setCustomYLabel] = useState<string>('')
+  const [customZLabel, setCustomZLabel] = useState<string>('')
   const handleFinish = (values: Option) => {
     const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       const data = dataRows
         .filter((row) => 
-          typeof row[values.dataVar] !== 'undefined' 
-          && typeof row[values.groupVar] !== 'undefined'
-          && !isNaN(Number(row[values.dataVar]))
+          typeof row[values.xVar] !== 'undefined'
+          && typeof row[values.yVar] !== 'undefined'
+          && !isNaN(Number(row[values.xVar]))
+          && !isNaN(Number(row[values.yVar]))
+          // 分组变量
+          && (!values.zVar || (typeof row[values.zVar] !== 'undefined'))
         )
-        .map((row) => ({ [values.groupVar]: row[values.groupVar], [values.dataVar]: Number(row[values.dataVar]) }))
-        .sort((a, b) => Number(a[values.groupVar]) - Number(b[values.groupVar]))
+        .map((row) => ({ 
+          [values.xVar]: Number(row[values.xVar]),
+          [values.yVar]: Number(row[values.yVar]),
+          // 分组变量
+          ...(values.zVar && { [values.zVar]: row[values.zVar] }),
+        }))
       setConfig({ 
         data,
         boxType: 'boxplot',
-        xField: values.groupVar,
-        yField: values.dataVar,
-        style: {
-          point: values.showOutliers,
-        },
+        xField: values.xVar,
+        yField: values.yVar,
+        colorField: values.zVar,
       })
       setCustomXLabel(values.xLabel || '')
       setCustomYLabel(values.yLabel || '')
+      setCustomZLabel(values.zLabel || '')
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -94,37 +101,28 @@ export function BasicBoxPlot() {
             flushSync(() => setDisabled(false))
           }}
           autoComplete='off'
-          initialValues={{
-            showOutliers: true,
-          }}
           disabled={disabled}
         >
           <Form.Item
-            label='分组变量'
-            name='groupVar'
-            rules={[{ required: true, message: '请选择分组变量' }]}
+            label='X轴变量'
+            name='xVar'
+            rules={[
+              { required: true, message: '请选择X轴变量' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (value === getFieldValue('yVar')) {
+                    return Promise.reject('请选择不同的变量')
+                  }
+                  return Promise.resolve()
+                },
+              }),
+            ]}
           >
             <Select
               className='w-full'
-              placeholder='请选择分组变量'
+              placeholder='请选择X轴变量'
             >
               {dataCols.map((col) => (
-                <Select.Option key={col.name} value={col.name}>
-                  {col.name} (水平数: {col.unique})
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label='数据变量'
-            name='dataVar'
-            rules={[{ required: true, message: '请选择数据变量' }]}
-          >
-            <Select
-              className='w-full'
-              placeholder='请选择数据变量'
-            >
-              {dataCols.map((col) => col.type === '等距或等比数据' && (
                 <Select.Option key={col.name} value={col.name}>
                   {col.name}
                 </Select.Option>
@@ -132,14 +130,54 @@ export function BasicBoxPlot() {
             </Select>
           </Form.Item>
           <Form.Item
-            label='异常点处理方式'
-            name='showOutliers'
-            rules={[{ required: true, message: '请选择异常点处理方式' }]}
+            label='Y轴变量'
+            name='yVar'
+            rules={[
+              { required: true, message: '请选择Y轴变量' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (value === getFieldValue('xVar')) {
+                    return Promise.reject('请选择不同的变量')
+                  }
+                  return Promise.resolve()
+                },
+              }),
+            ]}
           >
-            <Radio.Group block>
-              <Radio.Button value={true}>标注并排除</Radio.Button>
-              <Radio.Button value={false}>不特殊处理</Radio.Button>
-            </Radio.Group>
+            <Select
+              className='w-full'
+              placeholder='请选择Y轴变量'
+            >
+              {dataCols.map((col) => (
+                <Select.Option key={col.name} value={col.name}>
+                  {col.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label='分组变量及其标签'
+          >
+            <Space.Compact
+              className='w-full'
+            >
+              <Form.Item name='zVar' noStyle>
+                <Select
+                  className='w-full'
+                  placeholder='请选择分组变量'
+                  allowClear
+                >
+                  {dataCols.map((col) => col.type === '称名或等级数据' && (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name} (水平数: {col.unique})
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item name='zLabel' noStyle>
+                <Input className='w-max' placeholder='留空则不显示' allowClear />
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
           <Form.Item
             label='自定义X轴标签'
@@ -186,9 +224,12 @@ export function BasicBoxPlot() {
               {/* 纵向文字 */}
               {customYLabel.length > 0 ? customYLabel : config.yField}
             </p>
-            <Box {...config} className='p-4' />
+            <Scatter {...config} className='p-4' />
             <p className='absolute bottom-3 left-[45%] text-gray-700'>
               {customXLabel.length > 0 ? customXLabel : config.xField}
+            </p>
+            <p className='absolute top-0 left-10 text-gray-700'>
+              {customZLabel.length > 0 ? customZLabel : config.colorField}
             </p>
           </div>
         ) : (

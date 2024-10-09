@@ -1,4 +1,5 @@
 import { BasicBoxPlot } from '../plots/BasicBoxPlot'
+import { BasicScatterPlot } from '../plots/BasicScatterPlot'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -17,12 +18,27 @@ const CASCADER_OPTIONS: Option[] = [
         value: 'BasicBoxPlot',
         label: '基础箱线图',
       },
+      {
+        value: 'GroupedBoxPlot',
+        label: '分组箱线图',
+        disabled: true,
+      },
     ],
   },
   {
-    value: 'Dot',
+    value: 'Scatter',
     label: '散点图',
-    disabled: true,
+    children: [
+      {
+        value: 'BasicScatterPlot',
+        label: '基础散点图',
+      },
+      {
+        value: 'GroupedScatterPlot',
+        label: '一维散点图',
+        disabled: true,
+      },
+    ],
   },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
@@ -30,12 +46,15 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
     case 'BasicBoxPlot':
       set(<BasicBoxPlot />)
       break
+    case 'BasicScatterPlot':
+      set(<BasicScatterPlot />)
+      break
     default:
       set(DEFAULT_PAGE)
   }
 }
-const CASCADER_DEFAULT_VALUE = ['Box', 'BasicBoxPlot']
-const DEFAULT_PAGE = <BasicBoxPlot />
+const CASCADER_DEFAULT_VALUE = ['Scatter', 'BasicScatterPlot']
+const DEFAULT_PAGE = <BasicScatterPlot />
 
 export function PaintView() {
 

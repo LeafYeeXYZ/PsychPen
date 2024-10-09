@@ -41,6 +41,9 @@
   - [ ] 箱线图
     - [x] 基础箱线图
     - [ ] 分组箱线图
+  - [ ] 散点图
+    - [x] 基础散点图
+    - [ ] 一维散点图
   - [x] 图像导出 (基于 `html2canvas`)
 - **统计功能** (近期基于 `simple-statistics`、`@stdlib/stats`、`math.js` 等库, 远期基于 `WebAssembly` 实现)
   - [ ] t 检验
