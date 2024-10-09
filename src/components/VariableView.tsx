@@ -1,48 +1,17 @@
 import { useZustand } from '../lib/useZustand'
 import { Button, Table } from 'antd'
-import { CalculatorOutlined } from '@ant-design/icons'
+import { CalculatorOutlined, ZoomOutOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import * as ss from 'simple-statistics'
 
 export function VariableView() {
 
-  const { dataCols, setDataCols, dataRows, messageApi } = useZustand()
+  const { dataCols, setDataCols, dataRows, messageApi, CALCULATE_VARIABLES } = useZustand()
   const [calculating, setCalculating] = useState<boolean>(false)
-  const handleCalculate = () => { // 和 DataView.tsx 中的 handleCalculate 函数相同
+  const handleCalculate = () => {
     try {
       messageApi?.loading('正在处理数据...')
-      const cols = dataCols.map((col) => {
-        // 原始数据
-        const data = dataRows.map((row) => row[col.name])
-        // 基础统计量
-        const count = data.length
-        const missing = data.filter((v) => v === undefined).length
-        const valid = count - missing
-        const unique = new Set(data).size
-        // 判断数据类型, 并计算描述统计量
-        let type: '称名或等级数据' | '等距或等比数据' = '称名或等级数据'
-        if ( 
-          data.every((v) => typeof v === 'undefined' || !isNaN(Number(v))) &&
-          data.some((v) => !isNaN(Number(v)))
-        ) {
-          const numData: number[] = data
-            .filter((v) => typeof v !== 'undefined')
-            .map((v) => Number(v))
-          type = '等距或等比数据'
-          const min = +Math.min(...numData).toFixed(4)
-          const max = +Math.max(...numData).toFixed(4)
-          const mean = +ss.mean(numData).toFixed(4)
-          const mode = +ss.mode(numData).toFixed(4)
-          const q1 = +ss.quantile(numData, 0.25).toFixed(4)
-          const q2 = +ss.quantile(numData, 0.5).toFixed(4)
-          const q3 = +ss.quantile(numData, 0.75).toFixed(4)
-          const std = +ss.standardDeviation(numData).toFixed(4)
-          return { ...col, count, missing, valid, unique, min, max, mean, mode, q1, q2, q3, std, type }
-        } else {
-          return { ...col, count, missing, valid, unique, type }
-        }
-      })
+      const cols = CALCULATE_VARIABLES(dataCols, dataRows)
       setDataCols(cols)
       messageApi?.destroy()
       messageApi?.open({
@@ -72,6 +41,12 @@ export function VariableView() {
             }}
           >
             重新计算描述统计量
+          </Button>
+          <Button
+            icon={<ZoomOutOutlined />}
+            disabled={calculating || true}
+          >
+            手动定义变量缺失值
           </Button>
         </div>
         {/* 变量表格 */}

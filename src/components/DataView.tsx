@@ -1,66 +1,14 @@
 import { read, utils } from 'xlsx'
 import { useZustand } from '../lib/useZustand'
 import { Upload, Button, Tag, Table, Popconfirm } from 'antd'
-import { SlidersOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
-import { useEffect, useState } from 'react'
-import * as ss from 'simple-statistics'
+import { SlidersOutlined, DeleteOutlined, SaveOutlined, FilterOutlined } from '@ant-design/icons'
+import { useState } from 'react'
 import { parse, set_utils } from 'dta'
+import { flushSync } from 'react-dom'
 
 export function DataView() {
 
-  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, setDataCols, messageApi } = useZustand()
-  const handleCalculate = () => { // 和 VariableView.tsx 中的 handleCalculate 函数相同
-    try {
-      messageApi?.loading('正在处理数据...')
-      const cols = dataCols.map((col) => {
-        // 原始数据
-        const data = dataRows.map((row) => row[col.name])
-        // 基础统计量
-        const count = data.length
-        const missing = data.filter((v) => v === undefined).length
-        const valid = count - missing
-        const unique = new Set(data).size
-        // 判断数据类型, 并计算描述统计量
-        let type: '称名或等级数据' | '等距或等比数据' = '称名或等级数据'
-        if ( 
-          data.every((v) => typeof v === 'undefined' || !isNaN(Number(v))) &&
-          data.some((v) => !isNaN(Number(v)))
-        ) {
-          const numData: number[] = data
-            .filter((v) => typeof v !== 'undefined')
-            .map((v) => Number(v))
-          type = '等距或等比数据'
-          const min = +Math.min(...numData).toFixed(4)
-          const max = +Math.max(...numData).toFixed(4)
-          const mean = +ss.mean(numData).toFixed(4)
-          const mode = +ss.mode(numData).toFixed(4)
-          const q1 = +ss.quantile(numData, 0.25).toFixed(4)
-          const q2 = +ss.quantile(numData, 0.5).toFixed(4)
-          const q3 = +ss.quantile(numData, 0.75).toFixed(4)
-          const std = +ss.standardDeviation(numData).toFixed(4)
-          return { ...col, count, missing, valid, unique, min, max, mean, mode, q1, q2, q3, std, type }
-        } else {
-          return { ...col, count, missing, valid, unique, type }
-        }
-      })
-      setDataCols(cols)
-      messageApi?.destroy()
-      messageApi?.open({
-        type: 'success',
-        content: '数据处理完成',
-        duration: 0.5,
-      })
-    } catch (error) {
-      messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
-    }
-  }
-  useEffect(() => {
-    if (data && dataCols[0] && !dataCols[0].type) {
-      handleCalculate()
-    }
-  // eslint-disable-next-line
-  }, [data])
+  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, messageApi } = useZustand()
   // 上传状态
   const [uploading, setUploading] = useState<boolean>(false)
   
@@ -82,6 +30,12 @@ export function DataView() {
               </Button>
             </Popconfirm>
             <Button
+              icon={<FilterOutlined />}
+              disabled={true}
+            >
+              数据过滤
+            </Button>
+            <Button
               icon={<SaveOutlined />}
               disabled={true}
             >
@@ -96,7 +50,7 @@ export function DataView() {
             columns={dataCols.map((col, index) => ({
               title: col.name,
               dataIndex: col.name,
-              key: col.name + index,
+              key: `${col.name}-${index}`,
               width: `max(5rem, ${col.name.length}rem)`,
             }))}
             pagination={{
@@ -120,14 +74,25 @@ export function DataView() {
           </p>
           <Upload
             accept={ACCEPT_FILE_TYPES.join(',')}
-            beforeUpload={(file) => {
+            beforeUpload={async (file) => {
               try {
-                setUploading(true)
+                messageApi?.open({
+                  type: 'loading',
+                  key: 'uploading',
+                  content: '正在导入数据...',
+                  duration: 0,
+                })
+                flushSync(() => setUploading(true))
+                // 如果文件比较大, 延迟等待通知加载
+                if (file.size > 3 * 1024 * 1024) {
+                  await new Promise((resolve) => setTimeout(resolve, 500))
+                }
                 const reader = new FileReader()
                 const ext = file.name.split('.').pop()?.toLowerCase()
                 reader.onload = (e) => {
                   try {
                     if (!e.target?.result) {
+                      messageApi?.destroy('uploading')
                       messageApi?.error('文件读取失败, 请检查文件是否损坏')
                     } else if (ext === 'dta') {
                       set_utils(utils)
@@ -135,7 +100,14 @@ export function DataView() {
                     } else {
                       setData(read(e.target.result))
                     }
+                    messageApi?.destroy('uploading')
+                    messageApi?.open({
+                      type: 'success',
+                      content: '数据导入完成',
+                      duration: 0.5,
+                    })
                   } catch (error) {
+                    messageApi?.destroy('uploading')
                     messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
                   } finally {
                     setUploading(false)
@@ -143,6 +115,7 @@ export function DataView() {
                 }
                 reader.readAsArrayBuffer(file)
               } catch (error) {
+                messageApi?.destroy()
                 messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
                 setUploading(false)
               }
