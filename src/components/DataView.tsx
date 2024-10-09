@@ -8,7 +8,7 @@ import { flushSync } from 'react-dom'
 
 export function DataView() {
 
-  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, messageApi } = useZustand()
+  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, messageApi, setIsLargeData, LARGE_DATA_SIZE } = useZustand()
   // 上传状态
   const [uploading, setUploading] = useState<boolean>(false)
   
@@ -84,8 +84,9 @@ export function DataView() {
                 })
                 flushSync(() => setUploading(true))
                 // 如果文件比较大, 延迟等待通知加载
-                if (file.size > 3 * 1024 * 1024) {
+                if (file.size > LARGE_DATA_SIZE) {
                   await new Promise((resolve) => setTimeout(resolve, 500))
+                  setIsLargeData(true)
                 }
                 const reader = new FileReader()
                 const ext = file.name.split('.').pop()?.toLowerCase()

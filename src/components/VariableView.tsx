@@ -1,16 +1,18 @@
 import { useZustand } from '../lib/useZustand'
-import { Button, Table } from 'antd'
+import { Button, Table, Modal, Select } from 'antd'
 import { CalculatorOutlined, ZoomOutOutlined } from '@ant-design/icons'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { flushSync } from 'react-dom'
+import { utils } from 'xlsx'
 
 export function VariableView() {
 
-  const { dataCols, setDataCols, dataRows, messageApi, CALCULATE_VARIABLES } = useZustand()
+  const { data, dataCols, setDataCols, dataRows, setDataRows, messageApi, CALCULATE_VARIABLES, isLargeData } = useZustand()
   const [calculating, setCalculating] = useState<boolean>(false)
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     try {
       messageApi?.loading('正在处理数据...')
+      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
       const cols = CALCULATE_VARIABLES(dataCols, dataRows)
       setDataCols(cols)
       messageApi?.destroy()
@@ -24,6 +26,42 @@ export function VariableView() {
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }
+  // 处理缺失值
+  const handleMissingParams = useRef<{ variable?: string; missing?: unknown[] }>({})
+  const handleMissing = async (variable: string, missing?: unknown[]) => {
+    try {
+      messageApi?.loading('正在处理数据...')
+      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const cols = dataCols.map((col) => {
+        if (col.name === variable) {
+          return { ...col, missingValues: missing }
+        } else {
+          return col
+        }
+      })
+      const sheet = data!.Sheets[data!.SheetNames[0]]
+      const rows = (utils.sheet_to_json(sheet) as { [key: string]: unknown }[]).map((row) => {
+        const value = row[variable]
+        if (missing && missing.some((m) => value == m)) {
+          return { ...row, [variable]: undefined }
+        } else {
+          return row
+        }
+      })
+      setDataCols(CALCULATE_VARIABLES(cols, rows))
+      setDataRows(rows)
+      messageApi?.destroy()
+      messageApi?.open({
+        type: 'success',
+        content: '数据处理完成',
+        duration: 0.5,
+      })
+    } catch (error) {
+      messageApi?.destroy()
+      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+    }
+  }
+  const [modalApi, contextHolder] = Modal.useModal()
 
   return (
     <div className='w-full h-full overflow-hidden'>
@@ -32,11 +70,10 @@ export function VariableView() {
         <div className='w-full flex justify-start items-center gap-3 mb-4'>
           <Button
             icon={<CalculatorOutlined />}
-            loading={calculating}
             disabled={calculating}
-            onClick={() => {
+            onClick={async () => {
               flushSync(() => setCalculating(true))
-              handleCalculate()
+              await handleCalculate()
               flushSync(() => setCalculating(false))
             }}
           >
@@ -44,7 +81,40 @@ export function VariableView() {
           </Button>
           <Button
             icon={<ZoomOutOutlined />}
-            disabled={calculating || true}
+            disabled={calculating}
+            onClick={async () => {
+              flushSync(() => setCalculating(true))
+              await modalApi.confirm({
+                title: '手动定义变量缺失值',
+                content: (
+                  <div className='flex flex-col gap-4 my-4'>
+                    <Select
+                      placeholder='请选择变量'
+                      defaultValue={handleMissingParams.current.variable}
+                      onChange={(value) => handleMissingParams.current.variable = value as string}
+                    >
+                      {dataCols.map((col) => (
+                        <Select.Option key={col.name} value={col.name}>{col.name}</Select.Option>
+                      ))}
+                    </Select>
+                    <Select
+                      mode='tags'
+                      placeholder='请输入缺失值 (可为多个值/为空)'
+                      defaultValue={handleMissingParams.current.missing}
+                      onChange={(value) => handleMissingParams.current.missing = value?.length > 0 ? value : undefined}
+                    />
+                  </div>
+                ),
+                onOk: async () => {
+                  if (handleMissingParams.current.variable) {
+                    await handleMissing(handleMissingParams.current.variable, handleMissingParams.current.missing)
+                  }
+                },
+                okText: '确定',
+                cancelText: '取消',
+              })
+              flushSync(() => setCalculating(false))
+            }}
           >
             手动定义变量缺失值
           </Button>
@@ -53,11 +123,17 @@ export function VariableView() {
         <Table
           className='w-full overflow-auto text-nowrap'
           bordered
-          dataSource={dataCols}
+          dataSource={dataCols.map((col) => {
+            return {
+              ...col,
+              missingValues: col.missingValues?.join(', '),
+            }
+          })}
           columns={[
             { title: '变量名', dataIndex: 'name', key: 'name', width: '6rem' },
             { title: '数据类型', dataIndex: 'type', key: 'type', width: '6rem' },
             { title: '样本量', dataIndex: 'count', key: 'count', width: '6rem' },
+            { title: '缺失值定义', dataIndex: 'missingValues', key: 'missingValues', width: '7rem' },
             { title: '缺失值数量', dataIndex: 'missing', key: 'missing', width: '7rem' },
             { title: '有效值数量', dataIndex: 'valid', key: 'valid', width: '7rem' },
             { title: '唯一值数量', dataIndex: 'unique', key: 'unique', width: '7rem' },
@@ -77,6 +153,7 @@ export function VariableView() {
           }}
         />
       </div>
+      {contextHolder}
     </div>
   )
 }

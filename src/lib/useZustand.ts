@@ -38,6 +38,7 @@ const CALCULATE_VARIABLES = (dataCols: Variable[], dataRows: { [key: string]: un
   })
   return cols
 }
+const LARGE_DATA_SIZE = 3 * 1024 * 1024
 
 type Variable = {
   /** 变量名 */
@@ -68,7 +69,13 @@ type Variable = {
   q3?: number
   /** 标准差 */
   std?: number
-  /** 自定义的缺失值 */
+  /** 
+   * 自定义的缺失值   
+   * 默认为空, 即只把 undefined 作为缺失值  
+   * 在 VariableView.tsx 中改变后, 将把缺失值为 missingValues 的数据项置为 undefined  
+   * 同时, 在比较时故意使用 == 而不是 ===, 以规避数字和字符串的比较问题  
+   * 缺失值设置只改变 dataRows 和 dataCols 的值, 不改变 data 的值
+   */
   missingValues?: unknown[]
 }
 
@@ -83,6 +90,10 @@ type State = {
   dataCols: Variable[]
   setDataCols: (cols: Variable[]) => void
   setDataRows: (rows: { [key: string]: unknown }[]) => void
+  // 是否数据量过大
+  LARGE_DATA_SIZE: number
+  isLargeData: boolean
+  setIsLargeData: (isLarge: boolean) => void
   // 可打开的文件类型
   ACCEPT_FILE_TYPES: string[]
   // 计算变量描述统计量的函数
@@ -98,6 +109,8 @@ export const useZustand = create<State>()((set) => ({
   data: null,
   dataRows: [],
   dataCols: [],
+  isLargeData: false,
+  setIsLargeData: (isLarge) => set({ isLargeData: isLarge }),
   setData: (data) => {
     if (data) {
       const sheet = data.Sheets[data.SheetNames[0]]
@@ -116,6 +129,7 @@ export const useZustand = create<State>()((set) => ({
   setDataRows: (rows) => set({ dataRows: rows }),
   ACCEPT_FILE_TYPES,
   CALCULATE_VARIABLES,
+  LARGE_DATA_SIZE,
   messageApi: null,
   setMessageApi: (api) => set({ messageApi: api }),
 }))
