@@ -38,7 +38,7 @@ const CALCULATE_VARIABLES = (dataCols: Variable[], dataRows: { [key: string]: un
   })
   return cols
 }
-const LARGE_DATA_SIZE = 3 * 1024 * 1024
+const LARGE_DATA_SIZE = 2 * 1024 * 1024
 
 type Variable = {
   /** 变量名 */

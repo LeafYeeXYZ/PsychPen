@@ -30,17 +30,18 @@ type Config = {
 
 export function BasicScatterPlot() {
 
-  const { dataCols, dataRows, messageApi } = useZustand()
+  const { dataCols, dataRows, messageApi, isLargeData } = useZustand()
   // 图形设置相关
   const [config, setConfig] = useState<Config | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const [customXLabel, setCustomXLabel] = useState<string>('')
   const [customYLabel, setCustomYLabel] = useState<string>('')
   const [customZLabel, setCustomZLabel] = useState<string>('')
-  const handleFinish = (values: Option) => {
+  const handleFinish = async (values: Option) => {
     const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
+      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
       const data = dataRows
         .filter((row) => 
           typeof row[values.xVar] !== 'undefined'
@@ -95,9 +96,9 @@ export function BasicScatterPlot() {
         <Form<Option>
           className='w-full py-4'
           layout='vertical'
-          onFinish={(values) => {
+          onFinish={async (values) => {
             flushSync(() => setDisabled(true))
-            handleFinish(values)
+            await handleFinish(values)
             flushSync(() => setDisabled(false))
           }}
           autoComplete='off'
