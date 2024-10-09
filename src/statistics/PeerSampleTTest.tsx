@@ -55,10 +55,10 @@ export function PeerSampleTTest() {
   return (
     <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4'>
 
-      <div className='w-1/2 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4'>
+      <div className='w-1/2 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
 
         <Form<Option>
-          className='w-full'
+          className='w-full py-4'
           layout='vertical'
           onFinish={(values) => {
             flushSync(() => setDisabled(true))
