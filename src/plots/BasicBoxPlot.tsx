@@ -41,7 +41,11 @@ export function BasicBoxPlot() {
     try {
       messageApi?.loading('正在处理数据...')
       const data = dataRows
-        .filter((row) => typeof row[values.dataVar] !== 'undefined' && !isNaN(Number(row[values.dataVar])))
+        .filter((row) => 
+          typeof row[values.dataVar] !== 'undefined' 
+          && typeof row[values.groupVar] !== 'undefined'
+          && !isNaN(Number(row[values.dataVar]))
+        )
         .map((row) => ({ [values.groupVar]: row[values.groupVar], [values.dataVar]: Number(row[values.dataVar]) }))
         .sort((a, b) => Number(a[values.groupVar]) - Number(b[values.groupVar]))
       setConfig({ 

@@ -12,7 +12,7 @@ const CALCULATE_VARIABLES = (dataCols: Variable[], dataRows: { [key: string]: un
     const count = data.length
     const missing = data.filter((v) => v === undefined).length
     const valid = count - missing
-    const unique = new Set(data).size
+    const unique = new Set(data.filter((v) => v !== undefined)).size
     // 判断数据类型, 并计算描述统计量
     let type: '称名或等级数据' | '等距或等比数据' = '称名或等级数据'
     if ( 
