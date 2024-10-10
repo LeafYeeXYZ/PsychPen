@@ -35,7 +35,7 @@ const CASCADER_OPTIONS: Option[] = [
       },
       {
         value: 'GroupedScatterPlot',
-        label: '一维散点图',
+        label: '分组散点图',
         disabled: true,
       },
     ],
@@ -72,6 +72,7 @@ export function PaintView() {
             options={CASCADER_OPTIONS}
             onChange={(value) => CASCADER_ONCHANGE(value, setPage)}
             expandTrigger='hover'
+            allowClear={false}
           />
         </div>
         {/* 画图界面 */}

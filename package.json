@@ -22,10 +22,10 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
-    "@ant-design/plots": "^2.3.2",
     "@stdlib/stdlib": "^0.3.0",
     "antd": "^5.21.3",
     "dta": "https://cdn.sheetjs.com/dta-0.0.2/dta-0.0.2.tgz",
+    "echarts": "^5.5.1",
     "html2canvas": "^1.4.1",
     "mathjs": "^13.2.0",
     "react": "rc",
