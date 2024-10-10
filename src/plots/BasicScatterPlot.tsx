@@ -168,7 +168,7 @@ export function BasicScatterPlot() {
                   placeholder='请选择分组变量'
                   allowClear
                 >
-                  {dataCols.map((col) => col.type === '称名或等级数据' && (
+                  {dataCols.map((col) => col.unique! <= 10 && (
                     <Select.Option key={col.name} value={col.name}>
                       {col.name} (水平数: {col.unique})
                     </Select.Option>
