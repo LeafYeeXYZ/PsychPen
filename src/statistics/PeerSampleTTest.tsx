@@ -3,6 +3,7 @@ import { Select, Input, Button, Form } from 'antd'
 import { useState } from 'react'
 import { ttest } from '@stdlib/stats'
 import { flushSync } from 'react-dom'
+import { generatePResult } from '../lib/utils'
 
 type Option = {
   /** 变量名1 */
@@ -177,24 +178,38 @@ export function PeerSampleTTest() {
       <div className='w-full h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-auto p-4'>
 
         {result ? (
-          <div className='w-full h-full flex flex-col justify-start items-center gap-4 p-4'>
-            <div key='header' className='w-72 flex justify-between items-center border-t-[2px] border-b-[1px] border-black p-2'>
-              <span>统计量</span>
-              <span>值</span>
-            </div>
-            {Object.keys(result).map((key) => !(result[key] instanceof Function) && (
-              <div key={key} className='w-72 flex justify-between items-center px-2'>
-                <span>{key}</span>
-                <span>{
-                  typeof result[key] === 'number' ? result[key].toFixed(4) :
-                  typeof result[key] === 'string' ? result[key] :
-                  typeof result[key] === 'boolean' ? String(result[key]) :
-                  result[key] instanceof Array ? result[key].map((v) => +v.toFixed(4)).join(', ') :
-                  ''
-                }</span>
-              </div>
-            ))}
-            <div key='footer' className='w-72 flex justify-between items-center border-t-[2px] border-black py-2' />
+          <div className='w-max h-full flex flex-col justify-center items-center p-4 overflow-auto'>
+
+            <p className='text-lg mb-3'>配对样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
+            <table className='three-line-table'>
+              <thead>
+                <tr>
+                  <td>样本差异均值</td>
+                  <td>样本差异标准差</td>
+                  <td>自由度</td>
+                  <td>t</td>
+                  <td>p</td>
+                  <td>置信区间 (α={result.alpha})</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{(result.mean as number).toFixed(3)}</td>
+                  <td>{(result.sd as number).toFixed(3)}</td>
+                  <td>{(result.df as number).toFixed(0)}</td>
+                  <td>{generatePResult(result.statistic, result.pValue).statistic}</td>
+                  <td>{generatePResult(result.statistic, result.pValue).p}</td>
+                  <td>{`[${(result.ci as [number, number])[0].toFixed(3)}, ${(result.ci as [number, number])[1].toFixed(3)})`}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p className='w-full text-left text-sm mt-2 text-gray-800'>
+              H<sub>0</sub>: 均值差异={result.expect}
+            </p>
+            <p className='w-full text-left text-sm text-gray-800'>
+              缺失值处理: 删除法
+            </p>
+
           </div>
         ) : (
           <div className='w-full h-full flex justify-center items-center'>

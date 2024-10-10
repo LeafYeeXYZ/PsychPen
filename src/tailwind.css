@@ -5,3 +5,16 @@
 * {
   scrollbar-width: thin;
 }
+
+table.three-line-table {
+  @apply w-max text-center;
+  & > thead {
+    @apply border-t-2 border-black border-b;
+  }
+  & > tbody {
+    @apply border-b-2 border-black;
+  }
+  & td {
+    @apply py-2 px-4 text-sm;
+  }
+}
