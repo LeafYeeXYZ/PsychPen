@@ -10,17 +10,14 @@ export function VariableView() {
   const { data, dataCols, setDataCols, dataRows, setDataRows, messageApi, CALCULATE_VARIABLES, isLargeData } = useZustand()
   const [calculating, setCalculating] = useState<boolean>(false)
   const handleCalculate = async () => {
+    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
       const cols = CALCULATE_VARIABLES(dataCols, dataRows)
       setDataCols(cols)
       messageApi?.destroy()
-      messageApi?.open({
-        type: 'success',
-        content: '数据处理完成',
-        duration: 0.5,
-      })
+      messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp - (isLargeData ? 500 : 0)} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
@@ -29,6 +26,7 @@ export function VariableView() {
   // 处理缺失值
   const handleMissingParams = useRef<{ variable?: string; missing?: unknown[] }>({})
   const handleMissing = async (variable: string, missing?: unknown[]) => {
+    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
@@ -51,11 +49,7 @@ export function VariableView() {
       setDataCols(CALCULATE_VARIABLES(cols, rows))
       setDataRows(rows)
       messageApi?.destroy()
-      messageApi?.open({
-        type: 'success',
-        content: '数据处理完成',
-        duration: 0.5,
-      })
+      messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp - (isLargeData ? 500 : 0)} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
@@ -146,9 +140,15 @@ export function VariableView() {
             { title: '75%分位数', dataIndex: 'q3', key: 'q3', width: '7rem' },
             { title: '标准差', dataIndex: 'std', key: 'std', width: '6rem' },
           ]}
-          pagination={false}
+          pagination={{
+            hideOnSinglePage: false,
+            position: ['bottomLeft'],
+            defaultPageSize: 25,
+            showSizeChanger: true,
+            pageSizeOptions: [25, 50, 100],
+          }}
           scroll={{ 
-            y: 'max(calc(100dvh - 12.5rem), calc(480px - 12.5rem))',
+            y: 'max(calc(100dvh - 16rem), calc(480px - 16rem))',
             x: 'max-content',
           }}
         />
