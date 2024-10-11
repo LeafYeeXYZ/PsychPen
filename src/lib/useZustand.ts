@@ -80,9 +80,6 @@ type Variable = {
 }
 
 type State = {
-  // 当前页面 (实际页面切换在 App.tsx 中处理)
-  activePage: 'data' | 'statistics' | 'paint' | 'variable'
-  setActivePage: (page: 'data' | 'statistics' | 'paint' | 'variable') => void
   // 数据
   data: WorkBook | null
   setData: (data: WorkBook | null) => void // 仅在导入和清空数据时使用
@@ -101,11 +98,12 @@ type State = {
   // 消息实例
   messageApi: MessageInstance | null
   setMessageApi: (api: MessageInstance) => void
+  // 是否禁用导航栏
+  disabled: boolean
+  setDisabled: (disabled: boolean) => void
 }
 
 export const useZustand = create<State>()((set) => ({
-  activePage: 'data',
-  setActivePage: (pageName) => set({ activePage: pageName }),
   data: null,
   dataRows: [],
   dataCols: [],
@@ -132,4 +130,6 @@ export const useZustand = create<State>()((set) => ({
   LARGE_DATA_SIZE,
   messageApi: null,
   setMessageApi: (api) => set({ messageApi: api }),
+  disabled: false,
+  setDisabled: (disabled) => set({ disabled }),
 }))

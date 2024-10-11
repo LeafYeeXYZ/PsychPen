@@ -2,15 +2,12 @@ import { read, utils } from 'xlsx'
 import { useZustand } from '../lib/useZustand'
 import { Upload, Button, Tag, Table, Popconfirm } from 'antd'
 import { SlidersOutlined, DeleteOutlined, SaveOutlined, FilterOutlined } from '@ant-design/icons'
-import { useState } from 'react'
 import { parse, set_utils } from 'dta'
 import { flushSync } from 'react-dom'
 
 export function DataView() {
 
-  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, messageApi, setIsLargeData, LARGE_DATA_SIZE } = useZustand()
-  // 上传状态
-  const [uploading, setUploading] = useState<boolean>(false)
+  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, messageApi, setIsLargeData, LARGE_DATA_SIZE, disabled, setDisabled } = useZustand()
   
   return (
     <div className='w-full h-full overflow-hidden'>
@@ -88,7 +85,7 @@ export function DataView() {
                   content: '正在导入数据...',
                   duration: 0,
                 })
-                flushSync(() => setUploading(true))
+                flushSync(() => setDisabled(true))
                 // 如果文件比较大, 延迟等待通知加载
                 if (file.size > LARGE_DATA_SIZE) {
                   await new Promise((resolve) => setTimeout(resolve, 500))
@@ -117,14 +114,14 @@ export function DataView() {
                     messageApi?.destroy('uploading')
                     messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
                   } finally {
-                    setUploading(false)
+                    setDisabled(false)
                   }
                 }
                 reader.readAsArrayBuffer(file)
               } catch (error) {
                 messageApi?.destroy()
                 messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
-                setUploading(false)
+                setDisabled(false)
               }
               return false
             }}
@@ -133,8 +130,8 @@ export function DataView() {
           >
             <Button 
               icon={<SlidersOutlined />} 
-              loading={uploading}
-              disabled={uploading}
+              loading={disabled}
+              disabled={disabled}
             >
               点击导入数据
             </Button>

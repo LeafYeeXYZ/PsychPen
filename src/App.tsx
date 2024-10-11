@@ -6,6 +6,7 @@ import { PaintView } from './components/PaintView'
 import { StatisticsView } from './components/StatisticsView'
 import { VariableView } from './components/VariableView'
 import { useZustand } from './lib/useZustand'
+import { flushSync } from 'react-dom'
 
 const ANTD_THEME: ThemeConfig = {
   token: {
@@ -16,13 +17,14 @@ const ANTD_THEME: ThemeConfig = {
 
 export function App() {
 
+  const { data, setMessageApi, isLargeData, disabled, setDisabled } = useZustand()
   // 加载完成后切换页面标题
   useEffect(() => {
     document.title = 'PsychPen'
   }, [])
-  // 页面切换
+  // 页面切换 (仅 data 页面在数据变量较多时会有明显加载时间)
   const [page, setPage] = useState<React.ReactElement>(<DataView />)
-  const { activePage, setActivePage, data, setMessageApi } = useZustand()
+  const [activePage, setActivePage] = useState<string>('data')
   // 消息实例
   const [messageApi, contextHolder] = message.useMessage()
   useEffect(() => {
@@ -36,44 +38,60 @@ export function App() {
           <nav className='space-x-4'>
             <Button
               type={activePage === 'data' ? 'primary' : 'text'}
-              onClick={() => {
-                setActivePage('data')
-                setPage(<DataView />)
+              onClick={async () => {
+                if (activePage === 'data') return
+                isLargeData && messageApi.open({
+                  type: 'loading',
+                  content: '正在处理数据...',
+                  duration: 0,
+                })
+                isLargeData && flushSync(() => setDisabled(true))
+                isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+                flushSync(() => {
+                  setPage(<DataView />)
+                  setActivePage('data')
+                })
+                messageApi.destroy()
+                setDisabled(false)
               }}
               autoInsertSpace={false}
+              disabled={disabled}
             >
               数据
             </Button>
             <Button
               type={activePage === 'variable' ? 'primary' : 'text'}
               onClick={() => {
-                setActivePage('variable')
+                if (activePage === 'variable') return
                 setPage(<VariableView />)
+                setActivePage('variable')
               }}
               autoInsertSpace={false}
-              disabled={data === null}
+              disabled={(data === null) || disabled}
             >
               变量
             </Button>
             <Button
               type={activePage === 'paint' ? 'primary' : 'text'}
               onClick={() => {
-                setActivePage('paint')
+                if (activePage === 'paint') return
                 setPage(<PaintView />)
+                setActivePage('paint')
               }}
               autoInsertSpace={false}
-              disabled={data === null}
+              disabled={(data === null) || disabled}
             >
               绘图
             </Button>
             <Button
               type={activePage === 'statistics' ? 'primary' : 'text'}
               onClick={() => {
-                setActivePage('statistics')
+                if (activePage === 'statistics') return
                 setPage(<StatisticsView />)
+                setActivePage('statistics')
               }}
               autoInsertSpace={false}
-              disabled={data === null}
+              disabled={(data === null) || disabled}
             >
               统计
             </Button>
