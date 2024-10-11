@@ -46,7 +46,10 @@ export function DataView() {
           <Table
             className='w-full overflow-auto text-nowrap'
             bordered
-            dataSource={dataRows}
+            dataSource={dataRows.map((row, index) => ({ 
+              key: index,
+              ...row, // 如果 row 中有 key 字段, 会覆盖 key: index
+            }))}
             columns={dataCols.map((col, index) => ({
               title: col.name,
               dataIndex: col.name,
@@ -56,6 +59,9 @@ export function DataView() {
             pagination={{
               hideOnSinglePage: false,
               position: ['bottomLeft'],
+              defaultPageSize: 25,
+              showSizeChanger: true,
+              pageSizeOptions: [25, 50, 100],
             }}
             scroll={{ 
               y: 'max(calc(100dvh - 16rem), calc(480px - 16rem))',

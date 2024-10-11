@@ -71,7 +71,7 @@ export function VariableView() {
               flushSync(() => setCalculating(false))
             }}
           >
-            重新计算描述统计量
+            重新计算统计量
           </Button>
           <Button
             icon={<ZoomOutOutlined />}
@@ -79,7 +79,7 @@ export function VariableView() {
             onClick={async () => {
               flushSync(() => setCalculating(true))
               await modalApi.confirm({
-                title: '手动定义变量缺失值',
+                title: '定义变量缺失值',
                 content: (
                   <div className='flex flex-col gap-4 my-4'>
                     <Select
@@ -110,16 +110,17 @@ export function VariableView() {
               flushSync(() => setCalculating(false))
             }}
           >
-            手动定义变量缺失值
+            定义变量缺失值
           </Button>
         </div>
         {/* 变量表格 */}
         <Table
           className='w-full overflow-auto text-nowrap'
           bordered
-          dataSource={dataCols.map((col) => {
+          dataSource={dataCols.map((col, index) => {
             return {
-              ...col,
+              key: `${col.name}-${index}`,
+              ...col, // 如果 col 中有 key 字段, 会覆盖 key: index
               missingValues: col.missingValues?.join(', '),
             }
           })}
