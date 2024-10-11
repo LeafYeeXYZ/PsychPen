@@ -1,14 +1,14 @@
 import { useZustand } from '../lib/useZustand'
 import { Button, Table, Modal, Select } from 'antd'
 import { CalculatorOutlined, ZoomOutOutlined } from '@ant-design/icons'
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import { flushSync } from 'react-dom'
 import { utils } from 'xlsx'
 
 export function VariableView() {
 
-  const { data, dataCols, setDataCols, dataRows, setDataRows, messageApi, CALCULATE_VARIABLES, isLargeData } = useZustand()
-  const [calculating, setCalculating] = useState<boolean>(false)
+  const { data, dataCols, setDataCols, dataRows, setDataRows, messageApi, CALCULATE_VARIABLES, isLargeData, disabled, setDisabled } = useZustand()
+  // const [calculating, setCalculating] = useState<boolean>(false)
   const handleCalculate = async () => {
     const timestamp = Date.now()
     try {
@@ -64,20 +64,20 @@ export function VariableView() {
         <div className='w-full flex justify-start items-center gap-3 mb-4'>
           <Button
             icon={<CalculatorOutlined />}
-            disabled={calculating}
+            disabled={disabled}
             onClick={async () => {
-              flushSync(() => setCalculating(true))
+              flushSync(() => setDisabled(true))
               await handleCalculate()
-              flushSync(() => setCalculating(false))
+              flushSync(() => setDisabled(false))
             }}
           >
             重新计算统计量
           </Button>
           <Button
             icon={<ZoomOutOutlined />}
-            disabled={calculating}
+            disabled={disabled}
             onClick={async () => {
-              flushSync(() => setCalculating(true))
+              flushSync(() => setDisabled(true))
               await modalApi.confirm({
                 title: '定义变量缺失值',
                 content: (
@@ -107,7 +107,7 @@ export function VariableView() {
                 okText: '确定',
                 cancelText: '取消',
               })
-              flushSync(() => setCalculating(false))
+              flushSync(() => setDisabled(false))
             }}
           >
             定义变量缺失值

@@ -35,8 +35,9 @@
 - **数据管理**
   - [x] 数据导入 (基于 `sheet.js`)
   - [x] 数据和变量预览 
+  - [ ] 支持导入 `.sav` 文件
   - [ ] 在线数据编辑 (以 `CSV` 文本的形式)
-  - [ ] 数据导出 (基于 `sheet.js`)
+  - [x] 数据导出 (基于 `sheet.js`)
   - [x] 基础的缺失值定义 
   - [ ] 完善的缺失值处理 (当前为删除法)
 - **绘图功能** (基于 `echarts`)
@@ -47,9 +48,9 @@
     - [x] 基础散点图
     - [ ] 一维散点图
   - [x] 图像导出 (基于 `html2canvas`)
-- **统计功能** (近期基于 `simple-statistics`、`@stdlib/stats`、`math.js` 等库, 远期基于 `WebAssembly` 实现)
+- **统计功能** (近期基于 `simple-statistics`、`@stdlib/stats`、`math.js` 等库, 远期基于 `WebAssembly` (`pyodide` / `AssemblyScript`) 实现)
   - [ ] t 检验
     - [x] 单样本 t 检验
     - [ ] 独立样本 t 检验
     - [x] 配对样本 t 检验
-  - [ ] 输出统计表和对应 `LaTeX` 代码
+  - [ ] 输出统计表对应的 `TeX` 代码

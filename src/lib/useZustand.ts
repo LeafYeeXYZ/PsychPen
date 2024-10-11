@@ -4,6 +4,7 @@ import type { MessageInstance } from 'antd/es/message/interface'
 import * as ss from 'simple-statistics'
 
 const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta']
+const EXPORT_FILE_TYPES = ['.xlsx', '.csv', '.numbers']
 const CALCULATE_VARIABLES = (dataCols: Variable[], dataRows: { [key: string]: unknown }[]): Variable[] => {
   const cols = dataCols.map((col) => {
     // 原始数据
@@ -93,6 +94,8 @@ type State = {
   setIsLargeData: (isLarge: boolean) => void
   // 可打开的文件类型
   ACCEPT_FILE_TYPES: string[]
+  // 可导出的文件类型
+  EXPORT_FILE_TYPES: string[]
   // 计算变量描述统计量的函数
   CALCULATE_VARIABLES: (dataCols: Variable[], dataRows: { [key: string]: unknown }[]) => Variable[]
   // 消息实例
@@ -126,6 +129,7 @@ export const useZustand = create<State>()((set) => ({
   setDataCols: (cols) => set({ dataCols: cols }),
   setDataRows: (rows) => set({ dataRows: rows }),
   ACCEPT_FILE_TYPES,
+  EXPORT_FILE_TYPES,
   CALCULATE_VARIABLES,
   LARGE_DATA_SIZE,
   messageApi: null,

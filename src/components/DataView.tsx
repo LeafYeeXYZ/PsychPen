@@ -1,13 +1,26 @@
-import { read, utils } from 'xlsx'
+import { read, utils, writeFile } from 'xlsx'
 import { useZustand } from '../lib/useZustand'
-import { Upload, Button, Tag, Table, Popconfirm } from 'antd'
+import { Upload, Button, Tag, Table, Popconfirm, Modal, Input, Select } from 'antd'
 import { SlidersOutlined, DeleteOutlined, SaveOutlined, FilterOutlined } from '@ant-design/icons'
 import { parse, set_utils } from 'dta'
 import { flushSync } from 'react-dom'
+import { useRef } from 'react'
+import XLSX_ZAHL_PAYLOAD from 'xlsx/dist/xlsx.zahl.mjs'
 
 export function DataView() {
 
-  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, messageApi, setIsLargeData, LARGE_DATA_SIZE, disabled, setDisabled } = useZustand()
+  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, messageApi, setIsLargeData, LARGE_DATA_SIZE, disabled, setDisabled, EXPORT_FILE_TYPES } = useZustand()
+  const [modalApi, contextHolder] = Modal.useModal()
+  // 导出数据相关
+  const handleExport = async (filename: string, type: string) => {
+    const worksheet = utils.json_to_sheet(dataRows)
+    const workbook = utils.book_new(worksheet, 'psychpen')
+    writeFile(workbook, filename + type, {
+      compression: true,
+      numbers: XLSX_ZAHL_PAYLOAD,
+    })
+  }
+  const handleExportParams = useRef<{ filename?: string; type?: string }>({})
   
   return (
     <div className='w-full h-full overflow-hidden'>
@@ -22,21 +35,60 @@ export function DataView() {
               okText='确定'
               cancelText='取消'
             >
-              <Button icon={<DeleteOutlined />}>
+              <Button 
+                icon={<DeleteOutlined />}
+                disabled={disabled}
+              >
                 清除数据
               </Button>
             </Popconfirm>
+            <Button
+              icon={<SaveOutlined />}
+              disabled={disabled}
+              onClick={async () => {
+                flushSync(() => setDisabled(true))
+                await modalApi.confirm({
+                  title: '导出数据',
+                  content: (
+                    <div className='flex flex-col gap-4 my-4'>
+                      <Input
+                        placeholder='请输入文件名 (可留空)'
+                        onChange={(e) => handleExportParams.current.filename = e.target.value}
+                      />
+                      <Select
+                        placeholder='请选择导出格式'
+                        defaultValue={handleExportParams.current.type?.length ? handleExportParams.current.type : EXPORT_FILE_TYPES[0]}
+                        onChange={(value) => handleExportParams.current.type = value}
+                      >
+                        {EXPORT_FILE_TYPES.map((type) => (
+                          <Select.Option key={type} value={type}>
+                            导出为 <Tag color='pink'>{type}</Tag>文件
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </div>
+                  ),
+                  onOk: async () => {
+                    await handleExport(
+                      handleExportParams.current.filename?.length ? handleExportParams.current.filename : 'psychpen',
+                      handleExportParams.current.type?.length ? handleExportParams.current.type : EXPORT_FILE_TYPES[0],
+                    )
+                    handleExportParams.current.filename = undefined
+                  },
+                  okText: '确定',
+                  cancelText: '取消',
+                  
+                })
+                flushSync(() => setDisabled(false))
+              }}
+            >
+              导出数据
+            </Button>
             <Button
               icon={<FilterOutlined />}
               disabled={true}
             >
               数据过滤
-            </Button>
-            <Button
-              icon={<SaveOutlined />}
-              disabled={true}
-            >
-              导出数据
             </Button>
           </div>
           {/* 数据表格 */}
@@ -138,6 +190,7 @@ export function DataView() {
           </Upload>
         </div>
       )}
+      {contextHolder}
     </div>
   )
 }
