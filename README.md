@@ -50,6 +50,6 @@
 - **统计功能** (近期基于 `@stdlib/stdlib` 库, 远期基于 `WebAssembly` (`pyodide` / `AssemblyScript`) 实现)
   - t 检验
     - [x] 单样本 t 检验
-    - [ ] 独立样本 t 检验
+    - [x] 独立样本 t 检验
     - [x] 配对样本 t 检验
   - [ ] 输出统计表对应的 `TeX` 代码
