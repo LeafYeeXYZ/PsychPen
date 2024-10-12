@@ -10,22 +10,22 @@
 
 本软件所用的工具包括但不限于: `React`, `Vite`, `Ant Design`, `Ant Design Charts`, `Sheet.js`, `Math.js`, `HTML2Canvas`, `Simple-Statistics`, `@Stdlib/Stats` 等; 如果您对本项目感兴趣, 欢迎 `star`、`fork`、`watch` 或者提出 `issue` 和 `pull request`!
 
-## 使用说明
-
-请提前准备 `.xlsx`、`.xls`、`.csv`、`.txt`、`.json`、`.txt`、`.dta` 等格式的数据文件, 打开本项目的网站, 并导入数据文件, 即可进行数据分析和图表绘制
-
 ## 开发说明
 
 1. 克隆本项目到本地
+  ```bash
+  git clone https://github.com/LeafYeeXYZ/PsychPen.git
+  cd PsychPen
+  ```
 2. 安装依赖 (本项目使用 [bun](https://bun.sh) 作为包管理工具)
   ```bash
   bun install
   ```
-3. 启动项目
+1. 启动项目
   ```bash
   bun dev
   ```
-4. 打包项目
+1. 打包项目
   ```bash
   bun run build
   ```

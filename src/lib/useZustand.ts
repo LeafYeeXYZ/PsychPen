@@ -17,21 +17,19 @@ const CALCULATE_VARIABLES = (
   // 未来还会支持用不同方法定义插值 (在 dataCols 中), 返回插值后的数据
   calculatedRows: { [key: string]: unknown }[]
 } => {
-  const rows: { [key: string]: unknown }[] = new Array(dataRows.length).fill({})
+  const rows: { [key: string]: unknown }[] = dataRows.map((row) => {
+    // 替换缺失值
+    dataCols.forEach((col) => {
+      if (col.missingValues?.length) {
+        // 故意使用 == 而不是 ===
+        row[col.name] = col.missingValues?.some((m) => row[col.name] == m) ? undefined : row[col.name]
+      }
+    })
+    return row
+  })
   const cols: Variable[] = dataCols.map((col) => {
     // 原始数据
-    let data = dataRows.map((row) => row[col.name])
-    // 替换缺失值
-    if (col.missingValues?.length) {
-      data = data.map((v) => {
-        // 故意使用 == 而不是 ===
-        return col.missingValues?.some((m) => v == m) ? undefined : v
-      })
-    }
-    // 添加到 rows
-    data.forEach((v, i) => {
-      rows[i][col.name] = v
-    })
+    const data = rows.map((row) => row[col.name])
     // 基础统计量
     const count = data.length
     const missing = data.filter((v) => v === undefined).length
