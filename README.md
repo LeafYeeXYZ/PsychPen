@@ -23,11 +23,11 @@
   ```bash
   bun install
   ```
-1. 启动项目
+3. 启动项目
   ```bash
   bun dev
   ```
-1. 打包项目
+4. 打包项目
   ```bash
   bun run build
   ```
