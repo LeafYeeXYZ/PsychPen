@@ -14,7 +14,16 @@ table.three-line-table {
   & > tbody {
     @apply border-b-2 border-black;
   }
-  & td {
+  & > thead td {
     @apply py-2 px-4 text-sm;
+  }
+  & > tbody td {
+    @apply py-1 px-4 text-sm;
+  }
+  & > tbody > tr:first-of-type > td {
+    @apply pt-2
+  }
+  & > tbody > tr:last-of-type > td {
+    @apply pb-2
   }
 }

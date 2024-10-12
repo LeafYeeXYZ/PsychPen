@@ -149,17 +149,20 @@ export function OneSampleTTest() {
                 <tr>
                   <td>{(result.mean as number).toFixed(3)}</td>
                   <td>{(result.sd as number).toFixed(3)}</td>
-                  <td>{(result.df as number).toFixed(0)}</td>
+                  <td>{(result.df as number).toFixed(3)}</td>
                   <td>{generatePResult(result.statistic, result.pValue).statistic}</td>
                   <td>{generatePResult(result.statistic, result.pValue).p}</td>
                   <td>{`[${(result.ci as [number, number])[0].toFixed(3)}, ${(result.ci as [number, number])[1].toFixed(3)})`}</td>
                 </tr>
               </tbody>
             </table>
-            <p className='w-full text-left text-sm mt-2 text-gray-800'>
+            <p className='w-full text-left text-sm mt-2 pl-2 text-gray-800'>
+              方法: Student's T Test
+            </p>
+            <p className='w-full text-left text-sm pl-2 text-gray-800'>
               H<sub>0</sub>: 均值={result.expect}
             </p>
-            <p className='w-full text-left text-sm text-gray-800'>
+            <p className='w-full text-left text-sm pl-2 text-gray-800'>
               缺失值处理: 删除法
             </p>
 

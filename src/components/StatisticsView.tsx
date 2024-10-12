@@ -1,5 +1,6 @@
 import { OneSampleTTest } from '../statistics/OneSampleTTest'
 import { PeerSampleTTest } from '../statistics/PeerSampleTTest'
+import { TwoSampleTTest } from '../statistics/TwoSampleTTest'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -21,7 +22,6 @@ const CASCADER_OPTIONS: Option[] = [
       {
         value: 'TwoSampleTTest',
         label: '独立样本T检验',
-        disabled: true,
       },
       {
         value: 'PeerSampleTTest',
@@ -58,6 +58,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'PeerSampleTTest':
       set(<PeerSampleTTest />)
+      break
+    case 'TwoSampleTTest':
+      set(<TwoSampleTTest />)
       break
     default:
       set(DEFAULT_PAGE)
