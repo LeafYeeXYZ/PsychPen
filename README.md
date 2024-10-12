@@ -2,7 +2,9 @@
 
 **在线进行心理学统计分析和绘制统计图表**
 
-![](README.png)
+| ![](readme/1.png) | ![](readme/2.png) |
+| :---: | :---: |
+| ![](readme/3.png) | ![](readme/4.png) |
 
 ## 项目说明
 
