@@ -3,12 +3,35 @@ import { type WorkBook, utils } from 'xlsx'
 import type { MessageInstance } from 'antd/es/message/interface'
 import * as ss from 'simple-statistics'
 
-const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta']
+const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta', '.sav']
 const EXPORT_FILE_TYPES = ['.xlsx', '.csv', '.numbers']
-const CALCULATE_VARIABLES = (dataCols: Variable[], dataRows: { [key: string]: unknown }[]): Variable[] => {
-  const cols = dataCols.map((col) => {
+const CALCULATE_VARIABLES = (
+  // 必须提供 name 字段, 可选提供 missingValues 字段
+  dataCols: Variable[],
+  // 根据需求, 传入 原始数据(sheet_to_json) 或 dataRows(已经替换缺失值的数据)
+  dataRows: { [key: string]: unknown }[]
+) : {
+  // 添加了描述统计量的变量列表
+  calculatedCols: Variable[]
+  // 把定义的缺失值替换为 undefined 后的数据
+  // 未来还会支持用不同方法定义插值 (在 dataCols 中), 返回插值后的数据
+  calculatedRows: { [key: string]: unknown }[]
+} => {
+  const rows: { [key: string]: unknown }[] = new Array(dataRows.length).fill({})
+  const cols: Variable[] = dataCols.map((col) => {
     // 原始数据
-    const data = dataRows.map((row) => row[col.name])
+    let data = dataRows.map((row) => row[col.name])
+    // 替换缺失值
+    if (col.missingValues?.length) {
+      data = data.map((v) => {
+        // 故意使用 == 而不是 ===
+        return col.missingValues?.some((m) => v == m) ? undefined : v
+      })
+    }
+    // 添加到 rows
+    data.forEach((v, i) => {
+      rows[i][col.name] = v
+    })
     // 基础统计量
     const count = data.length
     const missing = data.filter((v) => v === undefined).length
@@ -37,9 +60,9 @@ const CALCULATE_VARIABLES = (dataCols: Variable[], dataRows: { [key: string]: un
       return { ...col, count, missing, valid, unique, type }
     }
   })
-  return cols
+  return { calculatedCols: cols, calculatedRows: rows }
 }
-const LARGE_DATA_SIZE = 2 * 1024 * 1024
+const LARGE_DATA_SIZE = 1 * 1024 * 1024
 
 type Variable = {
   /** 变量名 */
@@ -97,7 +120,7 @@ type State = {
   // 可导出的文件类型
   EXPORT_FILE_TYPES: string[]
   // 计算变量描述统计量的函数
-  CALCULATE_VARIABLES: (dataCols: Variable[], dataRows: { [key: string]: unknown }[]) => Variable[]
+  CALCULATE_VARIABLES: (dataCols: Variable[], dataRows: { [key: string]: unknown }[]) => { calculatedCols: Variable[], calculatedRows: { [key: string]: unknown }[] }
   // 消息实例
   messageApi: MessageInstance | null
   setMessageApi: (api: MessageInstance) => void
@@ -117,10 +140,11 @@ export const useZustand = create<State>()((set) => ({
       const sheet = data.Sheets[data.SheetNames[0]]
       const rows = utils.sheet_to_json(sheet) as { [key: string]: unknown }[]
       const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
+      const { calculatedCols, calculatedRows } = CALCULATE_VARIABLES(cols, rows)
       set({ 
         data,
-        dataRows: rows,
-        dataCols: CALCULATE_VARIABLES(cols, rows),
+        dataRows: calculatedRows,
+        dataCols: calculatedCols,
       })
     } else {
       set({ data, dataRows: [], dataCols: [] })

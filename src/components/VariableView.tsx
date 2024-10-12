@@ -7,22 +7,7 @@ import { utils } from 'xlsx'
 
 export function VariableView() {
 
-  const { data, dataCols, setDataCols, dataRows, setDataRows, messageApi, CALCULATE_VARIABLES, isLargeData, disabled, setDisabled } = useZustand()
-  // const [calculating, setCalculating] = useState<boolean>(false)
-  const handleCalculate = async () => {
-    const timestamp = Date.now()
-    try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
-      const cols = CALCULATE_VARIABLES(dataCols, dataRows)
-      setDataCols(cols)
-      messageApi?.destroy()
-      messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp - (isLargeData ? 500 : 0)} 毫秒`)
-    } catch (error) {
-      messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
-    }
-  }
+  const { data, dataCols, setDataCols, setDataRows, messageApi, CALCULATE_VARIABLES, isLargeData, disabled, setDisabled } = useZustand()
   // 处理缺失值
   const handleMissingParams = useRef<{ variable?: string; missing?: unknown[] }>({})
   const handleMissing = async (variable: string, missing?: unknown[]) => {
@@ -38,16 +23,9 @@ export function VariableView() {
         }
       })
       const sheet = data!.Sheets[data!.SheetNames[0]]
-      const rows = (utils.sheet_to_json(sheet) as { [key: string]: unknown }[]).map((row) => {
-        const value = row[variable]
-        if (missing && missing.some((m) => value == m)) {
-          return { ...row, [variable]: undefined }
-        } else {
-          return row
-        }
-      })
-      setDataCols(CALCULATE_VARIABLES(cols, rows))
-      setDataRows(rows)
+      const { calculatedRows, calculatedCols } = CALCULATE_VARIABLES(cols, utils.sheet_to_json(sheet) as { [key: string]: unknown }[])
+      setDataCols(calculatedCols)
+      setDataRows(calculatedRows)
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp - (isLargeData ? 500 : 0)} 毫秒`)
     } catch (error) {
@@ -62,17 +40,6 @@ export function VariableView() {
       <div className='flex flex-col justify-start items-center w-full h-full p-4'>
         {/* 上方工具栏 */}
         <div className='w-full flex justify-start items-center gap-3 mb-4'>
-          <Button
-            icon={<CalculatorOutlined />}
-            disabled={disabled}
-            onClick={async () => {
-              flushSync(() => setDisabled(true))
-              await handleCalculate()
-              flushSync(() => setDisabled(false))
-            }}
-          >
-            重新计算统计量
-          </Button>
           <Button
             icon={<ZoomOutOutlined />}
             disabled={disabled}
@@ -111,6 +78,12 @@ export function VariableView() {
             }}
           >
             定义变量缺失值
+          </Button>
+          <Button
+            icon={<CalculatorOutlined />}
+            disabled={disabled || true}
+          >
+            定义缺失值处理方式
           </Button>
         </div>
         {/* 变量表格 */}

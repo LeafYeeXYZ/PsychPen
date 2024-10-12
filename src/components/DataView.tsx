@@ -6,6 +6,7 @@ import { parse, set_utils } from 'dta'
 import { flushSync } from 'react-dom'
 import { useRef } from 'react'
 import XLSX_ZAHL_PAYLOAD from 'xlsx/dist/xlsx.zahl.mjs'
+import { SavParser, Feeder } from '../../external/sav/index'
 
 export function DataView() {
 
@@ -146,7 +147,7 @@ export function DataView() {
                 }
                 const reader = new FileReader()
                 const ext = file.name.split('.').pop()?.toLowerCase()
-                reader.onload = (e) => {
+                reader.onload = async (e) => {
                   try {
                     if (!e.target?.result) {
                       messageApi?.destroy('uploading')
@@ -154,6 +155,11 @@ export function DataView() {
                     } else if (ext === 'dta') {
                       set_utils(utils)
                       setData(parse(new Uint8Array(e.target.result as ArrayBuffer)))
+                    } else if (ext === 'sav') {
+                      const parser = new SavParser()
+                      const feeder = new Feeder(e.target.result as ArrayBuffer)
+                      const data = (await parser.all(feeder)).rows.map((map: Map<string, unknown>) => Object.fromEntries(map))
+                      setData(utils.book_new(utils.json_to_sheet(data), 'psychpen'))
                     } else {
                       setData(read(e.target.result))
                     }
