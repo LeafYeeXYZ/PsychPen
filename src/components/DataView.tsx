@@ -74,6 +74,7 @@ export function DataView() {
                       handleExportParams.current.type?.length ? handleExportParams.current.type : EXPORT_FILE_TYPES[0],
                     )
                     handleExportParams.current.filename = undefined
+                    handleExportParams.current.type = undefined
                   },
                   okText: '确定',
                   cancelText: '取消',

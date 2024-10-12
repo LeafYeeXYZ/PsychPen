@@ -84,7 +84,6 @@ export function VariableView() {
                   <div className='flex flex-col gap-4 my-4'>
                     <Select
                       placeholder='请选择变量'
-                      defaultValue={handleMissingParams.current.variable}
                       onChange={(value) => handleMissingParams.current.variable = value as string}
                     >
                       {dataCols.map((col) => (
@@ -94,7 +93,6 @@ export function VariableView() {
                     <Select
                       mode='tags'
                       placeholder='请输入缺失值 (可为多个值/为空)'
-                      defaultValue={handleMissingParams.current.missing}
                       onChange={(value) => handleMissingParams.current.missing = value?.length > 0 ? value : undefined}
                     />
                   </div>
@@ -103,6 +101,8 @@ export function VariableView() {
                   if (handleMissingParams.current.variable) {
                     await handleMissing(handleMissingParams.current.variable, handleMissingParams.current.missing)
                   }
+                  handleMissingParams.current.variable = undefined
+                  handleMissingParams.current.missing = undefined
                 },
                 okText: '确定',
                 cancelText: '取消',
