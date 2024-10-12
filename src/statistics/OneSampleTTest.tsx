@@ -1,7 +1,7 @@
 import { useZustand } from '../lib/useZustand'
 import { Select, Input, Button, Form } from 'antd'
 import { useState } from 'react'
-import { ttest } from '@stdlib/stats'
+import ttest from '@stdlib/stats/ttest'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
 

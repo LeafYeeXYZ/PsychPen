@@ -30,7 +30,6 @@
     "mathjs": "^13.2.0",
     "react": "rc",
     "react-dom": "rc",
-    "simple-statistics": "^7.8.5",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zustand": "^5.0.0-rc.2"
   },

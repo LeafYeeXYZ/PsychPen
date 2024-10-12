@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { type WorkBook, utils } from 'xlsx'
 import type { MessageInstance } from 'antd/es/message/interface'
-import * as ss from 'simple-statistics'
+import { calculateMode } from './utils'
+import * as math from 'mathjs'
 
 const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta', '.sav']
 const EXPORT_FILE_TYPES = ['.xlsx', '.csv', '.numbers']
@@ -45,14 +46,14 @@ const CALCULATE_VARIABLES = (
         .filter((v) => typeof v !== 'undefined')
         .map((v) => Number(v))
       type = '等距或等比数据'
-      const min = +Math.min(...numData).toFixed(4)
-      const max = +Math.max(...numData).toFixed(4)
-      const mean = +ss.mean(numData).toFixed(4)
-      const mode = +ss.mode(numData).toFixed(4)
-      const q1 = +ss.quantile(numData, 0.25).toFixed(4)
-      const q2 = +ss.quantile(numData, 0.5).toFixed(4)
-      const q3 = +ss.quantile(numData, 0.75).toFixed(4)
-      const std = +ss.standardDeviation(numData).toFixed(4)
+      const min = +math.min(numData).toFixed(4)
+      const max = +math.max(numData).toFixed(4)
+      const mean = +math.mean(numData).toFixed(4)
+      const mode = calculateMode(numData)
+      const q1 = +math.quantileSeq(numData, 0.25).toFixed(4)
+      const q2 = +math.quantileSeq(numData, 0.5).toFixed(4)
+      const q3 = +math.quantileSeq(numData, 0.75).toFixed(4)
+      const std = +Number(math.std(numData)).toFixed(4)
       return { ...col, count, missing, valid, unique, min, max, mean, mode, q1, q2, q3, std, type }
     } else {
       return { ...col, count, missing, valid, unique, type }
@@ -82,7 +83,7 @@ type Variable = {
   /** 均值 */
   mean?: number
   /** 众数 */
-  mode?: number
+  mode?: string // 计算方法不同, 用字符串显示
   /** 25%分位数 */
   q1?: number
   /** 50%分位数 */

@@ -15,7 +15,7 @@ export default defineConfig({
           'antd': ['antd', '@ant-design/icons'],
           'xlsx': ['xlsx', 'dta'],
           'chart': ['echarts'],
-          'utils': ['html2canvas', 'mathjs', 'simple-statistics'],
+          'utils': ['html2canvas', 'mathjs'],
         }
       }
     }

@@ -108,11 +108,11 @@ export function VariableView() {
             { title: '最小值', dataIndex: 'min', key: 'min', width: '6rem' },
             { title: '最大值', dataIndex: 'max', key: 'max', width: '6rem' },
             { title: '均值', dataIndex: 'mean', key: 'mean', width: '6rem' },
-            { title: '众数', dataIndex: 'mode', key: 'mode', width: '6rem' },
             { title: '25%分位数', dataIndex: 'q1', key: 'q1', width: '7rem' },
             { title: '50%分位数', dataIndex: 'q2', key: 'q2', width: '7rem' },
             { title: '75%分位数', dataIndex: 'q3', key: 'q3', width: '7rem' },
             { title: '标准差', dataIndex: 'std', key: 'std', width: '6rem' },
+            { title: '众数', dataIndex: 'mode', key: 'mode', width: '6rem' },
           ]}
           pagination={{
             hideOnSinglePage: false,
