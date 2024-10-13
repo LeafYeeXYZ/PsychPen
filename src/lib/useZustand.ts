@@ -1,11 +1,12 @@
 import { create } from 'zustand'
 import { type WorkBook, utils } from 'xlsx'
 import type { MessageInstance } from 'antd/es/message/interface'
-import { calculateMode } from './utils'
+import { calculateMode, interpolate } from './utils'
 import * as math from 'mathjs'
 
 const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta', '.sav']
 const EXPORT_FILE_TYPES = ['.xlsx', '.csv', '.numbers']
+export type ALLOWED_MISSING_METHODS = '均值插值' | '中位数插值' | '最临近点插值法' | '拉格朗日插值法'
 const CALCULATE_VARIABLES = (
   // 必须提供 name 字段, 可选提供 missingValues 字段
   dataCols: Variable[],
@@ -29,6 +30,15 @@ const CALCULATE_VARIABLES = (
     return row
   })
   const cols: Variable[] = dataCols.map((col) => {
+    // 插值
+    if (col.missingMethod) {
+      const data = rows.map((row) => typeof row[col.name] !== 'undefined' ? Number(row[col.name]) : undefined) as number[]
+      const peer = col.missingRefer ? rows.map((row) => typeof row[col.missingRefer!] !== 'undefined' ? Number(row[col.missingRefer!]) : undefined) as number[] : undefined
+      const interpolatedData = interpolate(data, col.missingMethod, peer)
+      rows.forEach((row, i) => {
+        row[col.name] = interpolatedData[i]
+      })
+    }
     // 原始数据
     const data = rows.map((row) => row[col.name])
     // 基础统计量
@@ -63,16 +73,16 @@ const CALCULATE_VARIABLES = (
 }
 const LARGE_DATA_SIZE = 1 * 1024 * 1024
 
-type Variable = {
+export type Variable = {
   /** 变量名 */
   name: string
   /** 数据类型 */
   type?: '称名或等级数据' | '等距或等比数据'
   /** 样本量 */
   count?: number
-  /** 缺失值数量 */
+  /** 缺失值数量 (不含已插值缺失值) */
   missing?: number
-  /** 有效值数量 */
+  /** 有效值数量 (含已插值缺失值) */
   valid?: number
   /** 唯一值数量 */
   unique?: number
@@ -94,12 +104,24 @@ type Variable = {
   std?: number
   /** 
    * 自定义的缺失值   
-   * 默认为空, 即只把 undefined 作为缺失值  
-   * 在 VariableView.tsx 中改变后, 将把缺失值为 missingValues 的数据项置为 undefined  
-   * 同时, 在比较时故意使用 == 而不是 ===, 以规避数字和字符串的比较问题  
+   * 默认为空, 即只把本来就是 undefined 的值作为缺失值  
+   * 在比较时故意使用 == 而不是 ===, 以规避数字和字符串的比较问题  
    * 缺失值设置只改变 dataRows 和 dataCols 的值, 不改变 data 的值
    */
   missingValues?: unknown[]
+  /**
+   * 自定义的插值方法  
+   * 默认为空, 即不插值, 直接删除缺失值  
+   * 先进行缺失值处理, 再进行插值处理  
+   * 插值处理只改变 dataRows 和 dataCols 的值, 不改变 data 的值
+   */
+  missingMethod?: ALLOWED_MISSING_METHODS
+  /** 
+   * 用于插值的配对变量名  
+   * 即另一个变量的 name 字段, 用于计算插值  
+   * 仅部分方法需要此字段  
+   */
+  missingRefer?: string
 }
 
 type State = {
