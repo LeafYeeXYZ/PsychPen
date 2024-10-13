@@ -44,7 +44,7 @@ export function calculateMode(data: number[]): string {
  * @param peer 参考变量
  * @returns 插值处理后的数据
  */
-export function interpolate(data: number[], method: ALLOWED_MISSING_METHODS, peer?: number[]): number[] {
+export function interpolate(data: (number | undefined)[], method: ALLOWED_MISSING_METHODS, peer?: (number | undefined)[]): (number | undefined)[] {
 
   if (method === '均值插值') {
 
@@ -109,10 +109,10 @@ export function interpolate(data: number[], method: ALLOWED_MISSING_METHODS, pee
  * @param xValues x 值列表 (可以不去重)
  * @param yValues y 值列表 (可以不去重)
  * @param x x 值
- * @returns 插值结果
+ * @returns 插值结果 (保留 4 位小数, 若插值失败则返回 undefined)
  * @throws xValues 和 yValues 的长度不一致
  */ 
-function lagrangeInterpolation(xValues: number[], yValues: number[], x: number): number {
+function lagrangeInterpolation(xValues: number[], yValues: number[], x: number): number | undefined {
   // 数组去重
   const peers = xValues.map((v, i) => ({ x: v, y: yValues[i] }))
   const uniquePeers = peers
@@ -125,6 +125,9 @@ function lagrangeInterpolation(xValues: number[], yValues: number[], x: number):
   // 只使用比 x 小/大的 3 个点插值
   const upper = xValues.toSorted((a, b) => a - b).filter(v => v < x).slice(-3)
   const lower = xValues.toSorted((a, b) => b - a).filter(v => v > x).slice(-3)
+  if (upper.length === 0 || lower.length === 0) {
+    return undefined
+  }
   xValues = [...upper, ...lower]
   yValues = xValues.map(v => yValues[xValues.indexOf(v)])
   // 拉格朗日插值
