@@ -5,23 +5,28 @@ import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import html2canvas from 'html2canvas'
 import type { EChartsOption } from 'echarts'
+import 'echarts-gl'
 
 type Option = {
   /** X轴变量 */
   xVar: string
   /** Y轴变量 */
   yVar: string
+  /** Z轴变量 */
+  zVar: string
   /** 自定义 x轴 标签 */
   xLabel?: string
   /** 自定义 y轴 标签 */
   yLabel?: string
+  /** 自定义 z轴 标签 */
+  zLabel?: string
   /** 自定义标题 */
   title?: string
   /** 自定义点大小 */
   dotSize?: number
 }
 
-export function BasicScatterPlot() {
+export function ThreeDScatterPlot() {
 
   const { dataCols, dataRows, messageApi, isLargeData } = useZustand()
   // 图形设置相关
@@ -33,34 +38,39 @@ export function BasicScatterPlot() {
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
-      const { xVar, yVar, xLabel, yLabel, title } = values
-      const chart = echarts.init(document.getElementById('basic-scatter-plot')!)
+      const { xVar, yVar, zVar ,xLabel, yLabel, zLabel, title, dotSize } = values
+      const chart = echarts.init(document.getElementById('three-d-scatter-plot')!)
       const option: EChartsOption = {
         title: {
           text: title,
           left: 'center',
         },
-        xAxis: {
+        xAxis3D: {
           name: xLabel || xVar,
           nameLocation: 'middle',
-          nameGap: 25,
         },
-        yAxis: {
+        yAxis3D: {
           name: yLabel || yVar,
           nameLocation: 'middle',
-          nameGap: 35,
         },
+        zAxis3D: {
+          name: zLabel || zVar,
+          nameLocation: 'middle',
+        },
+        grid3D: {},
+        // @ts-expect-error echarts-gl 没有提供类型定义
         series: [{
+          type: 'scatter3D',
+          symbolSize: dotSize || 8,
           data: dataRows
             .filter((row) => 
               typeof row[xVar] !== 'undefined'
               && typeof row[yVar] !== 'undefined'
+              && typeof row[zVar] !== 'undefined'
             )
             .map((row) => { 
-              return [Number(row[xVar]), Number(row[yVar])]
+              return [Number(row[xVar]), Number(row[yVar]), Number(row[zVar])]
             }),
-          symbolSize: values.dotSize || 10,
-          type: 'scatter',
         }],
       }
       chart.setOption(option, true)
@@ -74,7 +84,7 @@ export function BasicScatterPlot() {
   }
   // 导出图片相关
   const handleSave = () => {
-    html2canvas(document.getElementById('basic-scatter-plot')!.firstChild as HTMLElement).then((canvas) => {
+    html2canvas(document.getElementById('three-d-scatter-plot')!.firstChild as HTMLElement).then((canvas) => {
       const url = canvas.toDataURL('image/png')
       const a = document.createElement('a')
       a.href = url
@@ -108,7 +118,7 @@ export function BasicScatterPlot() {
                   { required: true, message: '请选择X轴变量' },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
-                      if (value === getFieldValue('yVar')) {
+                      if (value === getFieldValue('yVar') || value === getFieldValue('zVar')) {
                         return Promise.reject('请选择不同的变量')
                       }
                       return Promise.resolve()
@@ -144,7 +154,7 @@ export function BasicScatterPlot() {
                   { required: true, message: '请选择Y轴变量' },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
-                      if (value === getFieldValue('xVar')) {
+                      if (value === getFieldValue('xVar') || value === getFieldValue('zVar')) {
                         return Promise.reject('请选择不同的变量')
                       }
                       return Promise.resolve()
@@ -171,6 +181,42 @@ export function BasicScatterPlot() {
               </Form.Item>
             </Space.Compact>
           </Form.Item>
+          <Form.Item label='Z轴变量和(可选)标签'>
+            <Space.Compact className='w-full'>
+              <Form.Item
+                name='zVar'
+                noStyle
+                rules={[
+                  { required: true, message: '请选择Z轴变量' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (value === getFieldValue('xVar') || value === getFieldValue('yVar')) {
+                        return Promise.reject('请选择不同的变量')
+                      }
+                      return Promise.resolve()
+                    },
+                  }),
+                ]}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='请选择Z轴变量'
+                >
+                  {dataCols.map((col) => col.type === '等距或等比数据' && (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name='zLabel'
+                noStyle
+              >
+                <Input className='w-max' placeholder='标签默认为变量名' />
+              </Form.Item>
+            </Space.Compact>
+          </Form.Item>
           <Form.Item
             label='自定义标题'
             name='title'
@@ -181,7 +227,7 @@ export function BasicScatterPlot() {
             label='自定义点大小'
             name='dotSize'
           >
-            <InputNumber className='w-full' placeholder='默认为 10' />
+            <InputNumber className='w-full' placeholder='默认为 8' />
           </Form.Item>
           <div
             className='flex flex-row flex-nowrap justify-center items-center gap-4'
@@ -210,7 +256,7 @@ export function BasicScatterPlot() {
 
       <div className='w-full h-full relative rounded-md border bg-white overflow-auto p-4'>
 
-        <div className='w-full h-full' id='basic-scatter-plot' />
+        <div className='w-full h-full' id='three-d-scatter-plot' />
 
         {!rendered && <div className='absolute w-full h-full top-0 left-0 flex items-center justify-center'>请选择参数并点击生成</div>}
 

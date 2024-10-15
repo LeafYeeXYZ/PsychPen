@@ -1,5 +1,6 @@
 import { BasicBoxPlot } from '../plots/BasicBoxPlot'
 import { BasicScatterPlot } from '../plots/BasicScatterPlot'
+import { ThreeDScatterPlot } from '../plots/ThreeDScatterPlot'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -34,9 +35,8 @@ const CASCADER_OPTIONS: Option[] = [
         label: '基础散点图',
       },
       {
-        value: 'GroupedScatterPlot',
-        label: '分组散点图',
-        disabled: true,
+        value: 'ThreeDScatterPlot',
+        label: '3D散点图',
       },
     ],
   },
@@ -48,6 +48,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'BasicScatterPlot':
       set(<BasicScatterPlot />)
+      break
+    case 'ThreeDScatterPlot':
+      set(<ThreeDScatterPlot />)
       break
     default:
       set(DEFAULT_PAGE)
