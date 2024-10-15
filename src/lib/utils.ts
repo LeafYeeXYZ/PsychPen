@@ -1,5 +1,6 @@
 import * as math from 'mathjs'
 import { ALLOWED_MISSING_METHODS } from './useZustand'
+import html2canvas from 'html2canvas'
 
 /**
  * 生成符合论文写作规范的统计量和 p 值
@@ -174,4 +175,17 @@ export function getCohenDOfTTest2(
   const bottom = df1 + df2
   const pooled = Math.sqrt((top1 + top2) / bottom)
   return (mean1 - mean2) / pooled
+}
+
+/**
+ * 把当前 echarts 图表保存为图片
+ */
+export function downloadImage(): void {
+  html2canvas(document.getElementById('echarts-container')!.firstChild as HTMLElement).then((canvas) => {
+    const url = canvas.toDataURL('image/png')
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'psychpen.png'
+    a.click()
+  })
 }

@@ -3,9 +3,9 @@ import { Select, Button, Form, Input, Space, InputNumber } from 'antd'
 import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import html2canvas from 'html2canvas'
 import type { EChartsOption } from 'echarts'
 import 'echarts-gl'
+import { downloadImage } from '../lib/utils'
 
 type Option = {
   /** X轴变量 */
@@ -39,7 +39,7 @@ export function ThreeDScatterPlot() {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
       const { xVar, yVar, zVar ,xLabel, yLabel, zLabel, title, dotSize } = values
-      const chart = echarts.init(document.getElementById('three-d-scatter-plot')!)
+      const chart = echarts.init(document.getElementById('echarts-container')!)
       const option: EChartsOption = {
         title: {
           text: title,
@@ -82,21 +82,11 @@ export function ThreeDScatterPlot() {
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }
-  // 导出图片相关
-  const handleSave = () => {
-    html2canvas(document.getElementById('three-d-scatter-plot')!.firstChild as HTMLElement).then((canvas) => {
-      const url = canvas.toDataURL('image/png')
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'psychpen.png'
-      a.click()
-    })
-  }
 
   return (
     <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4'>
 
-      <div className='w-1/2 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
+      <div className='w-96 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
 
         <Form<Option>
           className='w-full py-4'
@@ -245,7 +235,7 @@ export function ThreeDScatterPlot() {
               type='default'
               autoInsertSpace={false}
               disabled={!rendered}
-              onClick={handleSave}
+              onClick={downloadImage}
             >
               保存图片
             </Button>
@@ -254,12 +244,11 @@ export function ThreeDScatterPlot() {
 
       </div>
 
-      <div className='w-full h-full relative rounded-md border bg-white overflow-auto p-4'>
-
-        <div className='w-full h-full' id='three-d-scatter-plot' />
-
-        {!rendered && <div className='absolute w-full h-full top-0 left-0 flex items-center justify-center'>请选择参数并点击生成</div>}
-
+      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-hidden p-4 relative'>
+        <div className='w-full h-full overflow-auto'>
+          <div className='w-full h-full' id='echarts-container' />
+        </div>
+        {!rendered && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>请选择参数并点击生成</div>}
       </div>
 
     </div>

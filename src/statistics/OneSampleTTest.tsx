@@ -134,10 +134,10 @@ export function OneSampleTTest() {
 
       </div>
 
-      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-auto p-4'>
+      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-auto p-8'>
 
         {result ? (
-          <div className='w-full h-full p-4 overflow-auto'>
+          <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>单样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
             <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值={result.expect}</p>
