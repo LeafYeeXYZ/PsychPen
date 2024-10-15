@@ -155,7 +155,10 @@ export function NormalDistribution() {
           <Button onClick={() => generate(1000)}>抽样 <Tag className='mx-0' color='blue'>1000</Tag> 次</Button>
         </Space.Compact>
         <Button 
-          onClick={() => animate()}
+          onClick={() => {
+            timer.current && clearInterval(timer.current)
+            animate()
+          }}
           icon={<PlaySquareOutlined />}
         >
           开始动态演示
