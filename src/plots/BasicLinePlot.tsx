@@ -5,6 +5,9 @@ import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import html2canvas from 'html2canvas'
 import type { EChartsOption } from 'echarts'
+import * as math from 'mathjs'
+
+type Statistic = 'mean' | 'median' | 'max' | 'min' | 'sum' | 'count'
 
 type Option = {
   /** 分组变量 */
@@ -17,9 +20,15 @@ type Option = {
   yLabel?: string
   /** 自定义标题 */
   title?: string
+  /** 折线图统计量 */
+  statistic: Statistic
+  /** 是否启用曲线平滑 */
+  smooth: boolean
+  /** 是否显示数据标签 */
+  label: boolean
 }
 
-export function BasicBoxPlot() {
+export function BasicLinePlot() {
 
   const { dataCols, dataRows, messageApi, isLargeData } = useZustand()
   // 图形设置相关
@@ -31,108 +40,68 @@ export function BasicBoxPlot() {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
       const { dataVar, groupVar, xLabel, yLabel, title } = values
-      const chart = echarts.init(document.getElementById('basic-box-plot')!)
+      const chart = echarts.init(document.getElementById('basic-line-plot')!)
       // 数据处理
       const cols = Array.from(new Set(dataRows.map((row) => row[groupVar])).values()).filter((value) => typeof value !== 'undefined').sort()
-      const rows = cols.map((col) => dataRows.filter((row) => row[groupVar] === col).map((row) => row[dataVar]).filter((value) => typeof value === 'number'))
+      const data: number[] = []
+      const rows: number[][] = cols.map((col) => dataRows.filter((row) => row[groupVar] === col).map((row) => row[dataVar]).filter((value) => typeof value === 'number'))
+      rows.map((row) => {
+        switch (values.statistic) {
+          case 'mean':
+            data.push(+math.mean(row).toFixed(4))
+            break
+          case 'median':
+            data.push(+math.median(row).toFixed(4))
+            break
+          case 'max':
+            data.push(+math.max(row).toFixed(4))
+            break
+          case 'min':
+            data.push(+math.min(row).toFixed(4))
+            break
+          case 'sum':
+            data.push(+math.sum(row).toFixed(4))
+            break
+          case 'count':
+            data.push(row.length)
+            break
+        }
+      })
       const option: EChartsOption = {
         title: [
           {
             text: title,
             left: 'center',
           },
-          {
-            text: '上离群值: Q3 + 1.5 * IQR\n下离群值: Q1 - 1.5 * IQR',
-            borderColor: '#a0a0a0',
-            borderWidth: 1,
-            textStyle: {
-              fontWeight: 'normal',
-              fontSize: 10,
-              lineHeight: 15,
-              color: '#a0a0a0'
-            },
-            left: '10%',
-            top: '90%'
-          },
         ],
-        grid: {
-          left: '10%',
-          right: '10%',
-          bottom: '15%',
-        },
         xAxis: {
           name: xLabel || groupVar,
           nameLocation: 'middle',
           type: 'category',
-          boundaryGap: true,
+          data: cols.map((col) => String(col)),
           nameGap: 30,
-          splitArea: {
-            show: false
-          },
-          splitLine: {
-            show: false
-          }
         },
         yAxis: {
           type: 'value',
           name: yLabel || dataVar,
           nameLocation: 'middle',
           nameGap: 35,
-          splitArea: {
-            show: true
-          },
         },
-        series: [
-          {
-            name: 'boxplot',
-            type: 'boxplot',
-            datasetIndex: 1,
+        series: [{
+          type: 'line',
+          data: data,
+          smooth: values.smooth,
+          label: {
+            show: values.label,
           },
-          {
-            name: 'outlier',
-            type: 'scatter',
-            datasetIndex: 2,
-          }
-        ],
-        dataset: [
-          {
-            source: rows,
+          emphasis: {
+            label: {
+              show: true,
+            },
           },
-          {
-            transform: {
-              type: 'boxplot',
-              config: { itemNameFormatter: (value: { value: number }) => cols[value.value] }
-            }
-          },
-          {
-            fromDatasetIndex: 1,
-            fromTransformResult: 1
-          }
-        ],
-        tooltip: {
-          trigger: 'item',
-          axisPointer: {
-            type: 'shadow'
-          },
-          formatter: (params) => {
-            // @ts-expect-error 无法正确推断类型
-            if (params.componentSubType === 'boxplot') {
-              return [
-                // @ts-expect-error 无法正确推断类型
-                `最大值: ${params.value[5]}`,
-                // @ts-expect-error 无法正确推断类型
-                `Q3: ${params.value[4]}`,
-                // @ts-expect-error 无法正确推断类型
-                `Q2: ${params.value[3]}`,
-                // @ts-expect-error 无法正确推断类型
-                `Q1: ${params.value[2]}`,
-                // @ts-expect-error 无法正确推断类型
-                `最小值: ${params.value[1]}`,
-              ].join('<br>')
-            }
-            // @ts-expect-error 无法正确推断类型
-            return `${params.value[1]}`
-          }
+        }],
+        legend: {
+          show: false,
         },
       }
       chart.setOption(option, true)
@@ -146,7 +115,7 @@ export function BasicBoxPlot() {
   }
   // 导出图片相关
   const handleSave = () => {
-    html2canvas(document.getElementById('basic-box-plot')!.firstChild as HTMLElement).then((canvas) => {
+    html2canvas(document.getElementById('basic-line-plot')!.firstChild as HTMLElement).then((canvas) => {
       const url = canvas.toDataURL('image/png')
       const a = document.createElement('a')
       a.href = url
@@ -169,9 +138,6 @@ export function BasicBoxPlot() {
             flushSync(() => setDisabled(false))
           }}
           autoComplete='off'
-          initialValues={{
-            showOutliers: true,
-          }}
           disabled={disabled}
         >
           <Form.Item label='分组(X)变量及其标签'>
@@ -239,10 +205,54 @@ export function BasicBoxPlot() {
                 </Select>
               </Form.Item>
               <Form.Item
-                name='xLabel'
+                name='yLabel'
                 noStyle
               >
                 <Input className='w-max' placeholder='标签默认为变量名' />
+              </Form.Item>
+            </Space.Compact>
+          </Form.Item>
+          <Form.Item
+            label='折线图统计量'
+            name='statistic'
+            initialValue='mean'
+          >
+            <Select className='w-full'>
+              <Select.Option value='mean'>均值</Select.Option>
+              <Select.Option value='count'>计数</Select.Option>
+              <Select.Option value='median'>中位数</Select.Option>
+              <Select.Option value='max'>最大值</Select.Option>
+              <Select.Option value='min'>最小值</Select.Option>
+              <Select.Option value='sum'>总和</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item label='图形设置'>
+            <Space.Compact className='w-full'>
+              <Form.Item
+                noStyle
+                name='smooth'
+                initialValue={false}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='曲线平滑'
+                >
+                  <Select.Option value={true}>启用曲线平滑</Select.Option>
+                  <Select.Option value={false}>关闭曲线平滑</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                noStyle
+                name='label'
+                initialValue={true}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='数据标签'
+                >
+                  <Select.Option value={true}>显示数据标签</Select.Option>
+                  <Select.Option value={false}>隐藏数据标签</Select.Option>
+                </Select>
               </Form.Item>
             </Space.Compact>
           </Form.Item>
@@ -279,7 +289,7 @@ export function BasicBoxPlot() {
 
       <div className='w-full h-full relative rounded-md border bg-white overflow-auto p-4'>
 
-        <div className='w-full h-full' id='basic-box-plot' />
+        <div className='w-full h-full' id='basic-line-plot' />
 
         {!rendered && <div className='absolute w-full h-full top-0 left-0 flex items-center justify-center'>请选择参数并点击生成</div>}
 
