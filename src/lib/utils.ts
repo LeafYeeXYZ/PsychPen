@@ -150,3 +150,28 @@ function lagrangeInterpolation(xValues: number[], yValues: number[], x: number):
   }
   return +result.toFixed(4)
 }
+
+/**
+ * 计算独立样本 T 检验的 Cohen's d
+ * @param mean1 样本 1 均值
+ * @param mean2 样本 2 均值
+ * @param sd1 样本 1 标准差
+ * @param sd2 样本 2 标准差
+ * @param df1 样本 1 自由度
+ * @param df2 样本 2 自由度
+ * @returns Cohen's d
+ */
+export function getCohenDOfTTest2(
+  mean1: number,
+  mean2: number,
+  sd1: number,
+  sd2: number,
+  df1: number,
+  df2: number,
+): number {
+  const top1 = (df1 - 1) * (sd1 ** 2)
+  const top2 = (df2 - 1) * (sd2 ** 2)
+  const bottom = df1 + df2
+  const pooled = Math.sqrt((top1 + top2) / bottom)
+  return (mean1 - mean2) / pooled
+}

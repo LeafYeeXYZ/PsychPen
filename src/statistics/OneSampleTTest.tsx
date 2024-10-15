@@ -4,6 +4,7 @@ import { useState } from 'react'
 import ttest from '@stdlib/stats/ttest'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
+import { std } from 'mathjs'
 
 type Option = {
   /** 变量名 */
@@ -33,7 +34,12 @@ export function OneSampleTTest() {
         .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
         .map((v) => Number(v))
       const result = ttest(data, { mu: +values.expect, alpha: +values.alpha, alternative: values.alternative })
-      setResult({ variable: values.variable, expect: +values.expect, ...result } as Result)
+      setResult({ 
+        variable: values.variable, 
+        expect: +values.expect,
+        std: std(data),
+        ...result 
+      } as Result)
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -45,7 +51,7 @@ export function OneSampleTTest() {
   return (
     <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4'>
 
-      <div className='w-1/2 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
+      <div className='w-96 h-full flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
 
         <Form<Option>
           className='w-full py-4'
@@ -128,43 +134,57 @@ export function OneSampleTTest() {
 
       </div>
 
-      <div className='w-full h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-auto p-4'>
+      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-auto p-4'>
 
         {result ? (
-          <div className='w-max h-full flex flex-col justify-center items-center p-4 overflow-auto'>
+          <div className='w-full h-full p-4 overflow-auto'>
 
-            <p className='text-lg mb-3'>单样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
+            <p className='text-lg mb-2 text-center w-full'>单样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
+            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值={result.expect}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
                   <td>样本均值</td>
-                  <td>样本标准差</td>
                   <td>自由度</td>
                   <td>t</td>
                   <td>p</td>
                   <td>置信区间 (α={result.alpha})</td>
+                  <td>效应量 (Cohen's d)</td>
+                  <td>测定系数 (R<sup>2</sup>)</td>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>{(result.mean as number).toFixed(3)}</td>
-                  <td>{(result.sd as number).toFixed(3)}</td>
                   <td>{(result.df as number).toFixed(3)}</td>
                   <td>{generatePResult(result.statistic, result.pValue).statistic}</td>
                   <td>{generatePResult(result.statistic, result.pValue).p}</td>
                   <td>{`[${(result.ci as [number, number])[0].toFixed(3)}, ${(result.ci as [number, number])[1].toFixed(3)})`}</td>
+                  <td>{(((result.mean as number) - result.expect) / (result.std as number)).toFixed(3)}</td>
+                  <td>{(((result.statistic as number) ** 2) / (((result.statistic as number) ** 2) + (result.df as number))).toFixed(3)}</td>
                 </tr>
               </tbody>
             </table>
-            <p className='w-full text-left text-sm mt-2 pl-2 text-gray-800'>
-              方法: Student's T Test
-            </p>
-            <p className='w-full text-left text-sm pl-2 text-gray-800'>
-              H<sub>0</sub>: 均值={result.expect}
-            </p>
-            <p className='w-full text-left text-sm pl-2 text-gray-800'>
-              缺失值处理: 删除法
-            </p>
+
+            <p className='text-lg mb-2 text-center w-full mt-8'>描述统计</p>
+            <table className='three-line-table'>
+              <thead>
+                <tr>
+                  <td>均值</td>
+                  <td>标准差</td>
+                  <td>样本量</td>
+                  <td>自由度</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{(result.mean as number).toFixed(3)}</td>
+                  <td>{(result.std as number).toFixed(3)}</td>
+                  <td>{(result.df as number) + 1}</td>
+                  <td>{(result.df as number)}</td>
+                </tr>
+              </tbody>
+            </table>
 
           </div>
         ) : (

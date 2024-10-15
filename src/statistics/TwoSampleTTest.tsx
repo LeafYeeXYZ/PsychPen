@@ -3,7 +3,7 @@ import { Select, Input, Button, Form } from 'antd'
 import { useState } from 'react'
 import ttest2 from '@stdlib/stats/ttest2'
 import { flushSync } from 'react-dom'
-import { generatePResult } from '../lib/utils'
+import { generatePResult, getCohenDOfTTest2 } from '../lib/utils'
 import { std } from 'mathjs'
 
 type Option = {
@@ -71,7 +71,7 @@ export function TwoSampleTTest() {
   return (
     <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4'>
 
-      <div className='w-1/2 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
+      <div className='w-96 h-full flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
 
         <Form<Option>
           className='w-full py-4'
@@ -190,13 +190,13 @@ export function TwoSampleTTest() {
 
       </div>
 
-      <div className='w-full h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-auto p-4'>
+      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-hidden p-4'>
 
         {result ? (
-          <div className='w-max h-full flex flex-col justify-center items-center p-4 overflow-auto'>
+          <div className='w-full h-full p-4 overflow-auto'>
            
-           <div>
-            <p className='text-lg mb-3 text-center w-full'>独立样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
+            <p className='text-lg mb-2 text-center w-full'>独立样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
+            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值差异={result.expect}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -205,6 +205,8 @@ export function TwoSampleTTest() {
                   <td>t</td>
                   <td>p</td>
                   <td>置信区间 (α={result.alpha})</td>
+                  <td>效应量 (Cohen's d)</td>
+                  <td>测定系数 (R<sup>2</sup>)</td>
                 </tr>
               </thead>
               <tbody>
@@ -214,21 +216,14 @@ export function TwoSampleTTest() {
                   <td>{generatePResult(result.statistic, result.pValue).statistic}</td>
                   <td>{generatePResult(result.statistic, result.pValue).p}</td>
                   <td>{`[${(result.ci as [number, number])[0].toFixed(3)}, ${(result.ci as [number, number])[1].toFixed(3)})`}</td>
+                  <td>{(getCohenDOfTTest2(result.xmean as number, result.ymean as number, (result.std as number[])[0], (result.std as number[])[1], (result.count as number[])[0] - 1, (result.count as number[])[1] - 1)).toFixed(3)}</td>
+                  <td>{(((result.statistic as number) ** 2) / (((result.statistic as number) ** 2) + (result.df as number))).toFixed(3)}</td>
                 </tr>
               </tbody>
             </table>
-            <p className='w-full text-left text-sm pl-2 mt-2 text-gray-800'>
-              方法: Student's T Test
-            </p>
-            <p className='w-full text-left text-sm pl-2 text-gray-800'>
-              H<sub>0</sub>: 均值差异={result.expect}
-            </p>
-            <p className='w-full text-left text-sm pl-2 text-gray-800'>
-              缺失值处理: 删除法
-            </p>
-          </div>
-          <div className='mt-10'>
-            <p className='text-lg mb-3 text-center w-full'>描述统计</p>
+
+            <p className='text-lg mb-2 text-center w-full mt-8'>描述统计</p>
+            <p className='text-xs mb-3 text-center w-full'>分组变量: {result.groupVar}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -236,6 +231,7 @@ export function TwoSampleTTest() {
                   <td>均值</td>
                   <td>标准差</td>
                   <td>样本量</td>
+                  <td>自由度</td>
                 </tr>
               </thead>
               <tbody>
@@ -244,19 +240,17 @@ export function TwoSampleTTest() {
                   <td>{(result.xmean as number).toFixed(3)}</td>
                   <td>{(result.std as number[])[0].toFixed(3)}</td>
                   <td>{(result.count as number[])[0]}</td>
+                  <td>{(result.count as number[])[0] - 1}</td>
                 </tr>
                 <tr>
                   <td>{String((result.groups as unknown[])[1])}</td>
                   <td>{(result.ymean as number).toFixed(3)}</td>
                   <td>{(result.std as number[])[1].toFixed(3)}</td>
                   <td>{(result.count as number[])[1]}</td>
+                  <td>{(result.count as number[])[1] - 1}</td>
                 </tr>
               </tbody>
-              <p className='w-full text-left text-sm pl-2 mt-2 text-gray-800'>
-                分组变量: {result.groupVar}
-              </p>
             </table>
-           </div>
 
           </div>
         ) : (

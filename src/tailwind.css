@@ -7,7 +7,7 @@
 }
 
 table.three-line-table {
-  @apply w-max text-center;
+  @apply w-fit max-w-full text-center mx-auto;
   & > thead {
     @apply border-t-2 border-black border-b;
   }
