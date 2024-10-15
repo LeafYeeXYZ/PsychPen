@@ -1,5 +1,5 @@
 import * as echarts from 'echarts'
-import { Select, Button, Form, Input } from 'antd'
+import { Select, Button, Form, Input, Space } from 'antd'
 import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -156,55 +156,83 @@ export function BasicBoxPlot() {
           }}
           disabled={disabled}
         >
-          <Form.Item
-            label='分组(X)变量'
-            name='groupVar'
-            rules={[{ required: true, message: '请选择分组变量' }]}
-          >
-            <Select
-              className='w-full'
-              placeholder='请选择分组变量'
-            >
-              {dataCols.map((col) => (
-                <Select.Option key={col.name} value={col.name}>
-                  {col.name} (水平数: {col.unique})
-                </Select.Option>
-              ))}
-            </Select>
+          <Form.Item label='分组(X)变量及其标签'>
+            <Space.Compact className='w-full'>
+              <Form.Item
+                noStyle
+                name='groupVar'
+                rules={[
+                  { required: true, message: '请选择分组变量' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (value === getFieldValue('dataVar')) {
+                        return Promise.reject('请选择不同的变量')
+                      }
+                      return Promise.resolve()
+                    },
+                  }),
+                ]}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='请选择分组变量'
+                >
+                  {dataCols.map((col) => (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name} (水平数: {col.unique})
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name='xLabel'
+                noStyle
+              >
+                <Input className='w-max' placeholder='标签默认为变量名' />
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
-          <Form.Item
-            label='数据(Y)变量'
-            name='dataVar'
-            rules={[{ required: true, message: '请选择数据变量' }]}
-          >
-            <Select
-              className='w-full'
-              placeholder='请选择数据变量'
-            >
-              {dataCols.map((col) => col.type === '等距或等比数据' && (
-                <Select.Option key={col.name} value={col.name}>
-                  {col.name}
-                </Select.Option>
-              ))}
-            </Select>
+          <Form.Item label='数据(Y)变量及其标签'>
+            <Space.Compact className='w-full'>
+              <Form.Item
+                noStyle
+                name='dataVar'
+                rules={[
+                  { required: true, message: '请选择数据变量' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (value === getFieldValue('groupVar')) {
+                        return Promise.reject('请选择不同的变量')
+                      }
+                      return Promise.resolve()
+                    },
+                  }),
+                ]}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='请选择数据变量'
+                >
+                  {dataCols.map((col) => col.type === '等距或等比数据' && (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name='xLabel'
+                noStyle
+              >
+                <Input className='w-max' placeholder='标签默认为变量名' />
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
           <Form.Item
             label='自定义标题'
             name='title'
           >
             <Input className='w-full' placeholder='默认无标题' />
-          </Form.Item>
-          <Form.Item
-            label='自定义X轴标签'
-            name='xLabel'
-          >
-            <Input className='w-full' placeholder='默认为变量名' />
-          </Form.Item>
-          <Form.Item
-            label='自定义Y轴标签'
-            name='yLabel'
-          >
-            <Input className='w-full' placeholder='默认为变量名' />
           </Form.Item>
           <div
             className='flex flex-row flex-nowrap justify-center items-center gap-4'

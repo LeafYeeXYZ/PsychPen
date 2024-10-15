@@ -99,7 +99,7 @@ export function BasicScatterPlot() {
           autoComplete='off'
           disabled={disabled}
         >
-          <Form.Item label='X轴变量和(可选)标签'>
+          <Form.Item label='X轴变量及其标签'>
             <Space.Compact className='w-full'>
               <Form.Item
                 name='xVar'
@@ -135,7 +135,7 @@ export function BasicScatterPlot() {
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item label='Y轴变量和(可选)标签'>
+          <Form.Item label='Y轴变量及其标签'>
             <Space.Compact className='w-full'>
               <Form.Item
                 name='yVar'

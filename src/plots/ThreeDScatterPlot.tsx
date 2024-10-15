@@ -109,7 +109,7 @@ export function ThreeDScatterPlot() {
           autoComplete='off'
           disabled={disabled}
         >
-          <Form.Item label='X轴变量和(可选)标签'>
+          <Form.Item label='X轴变量及其标签'>
             <Space.Compact className='w-full'>
               <Form.Item
                 name='xVar'
@@ -145,7 +145,7 @@ export function ThreeDScatterPlot() {
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item label='Y轴变量和(可选)标签'>
+          <Form.Item label='Y轴变量及其标签'>
             <Space.Compact className='w-full'>
               <Form.Item
                 name='yVar'
@@ -181,7 +181,7 @@ export function ThreeDScatterPlot() {
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item label='Z轴变量和(可选)标签'>
+          <Form.Item label='Z轴变量及其标签'>
             <Space.Compact className='w-full'>
               <Form.Item
                 name='zVar'
