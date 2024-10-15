@@ -5,6 +5,7 @@ import { DataView } from './components/DataView'
 import { PaintView } from './components/PaintView'
 import { StatisticsView } from './components/StatisticsView'
 import { VariableView } from './components/VariableView'
+import { ToolView } from './components/ToolView'
 import { useZustand } from './lib/useZustand'
 import { flushSync } from 'react-dom'
 
@@ -94,6 +95,18 @@ export function App() {
               disabled={(data === null) || disabled}
             >
               统计
+            </Button>
+            <Button
+              type={activePage === 'tool' ? 'primary' : 'text'}
+              onClick={() => {
+                if (activePage === 'tool') return
+                setPage(<ToolView />)
+                setActivePage('tool')
+              }}
+              autoInsertSpace={false}
+              disabled={disabled}
+            >
+              工具
             </Button>
           </nav>
           <a 

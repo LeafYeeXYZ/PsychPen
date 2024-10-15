@@ -122,7 +122,7 @@ export function DataView() {
         </div>
       ) : (
         // 无数据时的操作界面
-        <div className='flex flex-col justify-center items-center w-full h-full'>
+        <div className='flex flex-col justify-center items-center w-full h-full relative'>
           <p className='text-xl'>
             请先导入数据文件
           </p>
@@ -195,6 +195,9 @@ export function DataView() {
               点击导入数据
             </Button>
           </Upload>
+          <p className='text-sm p-4 absolute top-1 w-full text-center opacity-70'>
+            如只须使用小工具, 点击上方的工具按钮即可
+          </p>
         </div>
       )}
       {contextHolder}
