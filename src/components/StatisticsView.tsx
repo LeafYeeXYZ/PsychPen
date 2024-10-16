@@ -1,6 +1,8 @@
 import { OneSampleTTest } from '../statistics/OneSampleTTest'
 import { PeerSampleTTest } from '../statistics/PeerSampleTTest'
 import { TwoSampleTTest } from '../statistics/TwoSampleTTest'
+import { KolmogorovSmirnovTest } from '../statistics/KolmogorovSmirnovTest'
+import { LeveneTest } from '../statistics/LeveneTest'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -11,6 +13,20 @@ type Option = {
   children?: Option[]
 }
 const CASCADER_OPTIONS: Option[] = [
+  {
+    value: 'NonParametricTest',
+    label: '非参数检验',
+    children: [
+      {
+        value: 'KolmogorovSmirnovTest',
+        label: 'Kolmogorov-Smirnov 检验 (正态分布检验)',
+      },
+      {
+        value: 'LeveneTest',
+        label: 'Levene 检验 (方差齐性检验)'
+      },
+    ],
+  },
   {
     value: 'TTest',
     label: 'T检验',
@@ -32,23 +48,7 @@ const CASCADER_OPTIONS: Option[] = [
   {
     value: 'ANOVA',
     label: '方差分析',
-    children: [
-      {
-        value: 'OneWayANOVA',
-        label: '单因素方差分析',
-        disabled: true,
-      },
-      {
-        value: 'PeerSampleANOVA',
-        label: '配对样本方差分析',
-        disabled: true,
-      },
-      {
-        value: 'TwoWayANOVA',
-        label: '两因素方差分析',
-        disabled: true,
-      },
-    ],
+    disabled: true,
   },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
@@ -61,6 +61,12 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'TwoSampleTTest':
       set(<TwoSampleTTest />)
+      break
+    case 'KolmogorovSmirnovTest':
+      set(<KolmogorovSmirnovTest />)
+      break
+    case 'LeveneTest':
+      set(<LeveneTest />)
       break
     default:
       set(DEFAULT_PAGE)
@@ -86,6 +92,7 @@ export function StatisticsView() {
             onChange={(value) => CASCADER_ONCHANGE(value, setPage)}
             expandTrigger='hover'
             allowClear={false}
+            className='w-max'
           />
         </div>
         {/* 统计界面 */}
