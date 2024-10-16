@@ -59,10 +59,30 @@ export function NormalDistribution() {
     const option = {
       xAxis: { type: 'category', data: label, axisTick: { alignWithLabel: true } },
       yAxis: { type: 'value' },
-      series: [{ data: count, type: 'bar', barWidth: '101%', label: { 
-        formatter: (params: { value: number }) => {
-          return `${params.value}\n${(params.value / Math.max(data.length, 1) * 100).toFixed()}%`
-        }, position: 'top', show: true }
+      series: [{ 
+        data: count,
+        type: 'bar',
+        barWidth: '101%', 
+        label: { 
+          formatter: (params: { value: number }) => {
+            return `${params.value}\n${(params.value / Math.max(data.length, 1) * 100).toFixed()}%\n`
+          }, 
+          position: 'top', 
+          show: true 
+        },
+        itemStyle: { 
+          color: '#ff68c0',
+          opacity: 0.5,
+        },
+      },{
+        data: count,
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        lineStyle: { 
+          color: '#ff68c0',
+          opacity: 0.7,
+        },
       }]
     }
     chart.setOption(option)
