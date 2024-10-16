@@ -191,7 +191,7 @@ export function KolmogorovSmirnovTest() {
           <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>单样本 Kolmogorov-Smirnov 检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
-            <p className='text-xs mb-3 text-center w-full'>检验分布: {DISTRIBUTIONS.find((dist) => dist.en === result.expect)?.cn} | 显著性水平(α): {result.alpha}</p>
+            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 变量满足{DISTRIBUTIONS.find((dist) => dist.en === result.expect)?.cn} | 显著性水平(α): {result.alpha}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>

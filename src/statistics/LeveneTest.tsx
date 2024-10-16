@@ -1,5 +1,5 @@
 import { useZustand } from '../lib/useZustand'
-import { Select, Input, Button, Form } from 'antd'
+import { Select, Input, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import leveneTest from '@stdlib/stats/levene-test'
 import { flushSync } from 'react-dom'
@@ -7,14 +7,17 @@ import { generatePResult } from '../lib/utils'
 
 type Option = {
   /** 变量名 */
-  variable: string[]
+  variable: string[] | string
   /** 显著性水平, 默认 0.05 */
   alpha: number
+  /** 分组变量 */
+  group?: string
 }
 type Result = {
   F: string,
   p: string,
   df: number[],
+  groups: string[],
 } & Option
 
 export function LeveneTest() {
@@ -26,11 +29,34 @@ export function LeveneTest() {
     const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
-      const data: number[][] = values.variable.map((variable) => dataRows
-        .map((row) => row[variable])
-        .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
-        .map((v) => Number(v))
-      )
+      let groups: string[] = []
+      let data: number[][] = []
+      // 处理被试间变量
+      if (typeof values.group === 'string') {
+        const emptyIndex: number[] = []
+        groups = Array.from(new Set(dataRows.map((row) => row[values.group as string]))).map(String)
+        data = groups.map((group) => dataRows
+          .filter((row) => row[values.group as string] == group)
+          .map((row) => row[values.variable as string])
+          .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
+          .map((v) => Number(v))
+        ).filter((arr, index) => {
+          if (arr.length === 0) {
+            emptyIndex.push(index)
+            return false
+          }
+          return true
+        })
+        groups = groups.filter((_, index) => !emptyIndex.includes(index))
+      // 处理被试内变量
+      } else {
+        groups = values.variable as string[]
+        data = (values.variable as string[]).map((variable) => dataRows
+          .map((row) => row[variable])
+          .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
+          .map((v) => Number(v))
+        ) // 理论上这里也要过滤掉空数组, 但是正常使用不会出现这种情况, 故为了性能暂不处理
+      }
       // @ts-expect-error 类型推断错误, 实际没写错
       const { statistic, pValue, df } = leveneTest.apply(null, [...data, { alpha: values.alpha }])
       const result = generatePResult(statistic, pValue)
@@ -39,6 +65,7 @@ export function LeveneTest() {
         F: result.statistic,
         p: result.p,
         df: df as unknown as number[],
+        groups,
       })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -47,6 +74,7 @@ export function LeveneTest() {
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }
+  const [formType, setFormType] = useState<'peer' | 'independent'>('peer')
 
   return (
     <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4'>
@@ -66,29 +94,86 @@ export function LeveneTest() {
             expect: 'normal',
             alpha: 0.05,
             alternative: 'two-sided',
+            type: 'peer',
           }}
           disabled={disabled}
         >
           <Form.Item
-            label='选择变量 (至少两个)'
-            name='variable'
-            rules={[
-              { required: true, message: '请选择变量' },
-              { type: 'array', min: 2, message: '至少选择两个变量' },
-            ]}
+            name='type'
+            label='待检验变量类型'
+            rules={[{ required: true, message: '请选择待检验变量类型' }]}
           >
-            <Select
+            <Radio.Group
               className='w-full'
-              placeholder='请选择变量'
-              mode='tags'
+              block
+              onChange={(e) => setFormType(e.target.value)}
+              optionType='button'
+              buttonStyle='solid'
             >
-              {dataCols.map((col) => col.type === '等距或等比数据' && (
-                <Select.Option key={col.name} value={col.name}>
-                  {col.name}
-                </Select.Option>
-              ))}
-            </Select>
+              <Radio value='peer'>被试内变量</Radio>
+              <Radio value='independent'>被试间变量</Radio>
+            </Radio.Group>
           </Form.Item>
+          {formType === 'peer' ? (
+            <Form.Item
+              label='选择变量 (至少两个)'
+              name='variable'
+              rules={[
+                { required: true, message: '请选择变量' },
+                { type: 'array', min: 2, message: '至少选择两个变量' },
+              ]}
+            >
+              <Select
+                className='w-full'
+                placeholder='请选择变量'
+                mode='tags'
+              >
+                {dataCols.map((col) => col.type === '等距或等比数据' && (
+                  <Select.Option key={col.name} value={col.name}>
+                    {col.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          ) : (
+            <>
+              <Form.Item
+                label='选择数据变量'
+                name='variable'
+                rules={[
+                  { required: true, message: '请选择数据变量' },
+                  { type: 'string', message: '只能选择一个数据变量' },
+                ]}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='请选择数据变量'
+                >
+                  {dataCols.map((col) => col.type === '等距或等比数据' && (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label='分组变量'
+                name='group'
+                rules={[{ required: true, message: '请选择分组变量' }]}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='请选择分组变量'
+                >
+                  {dataCols.map((col) => (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name} (水平数: {col.unique})
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </>
+          )}
           <Form.Item
             label='显著性水平'
             name='alpha'
@@ -136,7 +221,7 @@ export function LeveneTest() {
                 </tr>
               </tbody>
             </table>
-            <p className='text-xs mt-3 text-center w-full'>检验变量: {result.variable.join(', ')}</p>
+            <p className='text-xs mt-3 text-center w-full'>检验变量/组: {result.groups.sort().join(', ')}</p>
 
           </div>
         ) : (
