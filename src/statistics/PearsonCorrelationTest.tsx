@@ -18,6 +18,8 @@ type Result = {
     peer: string[]
     r: string
     p: string
+    t: string
+    df: number
     /** 95%置信区间 */
     ci: string
   }[]
@@ -41,11 +43,14 @@ export function PearsonCorrelationTest() {
             alpha: values.alpha,
             alternative: values.alternative,
           })
-          const { p, statistic } = generatePResult(result.pcorr, result.pValue)
+          const r = generatePResult(result.pcorr, result.pValue)
+          const t = generatePResult(result.statistic, result.pValue)
           results.push({
             peer: [values.variable[i], values.variable[j]],
-            r: statistic,
-            p: p,
+            r: r.statistic,
+            t: t.statistic,
+            p: r.p,
+            df: data[0].length - 2,
             ci: `[${result.ci[0].toFixed(3)}, ${result.ci[1].toFixed(3)})`,
           })
         }
@@ -153,9 +158,11 @@ export function PearsonCorrelationTest() {
                 <tr>
                   <td>配对变量A</td>
                   <td>配对变量B</td>
-                  <td>r</td>
-                  <td>p</td>
+                  <td>相关系数(r)</td>
                   <td>95%置信区间</td>
+                  <td>t</td>
+                  <td>p</td>
+                  <td>自由度</td>
                 </tr>
               </thead>
               <tbody>
@@ -164,8 +171,10 @@ export function PearsonCorrelationTest() {
                     <td>{row.peer[0]}</td>
                     <td>{row.peer[1]}</td>
                     <td>{row.r}</td>
-                    <td>{row.p}</td>
                     <td>{row.ci}</td>
+                    <td>{row.t}</td>
+                    <td>{row.p}</td>
+                    <td>{row.df}</td>
                   </tr>
                 ))}
               </tbody>
