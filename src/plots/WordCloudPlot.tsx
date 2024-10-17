@@ -19,7 +19,7 @@ const SPAPE_OPTIONS = [
   { value: 'star', label: '星形' },
 ]
 const ROTATION_OPTIONS = [
-  { value: 'x', label: '水平', rotationRange: [-90, 90], rotationStep: 45 },
+  { value: 'x', label: '水平', rotationRange: [0, 0], rotationStep: 90 },
   { value: 'y', label: '水平/垂直', rotationRange: [-90, 90], rotationStep: 90 },
   { value: 'z', label: '水平/垂直/倾斜', rotationRange: [-90, 90], rotationStep: 45 },
 ]
