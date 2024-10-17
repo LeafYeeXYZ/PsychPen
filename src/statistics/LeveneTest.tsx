@@ -204,7 +204,7 @@ export function LeveneTest() {
           <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>Levene 检验</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 各组满足方差齐性 | 显著性水平(α): {result.alpha}</p>
+            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 各变量/组满足方差齐性 | 显著性水平(α): {result.alpha}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>

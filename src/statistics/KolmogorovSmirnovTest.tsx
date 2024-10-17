@@ -190,8 +190,8 @@ export function KolmogorovSmirnovTest() {
         {result ? (
           <div className='w-full h-full overflow-auto'>
 
-            <p className='text-lg mb-2 text-center w-full'>单样本 Kolmogorov-Smirnov 检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 变量满足{DISTRIBUTIONS.find((dist) => dist.en === result.expect)?.cn} | 显著性水平(α): {result.alpha}</p>
+            <p className='text-lg mb-2 text-center w-full'>单样本 Kolmogorov-Smirnov 检验</p>
+            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 变量{result.alternative === 'two-sided' ? '满足' : result.alternative === 'less' ? '小于' : '大于'}给定的{DISTRIBUTIONS.find((dist) => dist.en === result.expect)?.cn} | 显著性水平(α): {result.alpha}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -212,6 +212,8 @@ export function KolmogorovSmirnovTest() {
                 ))}
               </tbody>
             </table>
+            <p className='text-xs mt-3 text-center w-full'><sup>*</sup>正态分布会将原始数据标准化后计算</p>
+            <p className='text-xs mt-2 text-center w-full'><sup>*</sup>连续均匀分布采用原数据最大/最小值</p>
 
           </div>
         ) : (
