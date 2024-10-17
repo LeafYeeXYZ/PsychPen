@@ -142,6 +142,7 @@ export function WordCloudPlot() {
           <Form.Item label='单词尺寸范围'>
             <Space.Compact>
               <Form.Item
+                noStyle
                 name='min'
                 rules={[ 
                   { required: true, message: '请输入最小尺寸' },
@@ -164,6 +165,7 @@ export function WordCloudPlot() {
                 />
               </Form.Item>
               <Form.Item
+                noStyle
                 name='max'
                 rules={[ 
                   { required: true, message: '请输入最大尺寸' },
