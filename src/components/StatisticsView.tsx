@@ -2,6 +2,7 @@ import { OneSampleTTest } from '../statistics/OneSampleTTest'
 import { PeerSampleTTest } from '../statistics/PeerSampleTTest'
 import { TwoSampleTTest } from '../statistics/TwoSampleTTest'
 import { KolmogorovSmirnovTest } from '../statistics/KolmogorovSmirnovTest'
+import { PearsonCorrelationTest } from '../statistics/PearsonCorrelationTest'
 import { LeveneTest } from '../statistics/LeveneTest'
 import { Cascader } from 'antd'
 import { useState } from 'react'
@@ -24,6 +25,16 @@ const CASCADER_OPTIONS: Option[] = [
       {
         value: 'LeveneTest',
         label: 'Levene 检验 (方差齐性检验)'
+      },
+    ],
+  },
+  {
+    value: 'CorrelationOrRegression',
+    label: '相关和回归',
+    children: [
+      {
+        value: 'PearsonCorrelationTest',
+        label: 'Pearson 相关系数检验',
       },
     ],
   },
@@ -67,6 +78,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'LeveneTest':
       set(<LeveneTest />)
+      break
+    case 'PearsonCorrelationTest':
+      set(<PearsonCorrelationTest />)
       break
     default:
       set(DEFAULT_PAGE)

@@ -196,7 +196,7 @@ export function TwoSampleTTest() {
           <div className='w-full h-full overflow-auto'>
            
             <p className='text-lg mb-2 text-center w-full'>独立样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
-            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值差异={result.expect}</p>
+            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值差异={result.expect} | 显著性水平(α): {result.alpha}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -204,7 +204,7 @@ export function TwoSampleTTest() {
                   <td>自由度</td>
                   <td>t</td>
                   <td>p</td>
-                  <td>置信区间 (α={result.alpha})</td>
+                  <td>95%置信区间</td>
                   <td>效应量 (Cohen's d)</td>
                   <td>测定系数 (R<sup>2</sup>)</td>
                 </tr>
