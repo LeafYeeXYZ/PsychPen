@@ -1,6 +1,6 @@
 import { useZustand, type ALLOWED_MISSING_METHODS } from '../lib/useZustand'
 import { Button, Table, Modal, Select } from 'antd'
-import { CalculatorOutlined, ZoomOutOutlined } from '@ant-design/icons'
+import { CalculatorOutlined, ZoomOutOutlined, BoxPlotOutlined } from '@ant-design/icons'
 import { useRef } from 'react'
 import { flushSync } from 'react-dom'
 import { utils } from 'xlsx'
@@ -63,6 +63,34 @@ export function VariableView() {
       messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
     }
   }
+  // 定义子变量 (同时注意下面所有地方在遍历 dataCols 时过滤掉 derived 变量)
+  const handleSubVarsParams = useRef<{ targetVar?: string; standard?: boolean; center?: boolean }>({})
+  const handleSubVars = async (targetVar: string, options?: { standard?: boolean; center?: boolean }) => {
+    const timestamp = Date.now()
+    try {
+      messageApi?.loading('正在处理数据...')
+      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const cols = dataCols.map((col) => {
+        if (col.name === targetVar) {
+          return { 
+            ...col, 
+            subVars: options,
+          }
+        } else {
+          return col
+        }
+      })
+      const sheet = data!.Sheets[data!.SheetNames[0]]
+      const { calculatedRows, calculatedCols } = CALCULATE_VARIABLES(cols, utils.sheet_to_json(sheet) as { [key: string]: unknown }[])
+      setDataCols(calculatedCols)
+      setDataRows(calculatedRows)
+      messageApi?.destroy()
+      messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp - (isLargeData ? 500 : 0)} 毫秒`)
+    } catch (error) {
+      messageApi?.destroy()
+      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+    }
+  }
 
   return (
     <div className='w-full h-full overflow-hidden'>
@@ -82,7 +110,7 @@ export function VariableView() {
                       placeholder='请选择变量'
                       onChange={(value) => handleMissingValuesParams.current.variable = value as string}
                     >
-                      {dataCols.map((col) => (
+                      {dataCols.map((col) => col.derived !== true && (
                         <Select.Option key={col.name} value={col.name}>{col.name}</Select.Option>
                       ))}
                     </Select>
@@ -123,7 +151,7 @@ export function VariableView() {
                       placeholder='请选择变量'
                       onChange={(value) => handleMissingMethodParams.current.targetVar = value as string}
                     >
-                      {dataCols.map((col) => (
+                      {dataCols.map((col) => col.derived !== true && (
                         <Select.Option key={col.name} value={col.name}>{col.name}</Select.Option>
                       ))}
                     </Select>
@@ -139,7 +167,7 @@ export function VariableView() {
                       placeholder='请选择插值参考变量 (仅部分方法需要)'
                       onChange={(value) => handleMissingMethodParams.current.peerVar = value as string}
                     >
-                      {dataCols.map((col) => (
+                      {dataCols.map((col) => col.derived !== true && (
                         <Select.Option key={col.name} value={col.name}>{col.name}</Select.Option>
                       ))}
                     </Select>
@@ -172,29 +200,91 @@ export function VariableView() {
           >
             定义缺失值插值方式
           </Button>
+          <Button
+            icon={<BoxPlotOutlined />}
+            disabled={disabled}
+            onClick={async () => {
+              flushSync(() => setDisabled(true))
+              await modalApi.confirm({
+                title: '定义中心化/标准化自变量',
+                content: (
+                  <div className='flex flex-col gap-4 my-4'>
+                    <Select
+                      placeholder='请选择变量'
+                      onChange={(value) => handleSubVarsParams.current.targetVar = value as string}
+                    >
+                      {dataCols.map((col) => col.derived !== true && (
+                        <Select.Option key={col.name} value={col.name}>{col.name}</Select.Option>
+                      ))}
+                    </Select>
+                    <Select
+                      mode='multiple'
+                      placeholder='请选择要生成的子变量 (可多选/留空)'
+                      onChange={(value) => {
+                        handleSubVarsParams.current.standard = value.includes('标准化')
+                        handleSubVarsParams.current.center = value.includes('中心化')
+                      }}
+                    >
+                      <Select.Option key='标准化' value='标准化'>标准化</Select.Option>
+                      <Select.Option key='中心化' value='中心化'>中心化</Select.Option>
+                    </Select>
+                  </div>
+                ),
+                onOk: async () => {
+                  const { targetVar, standard, center } = handleSubVarsParams.current
+                  if (!targetVar) {
+                    messageApi?.error('请选择要定义子变量的变量')
+                  } else if (dataCols.find((col) => col.name === targetVar)?.type !== '等距或等比数据') {
+                    messageApi?.error('子变量生成仅适用于等距或等比数据')
+                  } else if (!standard && !center) {
+                    await handleSubVars(targetVar)
+                  } else {
+                    await handleSubVars(targetVar, { standard, center })
+                  }
+                  handleSubVarsParams.current.targetVar = undefined
+                  handleSubVarsParams.current.standard = undefined
+                  handleSubVarsParams.current.center = undefined
+                },
+                okText: '确定',
+                cancelText: '取消',
+              })
+              flushSync(() => setDisabled(false))
+            }}
+          >
+            定义中心化/标准化子变量
+          </Button>
         </div>
         {/* 变量表格 */}
         <Table
           className='w-full overflow-auto text-nowrap'
           bordered
-          dataSource={dataCols.map((col, index) => {
+          dataSource={dataCols.filter((col) => col.derived !== true).map((col, index) => {
+            let subVars = ''
+            if (col.subVars?.standard) {
+              subVars += '标准化'
+            }
+            if (col.subVars?.center) {
+              subVars += subVars ? '和中心化' : '中心化'
+            }
             return {
               key: `${col.name}-${index}`,
               ...col, // 如果 col 中有 key 字段, 会覆盖 key: index
               missingValues: col.missingValues?.join(', '),
               missingMethod: col.missingMethod ?? '删除法',
+              subVars: subVars || '无',
             }
           })}
           columns={[
-            { title: '变量名', dataIndex: 'name', key: 'name', width: '6rem' },
+            { title: '变量名', dataIndex: 'name', key: 'name', width: '6rem', fixed: 'left' },
             { title: '数据类型', dataIndex: 'type', key: 'type', width: '6rem' },
             { title: '样本量', dataIndex: 'count', key: 'count', width: '6rem' },
             { title: '有效值(含插值)数', dataIndex: 'valid', key: 'valid', width: '9rem' },
+            { title: '唯一值数量', dataIndex: 'unique', key: 'unique', width: '7rem' },
+            { title: '子变量', dataIndex: 'subVars', key: 'subVars', width: '6rem' },
             { title: '缺失值定义', dataIndex: 'missingValues', key: 'missingValues', width: '7rem' },
             { title: '未插值缺失值数', dataIndex: 'missing', key: 'missing', width: '9rem' },
             { title: '缺失值插值方法', dataIndex: 'missingMethod', key: 'missingMethod', width: '9rem' },
             { title: '插值的参考变量', dataIndex: 'missingRefer', key: 'missingRefer', width: '9rem' },
-            { title: '唯一值数量', dataIndex: 'unique', key: 'unique', width: '7rem' },
             { title: '最小值', dataIndex: 'min', key: 'min', width: '6rem' },
             { title: '最大值', dataIndex: 'max', key: 'max', width: '6rem' },
             { title: '均值', dataIndex: 'mean', key: 'mean', width: '6rem' },

@@ -15,8 +15,7 @@ const CALCULATE_VARIABLES = (
 ) : {
   // 添加了描述统计量的变量列表
   calculatedCols: Variable[]
-  // 把定义的缺失值替换为 undefined 后的数据
-  // 未来还会支持用不同方法定义插值 (在 dataCols 中), 返回插值后的数据
+  // 添加了插值/替换缺失值的数据
   calculatedRows: { [key: string]: unknown }[]
 } => {
   const rows: { [key: string]: unknown }[] = dataRows.map((row) => {
@@ -69,6 +68,25 @@ const CALCULATE_VARIABLES = (
       return { ...col, count, missing, valid, unique, type }
     }
   })
+  // 处理标准化子变量
+  const derivedCols: Variable[] = []
+  cols.map((col) => {
+    if (col.subVars?.standard) {
+      derivedCols.push({ ...col, name: `${col.name}_标准化`, derived: true })
+      // 添加到原始数据中
+      rows.forEach((row) => {
+        row[`${col.name}_标准化`] = (Number(row[col.name]) - col.mean!) / col.std!
+      })
+    }
+    if (col.subVars?.center) {
+      derivedCols.push({ ...col, name: `${col.name}_中心化`, derived: true })
+      // 添加到原始数据中
+      rows.forEach((row) => {
+        row[`${col.name}_中心化`] = Number(row[col.name]) - col.mean!
+      })
+    }
+  })
+  cols.unshift(...derivedCols)
   return { calculatedCols: cols, calculatedRows: rows }
 }
 const LARGE_DATA_SIZE = 1 * 1024 * 1024
@@ -122,16 +140,28 @@ export type Variable = {
    * 仅部分方法需要此字段  
    */
   missingRefer?: string
+  /**
+   * 用于标记变量是不是由另一个变量生成的  
+   * 即是否是中心化或标准化的结果  
+   */
+  derived?: true
+  /**
+   * 是否要对变量进行中心化或标准化  
+   */
+  subVars?: {
+    standard?: boolean
+    center?: boolean
+  }
 }
 
 type State = {
   // 数据
   data: WorkBook | null
-  setData: (data: WorkBook | null) => void // 仅在导入和清空数据时使用
+  setData: (data: WorkBook | null) => void // 仅在 DataView.tsx 中使用
   dataRows: { [key: string]: unknown }[]
   dataCols: Variable[]
-  setDataCols: (cols: Variable[]) => void
-  setDataRows: (rows: { [key: string]: unknown }[]) => void
+  setDataCols: (cols: Variable[]) => void // 仅在 VariableView.tsx 中使用
+  setDataRows: (rows: { [key: string]: unknown }[]) => void // 仅在 VariableView.tsx 中使用
   // 是否数据量过大
   LARGE_DATA_SIZE: number
   isLargeData: boolean
