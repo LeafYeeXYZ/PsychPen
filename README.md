@@ -2,9 +2,9 @@
 
 **在线进行心理学统计分析和绘制统计图表**
 
-| ![](readme/1.png) | ![](readme/2.png) |
-| :---: | :---: |
-| ![](readme/3.png) | ![](readme/4.png) |
+| ![](readme/1.png) | ![](readme/2.png) | ![](readme/3.png) |
+| :---: | :---: | :---: |
+| ![](readme/4.png) | ![](readme/5.png) | ![](readme/6.png) |
 
 ## 项目说明
 
@@ -64,5 +64,7 @@
   - 非参数检验
     - [x] Kolmogorov-Smirnov 检验
     - [x] Levene 检验
+  - 相关和回归
+    - [x] Pearson 相关系数
 - **其他工具**
   - [x] 正态分布可视化演示工具
