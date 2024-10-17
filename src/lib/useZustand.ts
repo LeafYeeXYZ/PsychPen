@@ -8,9 +8,9 @@ const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers',
 const EXPORT_FILE_TYPES = ['.xlsx', '.csv', '.numbers']
 export type ALLOWED_MISSING_METHODS = '均值插值' | '中位数插值' | '最临近点插值法' | '拉格朗日插值法'
 const CALCULATE_VARIABLES = (
-  // 必须提供 name 字段, 可选提供 missingValues 字段
+  // 必须提供 name 字段, 可选提供其他字段
   dataCols: Variable[],
-  // 根据需求, 传入 原始数据(sheet_to_json) 或 dataRows(已经替换缺失值的数据)
+  // 原始数据(sheet_to_json), 不要传入已经处理过的数据!
   dataRows: { [key: string]: unknown }[]
 ) : {
   // 添加了描述统计量的变量列表
@@ -28,7 +28,7 @@ const CALCULATE_VARIABLES = (
     })
     return row
   })
-  const cols: Variable[] = dataCols.map((col) => {
+  const cols: Variable[] = dataCols.filter((col) => col.derived !== true).map((col) => {
     // 插值
     if (col.missingMethod) {
       const data = rows.map((row) => typeof row[col.name] !== 'undefined' ? Number(row[col.name]) : undefined) as number[]
@@ -72,14 +72,46 @@ const CALCULATE_VARIABLES = (
   const derivedCols: Variable[] = []
   cols.map((col) => {
     if (col.subVars?.standard) {
-      derivedCols.push({ ...col, name: `${col.name}_标准化`, derived: true })
+      derivedCols.push({ 
+        name: `${col.name}_标准化`, 
+        derived: true,
+        count: col.count,
+        missing: col.missing,
+        valid: col.valid,
+        unique: col.unique,
+        type: col.type,
+        min: Number(col.min! - col.mean!) / col.std!,
+        max: Number(col.max! - col.mean!) / col.std!,
+        mean: 0,
+        mode: '',
+        q1: Number(col.q1! - col.mean!) / col.std!,
+        q2: Number(col.q2! - col.mean!) / col.std!,
+        q3: Number(col.q3! - col.mean!) / col.std!,
+        std: 1,
+      })
       // 添加到原始数据中
       rows.forEach((row) => {
         row[`${col.name}_标准化`] = (Number(row[col.name]) - col.mean!) / col.std!
       })
     }
     if (col.subVars?.center) {
-      derivedCols.push({ ...col, name: `${col.name}_中心化`, derived: true })
+      derivedCols.push({ 
+        name: `${col.name}_中心化`, 
+        derived: true,
+        count: col.count,
+        missing: col.missing,
+        valid: col.valid,
+        unique: col.unique,
+        type: col.type,
+        min: Number(col.min! - col.mean!),
+        max: Number(col.max! - col.mean!),
+        mean: 0,
+        mode: '',
+        q1: Number(col.q1! - col.mean!),
+        q2: Number(col.q2! - col.mean!),
+        q3: Number(col.q3! - col.mean!),
+        std: col.std,
+      })
       // 添加到原始数据中
       rows.forEach((row) => {
         row[`${col.name}_中心化`] = Number(row[col.name]) - col.mean!
@@ -170,7 +202,7 @@ type State = {
   ACCEPT_FILE_TYPES: string[]
   // 可导出的文件类型
   EXPORT_FILE_TYPES: string[]
-  // 计算变量描述统计量的函数
+  // 计算变量描述统计量的函数, 仅在 VariableView.tsx 中使用
   CALCULATE_VARIABLES: (dataCols: Variable[], dataRows: { [key: string]: unknown }[]) => { calculatedCols: Variable[], calculatedRows: { [key: string]: unknown }[] }
   // 消息实例
   messageApi: MessageInstance | null
