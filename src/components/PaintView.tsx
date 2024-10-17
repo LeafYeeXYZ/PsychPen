@@ -2,6 +2,7 @@ import { BasicBoxPlot } from '../plots/BasicBoxPlot'
 import { BasicScatterPlot } from '../plots/BasicScatterPlot'
 import { ThreeDScatterPlot } from '../plots/ThreeDScatterPlot'
 import { BasicLinePlot } from '../plots/BasicLinePlot'
+import { WordCloudPlot } from '../plots/WordCloudPlot'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -46,6 +47,16 @@ const CASCADER_OPTIONS: Option[] = [
       },
     ],
   },
+  {
+    value: 'Others',
+    label: '其他',
+    children: [
+      {
+        value: 'WordCloudPlot',
+        label: '词云图',
+      },
+    ],
+  },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
@@ -60,6 +71,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'BasicLinePlot':
       set(<BasicLinePlot />)
+      break
+    case 'WordCloudPlot':
+      set(<WordCloudPlot />)
       break
     default:
       set(DEFAULT_PAGE)

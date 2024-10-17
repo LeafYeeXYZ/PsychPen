@@ -16,7 +16,7 @@ export default defineConfig({
           'xlsx': ['xlsx', 'dta'],
           'chart': ['echarts'],
           'chart-gl': ['echarts-gl'],
-          'utils': ['html2canvas', 'mathjs'],
+          'utils': ['html2canvas', 'mathjs', 'echarts-wordcloud', 'jieba-wasm'],
         }
       }
     }

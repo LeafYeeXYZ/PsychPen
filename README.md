@@ -55,6 +55,8 @@
     - [ ] 堆叠折线图
   - 直方图
     - [ ] 基础直方图 (可以绘制误差线)
+  - 其他
+    - [x] 词云图 (基于 `echarts-wordcloud` 和 `jieba-wasm`)
   - [x] 图像导出 (基于 `html2canvas`)
 - **统计功能** (近期基于 `@stdlib/stdlib` 库, 远期基于 `WebAssembly` (`pyodide` / `AssemblyScript`) 实现)
   - t 检验
