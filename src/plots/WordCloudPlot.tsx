@@ -18,6 +18,11 @@ const SPAPE_OPTIONS = [
   { value: 'pentagon', label: '五边形' },
   { value: 'star', label: '星形' },
 ]
+const ROTATION_OPTIONS = [
+  { value: 'x', label: '水平', rotationRange: [-90, 90], rotationStep: 45 },
+  { value: 'y', label: '水平/垂直', rotationRange: [-90, 90], rotationStep: 90 },
+  { value: 'z', label: '水平/垂直/倾斜', rotationRange: [-90, 90], rotationStep: 45 },
+]
 
 type Option = {
   /** 变量 */
@@ -28,6 +33,8 @@ type Option = {
   min: number // 默认 12, 单位 px
   /** 单词最大尺寸 */
   max: number // 默认 60, 单位 px
+  /** 单词方向 */
+  rotation: string
 }
 
 export function WordCloudPlot() {
@@ -41,7 +48,7 @@ export function WordCloudPlot() {
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
-      const { variable, shape, min, max } = values
+      const { variable, shape, min, max, rotation } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const raw = dataRows.map((row) => String(row[variable]))
       const data: string[] = []
@@ -64,8 +71,8 @@ export function WordCloudPlot() {
           width: '80%',
           height: '80%',
           sizeRange: [min, max],
-          rotationRange: [-90, 90],
-          rotationStep: 45,
+          rotationRange: ROTATION_OPTIONS.find((r) => r.value === rotation)?.rotationRange,
+          rotationStep: ROTATION_OPTIONS.find((r) => r.value === rotation)?.rotationStep,
           data: wordCloudData,
         }],
       }, true)
@@ -97,6 +104,7 @@ export function WordCloudPlot() {
             shape: 'circle',
             min: 12,
             max: 60,
+            rotation: 'z',
           }}
         >
           <Form.Item
@@ -178,6 +186,22 @@ export function WordCloudPlot() {
                 />
               </Form.Item>
             </Space.Compact>
+          </Form.Item>
+          <Form.Item
+            label='单词方向'
+            name='rotation'
+            rules={[ { required: true, message: '请选择单词方向' } ]}
+          >
+            <Select
+              className='w-full'
+              placeholder='请选择单词方向'
+            >
+              {ROTATION_OPTIONS.map((rotation) => (
+                <Select.Option key={rotation.value} value={rotation.value}>
+                  {rotation.label}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
           <div
             className='flex flex-row flex-nowrap justify-center items-center gap-4'
