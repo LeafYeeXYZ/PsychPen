@@ -1,10 +1,19 @@
 import * as echarts from 'echarts'
+import ecStat from 'echarts-stat'
 import { Select, Button, Form, Input, Space, InputNumber } from 'antd'
 import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
 import { downloadImage } from '../lib/utils'
+
+const REGRESSION_TYPES = [
+  { value: 'linear', label: '线性回归' },
+  { value: 'exponential', label: '指数回归' },
+  { value: 'logarithmic', label: '对数回归' },
+  { value: 'polynomial', label: '多项式回归' },
+  { value: 'none', label: '不绘制回归线' },
+]
 
 type Option = {
   /** X轴变量 */
@@ -19,6 +28,10 @@ type Option = {
   title?: string
   /** 自定义点大小 */
   dotSize?: number
+  /** 回归类型 */
+  regression: string // 'linear' | 'exponential' | 'logarithmic' | 'polynomial' | 'none'
+  /** 是否显示回归公式 */
+  formula: boolean
 }
 
 export function BasicScatterPlot() {
@@ -33,7 +46,9 @@ export function BasicScatterPlot() {
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
-      const { xVar, yVar, xLabel, yLabel, title } = values
+      const { xVar, yVar, xLabel, yLabel, title, regression, formula } = values
+      // @ts-expect-error echarts-stat 没有提供正确的类型定义
+      echarts.registerTransform(ecStat.transform.regression)
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const option: EChartsOption = {
         title: {
@@ -50,18 +65,53 @@ export function BasicScatterPlot() {
           nameLocation: 'middle',
           nameGap: 35,
         },
-        series: [{
-          data: dataRows
-            .filter((row) => 
-              typeof row[xVar] !== 'undefined'
-              && typeof row[yVar] !== 'undefined'
-            )
-            .map((row) => { 
-              return [Number(row[xVar]), Number(row[yVar])]
-            }),
-          symbolSize: values.dotSize || 10,
-          type: 'scatter',
-        }],
+        dataset: [
+          {
+            source: dataRows
+              .filter((row) => 
+                typeof row[xVar] !== 'undefined'
+                && typeof row[yVar] !== 'undefined'
+              )
+              .map((row) => { 
+                return [Number(row[xVar]), Number(row[yVar])]
+              }),
+          },
+          {
+            transform: {
+              type: 'ecStat:regression',
+              config: {
+                method: regression === 'none' ? 'linear' : regression,
+              }
+            }
+          }
+        ],
+        series: [
+          {
+            datasetIndex: 0,
+            symbolSize: values.dotSize || 10,
+            type: 'scatter',
+          },
+          {
+            datasetIndex: 1,
+            name: 'line',
+            type: 'line',
+            smooth: true,
+            symbolSize: 0.1,
+            symbol: 'circle',
+            label: { 
+              show: true, 
+              fontSize: 16,
+              color: '#1010a0',
+              opacity: 0.8,
+              backgroundColor: '#ffffff',
+            },
+            labelLayout: { dx: -20 },
+            encode: { label: 2, tooltip: 1 },
+            // 如果 regression 为 none 则不显示回归线
+            showSymbol: regression !== 'none' && formula,
+            lineStyle: regression === 'none' ? { opacity: 0 } : {},
+          }
+        ],
       }
       chart.setOption(option, true)
       setRendered(true)
@@ -88,6 +138,11 @@ export function BasicScatterPlot() {
           }}
           autoComplete='off'
           disabled={disabled}
+          initialValues={{
+            dotSize: 10,
+            regression: 'none',
+            formula: false,
+          }}
         >
           <Form.Item label='X轴变量及其标签'>
             <Space.Compact className='w-full'>
@@ -162,16 +217,61 @@ export function BasicScatterPlot() {
             </Space.Compact>
           </Form.Item>
           <Form.Item
-            label='自定义标题'
-            name='title'
+            label='自定义标题和点大小'
           >
-            <Input className='w-full' placeholder='默认无标题' />
+            <Space.Compact block>
+              <Form.Item
+                name='title'
+                noStyle
+              >
+                <Input addonBefore='标题' className='w-full' placeholder='默认无标题' />
+              </Form.Item>
+              <Form.Item
+                name='dotSize'
+                noStyle
+              >
+                <InputNumber addonBefore='点大小' className='w-52' placeholder='默认为 10' min={1} step={1} />
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
           <Form.Item
-            label='自定义点大小'
-            name='dotSize'
+            label='回归线类型与通项公式'
           >
-            <InputNumber className='w-full' placeholder='默认为 10' />
+            <Space.Compact block>
+              <Form.Item
+                name='regression'
+                noStyle
+                rules={[{ required: true, message: '请选择回归类型' }]}
+              >
+                <Select>
+                  {REGRESSION_TYPES.map((type) => (
+                    <Select.Option key={type.value} value={type.value}>
+                      {type.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name='formula'
+                noStyle
+                rules={[
+                  { required: true, message: '请选择是否显示公式' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (getFieldValue('regression') === 'none' && value) {
+                        return Promise.reject('如果要显示公式, 请选择回归线类型')
+                      }
+                      return Promise.resolve()
+                    },
+                  }),
+                ]}
+              >
+                <Select>
+                  <Select.Option value={true}>显示公式</Select.Option>
+                  <Select.Option value={false}>不显示公式</Select.Option>
+                </Select>
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
           <div
             className='flex flex-row flex-nowrap justify-center items-center gap-4'

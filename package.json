@@ -29,6 +29,7 @@
     "dta": "https://cdn.sheetjs.com/dta-0.0.2/dta-0.0.2.tgz",
     "echarts": "^5.5.1",
     "echarts-gl": "^2.0.9",
+    "echarts-stat": "^1.2.0",
     "echarts-wordcloud": "^2.1.0",
     "html2canvas": "^1.4.1",
     "jieba-wasm": "^2.2.0",
