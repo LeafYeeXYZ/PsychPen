@@ -160,6 +160,10 @@ export function DataView() {
                       const feeder = new Feeder(e.target.result as ArrayBuffer)
                       const data = (await parser.all(feeder)).rows.map((map: Map<string, unknown>) => Object.fromEntries(map))
                       setData(utils.book_new(utils.json_to_sheet(data), 'psychpen'))
+                    } else if (ext === 'txt') {
+                      // SheetJS 默认对 TXT 的编码是 UTF-16, 这里让它用 UTF-8 解析
+                      const text = new TextDecoder('utf-8').decode(e.target.result as ArrayBuffer)
+                      setData(read(text, { type: 'string' }))
                     } else {
                       setData(read(e.target.result))
                     }
