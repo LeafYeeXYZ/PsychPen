@@ -23,6 +23,11 @@ const ROTATION_OPTIONS = [
   { value: 'y', label: '水平/垂直', rotationRange: [-90, 90], rotationStep: 90 },
   { value: 'z', label: '水平/垂直/倾斜', rotationRange: [-90, 90], rotationStep: 45 },
 ]
+const FILTER_OPTIONS = [
+  { value: 'punctuation', label: '标点符号', reg: /[\p{P}\u2000-\u206F\u2E00-\u2E7F]/u },
+  { value: 'number', label: '数字', reg: /\d/ },
+  { value: 'english', label: '英文', reg: /[a-zA-Z]/ },
+]
 
 type Option = {
   /** 变量 */
@@ -35,6 +40,8 @@ type Option = {
   max: number // 默认 60, 单位 px
   /** 单词方向 */
   rotation: string
+  /** 过滤设置 */
+  filter?: string[]
 }
 
 export function WordCloudPlot() {
@@ -48,14 +55,19 @@ export function WordCloudPlot() {
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
-      const { variable, shape, min, max, rotation } = values
+      const { variable, shape, min, max, rotation, filter } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const raw = dataRows.map((row) => String(row[variable]))
-      const data: string[] = []
+      let data: string[] = []
       await init()
       for (const text of raw) {
         const words = cut(text, true)
         data.push(...words)
+      }
+      if (filter) {
+        for (const f of filter) {
+          data = data.filter((word) => !FILTER_OPTIONS.find((filter) => filter.value === f)?.reg.test(word))
+        }
       }
       const counts = data.reduce((acc, cur) => {
         acc[cur] = (acc[cur] || 0) + 1
@@ -104,7 +116,8 @@ export function WordCloudPlot() {
             shape: 'circle',
             min: 12,
             max: 60,
-            rotation: 'z',
+            rotation: 'x',
+            filter: ['punctuation'],
           }}
         >
           <Form.Item
@@ -139,8 +152,8 @@ export function WordCloudPlot() {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label='单词尺寸范围'>
-            <Space.Compact>
+          <Form.Item label='单词最小/最大尺寸和方向'>
+            <Space.Compact block>
               <Form.Item
                 noStyle
                 name='min'
@@ -157,7 +170,8 @@ export function WordCloudPlot() {
                 ]}
               >
                 <InputNumber
-                  className='w-full'
+                  addonAfter='px'
+                  className='w-52'
                   placeholder='最小尺寸'
                   step={1}
                   min={1}
@@ -180,27 +194,44 @@ export function WordCloudPlot() {
                 ]}
               >
                 <InputNumber
-                  className='w-full'
+                  addonAfter='px'
+                  className='w-52'
                   placeholder='最大尺寸'
                   step={1}
                   min={1}
                   max={100}
                 />
               </Form.Item>
+              <Form.Item
+                noStyle
+                name='rotation'
+                rules={[ { required: true, message: '请选择单词方向' } ]}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='单词方向'
+                >
+                  {ROTATION_OPTIONS.map((rotation) => (
+                    <Select.Option key={rotation.value} value={rotation.value}>
+                      {rotation.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
             </Space.Compact>
           </Form.Item>
           <Form.Item
-            label='单词方向'
-            name='rotation'
-            rules={[ { required: true, message: '请选择单词方向' } ]}
+            label='内容过滤设置'
+            name='filter'
           >
             <Select
               className='w-full'
-              placeholder='请选择单词方向'
+              placeholder='留空则不过滤'
+              mode='multiple'
             >
-              {ROTATION_OPTIONS.map((rotation) => (
-                <Select.Option key={rotation.value} value={rotation.value}>
-                  {rotation.label}
+              {FILTER_OPTIONS.map((filter) => (
+                <Select.Option key={filter.value} value={filter.value}>
+                  {filter.label}
                 </Select.Option>
               ))}
             </Select>
