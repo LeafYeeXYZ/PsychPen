@@ -114,6 +114,7 @@ export function interpolate(data: (number | undefined)[], method: ALLOWED_MISSIN
  * @throws xValues 和 yValues 的长度不一致
  */ 
 function lagrangeInterpolation(xValues: number[], yValues: number[], x: number): number | undefined {
+  const DOT_COUNT = -3
   // 数组去重
   const peers = xValues.map((v, i) => ({ x: v, y: yValues[i] }))
   const uniquePeers = peers
@@ -124,9 +125,9 @@ function lagrangeInterpolation(xValues: number[], yValues: number[], x: number):
   xValues = uniquePeers.map(v => v.x)
   yValues = uniquePeers.map(v => v.y)
   // 只使用比 x 小/大的 3 个点插值
-  const upper = xValues.toSorted((a, b) => a - b).filter(v => v < x).slice(-3)
-  const lower = xValues.toSorted((a, b) => b - a).filter(v => v > x).slice(-3)
-  if (upper.length === 0 || lower.length === 0) {
+  const upper = xValues.toSorted((a, b) => a - b).filter(v => v < x).slice(DOT_COUNT)
+  const lower = xValues.toSorted((a, b) => b - a).filter(v => v > x).slice(DOT_COUNT)
+  if (upper.length === 0 && lower.length === 0) {
     return undefined
   }
   xValues = [...upper, ...lower]
