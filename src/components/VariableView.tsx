@@ -1,5 +1,5 @@
 import { useZustand, type ALLOWED_MISSING_METHODS } from '../lib/useZustand'
-import { Button, Table, Modal, Select } from 'antd'
+import { Button, Table, Modal, Select, Tag } from 'antd'
 import { CalculatorOutlined, ZoomOutOutlined, BoxPlotOutlined } from '@ant-design/icons'
 import { useRef } from 'react'
 import { flushSync } from 'react-dom'
@@ -206,7 +206,7 @@ export function VariableView() {
             onClick={async () => {
               flushSync(() => setDisabled(true))
               await modalApi.confirm({
-                title: '定义中心化/标准化自变量',
+                title: '定义中心化/标准化子变量',
                 content: (
                   <div className='flex flex-col gap-4 my-4'>
                     <Select
@@ -225,8 +225,8 @@ export function VariableView() {
                         handleSubVarsParams.current.center = value.includes('中心化')
                       }}
                     >
-                      <Select.Option key='标准化' value='标准化'>标准化</Select.Option>
-                      <Select.Option key='中心化' value='中心化'>中心化</Select.Option>
+                      <Select.Option key='标准化' value='标准化'>标准化 <Tag color='pink'>(x-mean)/std</Tag></Select.Option>
+                      <Select.Option key='中心化' value='中心化'>中心化 <Tag color='pink'>x-mean</Tag></Select.Option>
                     </Select>
                   </div>
                 ),
