@@ -36,7 +36,7 @@
 
 - **数据管理**
   - [x] 数据导入 (基于 `sheet.js`)
-  - [x] 数据和变量预览 
+  - [x] 数据和变量预览 (基于 `AG-Grid`)
   - [x] 支持导入 `.sav` 文件 (基于 [mhermher/savvy](https://github.com/mhermher/savvy) `但是不知道为什么不能直接安装, 只能手动下载源码`)
   - [x] 数据导出 (基于 `sheet.js`)
   - [x] 基础的缺失值定义 

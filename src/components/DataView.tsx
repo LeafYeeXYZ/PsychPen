@@ -1,12 +1,15 @@
 import { read, utils, writeFile } from 'xlsx'
 import { useZustand } from '../lib/useZustand'
-import { Upload, Button, Tag, Table, Popconfirm, Modal, Input, Select } from 'antd'
+import { Upload, Button, Tag, Popconfirm, Modal, Input, Select } from 'antd'
 import { SlidersOutlined, DeleteOutlined, SaveOutlined, FilterOutlined } from '@ant-design/icons'
 import { parse, set_utils } from 'dta'
 import { flushSync } from 'react-dom'
 import { useRef } from 'react'
 import XLSX_ZAHL_PAYLOAD from 'xlsx/dist/xlsx.zahl.mjs'
 import { SavParser, Feeder } from '../../external/sav/index'
+import { AgGridReact } from 'ag-grid-react'
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-quartz.css'
 
 export function DataView() {
 
@@ -94,30 +97,13 @@ export function DataView() {
             </Button>
           </div>
           {/* 数据表格 */}
-          <Table
-            className='w-full overflow-auto text-nowrap'
-            bordered
-            dataSource={dataRows.map((row, index) => ({ 
-              key: index,
-              ...row, // 如果 row 中有 key 字段, 会覆盖 key: index
+          <AgGridReact
+            className='ag-theme-quartz w-full h-full overflow-auto'
+            rowData={dataRows}
+            columnDefs={dataCols.map((col) => ({ 
+              field: col.name, 
+              headerName: col.name,
             }))}
-            columns={dataCols.map((col, index) => ({
-              title: col.name,
-              dataIndex: col.name,
-              key: `${col.name}-${index}`,
-              width: `max(5rem, ${col.name.length}rem)`,
-            }))}
-            pagination={{
-              hideOnSinglePage: false,
-              position: ['bottomLeft'],
-              defaultPageSize: 25,
-              showSizeChanger: true,
-              pageSizeOptions: [25, 50, 100],
-            }}
-            scroll={{ 
-              y: 'max(calc(100dvh - 16rem), calc(480px - 16rem))',
-              x: 'max-content',
-            }}
           />
         </div>
       ) : (

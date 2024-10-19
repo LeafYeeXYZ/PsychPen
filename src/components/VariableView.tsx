@@ -1,9 +1,12 @@
 import { useZustand, type ALLOWED_MISSING_METHODS } from '../lib/useZustand'
-import { Button, Table, Modal, Select, Tag } from 'antd'
+import { Button, Modal, Select, Tag } from 'antd'
 import { CalculatorOutlined, ZoomOutOutlined, BoxPlotOutlined } from '@ant-design/icons'
 import { useRef } from 'react'
 import { flushSync } from 'react-dom'
 import { utils } from 'xlsx'
+import { AgGridReact } from 'ag-grid-react'
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-quartz.css'
 
 export function VariableView() {
 
@@ -255,56 +258,42 @@ export function VariableView() {
           </Button>
         </div>
         {/* 变量表格 */}
-        <Table
-          className='w-full overflow-auto text-nowrap'
-          bordered
-          dataSource={dataCols.filter((col) => col.derived !== true).map((col, index) => {
-            let subVars = ''
-            if (col.subVars?.standard) {
-              subVars += '标准化'
-            }
-            if (col.subVars?.center) {
-              subVars += subVars ? '和中心化' : '中心化'
-            }
-            return {
-              key: `${col.name}-${index}`,
-              ...col, // 如果 col 中有 key 字段, 会覆盖 key: index
-              missingValues: col.missingValues?.join(', '),
-              missingMethod: col.missingMethod ?? '删除法',
-              subVars: subVars || '无',
-            }
-          })}
-          columns={[
-            { title: '变量名', dataIndex: 'name', key: 'name', width: '6rem', fixed: 'left' },
-            { title: '数据类型', dataIndex: 'type', key: 'type', width: '6rem' },
-            { title: '样本量', dataIndex: 'count', key: 'count', width: '6rem' },
-            { title: '有效值(含插值)数', dataIndex: 'valid', key: 'valid', width: '9rem' },
-            { title: '唯一值数量', dataIndex: 'unique', key: 'unique', width: '7rem' },
-            { title: '子变量', dataIndex: 'subVars', key: 'subVars', width: '6rem' },
-            { title: '缺失值定义', dataIndex: 'missingValues', key: 'missingValues', width: '7rem' },
-            { title: '未插值缺失值数', dataIndex: 'missing', key: 'missing', width: '9rem' },
-            { title: '缺失值插值方法', dataIndex: 'missingMethod', key: 'missingMethod', width: '9rem' },
-            { title: '插值的参考变量', dataIndex: 'missingRefer', key: 'missingRefer', width: '9rem' },
-            { title: '最小值', dataIndex: 'min', key: 'min', width: '6rem' },
-            { title: '最大值', dataIndex: 'max', key: 'max', width: '6rem' },
-            { title: '均值', dataIndex: 'mean', key: 'mean', width: '6rem' },
-            { title: '25%分位数', dataIndex: 'q1', key: 'q1', width: '7rem' },
-            { title: '50%分位数', dataIndex: 'q2', key: 'q2', width: '7rem' },
-            { title: '75%分位数', dataIndex: 'q3', key: 'q3', width: '7rem' },
-            { title: '标准差', dataIndex: 'std', key: 'std', width: '6rem' },
-            { title: '众数', dataIndex: 'mode', key: 'mode', width: '6rem' },
+        <AgGridReact
+          className='ag-theme-quartz w-full h-full overflow-auto'
+          rowData={dataCols
+            .filter((col) => col.derived !== true)
+            .map((col) => {
+              let subVars = ''
+              if (col.subVars?.standard) subVars += '标准化'
+              if (col.subVars?.center) subVars += subVars ? '和中心化' : '中心化'
+              return {
+                ...col,
+                missingValues: col.missingValues?.join(', '),
+                missingMethod: col.missingMethod ?? '删除法',
+                subVars: subVars || '无',
+              }
+            })
+          }
+          columnDefs={[
+            { headerName: '变量名', field: 'name', pinned: 'left', width: 150 },
+            { headerName: '数据类型', field: 'type', width: 130 },
+            { headerName: '样本量', field: 'count', width: 100 },
+            { headerName: '有效值数(含插值)', field: 'valid', width: 150 },
+            { headerName: '缺失值数(未插值)', field: 'missing', width: 150 },
+            { headerName: '唯一值数', field: 'unique', width: 100 },
+            { headerName: '子变量', field: 'subVars', width: 130 },
+            { headerName: '缺失值定义', field: 'missingValues', width: 130 },
+            { headerName: '缺失值插值方法', field: 'missingMethod', width: 130 },
+            { headerName: '插值的参考变量', field: 'missingRefer', width: 130 },
+            { headerName: '最小值', field: 'min', width: 130 },
+            { headerName: '最大值', field: 'max', width: 130 },
+            { headerName: '均值', field: 'mean', width: 130 },
+            { headerName: '25%分位数', field: 'q1', width: 130 },
+            { headerName: '50%分位数', field: 'q2', width: 130 },
+            { headerName: '75%分位数', field: 'q3', width: 130 },
+            { headerName: '标准差', field: 'std', width: 130 },
+            { headerName: '众数', field: 'mode', width: 150 },
           ]}
-          pagination={{
-            hideOnSinglePage: false,
-            position: ['bottomLeft'],
-            defaultPageSize: 25,
-            showSizeChanger: true,
-            pageSizeOptions: [25, 50, 100],
-          }}
-          scroll={{ 
-            y: 'max(calc(100dvh - 16rem), calc(480px - 16rem))',
-            x: 'max-content',
-          }}
         />
       </div>
       {contextHolder}

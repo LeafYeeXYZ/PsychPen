@@ -25,6 +25,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
     "@stdlib/stdlib": "^0.3.0",
+    "ag-grid-react": "^32.2.2",
     "antd": "^5.21.3",
     "dta": "https://cdn.sheetjs.com/dta-0.0.2/dta-0.0.2.tgz",
     "echarts": "^5.5.1",

@@ -7,7 +7,6 @@ import { StatisticsView } from './components/StatisticsView'
 import { VariableView } from './components/VariableView'
 import { ToolView } from './components/ToolView'
 import { useZustand } from './lib/useZustand'
-import { flushSync } from 'react-dom'
 
 const ANTD_THEME: ThemeConfig = {
   token: {
@@ -18,7 +17,7 @@ const ANTD_THEME: ThemeConfig = {
 
 export function App() {
 
-  const { data, setMessageApi, isLargeData, disabled, setDisabled } = useZustand()
+  const { data, setMessageApi, disabled } = useZustand()
   // 加载完成后切换页面标题
   useEffect(() => {
     document.title = 'PsychPen'
@@ -41,19 +40,8 @@ export function App() {
               type={activePage === 'data' ? 'primary' : 'text'}
               onClick={async () => {
                 if (activePage === 'data') return
-                isLargeData && messageApi.open({
-                  type: 'loading',
-                  content: '正在处理数据...',
-                  duration: 0,
-                })
-                isLargeData && flushSync(() => setDisabled(true))
-                isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
-                flushSync(() => {
-                  setPage(<DataView />)
-                  setActivePage('data')
-                })
-                messageApi.destroy()
-                setDisabled(false)
+                setPage(<DataView />)
+                setActivePage('data')
               }}
               autoInsertSpace={false}
               disabled={disabled}

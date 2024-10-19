@@ -27,3 +27,7 @@ table.three-line-table {
     @apply pb-2
   }
 }
+
+.ag-theme-quartz {
+  --ag-cell-horizontal-border: solid 1px #dddddd;
+}
