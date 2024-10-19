@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.2.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.1.0...v1.2.0) (2024-10-19)
+
+
+### Features
+
+* 为每个变量处理功能增加说明 ([b910e92](https://github.com/LeafYeeXYZ/PsychPen/commit/b910e92c4e1dd2f5e2d914ee62b4e583793cf20d))
+
 ## [1.1.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.0.0...v1.1.0) (2024-10-19)
 
 
