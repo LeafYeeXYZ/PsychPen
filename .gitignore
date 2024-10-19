@@ -1,4 +1,6 @@
+.VSCodeCounter
 .venv
+local
 
 # Logs
 logs
