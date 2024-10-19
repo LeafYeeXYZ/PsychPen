@@ -30,4 +30,12 @@ table.three-line-table {
 
 .ag-theme-quartz {
   --ag-cell-horizontal-border: solid 1px #dddddd;
+  --ag-row-hover-color: #fbfafa;
+  --ag-header-foreground-color: #450d1a;
+  --ag-foreground-color: #450d1a;
+  --ag-active-color: #450d1a;
+}
+
+p.intro-text {
+  @apply text-base text-gray-700 text-balance leading-8 w-full text-center;
 }
