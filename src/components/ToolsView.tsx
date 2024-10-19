@@ -27,7 +27,7 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
 const CASCADER_DEFAULT_VALUE = ['NormalDistribution']
 const DEFAULT_PAGE = <NormalDistribution />
 
-export function ToolView() {
+export function ToolsView() {
 
   // 加入新工具: 导入并修改常数定义
   const [page, setPage] = useState<React.ReactElement>(DEFAULT_PAGE)

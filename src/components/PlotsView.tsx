@@ -96,7 +96,7 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
 const CASCADER_DEFAULT_VALUE = ['Scatter', 'BasicScatterPlot']
 const DEFAULT_PAGE = <BasicScatterPlot />
 
-export function PaintView() {
+export function PlotsView() {
 
   // 加入新图: 导入并修改常数定义
   const [page, setPage] = useState<React.ReactElement>(DEFAULT_PAGE)

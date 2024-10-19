@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { Button, ConfigProvider, ThemeConfig, message } from 'antd'
 import { LinkOutlined, BarChartOutlined } from '@ant-design/icons'
 import { DataView } from './components/DataView'
-import { PaintView } from './components/PaintView'
+import { PlotsView } from './components/PlotsView'
 import { StatisticsView } from './components/StatisticsView'
 import { VariableView } from './components/VariableView'
-import { ToolView } from './components/ToolView'
+import { ToolsView } from './components/ToolsView'
 import { useZustand } from './lib/useZustand'
 
 const ANTD_THEME: ThemeConfig = {
@@ -61,11 +61,11 @@ export function App() {
               变量
             </Button>
             <Button
-              type={activePage === 'paint' ? 'primary' : 'text'}
+              type={activePage === 'plots' ? 'primary' : 'text'}
               onClick={() => {
-                if (activePage === 'paint') return
-                setPage(<PaintView />)
-                setActivePage('paint')
+                if (activePage === 'plots') return
+                setPage(<PlotsView />)
+                setActivePage('plots')
               }}
               autoInsertSpace={false}
               disabled={(data === null) || disabled}
@@ -85,11 +85,11 @@ export function App() {
               统计
             </Button>
             <Button
-              type={activePage === 'tool' ? 'primary' : 'text'}
+              type={activePage === 'tools' ? 'primary' : 'text'}
               onClick={() => {
-                if (activePage === 'tool') return
-                setPage(<ToolView />)
-                setActivePage('tool')
+                if (activePage === 'tools') return
+                setPage(<ToolsView />)
+                setActivePage('tools')
               }}
               autoInsertSpace={false}
               disabled={disabled}
