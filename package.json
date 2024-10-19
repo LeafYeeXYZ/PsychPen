@@ -1,6 +1,6 @@
 {
   "name": "psych-pen",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Web statistic app for Psychology and Education",
   "private": true,
   "type": "module",
