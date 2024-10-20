@@ -12,12 +12,20 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'antd': ['antd', '@ant-design/icons'],
+          'antd': ['antd'],
           'xlsx': ['xlsx', 'dta'],
           'chart': ['echarts'],
           'table': ['ag-grid-react'],
           'chart-gl': ['echarts-gl'],
-          'utils': ['html2canvas', 'mathjs', 'echarts-wordcloud', 'jieba-wasm', 'echarts-stat'],
+          'utils': [
+            'html2canvas', 
+            'mathjs', 
+            'echarts-wordcloud', 
+            'jieba-wasm', 
+            'echarts-stat',
+            '@leaf/sav-reader',
+            '@ant-design/icons',
+          ],
         }
       }
     }

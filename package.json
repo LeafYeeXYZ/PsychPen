@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
+    "@leaf/sav-reader": "npm:@jsr/leaf__sav-reader",
     "@stdlib/stdlib": "^0.3.0",
     "ag-grid-react": "^32.2.2",
     "antd": "^5.21.3",
@@ -41,6 +42,7 @@
     "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
+    "@types/bun": "^1.1.11",
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
