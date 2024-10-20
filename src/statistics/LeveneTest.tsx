@@ -6,8 +6,12 @@ import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
 
 type Option = {
-  /** 变量名 */
-  variable: string[] | string
+  /** 类别 */
+  type: 'peer' | 'independent'
+  /** 被试间变量名 */
+  variable?: string
+  /** 被试内变量名 */
+  variables?: string[]
   /** 显著性水平, 默认 0.05 */
   alpha: number
   /** 分组变量 */
@@ -32,12 +36,12 @@ export function LeveneTest() {
       let groups: string[] = []
       let data: number[][] = []
       // 处理被试间变量
-      if (typeof values.group === 'string') {
+      if (values.type === 'independent') {
         const emptyIndex: number[] = []
-        groups = Array.from(new Set(dataRows.map((row) => row[values.group as string]))).map(String)
+        groups = Array.from(new Set(dataRows.map((row) => row[values.group!]))).map(String)
         data = groups.map((group) => dataRows
-          .filter((row) => row[values.group as string] == group)
-          .map((row) => row[values.variable as string])
+          .filter((row) => row[values.group!] == group)
+          .map((row) => row[values.variable!])
           .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
           .map((v) => Number(v))
         ).filter((arr, index) => {
@@ -50,8 +54,8 @@ export function LeveneTest() {
         groups = groups.filter((_, index) => !emptyIndex.includes(index))
       // 处理被试内变量
       } else {
-        groups = values.variable as string[]
-        data = (values.variable as string[]).map((variable) => dataRows
+        groups = values.variables!
+        data = (values.variables!).map((variable) => dataRows
           .map((row) => row[variable])
           .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
           .map((v) => Number(v))
@@ -117,7 +121,7 @@ export function LeveneTest() {
           {formType === 'peer' ? (
             <Form.Item
               label='选择变量(至少两个)'
-              name='variable'
+              name='variables'
               rules={[
                 { required: true, message: '请选择变量' },
                 { type: 'array', min: 2, message: '至少选择两个变量' },
