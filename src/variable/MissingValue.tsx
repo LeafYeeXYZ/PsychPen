@@ -51,7 +51,7 @@ export function MissingValue() {
           disabled={disabled}
         >
           <Form.Item 
-            label='变量名 (可选择多个变量)'
+            label='变量名(可选择多个变量)'
             name='variable'
             rules={[{ required: true, message: '请选择变量' }]}
           >
@@ -63,7 +63,7 @@ export function MissingValue() {
             />
           </Form.Item>
           <Form.Item 
-            label='缺失值 (可输入多个值/留空)'
+            label='缺失值(可输入多个值/留空)'
           >
             <Select
               mode='tags'

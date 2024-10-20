@@ -115,14 +115,14 @@ export function KolmogorovSmirnovTest() {
           disabled={disabled}
         >
           <Form.Item
-            label='选择变量 (可多选)'
+            label='选择变量(可多选)'
             name='variable'
             rules={[{ required: true, message: '请选择变量' }]}
           >
             <Select
               className='w-full'
-              placeholder='请选择变量 (可多选)'
-              mode='tags'
+              placeholder='请选择变量'
+              mode='multiple'
             >
               {dataCols.map((col) => col.type === '等距或等比数据' && (
                 <Select.Option key={col.name} value={col.name}>

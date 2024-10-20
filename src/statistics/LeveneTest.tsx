@@ -116,7 +116,7 @@ export function LeveneTest() {
           </Form.Item>
           {formType === 'peer' ? (
             <Form.Item
-              label='选择变量 (至少两个)'
+              label='选择变量(至少两个)'
               name='variable'
               rules={[
                 { required: true, message: '请选择变量' },
@@ -126,7 +126,7 @@ export function LeveneTest() {
               <Select
                 className='w-full'
                 placeholder='请选择变量'
-                mode='tags'
+                mode='multiple'
               >
                 {dataCols.map((col) => col.type === '等距或等比数据' && (
                   <Select.Option key={col.name} value={col.name}>

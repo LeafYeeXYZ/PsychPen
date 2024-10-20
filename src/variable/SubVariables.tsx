@@ -80,7 +80,7 @@ export function SubVariables() {
             />
           </Form.Item>
           <Form.Item 
-            label='子变量 (可多选/留空)'
+            label='子变量(可多选/留空)'
             name='subVars'
           >
             <Select

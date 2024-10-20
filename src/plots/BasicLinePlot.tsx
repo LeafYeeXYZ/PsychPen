@@ -310,7 +310,7 @@ export function BasicLinePlot() {
           ) : (
             <>
               <Form.Item
-                label='选择配对变量(X轴各点)'
+                label='选择配对变量(X轴各点)(可多选)'
                 name='variables'
                 rules={[
                   { required: true, message: '请选择配对变量' },
@@ -320,7 +320,7 @@ export function BasicLinePlot() {
                 <Select
                   className='w-full'
                   placeholder='请选择配对变量'
-                  mode='tags'
+                  mode='multiple'
                   options={dataCols
                     .filter((col) => col.type === '等距或等比数据')
                     .map((col) => ({ label: col.name, value: col.name })

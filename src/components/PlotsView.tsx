@@ -4,6 +4,7 @@ import { ThreeDScatterPlot } from '../plots/ThreeDScatterPlot'
 import { BasicLinePlot } from '../plots/BasicLinePlot'
 import { WordCloudPlot } from '../plots/WordCloudPlot'
 import { ThreeDBarPlot } from '../plots/ThreeDBarPlot'
+import { ParallelLinePlot } from '../plots/ParallelLinePlot'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -21,6 +22,10 @@ const CASCADER_OPTIONS: Option[] = [
       {
         value: 'BasicLinePlot',
         label: '基础折线图',
+      },
+      {
+        value: 'ParallelLinePlot',
+        label: '平行折线图',
       },
     ],
   },
@@ -88,6 +93,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'ThreeDBarPlot':
       set(<ThreeDBarPlot />)
+      break
+    case 'ParallelLinePlot':
+      set(<ParallelLinePlot />)
       break
     default:
       set(DEFAULT_PAGE)

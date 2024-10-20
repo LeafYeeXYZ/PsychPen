@@ -37,7 +37,6 @@ export function ThreeDBarPlot() {
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
-
   const handleFinish = async (values: Option) => {
     const timestamp = Date.now()
     try {
