@@ -1,6 +1,6 @@
 import * as math from 'mathjs'
-import { ALLOWED_MISSING_METHODS } from './useZustand'
 import html2canvas from 'html2canvas'
+import type { AllowedInterpolationMethods } from './types'
 
 /**
  * 生成符合论文写作规范的统计量和 p 值
@@ -25,12 +25,12 @@ export function generatePResult(statistic: unknown, p: unknown): { statistic: st
 /**
  * 计算众数
  * @param data 数据
- * @returns 众数 (若众数个数小于等于 3, 则返回所有众数, 否则返回皮尔逊经验公式结果)
+ * @returns 众数 (若众数个数超过1个, 则返回皮尔逊经验公式结果)
  */
 export function calculateMode(data: number[]): string {
   const result = math.mode(data)
-  if (result.length <= 3) {
-    return result.join(' / ')
+  if (result.length <= 1) {
+    return result[0].toFixed(4)
   } else {
     const mid = math.median(data)
     const mean = math.mean(data)
@@ -45,7 +45,7 @@ export function calculateMode(data: number[]): string {
  * @param peer 参考变量
  * @returns 插值处理后的数据
  */
-export function interpolate(data: (number | undefined)[], method: ALLOWED_MISSING_METHODS, peer?: (number | undefined)[]): (number | undefined)[] {
+export function interpolate(data: (number | undefined)[], method: AllowedInterpolationMethods, peer?: (number | undefined)[]): (number | undefined)[] {
 
   if (method === '均值插值') {
 

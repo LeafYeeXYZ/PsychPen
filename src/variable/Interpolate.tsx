@@ -1,22 +1,22 @@
-import { useZustand, type ALLOWED_MISSING_METHODS } from '../lib/useZustand'
+import { useZustand } from '../lib/useZustand'
 import { Button, Select, Form } from 'antd'
 import { flushSync } from 'react-dom'
-import { utils } from 'xlsx'
+import type { AllowedInterpolationMethods } from '../lib/types'
 
 type Option = {
   /** 变量名 */
   variable: string
   /** 插值方法 */
-  method?: ALLOWED_MISSING_METHODS
+  method?: AllowedInterpolationMethods
   /** 插值参考变量 */
   peer?: string
 }
 
-const INTERPOLATE_METHODS: ALLOWED_MISSING_METHODS[] = ['均值插值', '中位数插值', '最临近点插值法', '拉格朗日插值法']
+const INTERPOLATE_METHODS: AllowedInterpolationMethods[] = ['均值插值', '中位数插值', '最临近点插值法', '拉格朗日插值法']
 
 export function Interpolate() {
 
-  const { data, dataCols, setDataCols, setDataRows, messageApi, CALCULATE_VARIABLES, isLargeData, disabled, setDisabled } = useZustand()
+  const { dataCols, messageApi, isLargeData, disabled, setDisabled, _VariableView_updateData } = useZustand()
 
   // 处理插值
   const handleFinish = async (values: Option) => {
@@ -35,10 +35,7 @@ export function Interpolate() {
           return col
         }
       })
-      const sheet = data!.Sheets[data!.SheetNames[0]]
-      const { calculatedRows, calculatedCols } = CALCULATE_VARIABLES(cols, utils.sheet_to_json(sheet) as { [key: string]: unknown }[])
-      setDataCols(calculatedCols)
-      setDataRows(calculatedRows)
+      _VariableView_updateData(cols)
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp - (isLargeData ? 500 : 0)} 毫秒`)
     } catch (error) {

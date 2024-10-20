@@ -17,7 +17,7 @@ const ANTD_THEME: ThemeConfig = {
 
 export function App() {
 
-  const { data, setMessageApi, disabled } = useZustand()
+  const { data, _App_setMessageApi, disabled } = useZustand()
   // 加载完成后切换页面标题
   useEffect(() => {
     document.title = 'PsychPen'
@@ -28,8 +28,8 @@ export function App() {
   // 消息实例
   const [messageApi, contextHolder] = message.useMessage()
   useEffect(() => {
-    setMessageApi(messageApi)
-  }, [messageApi, setMessageApi])
+    _App_setMessageApi(messageApi)
+  }, [messageApi, _App_setMessageApi])
 
   return (
     <ConfigProvider theme={ANTD_THEME}>

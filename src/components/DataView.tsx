@@ -11,9 +11,16 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 
+/** 可导入的文件类型 */
+const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta', '.sav']
+/** 可导出的文件类型 */
+const EXPORT_FILE_TYPES = ['.xlsx', '.csv', '.numbers']
+/** 数据量较大的阈值 */
+const LARGE_DATA_SIZE = 1 * 1024 * 1024
+
 export function DataView() {
 
-  const { data, setData, dataCols, dataRows, ACCEPT_FILE_TYPES, messageApi, setIsLargeData, LARGE_DATA_SIZE, disabled, setDisabled, EXPORT_FILE_TYPES } = useZustand()
+  const { data, _DataView_setData, dataCols, dataRows, messageApi, _DataView_setIsLargeData, disabled, setDisabled } = useZustand()
   const [modalApi, contextHolder] = Modal.useModal()
   // 导出数据相关
   const handleExport = async (filename: string, type: string) => {
@@ -35,7 +42,7 @@ export function DataView() {
           <div className='w-full flex justify-start items-center gap-3 mb-4'>
             <Popconfirm
               title={<span>是否确认清除数据<br />本地数据不受影响</span>}
-              onConfirm={() => setData(null)}
+              onConfirm={() => _DataView_setData(null)}
               okText='确定'
               cancelText='取消'
             >
@@ -132,7 +139,7 @@ export function DataView() {
                 // 如果文件比较大, 延迟等待通知加载
                 if (file.size > LARGE_DATA_SIZE) {
                   await new Promise((resolve) => setTimeout(resolve, 500))
-                  setIsLargeData(true)
+                  _DataView_setIsLargeData(true)
                 }
                 const reader = new FileReader()
                 const ext = file.name.split('.').pop()?.toLowerCase()
@@ -143,18 +150,18 @@ export function DataView() {
                       messageApi?.error('文件读取失败, 请检查文件是否损坏')
                     } else if (ext === 'dta') {
                       set_utils(utils)
-                      setData(parse(new Uint8Array(e.target.result as ArrayBuffer)))
+                      _DataView_setData(parse(new Uint8Array(e.target.result as ArrayBuffer)))
                     } else if (ext === 'sav') {
                       const parser = new SavParser()
                       const feeder = new Feeder(e.target.result as ArrayBuffer)
                       const data = (await parser.all(feeder)).rows.map((map: Map<string, unknown>) => Object.fromEntries(map))
-                      setData(utils.book_new(utils.json_to_sheet(data), 'psychpen'))
+                      _DataView_setData(utils.book_new(utils.json_to_sheet(data), 'psychpen'))
                     } else if (ext === 'txt') {
                       // SheetJS 默认对 TXT 的编码是 UTF-16, 这里让它用 UTF-8 解析
                       const text = new TextDecoder('utf-8').decode(e.target.result as ArrayBuffer)
-                      setData(read(text, { type: 'string' }))
+                      _DataView_setData(read(text, { type: 'string' }))
                     } else {
-                      setData(read(e.target.result))
+                      _DataView_setData(read(e.target.result))
                     }
                     messageApi?.destroy('uploading')
                     messageApi?.open({

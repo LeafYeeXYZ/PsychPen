@@ -1,7 +1,6 @@
 import { useZustand } from '../lib/useZustand'
 import { Button, Select, Form, Tag } from 'antd'
 import { flushSync } from 'react-dom'
-import { utils } from 'xlsx'
 
 type Option = {
   /** 变量名 */
@@ -20,7 +19,7 @@ const ALLOW_SUBVARS: {
 
 export function SubVariables() {
 
-  const { data, dataCols, setDataCols, setDataRows, messageApi, CALCULATE_VARIABLES, isLargeData, disabled, setDisabled } = useZustand()
+  const { dataCols, messageApi, isLargeData, disabled, setDisabled, _VariableView_updateData } = useZustand()
 
   // 定义子变量
   const handleFinish = async (values: Option) => {
@@ -41,10 +40,7 @@ export function SubVariables() {
           return col
         }
       })
-      const sheet = data!.Sheets[data!.SheetNames[0]]
-      const { calculatedRows, calculatedCols } = CALCULATE_VARIABLES(cols, utils.sheet_to_json(sheet) as { [key: string]: unknown }[])
-      setDataCols(calculatedCols)
-      setDataRows(calculatedRows)
+      _VariableView_updateData(cols)
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp - (isLargeData ? 500 : 0)} 毫秒`)
     } catch (error) {
