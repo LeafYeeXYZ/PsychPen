@@ -99,10 +99,13 @@ export function DataView() {
           {/* 数据表格 */}
           <AgGridReact
             className='ag-theme-quartz w-full h-full overflow-auto'
+            // @ts-expect-error 使用 valueFormatter 之后类型报错
             rowData={dataRows}
+            // @ts-expect-error 使用 valueFormatter 之后类型报错
             columnDefs={dataCols.map((col) => ({ 
               field: col.name, 
               headerName: col.name,
+              valueFormatter: (params) => col.type === '等距或等比数据' ? params.value : String(params.value),
             }))}
           />
         </div>
