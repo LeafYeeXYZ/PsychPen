@@ -1,5 +1,6 @@
 // 注意: 本组件及其子组件不应当使用全局状态
 import { NormalDistribution } from '../tools/NormalDistribution'
+import { StatisticToPvalue } from '../tools/StatisticToPvalue'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -14,18 +15,25 @@ const CASCADER_OPTIONS: Option[] = [
     value: 'NormalDistribution',
     label: '正态分布动态演示',
   },
+  {
+    value: 'StatisticToPvalue',
+    label: '统计量与P值相互转换',
+  },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[0]) {
     case 'NormalDistribution':
       set(<NormalDistribution />)
       break
+    case 'StatisticToPvalue':
+      set(<StatisticToPvalue />)
+      break
     default:
       set(DEFAULT_PAGE)
   }
 }
-const CASCADER_DEFAULT_VALUE = ['NormalDistribution']
-const DEFAULT_PAGE = <NormalDistribution />
+const CASCADER_DEFAULT_VALUE = ['StatisticToPvalue']
+const DEFAULT_PAGE = <StatisticToPvalue />
 
 export function ToolsView() {
 

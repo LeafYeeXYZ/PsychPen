@@ -25,6 +25,7 @@ export default defineConfig({
             'echarts-stat',
             '@leaf/sav-reader',
             '@ant-design/icons',
+            'jstat',
           ],
         }
       }
