@@ -4,6 +4,7 @@ import { TwoSampleTTest } from '../statistics/TwoSampleTTest'
 import { KolmogorovSmirnovTest } from '../statistics/KolmogorovSmirnovTest'
 import { PearsonCorrelationTest } from '../statistics/PearsonCorrelationTest'
 import { LeveneTest } from '../statistics/LeveneTest'
+import { Description } from '../statistics/Description'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -14,6 +15,10 @@ type Option = {
   children?: Option[]
 }
 const CASCADER_OPTIONS: Option[] = [
+  {
+    value: 'Description',
+    label: '描述统计',
+  },
   {
     value: 'NonParametricTest',
     label: '非参数检验',
@@ -83,7 +88,7 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       set(<PearsonCorrelationTest />)
       break
     default:
-      set(DEFAULT_PAGE)
+      set(<Description />)
   }
 }
 const CASCADER_DEFAULT_VALUE = ['TTest', 'OneSampleTTest']
