@@ -20,6 +20,29 @@ const CASCADER_OPTIONS: Option[] = [
     label: '描述统计',
   },
   {
+    value: 'TTest',
+    label: 'T检验',
+    children: [
+      {
+        value: 'OneSampleTTest',
+        label: '单样本T检验',
+      },
+      {
+        value: 'TwoSampleTTest',
+        label: '独立样本T检验',
+      },
+      {
+        value: 'PeerSampleTTest',
+        label: '配对样本T检验',
+      },
+    ],
+  },
+  {
+    value: 'ANOVA',
+    label: '方差分析',
+    disabled: true,
+  },
+  {
     value: 'NonParametricTest',
     label: '非参数检验',
     children: [
@@ -42,29 +65,6 @@ const CASCADER_OPTIONS: Option[] = [
         label: 'Pearson 相关系数检验',
       },
     ],
-  },
-  {
-    value: 'TTest',
-    label: 'T检验',
-    children: [
-      {
-        value: 'OneSampleTTest',
-        label: '单样本T检验',
-      },
-      {
-        value: 'TwoSampleTTest',
-        label: '独立样本T检验',
-      },
-      {
-        value: 'PeerSampleTTest',
-        label: '配对样本T检验',
-      },
-    ],
-  },
-  {
-    value: 'ANOVA',
-    label: '方差分析',
-    disabled: true,
   },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
