@@ -209,3 +209,5 @@ lib/utils.ts # 工具函数
     - [x] Pearson 相关系数
 - **其他工具**
   - [x] 正态分布可视化演示工具
+
+> 本项目使用了 `ECharts` 作为图表绘制库: `Li, D., Mei, H., Shen, Y., Su, S., Zhang, W., Wang, J., Zu, M., & Chen, W. (2018). ECharts: A declarative framework for rapid construction of web-based visualization. Visual Informatics, 2(2), 136–146. https://doi.org/10.1016/j.visinf.2018.04.011`
