@@ -17,6 +17,14 @@ export default defineConfig({
           'chart': ['echarts'],
           'table': ['ag-grid-react'],
           'chart-gl': ['echarts-gl'],
+          'stdlib': [
+            '@stdlib/stats/kstest',
+            '@stdlib/stats/levene-test',
+            '@stdlib/stats/ttest',
+            '@stdlib/stats/ttest2',
+            '@stdlib/stats/pcorrtest',
+            '@stdlib/random/base/normal',
+          ],
           'utils': [
             'html2canvas', 
             'mathjs', 
