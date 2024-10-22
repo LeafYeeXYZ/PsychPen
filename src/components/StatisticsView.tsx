@@ -5,6 +5,9 @@ import { KolmogorovSmirnovTest } from '../statistics/KolmogorovSmirnovTest'
 import { PearsonCorrelationTest } from '../statistics/PearsonCorrelationTest'
 import { LeveneTest } from '../statistics/LeveneTest'
 import { Description } from '../statistics/Description'
+import { CorrReliability } from '../statistics/CorrReliability'
+import { HalfReliability } from '../statistics/HalfReliability'
+import { HomoReliability } from '../statistics/HomoReliability'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -66,6 +69,24 @@ const CASCADER_OPTIONS: Option[] = [
       },
     ],
   },
+  {
+    value: 'Reliability',
+    label: '信度分析',
+    children: [
+      {
+        value: 'CorrReliability',
+        label: '重测或复本信度',
+      },
+      {
+        value: 'HalfReliability',
+        label: '分半信度',
+      },
+      {
+        value: 'HomoReliability',
+        label: '同质性信度',
+      },
+    ],
+  },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
@@ -86,6 +107,15 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'PearsonCorrelationTest':
       set(<PearsonCorrelationTest />)
+      break
+    case 'CorrReliability':
+      set(<CorrReliability />)
+      break
+    case 'HalfReliability':
+      set(<HalfReliability />)
+      break
+    case 'HomoReliability':
+      set(<HomoReliability />)
       break
     default:
       set(<Description />)
