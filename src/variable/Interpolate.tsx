@@ -45,9 +45,9 @@ export function Interpolate() {
   }
 
   return (
-    <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4 border rounded-md'>
+    <div className='component-main variable-view'>
 
-      <div className='w-96 h-full flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
+      <div className='component-form'>
         <Form<Option>
           className='w-full py-4'
           layout='vertical'
@@ -132,7 +132,7 @@ export function Interpolate() {
         </Form>
       </div>
 
-      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-center items-center rounded-md border bg-white overflow-auto p-8'>
+      <div className='component-result variable-view'>
         <p className='intro-text'>研究中会因为各种原因导致数据缺失</p>
         <p className='intro-text'>如果样本量较大, 直接删除缺失值是一个不错的选择</p>
         <p className='intro-text'>但在心理学研究中, 往往实验样本比较珍贵</p>

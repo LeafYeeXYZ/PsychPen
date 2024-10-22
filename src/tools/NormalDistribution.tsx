@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { DeleteOutlined, PauseOutlined, PlaySquareOutlined } from '@ant-design/icons'
 import * as math from 'mathjs'
 import * as echarts from 'echarts'
+import { useZustand } from '../lib/useZustand'
 
 const DEFAULT_MEAN = 0
 const DEFAULT_STD = 2
@@ -27,6 +28,7 @@ function generateDate(
 
 export function NormalDistribution() {
 
+  const { isDarkMode } = useZustand()
   // 基础数据
   const [mean, setMean] = useState<number>(DEFAULT_MEAN)
   const [std, setStd] = useState<number>(DEFAULT_STD)
@@ -67,6 +69,7 @@ export function NormalDistribution() {
           formatter: (params: { value: number }) => {
             return `${params.value}\n${(params.value / Math.max(data.length, 1) * 100).toFixed()}%\n`
           }, 
+          color: isDarkMode ? '#ffffff' : '#000000',
           position: 'top', 
           show: true 
         },

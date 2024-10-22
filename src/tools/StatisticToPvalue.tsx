@@ -46,9 +46,9 @@ export function StatisticToPvalue() {
   const [fP2, setFP2] = useState<number>(DEFAULT_VALUES.fP)
 
   return (
-    <div className='w-full h-full flex flex-col sm:flex-row justify-center items-center gap-4 p-4 text-rose-950'>
-      <div className='w-full sm:w-1/2 h-full flex flex-col justify-start items-center gap-4 p-4 border rounded-md bg-gray-50 relative overflow-auto'>
-        <p className='text-base pt-2'>统计量转P值</p>
+    <div className='w-full h-full flex flex-col sm:flex-row justify-center items-center gap-4 p-4 text-rose-950 dark:text-white'>
+      <div className='w-full sm:w-1/2 h-full flex flex-col justify-start items-center gap-4 p-4 border rounded-md bg-gray-50 relative overflow-auto dark:bg-gray-800 dark:border-black'>
+        <p className='text-base pb-2 pt-4'>统计量转P值</p>
         <Form 
           layout='vertical'
           className='w-full max-w-96'
@@ -186,8 +186,8 @@ export function StatisticToPvalue() {
           </Form.Item>
         </Form>
       </div>
-      <div className='w-full sm:w-1/2 h-full flex flex-col justify-start items-center gap-4 p-4 border rounded-md bg-gray-50 relative overflow-auto'>
-        <p className='text-base pt-2'>P值转统计量</p>
+      <div className='w-full sm:w-1/2 h-full flex flex-col justify-start items-center gap-4 p-4 border rounded-md bg-gray-50 relative overflow-auto dark:bg-gray-800 dark:border-black'>
+        <p className='text-base pb-2 pt-4'>P值转统计量</p>
         <Form 
           layout='vertical'
           className='w-full max-w-96'

@@ -145,7 +145,7 @@ export function StatisticsView() {
           />
         </div>
         {/* 统计界面 */}
-        <div className='w-full h-full overflow-auto border rounded-md'>
+        <div className='w-full h-full overflow-auto border rounded-md dark:bg-gray-900 dark:border-black'>
           {page}
         </div>
       </div>

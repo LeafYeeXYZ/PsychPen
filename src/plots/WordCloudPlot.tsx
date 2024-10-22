@@ -1,6 +1,6 @@
 import * as echarts from 'echarts'
 import 'echarts-wordcloud'
-import { Select, Button, Form, Space, InputNumber } from 'antd'
+import { Select, Button, Form, Space, InputNumber, ColorPicker } from 'antd'
 import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -34,6 +34,8 @@ type Option = {
   variable: string
   /** 词云形状 */
   shape: string
+  /** 词云颜色 */
+  color: { metaColor: { r: number, g: number, b: number, a: number } } | string
   /** 单词最小尺寸 */
   min: number // 默认 12, 单位 px
   /** 单词最大尺寸 */
@@ -46,7 +48,7 @@ type Option = {
 
 export function WordCloudPlot() {
 
-  const { dataCols, dataRows, messageApi, isLargeData } = useZustand()
+  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } = useZustand()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
@@ -55,7 +57,7 @@ export function WordCloudPlot() {
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
-      const { variable, shape, min, max, rotation, filter } = values
+      const { variable, shape, min, max, rotation, filter, color } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const raw = dataRows.map((row) => String(row[variable]))
       let data: string[] = []
@@ -82,6 +84,7 @@ export function WordCloudPlot() {
           top: 'center',
           width: '80%',
           height: '80%',
+          textStyle: { color: typeof color === 'string' ? color : `rgba(${color.metaColor.r}, ${color.metaColor.g}, ${color.metaColor.b}, ${color.metaColor.a})` },
           sizeRange: [min, max],
           rotationRange: ROTATION_OPTIONS.find((r) => r.value === rotation)?.rotationRange,
           rotationStep: ROTATION_OPTIONS.find((r) => r.value === rotation)?.rotationStep,
@@ -98,9 +101,9 @@ export function WordCloudPlot() {
   }
 
   return (
-    <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4'>
+    <div className='component-main'>
 
-      <div className='w-96 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
+      <div className='component-form'>
 
         <Form<Option>
           className='w-full py-4'
@@ -118,6 +121,7 @@ export function WordCloudPlot() {
             max: 60,
             rotation: 'x',
             filter: ['punctuation'],
+            color: isDarkMode ? '#ffffff' : '#000000',
           }}
         >
           <Form.Item
@@ -135,6 +139,32 @@ export function WordCloudPlot() {
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>
+          <Form.Item label='词云形状和颜色'>
+            <Space.Compact block>
+              <Form.Item
+                noStyle
+                name='shape'
+                rules={[ { required: true, message: '请选择词云形状' } ]}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='词云形状'
+                  options={SPAPE_OPTIONS.map((shape) => ({ label: shape.label, value: shape.value }))}
+                />
+              </Form.Item>
+              <Form.Item
+                noStyle
+                name='color'
+                rules={[ { required: true, message: '请选择词云颜色' } ]}
+              >
+                <ColorPicker 
+                  className='w-full' 
+                  showText 
+                  format='hex'
+                />
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
           <Form.Item
             label='词云形状'
@@ -267,7 +297,7 @@ export function WordCloudPlot() {
 
       </div>
 
-      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-hidden p-4 relative'>
+      <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>

@@ -76,9 +76,9 @@ export function PeerSampleTTest() {
   }
 
   return (
-    <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4'>
+    <div className='component-main'>
 
-      <div className='w-96 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
+      <div className='component-form'>
 
         <Form<Option>
           className='w-full py-4'
@@ -197,7 +197,7 @@ export function PeerSampleTTest() {
 
       </div>
 
-      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-auto p-8'>
+      <div className='component-result'>
 
         {result ? (
           <div className='w-full h-full overflow-auto'>

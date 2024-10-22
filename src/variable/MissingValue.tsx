@@ -36,9 +36,9 @@ export function MissingValue() {
   }
 
   return (
-    <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4 border rounded-md'>
+    <div className='component-main variable-view'>
 
-      <div className='w-96 h-full flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
+      <div className='component-form'>
         <Form<Option>
           className='w-full py-4'
           layout='vertical'
@@ -84,7 +84,7 @@ export function MissingValue() {
         </Form>
       </div>
 
-      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-center items-center rounded-md border bg-white overflow-auto p-8'>
+      <div className='component-result variable-view'>
         <p className='intro-text'>通常, 在研究数据中不会直接将缺失值留空</p>
         <p className='intro-text'>而是将缺失值替换为特定的值, 以便于后续的数据处理</p>
         <p className='intro-text'>例如用 <Tag>-1</Tag>、<Tag>-99</Tag>、<Tag>99</Tag> 表示缺失值</p>

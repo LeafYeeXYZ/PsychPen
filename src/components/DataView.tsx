@@ -9,7 +9,7 @@ import XLSX_ZAHL_PAYLOAD from 'xlsx/dist/xlsx.zahl.mjs'
 import { SavParser, Feeder } from '@leaf/sav-reader'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-quartz.css'
+import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 
 /** 可导入的文件类型 */
 const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta', '.sav']
@@ -105,7 +105,7 @@ export function DataView() {
           </div>
           {/* 数据表格 */}
           <AgGridReact
-            className='ag-theme-quartz w-full h-full overflow-auto'
+            className='ag-theme-quartz-auto-dark w-full h-full overflow-auto'
             // @ts-expect-error 使用 valueFormatter 之后类型报错
             rowData={dataRows}
             // @ts-expect-error 使用 valueFormatter 之后类型报错

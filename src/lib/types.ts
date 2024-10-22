@@ -110,6 +110,10 @@ export type GlobalState = {
    */
   _App_setMessageApi: (api: MessageInstance) => void
   /**
+   * 是否是黑暗模式
+   */
+  isDarkMode: boolean
+  /**
    * 是否禁用各种按钮等
    */
   disabled: boolean

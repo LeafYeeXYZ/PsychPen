@@ -36,7 +36,7 @@ type Option = {
 
 export function BasicScatterPlot() {
 
-  const { dataCols, dataRows, messageApi, isLargeData } = useZustand()
+  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } = useZustand()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
@@ -101,9 +101,9 @@ export function BasicScatterPlot() {
             label: { 
               show: true, 
               fontSize: 16,
-              color: '#1010a0',
+              color: isDarkMode ? '#ffffff' : '#1010a0',
               opacity: 0.8,
-              backgroundColor: '#ffffff',
+              backgroundColor: isDarkMode ? '#101010' : '#ffffff',
             },
             labelLayout: { dx: -20 },
             encode: { label: 2, tooltip: 1 },
@@ -124,9 +124,9 @@ export function BasicScatterPlot() {
   }
 
   return (
-    <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4'>
+    <div className='component-main'>
 
-      <div className='w-96 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
+      <div className='component-form'>
 
         <Form<Option>
           className='w-full py-4'
@@ -298,7 +298,7 @@ export function BasicScatterPlot() {
 
       </div>
 
-      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-hidden p-4 relative'>
+      <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>

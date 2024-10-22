@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, ConfigProvider, ThemeConfig, message } from 'antd'
+import { Button, ConfigProvider, type ThemeConfig, message, theme } from 'antd'
 import { LinkOutlined, BarChartOutlined } from '@ant-design/icons'
 import { DataView } from './components/DataView'
 import { PlotsView } from './components/PlotsView'
@@ -8,16 +8,24 @@ import { VariableView } from './components/VariableView'
 import { ToolsView } from './components/ToolsView'
 import { useZustand } from './lib/useZustand'
 
-const ANTD_THEME: ThemeConfig = {
+const ANTD_THEME_LIGHT: ThemeConfig = {
   token: {
     colorPrimary: '#ff8080',
     colorText: '#4c0519',
   },
 }
 
+const ANTD_THEME_DARK: ThemeConfig = {
+  algorithm: theme.darkAlgorithm,
+  token: {
+    colorPrimary: '#ff8080',
+    colorText: '#ffffff',
+  },
+}
+
 export function App() {
 
-  const { data, _App_setMessageApi, disabled } = useZustand()
+  const { data, _App_setMessageApi, disabled, isDarkMode } = useZustand()
   // 加载完成后切换页面标题
   useEffect(() => {
     document.title = 'PsychPen'
@@ -32,9 +40,9 @@ export function App() {
   }, [messageApi, _App_setMessageApi])
 
   return (
-    <ConfigProvider theme={ANTD_THEME}>
-      <main className='grid grid-rows-[auto,1fr] w-dvw h-dvh min-w-[640px] min-h-[480px] overflow-auto bg-white'>
-        <header className='flex justify-center items-center relative py-3 px-4 bg-gray-100 shadow-md'>
+    <ConfigProvider theme={isDarkMode ? ANTD_THEME_DARK : ANTD_THEME_LIGHT}>
+      <main className={'grid grid-rows-[auto,1fr] w-dvw h-dvh min-w-[640px] min-h-[480px] overflow-auto bg-white dark:bg-gray-950 dark:text-white' + (isDarkMode ? ' dark' : '')}>
+        <header className='flex justify-center items-center relative py-3 px-4 bg-gray-100 shadow-md dark:bg-gray-900'>
           <nav className='space-x-4'>
             <Button
               type={activePage === 'data' ? 'primary' : 'text'}

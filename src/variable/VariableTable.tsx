@@ -9,7 +9,7 @@ export function VariableTable() {
 
   return (
     <AgGridReact
-      className='ag-theme-quartz w-full h-full overflow-auto'
+      className='ag-theme-quartz-auto-dark w-full h-full overflow-auto'
       rowData={dataCols
         .filter((col) => col.derived !== true)
         .map((col) => {

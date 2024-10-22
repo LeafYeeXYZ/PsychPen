@@ -9,10 +9,10 @@
 table.three-line-table {
   @apply w-fit max-w-full text-center mx-auto;
   & > thead {
-    @apply border-t-2 border-black border-b;
+    @apply border-t-2 border-black border-b dark:border-white;
   }
   & > tbody {
-    @apply border-b-2 border-black;
+    @apply border-b-2 border-black dark:border-white;
   }
   & > thead td {
     @apply py-2 px-4 text-sm;
@@ -37,5 +37,26 @@ table.three-line-table {
 }
 
 p.intro-text {
-  @apply text-base text-gray-700 text-balance leading-8 w-full text-center;
+  @apply text-base text-gray-700 text-balance leading-8 w-full text-center dark:text-white;
+}
+
+/* 绘图和统计组件的主窗口 */
+.component-main {
+  @apply w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4;
+}
+/* 绘图和统计组件的表单 */
+.component-form {
+  @apply w-96 h-full max-w-sm min-w-80 flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto dark:bg-gray-800 dark:border-black;
+}
+/* 绘图和统计组件的结果 */
+.component-result {
+  @apply w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-hidden p-4 relative dark:bg-gray-800 dark:border-black;
+}
+/* 变量组件的主窗口 */
+.component-main.variable-view {
+  @apply border rounded-md dark:bg-gray-900 dark:border-black;
+}
+/* 变量组件的结果 */
+.component-result.variable-view {
+  @apply justify-center gap-0;
 }

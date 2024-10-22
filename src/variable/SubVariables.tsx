@@ -50,9 +50,9 @@ export function SubVariables() {
   }
 
   return (
-    <div className='w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4 border rounded-md'>
+    <div className='component-main variable-view'>
 
-      <div className='w-96 h-full flex flex-col justify-center items-center rounded-md border bg-gray-50 px-4 overflow-auto'>
+      <div className='component-form'>
         <Form<Option>
           className='w-full py-4'
           layout='vertical'
@@ -103,7 +103,7 @@ export function SubVariables() {
         </Form>
       </div>
 
-      <div className='w-[calc(100%-24rem)] h-full flex flex-col justify-center items-center rounded-md border bg-white overflow-auto p-8'>
+      <div className='component-result variable-view'>
         <p className='intro-text'>在数据分析中, 有时需要对原始数据进行处理</p>
         <p className='intro-text'>标准化是指把 <Tag>x</Tag>转换为 <Tag>(x - μ) / σ</Tag>, 从而让数据的均值为0, 方差为1</p>
         <p className='intro-text'>中心化是指把 <Tag>x</Tag>转换为 <Tag>x - μ</Tag>, 从而让数据的均值为0, 方差不变</p>
