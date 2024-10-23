@@ -353,6 +353,8 @@ lib/types.ts # 类型定义
 - **统计** (近期基于 `@stdlib/stdlib` 库, 远期基于 `WebAssembly` (`pyodide` / `AssemblyScript` / `Rust`))
   - [ ] One-Way ANOVA
   - [ ] (中远期) 简单中介效应分析
+  - [ ] 一元线性回归 `SimpleLinearRegression`
+  - [x] 多元线性回归 `MultipleLinearRegression`
 - **工具**
 
 > 本项目使用了 `ECharts` 作为图表绘制库: `Li, D., Mei, H., Shen, Y., Su, S., Zhang, W., Wang, J., Zu, M., & Chen, W. (2018). ECharts: A declarative framework for rapid construction of web-based visualization. Visual Informatics, 2(2), 136–146. https://doi.org/10.1016/j.visinf.2018.04.011`

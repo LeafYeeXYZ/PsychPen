@@ -18,6 +18,7 @@ export default defineConfig({
           'chart': ['echarts'],
           'table': ['ag-grid-react'],
           'chart-gl': ['echarts-gl'],
+          'tensor': ['@tensorflow/tfjs'],
           'stdlib': [
             '@stdlib/stats/kstest',
             '@stdlib/stats/levene-test',

@@ -8,6 +8,7 @@ import { Description } from '../statistics/Description'
 import { CorrReliability } from '../statistics/CorrReliability'
 import { HalfReliability } from '../statistics/HalfReliability'
 import { HomoReliability } from '../statistics/HomoReliability'
+import { MultipleLinearRegression } from '../statistics/MultipleLinearRegression'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -67,6 +68,10 @@ const CASCADER_OPTIONS: Option[] = [
         value: 'PearsonCorrelationTest',
         label: 'Pearson 相关系数检验',
       },
+      {
+        value: 'MultipleLinearRegression',
+        label: '多元线性回归 (测试)',
+      },
     ],
   },
   {
@@ -116,6 +121,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'HomoReliability':
       set(<HomoReliability />)
+      break
+    case 'MultipleLinearRegression':
+      set(<MultipleLinearRegression />)
       break
     default:
       set(<Description />)
