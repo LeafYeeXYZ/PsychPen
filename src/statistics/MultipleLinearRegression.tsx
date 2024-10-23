@@ -12,6 +12,8 @@ type Option = {
   x2: string
   /** y 变量 */
   y: string
+  /** 优化器 */
+  optimizer: 'sgd' | 'adam'
 }
 type Result = {
   /** 数据量 */
@@ -30,13 +32,13 @@ export function MultipleLinearRegression() {
     try {
       messageApi?.loading('正在处理数据(训练模型)...', 0)
       await new Promise((resolve) => setTimeout(resolve, 500))
-      const { x1, x2, y } = values
+      const { x1, x2, y, optimizer } = values
       const filteredRows = dataRows.filter((row) => [x1, x2, y].every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
       const xData = tensor2d(filteredRows.map((row) => [Number(row[x1]), Number(row[x2])]), [filteredRows.length, 2])
       const yData = tensor2d(filteredRows.map((row) => [Number(row[y])]), [filteredRows.length, 1])
       const model = sequential()
       model.add(layers.dense({ units: 1, inputShape: [2] }))
-      model.compile({ loss: 'meanSquaredError', optimizer: 'adam' })
+      model.compile({ loss: 'meanSquaredError', optimizer: optimizer })
       await model.fit(xData, yData, { epochs: 100 })
       const [a, b] = model.getWeights().map((weight) => (weight.arraySync() as number[])[0])
       const c = model.getWeights().map((weight) => (weight.arraySync() as number[])[1])[0]
@@ -72,6 +74,9 @@ export function MultipleLinearRegression() {
           }}
           autoComplete='off'
           disabled={disabled}
+          initialValues={{
+            optimizer: 'adam',
+          }}
         >
           <Form.Item
             label={<span>第一个自变量 <Tag color='blue'>X<sub>1</sub></Tag></span>}
@@ -143,6 +148,20 @@ export function MultipleLinearRegression() {
               options={dataCols.filter((col) => col.type === '等距或等比数据').map((col) => ({ label: col.name, value: col.name }))}
             />
           </Form.Item>
+          <Form.Item
+            label='优化器'
+            name='optimizer'
+            rules={[{ required: true, message: '请选择优化方式' }]}
+          >
+            <Select
+              className='w-full'
+              placeholder='请选择优化方式'
+              options={[
+                { label: 'Stochastic Gradient Descent', value: 'sgd' },
+                { label: 'Adaptive Moment Estimation', value: 'adam' },
+              ]}
+            />
+          </Form.Item>
           <Form.Item>
             <Button
               className='w-full mt-4'
@@ -189,6 +208,7 @@ export function MultipleLinearRegression() {
                 </tr>
               </tbody>
             </table>
+            <p className='text-xs mt-3 text-center w-full'>本功能暂时基于 TensorFlow 实现, 模型具有随机性, 不能作为心理统计学结论</p>
 
           </div>
         ) : (
