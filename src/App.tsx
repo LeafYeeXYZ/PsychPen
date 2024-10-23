@@ -7,6 +7,7 @@ import { StatisticsView } from './components/StatisticsView'
 import { VariableView } from './components/VariableView'
 import { ToolsView } from './components/ToolsView'
 import { useZustand } from './lib/useZustand'
+import Bowser from 'bowser'
 
 const ANTD_THEME_LIGHT: ThemeConfig = {
   token: {
@@ -30,13 +31,21 @@ export function App() {
   useEffect(() => {
     document.title = 'PsychPen'
   }, [])
-  // 页面切换 (仅 data 页面在数据变量较多时会有明显加载时间)
+  // 页面切换
   const [page, setPage] = useState<React.ReactElement>(<DataView />)
   const [activePage, setActivePage] = useState<string>('data')
   // 消息实例
   const [messageApi, contextHolder] = message.useMessage()
   useEffect(() => {
     _App_setMessageApi(messageApi)
+    const browser = Bowser.getParser(window.navigator.userAgent)
+    const valid = browser.satisfies({
+      chrome: '>=110',
+      firefox: '>=115',
+      safari: '>=16',
+      edge: '>=110',
+    })
+    valid || messageApi.warning('当前浏览器版本较低, 可能会导致部分功能无法正常使用, 请使用最新版本的 Chrome, Firefox, Safari 或 Edge 浏览器', 8)
   }, [messageApi, _App_setMessageApi])
 
   return (

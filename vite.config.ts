@@ -9,6 +9,7 @@ export default defineConfig({
     },
   })],
   build: {
+    target: ['chrome110', 'firefox115', 'safari16', 'edge110'],
     rollupOptions: {
       output: {
         manualChunks: {
@@ -34,6 +35,7 @@ export default defineConfig({
             '@leaf/sav-reader',
             '@ant-design/icons',
             'jstat',
+            'bowser',
           ],
         }
       }

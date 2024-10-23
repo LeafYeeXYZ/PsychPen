@@ -164,11 +164,7 @@ export function DataView() {
                       _DataView_setData(read(e.target.result))
                     }
                     messageApi?.destroy('uploading')
-                    messageApi?.open({
-                      type: 'success',
-                      content: '数据导入完成',
-                      duration: 0.5,
-                    })
+                    messageApi?.success('数据导入完成', 0.5)
                   } catch (error) {
                     messageApi?.destroy('uploading')
                     messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
