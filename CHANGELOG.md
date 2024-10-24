@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.3.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.2.0...v1.3.0) (2024-10-24)
+
+
+### Features
+
+* 基础箱线图支持被试内变量绘图 ([7395692](https://github.com/LeafYeeXYZ/PsychPen/commit/7395692694fd22913416952eb04ad9acc2ccec33))
+* 基础折线图支持被试内变量绘图 ([38878ca](https://github.com/LeafYeeXYZ/PsychPen/commit/38878caf1e163b8a30e0fca77f8f78ad56628087))
+* 新增单独的描述统计页面 ([a6630ae](https://github.com/LeafYeeXYZ/PsychPen/commit/a6630aea075b4c4ea84780ed047759ba6d1c6af0))
+* 新增平行折线图 ([fa20a24](https://github.com/LeafYeeXYZ/PsychPen/commit/fa20a24ab507952619029269a75a4ef2b4dd9eb6))
+* 新增统计量和P值转换工具 ([d702b97](https://github.com/LeafYeeXYZ/PsychPen/commit/d702b97feb6b5d4226e7171b1318430985bf764a))
+* 重测信度/复本信度/分半信度/同质性信度 ([1dd709e](https://github.com/LeafYeeXYZ/PsychPen/commit/1dd709e1fa265baf73a1e1a06315107f93a0f581))
+* **preview:** 多元线性回归 ([13b2a68](https://github.com/LeafYeeXYZ/PsychPen/commit/13b2a680bf61f7a7342bbcdd6b53f585b7349399))
+* **preview:** 多元线性回归支持选择优化器 ([a691284](https://github.com/LeafYeeXYZ/PsychPen/commit/a69128404296f6198444e908ca8f90c6d3cbc0b8))
+
+
+### Bug Fixes
+
+* AgGrid自动推断的数据格式错误 ([7f87009](https://github.com/LeafYeeXYZ/PsychPen/commit/7f87009714bcda6b07ce6bde0f308ca7470b7ac7))
+* Levene检验被试内被试间不再使用同一个表单项 ([29a76fb](https://github.com/LeafYeeXYZ/PsychPen/commit/29a76fb28c0646f968c7b6d0cc3b99e9c6db2a52))
+
+
+### Code Refactoring
+
+* 提高编译版本, 新增浏览器过老提示 ([568b721](https://github.com/LeafYeeXYZ/PsychPen/commit/568b721fa367642c89dffd8b45500966793551bf))
+* 重构全局状态结构, 简化项目结构, 为后期拓展做准备 ([834ea0c](https://github.com/LeafYeeXYZ/PsychPen/commit/834ea0c658f59ba0ea0349e9aecd3ce57cf65cd8))
+* 重构样式架构, 新增黑暗模式 ([d019602](https://github.com/LeafYeeXYZ/PsychPen/commit/d019602fda2d289b902dea1a69eaf240129ff8e2))
+
 ## [1.2.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.1.0...v1.2.0) (2024-10-19)
 
 
