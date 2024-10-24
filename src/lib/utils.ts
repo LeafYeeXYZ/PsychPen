@@ -190,3 +190,12 @@ export function downloadImage(): void {
     a.click()
   })
 }
+
+/**
+ * 计算数值差的平方和 SS (Sum of Squares)
+ * @param data 数据
+ * @returns 数值差的平方和
+ */
+export function ss(data: [number, number][]): number {
+  return data.reduce((pre, cur) => pre + (cur[0] - cur[1]) ** 2, 0)
+}
