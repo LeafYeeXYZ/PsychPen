@@ -76,7 +76,6 @@ const CASCADER_OPTIONS: Option[] = [
       {
         value: 'TwoLinearRegression',
         label: '二元线性回归',
-        disabled: true,
       },
     ],
   },

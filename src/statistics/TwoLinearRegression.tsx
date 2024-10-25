@@ -27,9 +27,13 @@ export function TwoLinearRegression() {
     const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
-      
-      
-
+      const { x1, x2, y } = values
+      const filteredRows = dataRows.filter((row) => [x1, x2, y].every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
+      const x1Data = filteredRows.map((row) => Number(row[x1]))
+      const x2Data = filteredRows.map((row) => Number(row[x2]))
+      const yData = filteredRows.map((row) => Number(row[y]))
+      const m = new LinearRegressionTwo(x1Data, x2Data, yData)
+      setResult({ x1, x2, y, m })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -146,13 +150,90 @@ export function TwoLinearRegression() {
           <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>二元线性回归</p>
-            <p className='text-xs mb-3 text-center w-full'></p>
+            <p className='text-xs mb-3 text-center w-full'>模型: y = {result.m.b0.toFixed(4)} + {result.m.b1.toFixed(4)} * x<sub>1</sub> + {result.m.b2.toFixed(4)} * x<sub>2</sub></p>
             <table className='three-line-table'>
               <thead>
-                
+                <tr>
+                  <td>b<sub>0</sub> (截距)</td>
+                  <td>b<sub>1</sub> (x<sub>1</sub>偏回归系数)</td>
+                  <td>b<sub>2</sub> (x<sub>2</sub>偏回归系数)</td>
+                  <td>F</td>
+                  <td>t</td>
+                  <td>p</td>
+                  <td>测定系数 (R²)</td>
+                </tr>
               </thead>
               <tbody>
+                <tr>
+                  <td>{result.m.b0.toFixed(4)}</td>
+                  <td>{result.m.b1.toFixed(4)}</td>
+                  <td>{result.m.b2.toFixed(4)}</td>
+                  <td>{generatePResult(result.m.F, result.m.p).statistic}</td>
+                  <td>{generatePResult(result.m.t, result.m.p).statistic}</td>
+                  <td>{generatePResult(result.m.F, result.m.p).p}</td>
+                  <td>{result.m.r2.toFixed(4)}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p className='text-xs mt-3 text-center w-full'>x<sub>1</sub>: {result.x1} | x<sub>2</sub>: {result.x2} | y: {result.y}</p>
 
+            <p className='text-lg mb-2 text-center w-full mt-8'>模型细节</p>
+            <table className='three-line-table'>
+              <thead>
+                <tr>
+                  <td>误差项</td>
+                  <td>自由度 (df)</td>
+                  <td>平方和 (SS)</td>
+                  <td>均方 (MS)</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>总和 (T)</td>
+                  <td>{result.m.dfT}</td>
+                  <td>{result.m.SSt.toFixed(4)}</td>
+                  <td>{(result.m.SSt / result.m.dfT).toFixed(4)}</td>
+                </tr>
+                <tr>
+                  <td>回归 (R)</td>
+                  <td>{result.m.dfR}</td>
+                  <td>{result.m.SSr.toFixed(4)}</td>
+                  <td>{(result.m.SSr / result.m.dfR).toFixed(4)}</td>
+                </tr>
+                <tr>
+                  <td>残差 (E)</td>
+                  <td>{result.m.dfE}</td>
+                  <td>{result.m.SSe.toFixed(4)}</td>
+                  <td>{(result.m.SSe / result.m.dfE).toFixed(4)}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <p className='text-lg mb-2 text-center w-full mt-8'>描述统计</p>
+            <table className='three-line-table'>
+              <thead>
+                <tr>
+                  <td>变量</td>
+                  <td>均值</td>
+                  <td>标准差</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{result.x1}</td>
+                  <td>{result.m.x1Mean.toFixed(4)}</td>
+                  <td>{result.m.x1Std.toFixed(4)}</td>
+                </tr>
+                <tr>
+                  <td>{result.x2}</td>
+                  <td>{result.m.x2Mean.toFixed(4)}</td>
+                  <td>{result.m.x2Std.toFixed(4)}</td>
+                </tr>
+                <tr>
+                  <td>{result.y}</td>
+                  <td>{result.m.yMean.toFixed(4)}</td>
+                  <td>{result.m.yStd.toFixed(4)}</td>
+                </tr>
               </tbody>
             </table>
 
