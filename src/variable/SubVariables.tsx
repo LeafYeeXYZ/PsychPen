@@ -23,10 +23,10 @@ export function SubVariables() {
 
   // 定义子变量
   const handleFinish = async (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
       const cols = dataCols.map((col) => {
         if (col.name === values.variable) {
           return { 

@@ -31,9 +31,9 @@ export function PearsonCorrelationTest() {
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
+      const timestamp = Date.now()
       const filteredRows = dataRows.filter((row) => values.variable.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
       const results: Result['data'] = []
       for (let i = 0; i < values.variable.length - 1; i++) {

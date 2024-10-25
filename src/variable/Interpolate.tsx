@@ -20,10 +20,10 @@ export function Interpolate() {
 
   // 处理插值
   const handleFinish = async (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
       const cols = dataCols.map((col) => {
         if (col.name === values.variable) {
           return { 

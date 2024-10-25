@@ -24,9 +24,9 @@ export function TwoLinearRegression() {
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
+      const timestamp = Date.now()
       const { x1, x2, y } = values
       const filteredRows = dataRows.filter((row) => [x1, x2, y].every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
       const x1Data = filteredRows.map((row) => Number(row[x1]))

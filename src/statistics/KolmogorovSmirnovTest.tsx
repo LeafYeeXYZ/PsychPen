@@ -40,9 +40,9 @@ export function KolmogorovSmirnovTest() {
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
+      const timestamp = Date.now()
       const data: number[][] = values.variable.map((variable) => dataRows
         .map((row) => row[variable])
         .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))

@@ -15,10 +15,10 @@ export function MissingValue() {
 
   // 处理缺失值
   const handleFinish = async (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
       const cols = dataCols
       values.variable.forEach((variable) => {
         const col = cols.findIndex((col) => col.name === variable)

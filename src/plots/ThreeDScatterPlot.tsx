@@ -34,10 +34,10 @@ export function ThreeDScatterPlot() {
   const [rendered, setRendered] = useState<boolean>(false)
 
   const handleFinish = async (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
       const { xVar, yVar, zVar ,xLabel, yLabel, zLabel, title, dotSize } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const option: EChartsOption = {

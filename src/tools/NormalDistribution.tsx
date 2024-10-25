@@ -190,7 +190,6 @@ export function NormalDistribution() {
             step={1}
             max={100}
             onChange={(value) => {
-              console.log(value)
               if (timer.current) {
                 clearInterval(timer.current)
                 timer.current = setInterval(() => {

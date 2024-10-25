@@ -7,6 +7,7 @@ import { ThreeDBarPlot } from '../plots/ThreeDBarPlot'
 import { ParallelLinePlot } from '../plots/ParallelLinePlot'
 import { BasicPiePlot } from '../plots/BasicPiePlot'
 import { BasicBarPlot } from '../plots/BasicBarPlot'
+import { DecisionTree } from '../plots/DecisionTree'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -87,6 +88,10 @@ const CASCADER_OPTIONS: Option[] = [
         value: 'WordCloudPlot',
         label: '词云图',
       },
+      {
+        value: 'DecisionTree',
+        label: 'CART 决策树',
+      },
     ],
   },
 ]
@@ -118,6 +123,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'BasicBarPlot':
       set(<BasicBarPlot />)
+      break
+    case 'DecisionTree':
+      set(<DecisionTree />)
       break
     default:
       set(DEFAULT_PAGE)

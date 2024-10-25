@@ -28,9 +28,9 @@ export function TwoSampleTTest() {
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
+      const timestamp = Date.now()
       const data1: number[] = []
       const data2: number[] = []
       const groups = Array.from((new Set(dataRows.map((value) => value[values.groupVar]))).values())

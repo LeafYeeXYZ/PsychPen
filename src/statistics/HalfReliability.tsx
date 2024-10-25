@@ -21,9 +21,9 @@ export function HalfReliability() {
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
+      const timestamp = Date.now()
       const filteredRows = dataRows.filter((row) => values.variablesA.concat(values.variablesB).every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
       const meansA = filteredRows.map((row) => values.variablesA.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesA.length)
       const meansB = filteredRows.map((row) => values.variablesB.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesB.length)

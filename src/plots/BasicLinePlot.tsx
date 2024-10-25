@@ -49,10 +49,10 @@ export function BasicLinePlot() {
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
       const { dataVar, groupVar, xLabel, yLabel, title, variables, peerLabel, dataLabel, type, statistic, smooth, label } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       if (type === 'independent') {

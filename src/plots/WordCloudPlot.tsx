@@ -53,10 +53,10 @@ export function WordCloudPlot() {
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
       const { variable, shape, min, max, rotation, filter, color } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const raw = dataRows.map((row) => String(row[variable]))

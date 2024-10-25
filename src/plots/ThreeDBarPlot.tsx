@@ -38,10 +38,10 @@ export function ThreeDBarPlot() {
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
       const { xVar, yVar, zVar ,xLabel, yLabel, zLabel, title, statistic, opacity } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const x: string[] = Array.from(new Set(dataRows.map((row) => row[xVar]))).sort().map(String)

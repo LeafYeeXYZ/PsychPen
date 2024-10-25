@@ -40,10 +40,10 @@ export function BasicPiePlot() {
   const [rendered, setRendered] = useState<boolean>(false)
 
   const handleFinish = async (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
       const { variable, title, labels, label } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const data = dataRows

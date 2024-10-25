@@ -42,10 +42,10 @@ export function BasicScatterPlot() {
   const [rendered, setRendered] = useState<boolean>(false)
 
   const handleFinish = async (values: Option) => {
-    const timestamp = Date.now()
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
       const { xVar, yVar, xLabel, yLabel, title, regression, formula } = values
       // @ts-expect-error echarts-stat 没有提供正确的类型定义
       echarts.registerTransform(ecStat.transform.regression)

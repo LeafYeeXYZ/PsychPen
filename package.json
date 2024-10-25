@@ -41,6 +41,7 @@
     "jieba-wasm": "^2.2.0",
     "jstat": "^1.9.6",
     "mathjs": "^13.2.0",
+    "ml-cart": "^2.1.1",
     "react": "rc",
     "react-dom": "rc",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
