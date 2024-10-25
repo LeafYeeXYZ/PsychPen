@@ -170,7 +170,7 @@ export function DecisionTree() {
             <Select
               className='w-full'
               placeholder='请选择因变量'
-              options={dataCols.filter((col) => col.type === '等距或等比数据').map((col) => ({ label: `${col.name} (水平数: ${col.unique})`, value: col.name }))}
+              options={dataCols.filter((col) => col.type === '等距或等比数据').map((col) => ({ label: col.name, value: col.name }))}
             />
           </Form.Item>
           <Form.Item label='最大深度和叶子的最小样本数'>
