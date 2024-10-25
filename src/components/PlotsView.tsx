@@ -5,6 +5,7 @@ import { BasicLinePlot } from '../plots/BasicLinePlot'
 import { WordCloudPlot } from '../plots/WordCloudPlot'
 import { ThreeDBarPlot } from '../plots/ThreeDBarPlot'
 import { ParallelLinePlot } from '../plots/ParallelLinePlot'
+import { BasicPiePlot } from '../plots/BasicPiePlot'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -64,6 +65,16 @@ const CASCADER_OPTIONS: Option[] = [
     ],
   },
   {
+    value: 'Pie',
+    label: '饼图',
+    children: [
+      {
+        value: 'BasicPiePlot',
+        label: '基础饼图',
+      },
+    ],
+  },
+  {
     value: 'Others',
     label: '其他',
     children: [
@@ -96,6 +107,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'ParallelLinePlot':
       set(<ParallelLinePlot />)
+      break
+    case 'BasicPiePlot':
+      set(<BasicPiePlot />)
       break
     default:
       set(DEFAULT_PAGE)
