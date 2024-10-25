@@ -6,6 +6,7 @@ import { WordCloudPlot } from '../plots/WordCloudPlot'
 import { ThreeDBarPlot } from '../plots/ThreeDBarPlot'
 import { ParallelLinePlot } from '../plots/ParallelLinePlot'
 import { BasicPiePlot } from '../plots/BasicPiePlot'
+import { BasicBarPlot } from '../plots/BasicBarPlot'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -59,6 +60,10 @@ const CASCADER_OPTIONS: Option[] = [
     label: '柱状图',
     children: [
       {
+        value: 'BasicBarPlot',
+        label: '基础柱状图',
+      },
+      {
         value: 'ThreeDBarPlot',
         label: '三维柱状图',
       },
@@ -110,6 +115,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'BasicPiePlot':
       set(<BasicPiePlot />)
+      break
+    case 'BasicBarPlot':
+      set(<BasicBarPlot />)
       break
     default:
       set(DEFAULT_PAGE)
