@@ -16,7 +16,7 @@ const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers',
 /** 可导出的文件类型 */
 const EXPORT_FILE_TYPES = ['.xlsx', '.csv', '.numbers']
 /** 数据量较大的阈值 */
-const LARGE_DATA_SIZE = 1 * 1024 * 1024
+const LARGE_DATA_SIZE = 512 * 1024
 
 export function DataView() {
 
