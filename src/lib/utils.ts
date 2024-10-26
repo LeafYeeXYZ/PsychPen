@@ -190,22 +190,3 @@ export function downloadImage(): void {
     a.click()
   })
 }
-
-/**
- * 计算数值差的平方和 SS (Sum of Squares)
- * @param data 数据
- * @returns 数值差的平方和
- */
-export function ss(data: [number, number][]): number {
-  return data.reduce((pre, cur) => pre + (cur[0] - cur[1]) ** 2, 0)
-}
-
-/**
- * 计算数值差的乘积和 SP (Sum of Products)
- * @param data 数据
- * @returns 数值差的乘积和
- */
-export function sp(data: [number, number][]): number {
-  const mean = data.reduce((pre, cur) => [pre[0] + cur[0], pre[1] + cur[1]], [0, 0]).map(v => v / data.length)
-  return data.reduce((pre, cur) => pre + (cur[0] - mean[0]) * (cur[1] - mean[1]), 0)
-}

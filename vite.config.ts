@@ -33,7 +33,6 @@ export default defineConfig({
             'echarts-wordcloud', 
             'jieba-wasm', 
             'echarts-stat',
-            '@leaf/sav-reader',
             '@ant-design/icons',
             'bowser',
             'ml-kmeans',

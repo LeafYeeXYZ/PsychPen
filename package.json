@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
+    "@leaf/psych-lib": "npm:@jsr/leaf__psych-lib",
     "@leaf/sav-reader": "npm:@jsr/leaf__sav-reader",
     "@stdlib/stdlib": "^0.3.0",
     "ag-grid-react": "^32.2.2",
