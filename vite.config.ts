@@ -18,11 +18,6 @@ export default defineConfig({
           'chart': ['echarts'],
           'table': ['ag-grid-react'],
           'chart-gl': ['echarts-gl'],
-          'stat': [
-            'jstat',
-            'mathjs', 
-            'ml-cart',
-          ],
           'stdlib': [
             '@stdlib/stats/kstest',
             '@stdlib/stats/levene-test',
@@ -32,6 +27,8 @@ export default defineConfig({
             '@stdlib/random/base/normal',
           ],
           'utils': [
+            'jstat',
+            'mathjs', 
             'html2canvas', 
             'echarts-wordcloud', 
             'jieba-wasm', 

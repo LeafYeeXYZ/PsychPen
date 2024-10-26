@@ -42,7 +42,7 @@ export function CorrReliability() {
       <div className='component-form'>
 
         <Form<Option>
-          className='w-full py-4'
+          className='w-full py-4 overflow-auto'
           layout='vertical'
           onFinish={(values) => {
             flushSync(() => setDisabled(true))

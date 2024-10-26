@@ -31,11 +31,16 @@ export function App() {
   useEffect(() => {
     document.title = 'PsychPen'
   }, [])
+  // 黑暗模式
+  useEffect(() => {
+    isDarkMode ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark')
+  }, [isDarkMode])
   // 页面切换
   const [page, setPage] = useState<React.ReactElement>(<DataView />)
   const [activePage, setActivePage] = useState<string>('data')
   // 消息实例
   const [messageApi, contextHolder] = message.useMessage()
+  // 检查浏览器版本
   useEffect(() => {
     _App_setMessageApi(messageApi)
     const browser = Bowser.getParser(window.navigator.userAgent)
@@ -50,7 +55,7 @@ export function App() {
 
   return (
     <ConfigProvider theme={isDarkMode ? ANTD_THEME_DARK : ANTD_THEME_LIGHT}>
-      <main className={'grid grid-rows-[auto,1fr] w-dvw h-dvh min-w-[640px] min-h-[480px] overflow-auto bg-white dark:bg-gray-950 dark:text-white' + (isDarkMode ? ' dark' : '')}>
+      <main className='grid grid-rows-[auto,1fr] w-dvw h-dvh min-w-[640px] min-h-[480px] overflow-auto bg-white dark:bg-gray-950 dark:text-white'>
         <header className='flex justify-center items-center relative py-3 px-4 bg-gray-100 shadow-md dark:bg-gray-900'>
           <nav className='space-x-4'>
             <Button

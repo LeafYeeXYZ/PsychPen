@@ -50,7 +50,7 @@ p.intro-text {
 }
 /* 绘图和统计组件的表单 */
 .component-form {
-  @apply w-96 h-full max-w-sm min-w-80 flex flex-col justify-start items-center rounded-md border bg-gray-50 px-4 py-2 overflow-auto dark:bg-gray-800 dark:border-black;
+  @apply w-96 h-full flex flex-col justify-center items-center rounded-md border bg-gray-50 p-4 overflow-hidden dark:bg-gray-800 dark:border-black;
 }
 /* 绘图和统计组件的结果 */
 .component-result {
