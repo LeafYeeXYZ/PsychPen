@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.4.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.3.0...v1.4.0) (2024-10-26)
+
+
+### Features
+
+* 变量离散化 ([4fbc87e](https://github.com/LeafYeeXYZ/PsychPen/commit/4fbc87ee70776afdd692a1a6ac951f63e2b3a9f2))
+* 二元线性回归 ([6324c1a](https://github.com/LeafYeeXYZ/PsychPen/commit/6324c1a2d36d02acc7a56fb948738e5e40394ec6))
+* 基础饼图 ([a169011](https://github.com/LeafYeeXYZ/PsychPen/commit/a169011cad4b9cc134aefe7c26de260d6f348bf5))
+* 基础柱状图/直方图 (带误差棒) ([394f4f4](https://github.com/LeafYeeXYZ/PsychPen/commit/394f4f4720c377c03fad7e4484c17f0933cdea40))
+* 一元线性回归 ([363bc33](https://github.com/LeafYeeXYZ/PsychPen/commit/363bc334ee257ca0bb990f181ec97a3080a465d6))
+* CART决策树绘图 ([352bf9a](https://github.com/LeafYeeXYZ/PsychPen/commit/352bf9a6e542e3fae83911b250738095bc7a3a0d))
+
+
+### Bug Fixes
+
+* 滚动相关样式错误 ([ea822c4](https://github.com/LeafYeeXYZ/PsychPen/commit/ea822c4da86b2ab27c1a09870235068cd91a9f44))
+* 减小大数据量定义 ([ae144c6](https://github.com/LeafYeeXYZ/PsychPen/commit/ae144c6f7a484473d80f0babc42e09885860d7f1))
+* 去除错误描述 ([cae1a19](https://github.com/LeafYeeXYZ/PsychPen/commit/cae1a19e9e3144739565bee1b884f7dfcf50cde0))
+
 ## [1.3.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.2.0...v1.3.0) (2024-10-24)
 
 
