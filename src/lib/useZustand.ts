@@ -3,6 +3,7 @@ import { utils } from 'xlsx'
 import { GlobalState, Variable } from './types'
 import * as math from 'mathjs'
 import { interpolate, calculateMode } from './utils'
+import { Discrete } from './discrete'
 
 /**
  * 处理原始数据
@@ -66,9 +67,10 @@ const Calculator = (
       return { ...col, count, missing, valid, unique, type }
     }
   })
-  // 处理标准化子变量
+  // 衍生变量
   const derivedCols: Variable[] = []
   cols.map((col) => {
+    // 处理标准化子变量
     if (col.subVars?.standard) {
       derivedCols.push({ 
         name: `${col.name}_标准化`, 
@@ -81,17 +83,18 @@ const Calculator = (
         min: Number(col.min! - col.mean!) / col.std!,
         max: Number(col.max! - col.mean!) / col.std!,
         mean: 0,
-        mode: '',
         q1: Number(col.q1! - col.mean!) / col.std!,
         q2: Number(col.q2! - col.mean!) / col.std!,
         q3: Number(col.q3! - col.mean!) / col.std!,
         std: 1,
+        mode: ((parseFloat(col.mode!) - col.mean!) / col.std!).toFixed(4) + (/皮尔逊经验公式/.test(col.mode!) ? '(皮尔逊经验公式)' : ''),
       })
       // 添加到原始数据中
       rows.forEach((row) => {
         row[`${col.name}_标准化`] = (Number(row[col.name]) - col.mean!) / col.std!
       })
     }
+    // 处理中心化子变量
     if (col.subVars?.center) {
       derivedCols.push({ 
         name: `${col.name}_中心化`, 
@@ -104,15 +107,48 @@ const Calculator = (
         min: Number(col.min! - col.mean!),
         max: Number(col.max! - col.mean!),
         mean: 0,
-        mode: '',
         q1: Number(col.q1! - col.mean!),
         q2: Number(col.q2! - col.mean!),
         q3: Number(col.q3! - col.mean!),
         std: col.std,
+        mode: (parseFloat(col.mode!) - col.mean!).toFixed(4) + (/皮尔逊经验公式/.test(col.mode!) ? '(皮尔逊经验公式)' : ''),
       })
       // 添加到原始数据中
       rows.forEach((row) => {
         row[`${col.name}_中心化`] = Number(row[col.name]) - col.mean!
+      })
+    }
+    // 处理离散化子变量, 离散方法应在自变量名中体现
+    if (col.subVars?.discrete) {
+      const groups = col.subVars.discrete.groups
+      const method = col.subVars.discrete.method
+      const discrete = new Discrete(
+        rows.filter((row) => typeof row[col.name] !== 'undefined').map((row) => Number(row[col.name])),
+        groups,
+        method
+      )
+      const predictedData = rows.map((row) => discrete.predictor(typeof row[col.name] !== 'undefined' ? Number(row[col.name]) : undefined))
+      const predictedNums = predictedData.filter((v) => typeof v !== 'undefined') as number[]
+      derivedCols.push({ 
+        name: `${col.name}_${method}离散`, 
+        derived: true,
+        count: col.count,
+        missing: col.missing,
+        valid: col.valid,
+        unique: groups,
+        type: '等距或等比数据',
+        min: 0,
+        max: groups - 1,
+        mean: Number(math.mean(predictedNums)),
+        q1: math.quantileSeq(predictedNums, 0.25),
+        q2: math.quantileSeq(predictedNums, 0.5),
+        q3: math.quantileSeq(predictedNums, 0.75),
+        std: Number(math.std(predictedNums)),
+        mode: calculateMode(predictedNums),
+      })
+      // 添加到原始数据中
+      predictedData.forEach((v, i) => {
+        rows[i][`${col.name}_${method}离散`] = v
       })
     }
   })

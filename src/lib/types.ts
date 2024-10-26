@@ -2,6 +2,7 @@ import type { MessageInstance } from 'antd/es/message/interface'
 import type { WorkBook } from 'xlsx'
 
 export type AllowedInterpolationMethods = '均值插值' | '中位数插值' | '最临近点插值法' | '拉格朗日插值法'
+export type AllowedDiscreteMethods = '等频' | '等宽' | '聚类分析'
 
 export type Variable = {
   /** 变量名 */
@@ -61,8 +62,17 @@ export type Variable = {
    * 是否要对变量进行中心化或标准化  
    */
   subVars?: {
+    /** 标准化 */
     standard?: boolean
+    /** 中心化 */
     center?: boolean
+    /** 离散化 */
+    discrete?: {
+      /** 方法 */
+      method: AllowedDiscreteMethods
+      /** 分组数 */
+      groups: number
+    }
   }
 }
 

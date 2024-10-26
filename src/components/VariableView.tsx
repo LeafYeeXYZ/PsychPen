@@ -43,7 +43,7 @@ export function VariableView() {
             type={activePage === 'MissingValue' ? 'primary' : 'default'}
             autoInsertSpace={false}
           >
-            定义变量缺失值
+            定义缺失值
           </Button>
           <Button
             icon={<CalculatorOutlined />}
@@ -69,7 +69,7 @@ export function VariableView() {
             type={activePage === 'SubVariables' ? 'primary' : 'default'}
             autoInsertSpace={false}
           >
-            定义中心化/标准化子变量
+            中心化/标准化/离散化
           </Button>
         </div>
         {/* 页面内容 */}

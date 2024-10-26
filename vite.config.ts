@@ -36,6 +36,7 @@ export default defineConfig({
             '@leaf/sav-reader',
             '@ant-design/icons',
             'bowser',
+            'ml-kmeans',
           ],
         }
       }

@@ -19,11 +19,12 @@ export function MissingValue() {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
       const timestamp = Date.now()
+      const { variable, missing } = values
       const cols = dataCols
-      values.variable.forEach((variable) => {
+      variable.forEach((variable) => {
         const col = cols.findIndex((col) => col.name === variable)
         if (col !== -1) {
-          cols[col].missingValues = values.missing
+          cols[col].missingValues = missing
         }
       })
       _VariableView_updateData(cols)
@@ -64,6 +65,7 @@ export function MissingValue() {
           </Form.Item>
           <Form.Item 
             label='缺失值(可输入多个值/留空)'
+            name='missing'
           >
             <Select
               mode='tags'
