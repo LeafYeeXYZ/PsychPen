@@ -36,6 +36,7 @@ export default defineConfig({
             '@ant-design/icons',
             'bowser',
             'ml-kmeans',
+            'hyparquet',
           ],
         }
       }

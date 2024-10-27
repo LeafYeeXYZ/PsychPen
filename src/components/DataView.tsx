@@ -7,12 +7,13 @@ import { flushSync } from 'react-dom'
 import { useRef } from 'react'
 import XLSX_ZAHL_PAYLOAD from 'xlsx/dist/xlsx.zahl.mjs'
 import { SavParser, Feeder } from '@leaf/sav-reader'
+import { parquetRead } from 'hyparquet'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 
 /** 可导入的文件类型 */
-const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta', '.sav']
+const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta', '.sav', '.parquet']
 /** 可导出的文件类型 */
 const EXPORT_FILE_TYPES = ['.xlsx', '.csv', '.numbers']
 /** 数据量较大的阈值 */
@@ -160,6 +161,14 @@ export function DataView() {
                       // SheetJS 默认对 TXT 的编码是 UTF-16, 这里让它用 UTF-8 解析
                       const text = new TextDecoder('utf-8').decode(e.target.result as ArrayBuffer)
                       _DataView_setData(read(text, { type: 'string' }))
+                    } else if (ext === 'parquet') {
+                      await parquetRead({ 
+                        file: e.target.result as ArrayBuffer ,
+                        rowFormat: 'object',
+                        onComplete: (data) => {
+                          _DataView_setData(utils.book_new(utils.json_to_sheet(data), 'psychpen'))
+                        },
+                      })
                     } else {
                       _DataView_setData(read(e.target.result))
                     }

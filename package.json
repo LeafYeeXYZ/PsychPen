@@ -39,6 +39,7 @@
     "echarts-stat": "^1.2.0",
     "echarts-wordcloud": "^2.1.0",
     "html2canvas": "^1.4.1",
+    "hyparquet": "^1.5.0",
     "jieba-wasm": "^2.2.0",
     "jstat": "^1.9.6",
     "mathjs": "^13.2.0",
