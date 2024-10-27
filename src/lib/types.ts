@@ -1,9 +1,9 @@
-import type { MessageInstance } from 'antd/es/message/interface'
-import type { WorkBook } from 'xlsx'
+/**
+ * @file 全局自定义类型定义
+ */
 
 export type AllowedInterpolationMethods = '均值插值' | '中位数插值' | '最临近点插值法' | '拉格朗日插值法'
 export type AllowedDiscreteMethods = '等频' | '等宽' | '聚类分析'
-
 export type Variable = {
   /** 变量名 */
   name: string
@@ -74,62 +74,4 @@ export type Variable = {
       groups: number
     }
   }
-}
-
-export type GlobalState = {
-  /**
-   * 原始数据
-   */
-  data: WorkBook | null
-  /**
-   * 设置原始数据
-   * @param data 原始数据 (WorkBook 类型)
-   * @important 仅在 DataView.tsx 中使用
-   */
-  _DataView_setData: (data: WorkBook | null) => void
-  /**
-   * 更新数据
-   * @param cols 变量列表
-   * @important 仅在 VariableView.tsx 中使用
-   */
-  _VariableView_updateData: (cols: Variable[]) => void
-  /**
-   * 数据列表
-   */
-  dataRows: { [key: string]: unknown }[]
-  /**
-   * 变量列表
-   */
-  dataCols: Variable[]
-  /**
-   * 是否数据量较大 (超过 LARGE_DATA_SIZE)
-   */
-  isLargeData: boolean
-  /**
-   * 设置数据量是否较大
-   * @param isLarge 是否数据量较大
-   */
-  _DataView_setIsLargeData: (isLarge: boolean) => void
-  /**
-   * 消息提示 API
-   */
-  messageApi: MessageInstance | null
-  /**
-   * 设置消息提示 API
-   * @param api 消息提示 API
-   */
-  _App_setMessageApi: (api: MessageInstance) => void
-  /**
-   * 是否是黑暗模式
-   */
-  isDarkMode: boolean
-  /**
-   * 是否禁用各种按钮等
-   */
-  disabled: boolean
-  /**
-   * 设置是否禁用各种按钮等
-   * @param disabled 是否禁用
-   */
-  setDisabled: (disabled: boolean) => void
 }

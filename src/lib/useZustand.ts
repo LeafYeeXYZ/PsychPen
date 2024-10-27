@@ -1,159 +1,34 @@
+/**
+ * @file 全局状态管理
+ */
+
 import { create } from 'zustand'
 import { utils } from 'xlsx'
-import { GlobalState, Variable } from './types'
-import * as math from 'mathjs'
-import { interpolate, calculateMode } from './utils'
-import { Discrete } from './discrete'
+import { Variable } from './types'
+import type { MessageInstance } from 'antd/es/message/interface'
+import type { WorkBook } from 'xlsx'
+import { Derive } from './derive'
+import { Missing } from './misssing'
+import { Describe } from './describe'
 
 /**
  * 处理原始数据
  * @param dataCols 数据变量列表, 必须提供 name 字段, 可选提供其他字段
  * @param dataRows 原始数据(sheet_to_json), 不要传入已经处理过的数据
- * @returns 添加了描述统计量的变量列表和插值/替换缺失值的数据
- * @important 仅在 useZustand 本地使用
+ * @returns 处理后的数据变量列表和数据行
+ * @important 过滤派生变量 -> 缺失值处理 -> 描述统计量计算 -> 派生变量生成
  */
-const Calculator = ( 
-  dataCols: Variable[], dataRows: { [key: string]: unknown }[] 
+const calculator = ( 
+  dataCols: Variable[], 
+  dataRows: { [key: string]: unknown }[] 
 ) : { 
-  calculatedCols: Variable[], calculatedRows: { [key: string]: unknown }[] 
+  calculatedCols: Variable[], 
+  calculatedRows: { [key: string]: unknown }[] 
 } => {
-  const rows: { [key: string]: unknown }[] = dataRows.map((row) => {
-    // 替换缺失值
-    dataCols.forEach((col) => {
-      if (col.missingValues?.length) {
-        // 故意使用 == 而不是 ===
-        row[col.name] = col.missingValues?.some((m) => row[col.name] == m) ? undefined : row[col.name]
-      }
-    })
-    return row
-  })
-  const cols: Variable[] = dataCols.filter((col) => col.derived !== true).map((col) => {
-    // 插值
-    if (col.missingMethod) {
-      const data = rows.map((row) => typeof row[col.name] !== 'undefined' ? Number(row[col.name]) : undefined) as number[]
-      const peer = col.missingRefer ? rows.map((row) => typeof row[col.missingRefer!] !== 'undefined' ? Number(row[col.missingRefer!]) : undefined) as number[] : undefined
-      const interpolatedData = interpolate(data, col.missingMethod, peer)
-      rows.forEach((row, i) => {
-        row[col.name] = interpolatedData[i]
-      })
-    }
-    // 原始数据
-    const data = rows.map((row) => row[col.name])
-    // 基础统计量
-    const count = data.length
-    const missing = data.filter((v) => v === undefined).length
-    const valid = count - missing
-    const unique = new Set(data.filter((v) => v !== undefined)).size
-    // 判断数据类型, 并计算描述统计量
-    let type: '称名或等级数据' | '等距或等比数据' = '称名或等级数据'
-    if ( 
-      data.every((v) => typeof v === 'undefined' || !isNaN(Number(v))) &&
-      data.some((v) => !isNaN(Number(v)))
-    ) {
-      const numData: number[] = data
-        .filter((v) => typeof v !== 'undefined')
-        .map((v) => Number(v))
-      type = '等距或等比数据'
-      const min = +math.min(numData).toFixed(4)
-      const max = +math.max(numData).toFixed(4)
-      const mean = +math.mean(numData).toFixed(4)
-      const mode = calculateMode(numData)
-      const q1 = +math.quantileSeq(numData, 0.25).toFixed(4)
-      const q2 = +math.quantileSeq(numData, 0.5).toFixed(4)
-      const q3 = +math.quantileSeq(numData, 0.75).toFixed(4)
-      const std = +Number(math.std(numData)).toFixed(4)
-      return { ...col, count, missing, valid, unique, min, max, mean, mode, q1, q2, q3, std, type }
-    } else {
-      return { ...col, count, missing, valid, unique, type }
-    }
-  })
-  // 衍生变量
-  const derivedCols: Variable[] = []
-  cols.map((col) => {
-    // 处理标准化子变量
-    if (col.subVars?.standard) {
-      derivedCols.push({ 
-        name: `${col.name}_标准化`, 
-        derived: true,
-        count: col.count,
-        missing: col.missing,
-        valid: col.valid,
-        unique: col.unique,
-        type: col.type,
-        min: Number(col.min! - col.mean!) / col.std!,
-        max: Number(col.max! - col.mean!) / col.std!,
-        mean: 0,
-        q1: Number(col.q1! - col.mean!) / col.std!,
-        q2: Number(col.q2! - col.mean!) / col.std!,
-        q3: Number(col.q3! - col.mean!) / col.std!,
-        std: 1,
-        mode: ((parseFloat(col.mode!) - col.mean!) / col.std!).toFixed(4) + (/皮尔逊经验公式/.test(col.mode!) ? '(皮尔逊经验公式)' : ''),
-      })
-      // 添加到原始数据中
-      rows.forEach((row) => {
-        row[`${col.name}_标准化`] = (Number(row[col.name]) - col.mean!) / col.std!
-      })
-    }
-    // 处理中心化子变量
-    if (col.subVars?.center) {
-      derivedCols.push({ 
-        name: `${col.name}_中心化`, 
-        derived: true,
-        count: col.count,
-        missing: col.missing,
-        valid: col.valid,
-        unique: col.unique,
-        type: col.type,
-        min: Number(col.min! - col.mean!),
-        max: Number(col.max! - col.mean!),
-        mean: 0,
-        q1: Number(col.q1! - col.mean!),
-        q2: Number(col.q2! - col.mean!),
-        q3: Number(col.q3! - col.mean!),
-        std: col.std,
-        mode: (parseFloat(col.mode!) - col.mean!).toFixed(4) + (/皮尔逊经验公式/.test(col.mode!) ? '(皮尔逊经验公式)' : ''),
-      })
-      // 添加到原始数据中
-      rows.forEach((row) => {
-        row[`${col.name}_中心化`] = Number(row[col.name]) - col.mean!
-      })
-    }
-    // 处理离散化子变量, 离散方法应在自变量名中体现
-    if (col.subVars?.discrete) {
-      const groups = col.subVars.discrete.groups
-      const method = col.subVars.discrete.method
-      const discrete = new Discrete(
-        rows.filter((row) => typeof row[col.name] !== 'undefined').map((row) => Number(row[col.name])),
-        groups,
-        method
-      )
-      const predictedData = rows.map((row) => discrete.predictor(typeof row[col.name] !== 'undefined' ? Number(row[col.name]) : undefined))
-      const predictedNums = predictedData.filter((v) => typeof v !== 'undefined') as number[]
-      derivedCols.push({ 
-        name: `${col.name}_${method}离散`, 
-        derived: true,
-        count: col.count,
-        missing: col.missing,
-        valid: col.valid,
-        unique: groups,
-        type: '等距或等比数据',
-        min: 0,
-        max: groups - 1,
-        mean: Number(math.mean(predictedNums)),
-        q1: math.quantileSeq(predictedNums, 0.25),
-        q2: math.quantileSeq(predictedNums, 0.5),
-        q3: math.quantileSeq(predictedNums, 0.75),
-        std: Number(math.std(predictedNums)),
-        mode: calculateMode(predictedNums),
-      })
-      // 添加到原始数据中
-      predictedData.forEach((v, i) => {
-        rows[i][`${col.name}_${method}离散`] = v
-      })
-    }
-  })
-  cols.unshift(...derivedCols)
-  return { calculatedCols: cols, calculatedRows: rows }
+  const missinged = new Missing(dataCols.filter((col) => !col.derived), dataRows)
+  const described = new Describe(missinged.updatedCols, missinged.updatedRows)
+  const derived = new Derive(described.updatedCols, described.updatedRows)
+  return { calculatedCols: derived.updatedCols, calculatedRows: derived.updatedRows }
 }
 
 export const useZustand = create<GlobalState>()((set) => ({
@@ -167,7 +42,7 @@ export const useZustand = create<GlobalState>()((set) => ({
       const sheet = data.Sheets[data.SheetNames[0]]
       const rows = utils.sheet_to_json(sheet) as { [key: string]: unknown }[]
       const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
-      const { calculatedCols, calculatedRows } = Calculator(cols, rows)
+      const { calculatedCols, calculatedRows } = calculator(cols, rows)
       set({ 
         data,
         dataRows: calculatedRows,
@@ -181,7 +56,7 @@ export const useZustand = create<GlobalState>()((set) => ({
     set((state) => {
       const sheet = state.data!.Sheets[state.data!.SheetNames[0]]
       const rows = utils.sheet_to_json(sheet) as { [key: string]: unknown }[]
-      const { calculatedCols, calculatedRows } = Calculator(cols, rows)
+      const { calculatedCols, calculatedRows } = calculator(cols, rows)
       return { dataCols: calculatedCols, dataRows: calculatedRows }
     })
   },
@@ -191,3 +66,62 @@ export const useZustand = create<GlobalState>()((set) => ({
   setDisabled: (disabled) => set({ disabled }),
   isDarkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
 }))
+
+
+type GlobalState = {
+  /**
+   * 原始数据
+   */
+  data: WorkBook | null
+  /**
+   * 设置原始数据
+   * @param data 原始数据 (WorkBook 类型)
+   * @important 仅在 DataView.tsx 中使用
+   */
+  _DataView_setData: (data: WorkBook | null) => void
+  /**
+   * 更新数据
+   * @param cols 变量列表
+   * @important 仅在 VariableView.tsx 中使用
+   */
+  _VariableView_updateData: (cols: Variable[]) => void
+  /**
+   * 数据列表
+   */
+  dataRows: { [key: string]: unknown }[]
+  /**
+   * 变量列表
+   */
+  dataCols: Variable[]
+  /**
+   * 是否数据量较大 (超过 LARGE_DATA_SIZE)
+   */
+  isLargeData: boolean
+  /**
+   * 设置数据量是否较大
+   * @param isLarge 是否数据量较大
+   */
+  _DataView_setIsLargeData: (isLarge: boolean) => void
+  /**
+   * 消息提示 API
+   */
+  messageApi: MessageInstance | null
+  /**
+   * 设置消息提示 API
+   * @param api 消息提示 API
+   */
+  _App_setMessageApi: (api: MessageInstance) => void
+  /**
+   * 是否是黑暗模式
+   */
+  isDarkMode: boolean
+  /**
+   * 是否禁用各种按钮等
+   */
+  disabled: boolean
+  /**
+   * 设置是否禁用各种按钮等
+   * @param disabled 是否禁用
+   */
+  setDisabled: (disabled: boolean) => void
+}

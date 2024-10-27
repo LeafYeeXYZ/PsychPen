@@ -13,13 +13,25 @@ export function VariableTable() {
         className='ag-theme-quartz-auto-dark w-full h-full overflow-auto'
         rowData={dataCols
           .filter((col) => col.derived !== true)
-          .map((col) => {
-            return {
-              ...col,
-              missingValues: col.missingValues?.join(', '),
-              missingMethod: col.missingMethod ?? '删除法',
-            }
-          })
+          .map((col) => ({
+            name: col.name,
+            type: col.type,
+            count: col.count,
+            valid: col.valid,
+            missing: col.missing,
+            unique: col.unique,
+            missingValues: col.missingValues?.join(', '),
+            missingMethod: col.missingMethod ?? '删除法',
+            missingRefer: col.missingRefer,
+            min: col.min?.toFixed(4),
+            max: col.max?.toFixed(4),
+            mean: col.mean?.toFixed(4),
+            q1: col.q1?.toFixed(4),
+            q2: col.q2?.toFixed(4),
+            q3: col.q3?.toFixed(4),
+            std: col.std?.toFixed(4),
+            mode: col.mode,
+          }))
         }
         columnDefs={[
           { headerName: '变量名', field: 'name', pinned: 'left', width: 150 },
@@ -46,25 +58,18 @@ export function VariableTable() {
         overlayNoRowsTemplate='如果定义了标准化/中心化/离散化子变量, 将显示在这里'
         rowData={dataCols
           .filter((col) => col.derived === true)
-          .map((col) => {
-            let subVars = ''
-            if (col.subVars?.standard) subVars += '标准化'
-            if (col.subVars?.center) subVars += subVars ? '、中心化' : '中心化'
-            if (col.subVars?.discrete) subVars += subVars ? `、离散化(${col.subVars.discrete.method}-${col.subVars.discrete.groups}组)` : `离散化(${col.subVars.discrete.method}-${col.subVars.discrete.groups}组)`
-            return {
-              ...col,
-              min: +col.min!.toFixed(4),
-              max: +col.max!.toFixed(4),
-              mean: +col.mean!.toFixed(4),
-              q1: +col.q1!.toFixed(4),
-              q2: +col.q2!.toFixed(4),
-              q3: +col.q3!.toFixed(4),
-              std: +col.std!.toFixed(4),
-              missingValues: col.missingValues?.join(', '),
-              missingMethod: col.missingMethod ?? '删除法',
-              subVars: subVars || '无',
-            }
-          })
+          .map((col) => ({
+            name: col.name,
+            unique: col.unique,
+            min: +col.min!.toFixed(4),
+            max: +col.max!.toFixed(4),
+            mean: +col.mean!.toFixed(4),
+            q1: +col.q1!.toFixed(4),
+            q2: +col.q2!.toFixed(4),
+            q3: +col.q3!.toFixed(4),
+            std: +col.std!.toFixed(4),
+            mode: col.mode,
+          }))
         }
         columnDefs={[
           { headerName: '子变量', field: 'name', pinned: 'left', width: 200 },
