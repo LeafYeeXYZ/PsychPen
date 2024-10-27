@@ -44,6 +44,8 @@ type Option = {
   rotation: string
   /** 过滤设置 */
   filter?: string[]
+  /** 是否启用词语切分 */
+  split: boolean
 }
 
 export function WordCloudPlot() {
@@ -57,14 +59,18 @@ export function WordCloudPlot() {
       messageApi?.loading('正在处理数据...')
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
       const timestamp = Date.now()
-      const { variable, shape, min, max, rotation, filter, color } = values
+      const { variable, shape, min, max, rotation, filter, color, split } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const raw = dataRows.map((row) => String(row[variable]))
       let data: string[] = []
-      await init()
-      for (const text of raw) {
-        const words = cut(text, true)
-        data.push(...words)
+      if (split) {
+        await init()
+        for (const text of raw) {
+          const words = cut(text, true)
+          data.push(...words)
+        }
+      } else {
+        data = raw
       }
       if (filter) {
         for (const f of filter) {
@@ -122,6 +128,7 @@ export function WordCloudPlot() {
             rotation: 'x',
             filter: ['punctuation'],
             color: isDarkMode ? '#ffffff' : '#000000',
+            split: true,
           }}
         >
           <Form.Item
@@ -165,22 +172,6 @@ export function WordCloudPlot() {
                 />
               </Form.Item>
             </Space.Compact>
-          </Form.Item>
-          <Form.Item
-            label='词云形状'
-            name='shape'
-            rules={[ { required: true, message: '请选择词云形状' } ]}
-          >
-            <Select
-              className='w-full'
-              placeholder='请选择词云形状'
-            >
-              {SPAPE_OPTIONS.map((shape) => (
-                <Select.Option key={shape.value} value={shape.value}>
-                  {shape.label}
-                </Select.Option>
-              ))}
-            </Select>
           </Form.Item>
           <Form.Item label='单词最小/最大尺寸和方向'>
             <Space.Compact block>
@@ -266,6 +257,19 @@ export function WordCloudPlot() {
               ))}
             </Select>
           </Form.Item>
+          <Form.Item
+            label='词语切分'
+            name='split'
+          >
+            <Select
+              className='w-full'
+              placeholder='请选择是否启用词语切分'
+              options={[
+                { label: '启用', value: true },
+                { label: '不启用', value: false },
+              ]}
+            />
+          </Form.Item>
           <div
             className='flex flex-row flex-nowrap justify-center items-center gap-4'
           >
@@ -289,7 +293,7 @@ export function WordCloudPlot() {
           </div>
         </Form>
         <p className='text-xs text-gray-400 mt-1'>
-          首次生成时, 会加载外部的中文分词模块, 请耐心等待
+          如果启用词语切分, 首次生成时会加载分词模块, 请耐心等待
         </p>
         <p className='text-xs text-gray-400 mt-1 mb-4'>
           如果形状不明显, 请调小最小单词尺寸
