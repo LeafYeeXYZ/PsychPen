@@ -188,7 +188,7 @@ export function TwoLinearRegression() {
                 </tr>
                 <tr>
                   <td>b1</td>
-                  <td>{result.m.b1.toFixed(4)}</td>
+                  <td>{result.m.b1.toFixed(4)}{result.method === 'standard' ? ' (偏回归系数)' : '(含 x1 x2 的共同效应)'}</td>
                   <td>b1 = 0</td>
                   <td>{result.method === 'standard' ? (
                     `t = ${generatePResult(result.m.b1t, result.m.b1p).statistic}`
@@ -203,7 +203,7 @@ export function TwoLinearRegression() {
                 </tr>
                 <tr>
                   <td>b2</td>
-                  <td>{result.m.b2.toFixed(4)}</td>
+                  <td>{result.m.b2.toFixed(4)}{result.method === 'standard' ? ' (偏回归系数)' : '(不含 x1 x2 的共同效应)'}</td>
                   {result.method === 'standard' ? (<td>b2 = 0</td>) : (<td>加入 x2 后 r2 变化量为 0</td>)}
                   <td>{result.method === 'standard' ? (
                     `t = ${generatePResult(result.m.b2t, result.m.b2p).statistic}`
