@@ -4,7 +4,7 @@
 
 import type { Variable, AllowedDiscreteMethods } from './types'
 import { mean, std, quantileSeq, max, min } from 'mathjs'
-import { calculateMode } from './utils'
+import { mode } from '@leaf/psych-lib'
 import { kmeans } from 'ml-kmeans'
 
 /** 生成子变量 */
@@ -33,14 +33,14 @@ export class Derive {
           valid: col.valid,
           unique: col.unique,
           type: col.type,
-          min: Number(col.min! - col.mean!) / col.std!,
-          max: Number(col.max! - col.mean!) / col.std!,
+          min: (col.min! - col.mean!) / col.std!,
+          max: (col.max! - col.mean!) / col.std!,
           mean: 0,
-          q1: Number(col.q1! - col.mean!) / col.std!,
-          q2: Number(col.q2! - col.mean!) / col.std!,
-          q3: Number(col.q3! - col.mean!) / col.std!,
+          q1: (col.q1! - col.mean!) / col.std!,
+          q2: (col.q2! - col.mean!) / col.std!,
+          q3: (col.q3! - col.mean!) / col.std!,
           std: 1,
-          mode: ((parseFloat(col.mode!) - col.mean!) / col.std!).toFixed(4) + (/皮尔逊经验公式/.test(col.mode!) ? '(皮尔逊经验公式)' : ''),
+          mode: (col.mode! - col.mean!) / col.std!,
         })
         dataRows.forEach((row) => {
           row[`${col.name}_标准化`] = (Number(row[col.name]) - col.mean!) / col.std!
@@ -55,14 +55,14 @@ export class Derive {
           valid: col.valid,
           unique: col.unique,
           type: col.type,
-          min: Number(col.min! - col.mean!),
-          max: Number(col.max! - col.mean!),
+          min: col.min! - col.mean!,
+          max: col.max! - col.mean!,
           mean: 0,
-          q1: Number(col.q1! - col.mean!),
-          q2: Number(col.q2! - col.mean!),
-          q3: Number(col.q3! - col.mean!),
+          q1: col.q1! - col.mean!,
+          q2: col.q2! - col.mean!,
+          q3: col.q3! - col.mean!,
           std: col.std,
-          mode: (parseFloat(col.mode!) - col.mean!).toFixed(4) + (/皮尔逊经验公式/.test(col.mode!) ? '(皮尔逊经验公式)' : ''),
+          mode: col.mode! - col.mean!,
         })
         dataRows.forEach((row) => {
           row[`${col.name}_中心化`] = Number(row[col.name]) - col.mean!
@@ -88,12 +88,12 @@ export class Derive {
           type: col.type,
           min: 0,
           max: groups - 1,
-          mean: Number(mean(predictedNums)),
+          mean: mean(predictedNums),
           q1: quantileSeq(predictedNums, 0.25),
           q2: quantileSeq(predictedNums, 0.5),
           q3: quantileSeq(predictedNums, 0.75),
           std: Number(std(predictedNums)),
-          mode: calculateMode(predictedNums),
+          mode: mode(predictedNums),
         })
         predictedData.forEach((v, i) => {
           dataRows[i][`${col.name}_${method}离散`] = v

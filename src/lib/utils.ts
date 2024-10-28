@@ -2,7 +2,6 @@
  * @file 工具函数
  */
 
-import * as math from 'mathjs'
 import html2canvas from 'html2canvas'
 
 /**
@@ -22,22 +21,6 @@ export function generatePResult(statistic: unknown, p: unknown): { statistic: st
     return { statistic: sv.toFixed(3) + '*', p: pv.toFixed(3) }
   } else {
     return { statistic: sv.toFixed(3), p: pv.toFixed(3) }
-  }
-}
-
-/**
- * 计算众数
- * @param data 数据
- * @returns 众数 (若众数个数超过1个, 则返回皮尔逊经验公式结果)
- */
-export function calculateMode(data: number[]): string {
-  const result = math.mode(data)
-  if (result.length <= 1) {
-    return result[0].toFixed(4)
-  } else {
-    const mid = math.median(data)
-    const mean = math.mean(data)
-    return `${(3 * mid - 2 * mean).toFixed(4)} (皮尔逊经验公式)`
   }
 }
 

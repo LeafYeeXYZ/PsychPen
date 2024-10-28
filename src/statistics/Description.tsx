@@ -2,8 +2,8 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import * as math from 'mathjs'
-import { calculateMode } from '../lib/utils'
+import { min, max, mean, quantileSeq, std } from 'mathjs'
+import { mode } from '@leaf/psych-lib'
 
 type AvialableStat = 'min' | 'max' | 'mean' | 'mode' | 'q1' | 'q2' | 'q3' | 'std' | 'count' | 'unique'
 
@@ -66,14 +66,14 @@ export function Description() {
             .map((v) => Number(v))
           const data = statistic.map((stat) => {
             switch (stat) {
-              case 'min': return { value: +math.min(rows).toFixed(4), label: '最小值' }
-              case 'max': return { value: +math.max(rows).toFixed(4), label: '最大值' }
-              case 'mean': return { value: +math.mean(rows).toFixed(4), label: '均值' }
-              case 'mode': return { value: calculateMode(rows), label: '众数' }
-              case 'q1': return { value: +math.quantileSeq(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
-              case 'q2': return { value: +math.quantileSeq(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
-              case 'q3': return { value: +math.quantileSeq(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
-              case 'std': return { value: +Number(math.std(rows)).toFixed(4), label: '标准差' }
+              case 'min': return { value: +min(rows).toFixed(4), label: '最小值' }
+              case 'max': return { value: +max(rows).toFixed(4), label: '最大值' }
+              case 'mean': return { value: +mean(rows).toFixed(4), label: '均值' }
+              case 'mode': return { value: +mode(rows).toFixed(4), label: '众数' }
+              case 'q1': return { value: +quantileSeq(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
+              case 'q2': return { value: +quantileSeq(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
+              case 'q3': return { value: +quantileSeq(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
+              case 'std': return { value: +Number(std(rows)).toFixed(4), label: '标准差' }
               case 'count': return { value: rows.length, label: '有效值数' }
               case 'unique': return { value: new Set(rows).size, label: '唯一值数' }
             }
@@ -91,14 +91,14 @@ export function Description() {
             .map((v) => Number(v))
           const data = statistic.map((stat) => {
             switch (stat) {
-              case 'min': return { value: +math.min(rows).toFixed(4), label: '最小值' }
-              case 'max': return { value: +math.max(rows).toFixed(4), label: '最大值' }
-              case 'mean': return { value: +math.mean(rows).toFixed(4), label: '均值' }
-              case 'mode': return { value: calculateMode(rows), label: '众数' }
-              case 'q1': return { value: +math.quantileSeq(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
-              case 'q2': return { value: +math.quantileSeq(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
-              case 'q3': return { value: +math.quantileSeq(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
-              case 'std': return { value: +Number(math.std(rows)).toFixed(4), label: '标准差' }
+              case 'min': return { value: +min(rows).toFixed(4), label: '最小值' }
+              case 'max': return { value: +max(rows).toFixed(4), label: '最大值' }
+              case 'mean': return { value: +mean(rows).toFixed(4), label: '均值' }
+              case 'mode': return { value: +mode(rows).toFixed(4), label: '众数' }
+              case 'q1': return { value: +quantileSeq(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
+              case 'q2': return { value: +quantileSeq(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
+              case 'q3': return { value: +quantileSeq(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
+              case 'std': return { value: +Number(std(rows)).toFixed(4), label: '标准差' }
               case 'count': return { value: rows.length, label: '有效值数' }
               case 'unique': return { value: new Set(rows).size, label: '唯一值数' }
             }

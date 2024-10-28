@@ -4,7 +4,7 @@
 
 import type { Variable } from './types'
 import { min, max, mean, quantileSeq, std } from 'mathjs'
-import { calculateMode } from './utils'
+import { mode } from '@leaf/psych-lib'
 
 /** 生成描述统计量 */
 export class Describe {
@@ -41,7 +41,7 @@ export class Describe {
           q1: quantileSeq(nums, 0.25), 
           q2: quantileSeq(nums, 0.5), 
           q3: quantileSeq(nums, 0.75), 
-          mode: calculateMode(nums)
+          mode: mode(nums),
         }
       } else {
         return { ...col, count, missing, valid, unique, type }

@@ -23,8 +23,8 @@ export type Variable = {
   max?: number
   /** 均值 */
   mean?: number
-  /** 众数 */
-  mode?: string // 计算方法不同, 用字符串显示
+  /** 众数 (超过一个时取皮尔逊众数) */
+  mode?: number
   /** 25%分位数 */
   q1?: number
   /** 50%分位数 */

@@ -42,7 +42,7 @@ All notable changes to this project will be documented in this file. See [commit
 * Levene检验被试内被试间不再使用同一个表单项 ([29a76fb](https://github.com/LeafYeeXYZ/PsychPen/commit/29a76fb28c0646f968c7b6d0cc3b99e9c6db2a52))
 
 
-### Code Refactoring
+### Refactoring
 
 * 提高编译版本, 新增浏览器过老提示 ([568b721](https://github.com/LeafYeeXYZ/PsychPen/commit/568b721fa367642c89dffd8b45500966793551bf))
 * 重构全局状态结构, 简化项目结构, 为后期拓展做准备 ([834ea0c](https://github.com/LeafYeeXYZ/PsychPen/commit/834ea0c658f59ba0ea0349e9aecd3ce57cf65cd8))
