@@ -10,6 +10,7 @@ import { HalfReliability } from '../statistics/HalfReliability'
 import { HomoReliability } from '../statistics/HomoReliability'
 import { OneLinearRegression } from '../statistics/OneLinearRegression'
 import { TwoLinearRegression } from '../statistics/TwoLinearRegression'
+import { SeqLinearRegression } from '../statistics/SeqLinearRegression'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -75,7 +76,12 @@ const CASCADER_OPTIONS: Option[] = [
       },
       {
         value: 'TwoLinearRegression',
-        label: '二元线性回归',
+        label: '标准二元线性回归',
+      },
+      {
+        value: 'SeqLinearRegression',
+        label: '序列多元线性回归',
+        disabled: true,
       },
     ],
   },
@@ -132,6 +138,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'TwoLinearRegression':
       set(<TwoLinearRegression />)
+      break
+    case 'SeqLinearRegression':
+      set(<SeqLinearRegression />)
       break
     default:
       set(<Description />)

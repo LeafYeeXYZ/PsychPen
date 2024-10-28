@@ -9,10 +9,14 @@ type Option = {
   variablesA: string[]
   /** 后一半变量名 */
   variablesB: string[]
+  /** 分组变量 */
+  group?: string
 }
 type Result = {
   /** 矫正后的相关系数 */
-  correctedR: number
+  correctedR: number[]
+  /** 分组名 */
+  groups: string[]
 } & Option
 
 export function HalfReliability() {
@@ -25,14 +29,26 @@ export function HalfReliability() {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
       const filteredRows = dataRows.filter((row) => values.variablesA.concat(values.variablesB).every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
-      const meansA = filteredRows.map((row) => values.variablesA.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesA.length)
-      const meansB = filteredRows.map((row) => values.variablesB.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesB.length)
-      const r = Number(corr(meansA, meansB))
-      const correctedR = 2 * r / (1 + r)
-      setResult({
-        ...values,
-        correctedR,
-      })
+      if (!values.group) {
+        const meansA = filteredRows.map((row) => values.variablesA.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesA.length)
+        const meansB = filteredRows.map((row) => values.variablesB.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesB.length)
+        const r = Number(corr(meansA, meansB))
+        const correctedR = 2 * r / (1 + r)
+        setResult({ correctedR: [correctedR], groups: ['-'], ...values })
+      } else {
+        const groups = Array.from(new Set(filteredRows.map((row) => row[values.group!])))
+        const result: Result = { correctedR: [], groups: [], ...values }
+        for (const group of groups) {
+          const filteredRowsByGroup = filteredRows.filter((row) => row[values.group!] == group)
+          const meansA = filteredRowsByGroup.map((row) => values.variablesA.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesA.length)
+          const meansB = filteredRowsByGroup.map((row) => values.variablesB.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesB.length)
+          const r = Number(corr(meansA, meansB))
+          const correctedR = 2 * r / (1 + r)
+          result.correctedR.push(correctedR)
+          result.groups.push(String(group))
+        }
+        setResult(result)
+      }
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -58,7 +74,7 @@ export function HalfReliability() {
           disabled={disabled}
         >
           <Form.Item
-            label='选择前一半变量'
+            label='前一半变量'
             name='variablesA'
             rules={[
               { required: true, message: '请选择变量' },
@@ -85,7 +101,7 @@ export function HalfReliability() {
             </Select>
           </Form.Item>
           <Form.Item
-            label='选择后一半变量'
+            label='后一半变量'
             name='variablesB'
             rules={[
               { required: true, message: '请选择变量' },
@@ -111,6 +127,17 @@ export function HalfReliability() {
               ))}
             </Select>
           </Form.Item>
+          <Form.Item
+            label='分组变量(可选)'
+            name='group'
+          >
+            <Select
+              className='w-full'
+              placeholder='请选择变量'
+              options={dataCols.map((col) => ({ label: `${col.name} (水平数: ${col.unique})`, value: col.name }))}
+              allowClear
+            />
+          </Form.Item>
           <Form.Item>
             <Button
               className='w-full mt-4'
@@ -133,21 +160,26 @@ export function HalfReliability() {
             <table className='three-line-table'>
               <thead>
                 <tr>
+                  <td>分组</td>
                   <td>前半部分题目数</td>
                   <td>后半部分题目数</td>
                   <td>修正后相关系数(r<sub>xx</sub>)</td>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{result.variablesA.length}</td>
-                  <td>{result.variablesB.length}</td>
-                  <td>{result.correctedR.toFixed(3)}</td>
-                </tr>
+                {result.correctedR.map((r, index) => (
+                  <tr key={index}>
+                    <td>{result.groups[index]}</td>
+                    <td>{result.variablesA.length}</td>
+                    <td>{result.variablesB.length}</td>
+                    <td>{r.toFixed(3)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             <p className='text-xs mt-3 text-center w-full'>前半部分题目: {result.variablesA.join(', ')}</p>
             <p className='text-xs mt-2 text-center w-full'>后半部分题目: {result.variablesB.join(', ')}</p>
+            {result.group && (<p className='text-xs mt-2 text-center w-full'>分组变量: {result.group}</p>)}
 
           </div>
         ) : (

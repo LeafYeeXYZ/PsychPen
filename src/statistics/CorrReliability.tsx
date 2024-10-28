@@ -7,9 +7,14 @@ import { corr } from 'mathjs'
 type Option = {
   /** 变量名 */
   variables: [string, string]
+  /** 分组变量 */
+  group?: string
 }
 type Result = {
-  r: number
+  /** 相关系数 */
+  r: number[]
+  /** 组名 */
+  groups: string[]
 } & Option
 
 export function CorrReliability() {
@@ -22,12 +27,21 @@ export function CorrReliability() {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
       const filteredRows = dataRows.filter((row) => values.variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
-      const data = values.variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
-      const r = corr(data[0], data[1])
-      setResult({
-        ...values,
-        r: Number(r),
-      })
+      if (!values.group) {
+        const data = values.variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
+        const r = Number(corr(data[0], data[1]))
+        setResult({ r: [r], groups: ['-'], ...values })
+      } else {
+        const groups = Array.from(new Set(filteredRows.map((row) => row[values.group!])))
+        const result: Result = { r: [], groups: [], ...values }
+        for (const group of groups) {
+          const data = values.variables.map((variable) => filteredRows.filter((row) => row[values.group!] == group).map((row) => Number(row[variable])))
+          const r = Number(corr(data[0], data[1]))
+          result.r.push(r)
+          result.groups.push(String(group))
+        }
+        setResult(result)
+      }
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -53,7 +67,7 @@ export function CorrReliability() {
           disabled={disabled}
         >
           <Form.Item
-            label='选择变量(两个)'
+            label='待检验变量(两个)'
             name='variables'
             rules={[
               { required: true, message: '请选择变量' },
@@ -71,6 +85,17 @@ export function CorrReliability() {
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>
+          <Form.Item
+            label='分组变量(可选)'
+            name='group'
+          >
+            <Select
+              className='w-full'
+              placeholder='请选择变量'
+              options={dataCols.map((col) => ({ label: `${col.name} (水平数: ${col.unique})`, value: col.name }))}
+              allowClear
+            />
           </Form.Item>
           <Form.Item>
             <Button
@@ -94,19 +119,21 @@ export function CorrReliability() {
             <table className='three-line-table'>
               <thead>
                 <tr>
-                  <td>配对变量A</td>
-                  <td>配对变量B</td>
+                  <td>分组</td>
                   <td>相关系数(r<sub>xx</sub>)</td>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{result.variables[0]}</td>
-                  <td>{result.variables[1]}</td>
-                  <td>{result.r.toFixed(3)}</td>
-                </tr>
+                {result.r.map((r, index) => (
+                  <tr key={index}>
+                    <td>{result.groups[index]}</td>
+                    <td>{r.toFixed(3)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
+            <p className='text-xs mt-3 text-center w-full'>配对变量: {result.variables.join(', ')}</p>
+            {result.group && <p className='text-xs mt-2 text-center w-full'>分组变量: {result.group}</p>}
 
           </div>
         ) : (

@@ -150,7 +150,7 @@ export function TwoLinearRegression() {
           <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>二元线性回归</p>
-            <p className='text-xs mb-3 text-center w-full'>模型: y = {result.m.b0.toFixed(4)} + {result.m.b1.toFixed(4)} * x<sub>1</sub> + {result.m.b2.toFixed(4)} * x<sub>2</sub></p>
+            <p className='text-xs mb-3 text-center w-full'>模型: y = {result.m.b0.toFixed(4)} + {result.m.b1.toFixed(4)} * x<sub>1</sub> + {result.m.b2.toFixed(4)} * x<sub>2</sub> | H<sub>0</sub>: b<sub>1</sub> = b<sub>2</sub> = 0</p>
             <table className='three-line-table'>
               <thead>
                 <tr>

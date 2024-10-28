@@ -7,10 +7,14 @@ import { variance } from 'mathjs'
 type Option = {
   /** 变量名 */
   variables: string[]
+  /** 分组变量 */
+  group?: string
 }
 type Result = {
   /** alpha 系数 */
-  alpha: number
+  alpha: number[]
+  /** 分组 */
+  groups: string[]
 } & Option
 
 export function HomoReliability() {
@@ -23,16 +27,30 @@ export function HomoReliability() {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
       const filteredRows = dataRows.filter((row) => values.variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
-      const items = values.variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
-      const total = filteredRows.map((row) => values.variables.reduce((acc, variable) => acc + Number(row[variable]), 0))
-      const itemsVariance = items.map((item) => Number(variance(item))).reduce((acc, variance) => acc + variance, 0)
-      const totalVariance = Number(variance(total))
-      const k = values.variables.length
-      const alpha = (k / (k - 1)) * (1 - itemsVariance / totalVariance)
-      setResult({
-        ...values,
-        alpha,
-      })
+      if (!values.group) {
+        const items = values.variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
+        const total = filteredRows.map((row) => values.variables.reduce((acc, variable) => acc + Number(row[variable]), 0))
+        const itemsVariance = items.map((item) => Number(variance(item))).reduce((acc, variance) => acc + variance, 0)
+        const totalVariance = Number(variance(total))
+        const k = values.variables.length
+        const alpha = (k / (k - 1)) * (1 - itemsVariance / totalVariance)
+        setResult({ alpha: [alpha], groups: ['-'], ...values })
+      } else {
+        const groups = Array.from(new Set(filteredRows.map((row) => row[values.group!])))
+        const result: Result = { alpha: [], groups: [], ...values }
+        for (const group of groups) {
+          const filteredRowsByGroup = filteredRows.filter((row) => row[values.group!] == group)
+          const items = values.variables.map((variable) => filteredRowsByGroup.map((row) => Number(row[variable])))
+          const total = filteredRowsByGroup.map((row) => values.variables.reduce((acc, variable) => acc + Number(row[variable]), 0))
+          const itemsVariance = items.map((item) => Number(variance(item))).reduce((acc, variance) => acc + variance, 0)
+          const totalVariance = Number(variance(total))
+          const k = values.variables.length
+          const alpha = (k / (k - 1)) * (1 - itemsVariance / totalVariance)
+          result.alpha.push(alpha)
+          result.groups.push(String(group))
+        }
+        setResult(result)
+      }
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -58,7 +76,7 @@ export function HomoReliability() {
           disabled={disabled}
         >
           <Form.Item
-            label='选择量表的所有变量'
+            label='量表的所有变量'
             name='variables'
             rules={[
               { required: true, message: '请选择变量' },
@@ -76,6 +94,17 @@ export function HomoReliability() {
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>
+          <Form.Item
+            label='分组变量(可选)'
+            name='group'
+          >
+            <Select
+              className='w-full'
+              placeholder='请选择变量'
+              options={dataCols.map((col) => ({ label: `${col.name} (水平数: ${col.unique})`, value: col.name }))}
+              allowClear
+            />
           </Form.Item>
           <Form.Item>
             <Button
@@ -99,19 +128,24 @@ export function HomoReliability() {
             <table className='three-line-table'>
               <thead>
                 <tr>
+                  <td>分组</td>
                   <td>量表题目数</td>
                   <td>alpha 系数</td>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{result.variables.length}</td>
-                  <td>{result.alpha.toFixed(3)}</td>
-                </tr>
+                {result.alpha.map((alpha, index) => (
+                  <tr key={index}>
+                    <td>{result.groups[index]}</td>
+                    <td>{result.variables.length}</td>
+                    <td>{alpha.toFixed(3)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             <p className='text-xs mt-3 text-center w-full'>应用中, alpha 的值至少要大于 0.5, 最好能大于 0.7</p>
             <p className='text-xs mt-2 text-center w-full'>量表题目: {result.variables.join(', ')}</p>
+            {result.group && (<p className='text-xs mt-2 text-center w-full'>分组变量: {result.group}</p>)}
 
           </div>
         ) : (
