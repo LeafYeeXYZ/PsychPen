@@ -40,6 +40,7 @@
     - [5.4 非参数检验](#54-非参数检验)
       - [5.4.1 Kolmogorov-Smirnov 检验](#541-kolmogorov-smirnov-检验)
       - [5.4.2 Levene 检验](#542-levene-检验)
+      - [5.4.3 峰度和偏度检验](#543-峰度和偏度检验)
     - [5.5 相关和回归](#55-相关和回归)
       - [5.5.1 Pearson 相关检验](#551-pearson-相关检验)
       - [5.5.2 一元线性回归](#552-一元线性回归)
@@ -56,6 +57,7 @@
   - [1 项目结构](#1-项目结构)
   - [2 开发说明](#2-开发说明)
   - [3 开发计划](#3-开发计划)
+  - [4 参考文献](#4-参考文献)
 
 ## 1 项目简介
 
@@ -237,11 +239,15 @@ t 检验有一些前提假设, 如数据服从正态分布、方差齐性. 在�
 
 #### 5.4.1 Kolmogorov-Smirnov 检验
 
-Kolmogorov-Smirnov 检验用于检验数据是否服从某个分布 (通常是正态分布). 在 Kolmogorov-Smirnov 检验页面中, 你可以选择你要进行检验的变量 (可以一次选择多个), 点击 `计算` 按钮即可进行 Kolmogorov-Smirnov 检验. 除此之外, 你还可以自定义显著性水平、检验方向和分布类型 (默认为正态分布, 还可以选择均匀分布)
+Kolmogorov-Smirnov 检验用于检验数据是否服从某个分布 (通常是正态分布). 在 Kolmogorov-Smirnov 检验页面中, 你可以选择你要进行检验的变量 (可以一次选择多个), 点击 `计算` 按钮即可进行 Kolmogorov-Smirnov 检验
 
 注意: 结果的 P 值不显著 (大于 0.05) 时, 才说明数据服从正态分布 (因为检验的原假设是"数据服从XX分布")
 
-![](readme/stat-7.png)
+| 被试内变量 | 被试间变量 |
+| :---: | :---: |
+| ![](readme/stat-7.png) | ![](readme/stat-18.png) |
+
+需要注意的是，显著性检验在⼩样本中（n<30）由于检验⼒的不⾜，即便是偏态分布也可能⽆法检验出来；但在很⼤的样本中（n＞1000）又很敏感，即便有很⼩的峰度或偏度值也会拒绝正态分布的虚⽆假设，但从直⽅图或者正态概率图中直观地看，分布仍然⾮常接近正态分布。因此在检验时需要结合样本量，图形检验，以及峰度或者偏度取值的⼤⼩来综合考虑 (刘红云, 2023)
 
 #### 5.4.2 Levene 检验
 
@@ -252,6 +258,14 @@ Levene 检验用于检验数据是否具有方差齐性. 在 Levene 检验页面
 | 被试内变量 | 被试间变量 |
 | :---: | :---: |
 | ![](readme/stat-8.png) | ![](readme/stat-9.png) |
+
+#### 5.4.3 峰度和偏度检验
+
+峰度和偏度也是检验数据是否服从正态分布的方法之一. 一般来说, 若计算出的偏度或峰度的绝对值大于 1.96, 则说明分布是非正态的; 若偏度显著大于 0, 则说明分布呈正偏态, 反之, 则说明分布呈负偏态; 若峰度显著大于 0, 则说明分布形态尖而高耸, 若峰度显著小于 0, 则说明分布形态较为扁平. 但在实际应用中, 峰度和偏度值的检验容易受样本量的影响, 即样本量大时特别容易拒绝虚无假设. 因此在经验上, 即使虚无假设被拒绝 (即 P 值的绝对值大于 1.96), 若偏度和峰度绝对值较小, 分布仍可近似为正态的 (刘红云, 2023)
+
+| 被试内变量 | 被试间变量 |
+| :---: | :---: |
+| ![](readme/stat-19.png) | ![](readme/stat-20.png) |
 
 ### 5.5 相关和回归
 
@@ -387,4 +401,9 @@ lib/types.ts # 类型定义
 - [ ] One-Way ANOVA
 - [ ] 简单中介效应分析
 
-> 本项目使用了 `ECharts` 作为图表绘制库: `Li, D., Mei, H., Shen, Y., Su, S., Zhang, W., Wang, J., Zu, M., & Chen, W. (2018). ECharts: A declarative framework for rapid construction of web-based visualization. Visual Informatics, 2(2), 136–146. https://doi.org/10.1016/j.visinf.2018.04.011`
+## 4 参考文献
+
+- `基础统计` 刘红云. (2023). 教育与心理统计学. 北京师范大学出版社.
+- `进阶统计` 高级心理统计（新编21世纪心理学系列教材）. (2019). 中国人民大学出版社.
+- `图表库` Li, D., Mei, H., Shen, Y., Su, S., Zhang, W., Wang, J., Zu, M., & Chen, W. (2018). ECharts: A declarative framework for rapid construction of web-based visualization. Visual Informatics, 2(2), 136–146. https://doi.org/10.1016/j.visinf.2018.04.011
+- `K-means` D. Arthur, S. Vassilvitskii, k-means++: The Advantages of Careful Seeding, in: Proc. of the 18th Annual ACM-SIAM Symposium on Discrete Algorithms, 2007, pp. 1027–1035.

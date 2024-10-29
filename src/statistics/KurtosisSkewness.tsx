@@ -1,10 +1,9 @@
 import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
-import kstest from '@stdlib/stats/kstest'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { mean, std } from 'mathjs'
+import { kurtosis, skewness } from '@leaf/psych-lib'
 
 type Option = {
   /** 类型 */
@@ -17,15 +16,13 @@ type Option = {
   group?: string
 }
 type Result = {
-  data: {
-    name: string,
-    count: number
-    D: string,
-    p: string,
-  }[]
+  kurtosis: { kurtosis: number, z: number, p: number }[]
+  skewness: { skewness: number, z: number, p: number }[]
+  labels: string[]
+  counts: number[]
 } & Option
 
-export function KolmogorovSmirnovTest() {
+export function KurtosisSkewness() {
 
   const { dataCols, dataRows, messageApi } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
@@ -41,17 +38,9 @@ export function KolmogorovSmirnovTest() {
           .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
           .map((v) => Number(v))
         )
-        const result = data.map((arr, index) => {
-          const _mean = mean(arr)
-          const _std = Number(std(arr))
-          const { pValue, statistic } = kstest(arr.map((v) => ((v - _mean) / _std)), 'normal', 0, 1, {
-            alpha: 0.05,
-            alternative: 'two-sided',
-          })
-          const text = generatePResult(statistic, pValue)
-          return { name: variables![index], count: arr.length, D: text.statistic, p: text.p }
-        })
-        setResult({ data: result, ...values })
+        const k = data.map((arr) => kurtosis(arr))
+        const s = data.map((arr) => skewness(arr))
+        setResult({ kurtosis: k, skewness: s, labels: variables!, counts: data.map((arr) => arr.length), ...values })
       } else {
         const groups = Array.from(new Set(dataRows.map((row) => row[group!]))).map(String)
         const data: number[][] = groups.map((g) => dataRows
@@ -60,17 +49,9 @@ export function KolmogorovSmirnovTest() {
           .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
           .map((v) => Number(v))
         )
-        const result = data.map((arr, index) => {
-          const _mean = mean(arr)
-          const _std = Number(std(arr))
-          const { pValue, statistic } = kstest(arr.map((v) => ((v - _mean) / _std)), 'normal', 0, 1, {
-            alpha: 0.05,
-            alternative: 'two-sided',
-          })
-          const text = generatePResult(statistic, pValue)
-          return { name: groups[index], count: arr.length, D: text.statistic, p: text.p }
-        })
-        setResult({ data: result, ...values })
+        const k = data.map((arr) => kurtosis(arr))
+        const s = data.map((arr) => skewness(arr))
+        setResult({ kurtosis: k, skewness: s, labels: groups, counts: data.map((arr) => arr.length), ...values })
       }
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -188,24 +169,32 @@ export function KolmogorovSmirnovTest() {
         {result ? (
           <div className='w-full h-full overflow-auto'>
 
-            <p className='text-lg mb-2 text-center w-full'>单样本 Kolmogorov-Smirnov 检验</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 数据符合正态分布 | 显著性水平(α): 0.05</p>
+            <p className='text-lg mb-2 text-center w-full'>峰度和偏度检验</p>
+            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 峰度/偏度等于零 | 显著性水平(α): 0.05</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
                   <td>{result.type === 'paired' ? '变量' : '组别'}</td>
                   <td>样本量</td>
-                  <td>D</td>
+                  <td>峰度</td>
+                  <td>z</td>
+                  <td>p</td>
+                  <td>偏度</td>
+                  <td>z</td>
                   <td>p</td>
                 </tr>
               </thead>
               <tbody>
-                {result.data.map((row, index) => (
-                  <tr key={index}>
-                    <td>{row.name}</td>
-                    <td>{row.count}</td>
-                    <td>{row.D}</td>
-                    <td>{row.p}</td>
+                {result.labels.map((label, i) => (
+                  <tr key={i}>
+                    <td>{label}</td>
+                    <td>{result.counts[i]}</td>
+                    <td>{result.kurtosis[i].kurtosis.toFixed(3)}</td>
+                    <td>{generatePResult(result.kurtosis[i].z, result.kurtosis[i].p).statistic}</td>
+                    <td>{generatePResult(result.kurtosis[i].z, result.kurtosis[i].p).p}</td>
+                    <td>{result.skewness[i].skewness.toFixed(3)}</td>
+                    <td>{generatePResult(result.skewness[i].z, result.skewness[i].p).statistic}</td>
+                    <td>{generatePResult(result.skewness[i].z, result.skewness[i].p).p}</td>
                   </tr>
                 ))}
               </tbody>

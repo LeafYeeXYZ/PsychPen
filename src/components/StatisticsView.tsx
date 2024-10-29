@@ -10,6 +10,7 @@ import { HalfReliability } from '../statistics/HalfReliability'
 import { HomoReliability } from '../statistics/HomoReliability'
 import { OneLinearRegression } from '../statistics/OneLinearRegression'
 import { TwoLinearRegression } from '../statistics/TwoLinearRegression'
+import { KurtosisSkewness } from '../statistics/KurtosisSkewness'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -54,6 +55,10 @@ const CASCADER_OPTIONS: Option[] = [
       {
         value: 'KolmogorovSmirnovTest',
         label: 'Kolmogorov-Smirnov 检验 (正态分布检验)',
+      },
+      {
+        value: 'KurtosisSkewness',
+        label: '峰度和偏度检验 (正态分布检验)',
       },
       {
         value: 'LeveneTest',
@@ -132,6 +137,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'TwoLinearRegression':
       set(<TwoLinearRegression />)
+      break
+    case 'KurtosisSkewness':
+      set(<KurtosisSkewness />)
       break
     default:
       set(<Description />)
