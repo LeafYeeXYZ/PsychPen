@@ -49,7 +49,8 @@
       - [5.6.1 重测信度/复本信度](#561-重测信度复本信度)
       - [5.6.2 分半信度](#562-分半信度)
       - [5.6.3 同质性信度](#563-同质性信度)
-    - [5.7 🚧 中介效应检验](#57--中介效应检验)
+    - [5.7 中介效应分析](#57-中介效应分析)
+      - [5.7.1 简单中介效应检验](#571-简单中介效应检验)
   - [6 工具视图](#6-工具视图)
     - [6.1 正态分布可视化演示工具](#61-正态分布可视化演示工具)
     - [6.2 统计量与P值转换工具](#62-统计量与p值转换工具)
@@ -329,7 +330,13 @@ Pearson 相关检验用于检验两组数据之间的线性相关性. 在 Pearso
 
 ![](readme/stat-14.png)
 
-### 5.7 🚧 中介效应检验
+### 5.7 中介效应分析
+
+中介效应分析用于检验一个变量对另一个变量的影响是否通过第三个变量来实现. 详见[作者的心理统计学笔记](https://blog.leafyee.xyz/2024/01/08/心理统计学/#中介效应)
+
+#### 5.7.1 简单中介效应检验
+
+
 
 ## 6 工具视图
 
@@ -407,3 +414,4 @@ lib/types.ts # 类型定义
 - `进阶统计` 高级心理统计（新编21世纪心理学系列教材）. (2019). 中国人民大学出版社.
 - `图表库` Li, D., Mei, H., Shen, Y., Su, S., Zhang, W., Wang, J., Zu, M., & Chen, W. (2018). ECharts: A declarative framework for rapid construction of web-based visualization. Visual Informatics, 2(2), 136–146. https://doi.org/10.1016/j.visinf.2018.04.011
 - `K-means` D. Arthur, S. Vassilvitskii, k-means++: The Advantages of Careful Seeding, in: Proc. of the 18th Annual ACM-SIAM Symposium on Discrete Algorithms, 2007, pp. 1027–1035.
+- `中介效应检验` 方杰, 张敏强, 李晓鹏. (2011). 中介效应的三类区间估计方法. 心理科学进展, 19(5), 765–774.

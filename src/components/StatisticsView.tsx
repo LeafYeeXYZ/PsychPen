@@ -11,6 +11,7 @@ import { HomoReliability } from '../statistics/HomoReliability'
 import { OneLinearRegression } from '../statistics/OneLinearRegression'
 import { TwoLinearRegression } from '../statistics/TwoLinearRegression'
 import { KurtosisSkewness } from '../statistics/KurtosisSkewness'
+import { SimpleMediatorTest } from '../statistics/SimpleMediatorTest'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -102,6 +103,16 @@ const CASCADER_OPTIONS: Option[] = [
       },
     ],
   },
+  {
+    value: 'Mediation',
+    label: '中介效应分析',
+    children: [
+      {
+        value: 'SimpleMediatorTest',
+        label: '简单中介效应检验',
+      },
+    ],
+  },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
@@ -140,6 +151,9 @@ const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => v
       break
     case 'KurtosisSkewness':
       set(<KurtosisSkewness />)
+      break
+    case 'SimpleMediatorTest':
+      set(<SimpleMediatorTest />)
       break
     default:
       set(<Description />)
