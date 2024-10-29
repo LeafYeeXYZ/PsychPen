@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.5.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.4.0...v1.5.0) (2024-10-29)
+
+
+### Features
+
+* 词云图允许手动选择是否进行分词 ([4066888](https://github.com/LeafYeeXYZ/PsychPen/commit/4066888f0dd24a92534d0205601664897c892072))
+* 二元线性回归增加更多文字解释 ([fbbba2c](https://github.com/LeafYeeXYZ/PsychPen/commit/fbbba2c8293649774258c98ef70d8b43f043ef73))
+* 简单中介效应分析功能完成 ([7ba5da6](https://github.com/LeafYeeXYZ/PsychPen/commit/7ba5da652249ae7ebffe7907374d1b593d229c86))
+* 新增峰度和偏度检验 ([ced1a88](https://github.com/LeafYeeXYZ/PsychPen/commit/ced1a882365eb11b6249ac34e93d3a10d19a8d53))
+* 信度检验支持根据变量分组 ([eb7e3cb](https://github.com/LeafYeeXYZ/PsychPen/commit/eb7e3cbd76f431cbda065a2c0f2476b133b16773))
+* 序列二元线性回归 ([3247ea6](https://github.com/LeafYeeXYZ/PsychPen/commit/3247ea6b8d06da9878f916d96561a53adae4b583))
+* 支持导入 .parquet 文件 ([bda80c7](https://github.com/LeafYeeXYZ/PsychPen/commit/bda80c7e53f1692b9ff95657ae1b64709f182169))
+* **preview:** 简单中介效应分析 ([0bfca2e](https://github.com/LeafYeeXYZ/PsychPen/commit/0bfca2eb71f9826c53cec701cfaa21a930e44999))
+
+
+### Bug Fixes
+
+* 耗时计算错误 ([18543c4](https://github.com/LeafYeeXYZ/PsychPen/commit/18543c42ae33dc1363a74a8df43e276d6ccad141))
+
+
+### Refactoring
+
+* 将计算众数的功能转移到 PsychLib ([7146202](https://github.com/LeafYeeXYZ/PsychPen/commit/71462024da9b659d6e3a521945e9908ec525b7ab))
+* 重构变量处理模块, 采用模块化设计而为计算变量等未来功能提供支持 ([4b62023](https://github.com/LeafYeeXYZ/PsychPen/commit/4b62023d16864e49fc2d84292558f8dc2e41bf6e))
+
 ## [1.4.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.3.0...v1.4.0) (2024-10-26)
 
 
