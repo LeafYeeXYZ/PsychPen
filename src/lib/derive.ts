@@ -124,7 +124,7 @@ class Discrete {
 
     this.method = methed
     this.groups = groups
-    this.#data = data.toSorted()
+    this.#data = data.toSorted((a, b) => a - b)
     this.#min = min(data)
     this.#max = max(data)
     switch (methed) {
