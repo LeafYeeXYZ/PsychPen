@@ -9,7 +9,10 @@ export default defineConfig({
     },
   })],
   optimizeDeps: {
-    exclude: ['psych-wasm'],
+    exclude: [
+      'psych-wasm',
+      'jieba-wasm',
+    ],
   },
   build: {
     target: ['chrome110', 'firefox115', 'safari16', 'edge110'],

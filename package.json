@@ -44,7 +44,7 @@
     "jieba-wasm": "^2.2.0",
     "jstat": "^1.9.6",
     "ml-kmeans": "^6.0.0",
-    "psych-wasm": "^1.1.1",
+    "psych-wasm": "^1.1.2",
     "react": "rc",
     "react-dom": "rc",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
