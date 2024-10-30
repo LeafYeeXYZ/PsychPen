@@ -39,14 +39,16 @@ type Result = {
 
 export function SimpleMediatorTest() {
 
-  const { dataCols, dataRows, messageApi } = useZustand()
+  const { dataCols, dataRows, messageApi, isLargeData } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
       const { x, m, y, B } = values
-      B > 1000 && await new Promise((resolve) => setTimeout(resolve, 500))
+      if (isLargeData || B > 1000) {
+        await new Promise((resolve) => setTimeout(resolve, 500))
+      }
       const timestamp = Date.now()
       const filteredRows = dataRows.filter((row) => [x, m, y].every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
 
