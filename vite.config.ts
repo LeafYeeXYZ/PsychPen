@@ -8,6 +8,9 @@ export default defineConfig({
       plugins: ['babel-plugin-react-compiler', {}],
     },
   })],
+  optimizeDeps: {
+    exclude: ['psych-wasm'],
+  },
   build: {
     target: ['chrome110', 'firefox115', 'safari16', 'edge110'],
     rollupOptions: {
@@ -28,7 +31,6 @@ export default defineConfig({
           ],
           'utils': [
             'jstat',
-            'mathjs', 
             'html2canvas', 
             'echarts-wordcloud', 
             'jieba-wasm', 
@@ -37,6 +39,9 @@ export default defineConfig({
             'bowser',
             'ml-kmeans',
             'hyparquet',
+            'psych-wasm',
+            '@leaf/psych-lib',
+            '@leaf/sav-reader',
           ],
         }
       }

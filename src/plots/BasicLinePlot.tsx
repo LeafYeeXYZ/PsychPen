@@ -4,7 +4,7 @@ import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
-import * as math from 'mathjs'
+import { min, max, mean, median, sum } from 'psych-wasm'
 import { downloadImage } from '../lib/utils'
 
 type Statistic = 'mean' | 'median' | 'max' | 'min' | 'sum' | 'count'
@@ -72,19 +72,19 @@ export function BasicLinePlot() {
         rows.map((row) => {
           switch (statistic) {
             case 'mean':
-              data.push(+math.mean(row).toFixed(4))
+              data.push(+mean(row).toFixed(4))
               break
             case 'median':
-              data.push(+math.median(row).toFixed(4))
+              data.push(+median(row).toFixed(4))
               break
             case 'max':
-              data.push(+math.max(row).toFixed(4))
+              data.push(+max(row).toFixed(4))
               break
             case 'min':
-              data.push(+math.min(row).toFixed(4))
+              data.push(+min(row).toFixed(4))
               break
             case 'sum':
-              data.push(+math.sum(row).toFixed(4))
+              data.push(+sum(row).toFixed(4))
               break
             case 'count':
               data.push(row.length)
@@ -160,15 +160,15 @@ export function BasicLinePlot() {
                 .map((value) => Number(value))
               switch (statistic) {
                 case 'mean':
-                  return +math.mean(row).toFixed(4)
+                  return +mean(row).toFixed(4)
                 case 'median':
-                  return +math.median(row).toFixed(4)
+                  return +median(row).toFixed(4)
                 case 'max':
-                  return +math.max(row).toFixed(4)
+                  return +max(row).toFixed(4)
                 case 'min':
-                  return +math.min(row).toFixed(4)
+                  return +min(row).toFixed(4)
                 case 'sum':
-                  return +math.sum(row).toFixed(4)
+                  return +sum(row).toFixed(4)
                 case 'count':
                   return row.length
               }

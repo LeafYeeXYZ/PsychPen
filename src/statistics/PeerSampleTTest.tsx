@@ -4,7 +4,7 @@ import { useState } from 'react'
 import ttest from '@stdlib/stats/ttest'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { std, mean } from 'mathjs'
+import { std, mean } from 'psych-wasm'
 
 type Option = {
   /** 变量名1 */
@@ -54,9 +54,9 @@ export function PeerSampleTTest() {
           mean(diff),
         ],
         std: [
-          Number(std(data1)),
-          Number(std(data2)),
-          Number(std(diff)),
+          std(data1),
+          std(data2),
+          std(diff),
         ],
         count: [
           data1.length,

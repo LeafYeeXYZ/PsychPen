@@ -3,7 +3,7 @@
  */
 
 import type { Variable } from './types'
-import { min, max, mean, quantileSeq, std } from 'mathjs'
+import { min, max, mean, quantile, std } from 'psych-wasm'
 import { mode } from '@leaf/psych-lib'
 
 /** 生成描述统计量 */
@@ -37,10 +37,10 @@ export class Describe {
           min: min(nums), 
           max: max(nums), 
           mean: mean(nums), 
-          std: Number(std(nums)), 
-          q1: quantileSeq(nums, 0.25), 
-          q2: quantileSeq(nums, 0.5), 
-          q3: quantileSeq(nums, 0.75), 
+          std: std(nums), 
+          q1: quantile(nums, 0.25), 
+          q2: quantile(nums, 0.5), 
+          q3: quantile(nums, 0.75), 
           mode: mode(nums),
         }
       } else {

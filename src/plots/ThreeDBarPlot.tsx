@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
 import { downloadImage } from '../lib/utils'
-import { median, mean, max, min } from 'mathjs'
+import { median, mean, max, min } from 'psych-wasm'
 
 type Statistic = 'mean' | 'median' | 'max' | 'min' | 'sum' | 'count'
 
@@ -123,13 +123,13 @@ export function ThreeDBarPlot() {
       switch (statistic) {
         case 'mean': {
           z.forEach((item) => {
-            item[2] = +mean(item[2]).toFixed(4)
+            item[2] = +mean(item[2] as unknown as number[]).toFixed(4)
           })
           break
         }
         case 'median': {
           z.forEach((item) => {
-            item[2] = +median(item[2]).toFixed(4)
+            item[2] = +median(item[2] as unknown as number[]).toFixed(4)
           })
           break
         }

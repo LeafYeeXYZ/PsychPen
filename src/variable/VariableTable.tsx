@@ -30,7 +30,7 @@ export function VariableTable() {
             q2: col.q2?.toFixed(4),
             q3: col.q3?.toFixed(4),
             std: col.std?.toFixed(4),
-            mode: col.mode,
+            mode: col.mode?.toFixed(4),
           }))
         }
         columnDefs={[
@@ -61,14 +61,14 @@ export function VariableTable() {
           .map((col) => ({
             name: col.name,
             unique: col.unique,
-            min: +col.min!.toFixed(4),
-            max: +col.max!.toFixed(4),
-            mean: +col.mean!.toFixed(4),
-            q1: +col.q1!.toFixed(4),
-            q2: +col.q2!.toFixed(4),
-            q3: +col.q3!.toFixed(4),
-            std: +col.std!.toFixed(4),
-            mode: col.mode,
+            min: col.min?.toFixed(4),
+            max: col.max?.toFixed(4),
+            mean: col.mean?.toFixed(4),
+            q1: col.q1?.toFixed(4),
+            q2: col.q2?.toFixed(4),
+            q3: col.q3?.toFixed(4),
+            std: col.std?.toFixed(4),
+            mode: col.mode?.toFixed(4),
           }))
         }
         columnDefs={[

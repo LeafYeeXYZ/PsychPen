@@ -3,7 +3,7 @@
  */
 
 import type { Variable, AllowedDiscreteMethods } from './types'
-import { mean, std, quantileSeq, max, min } from 'mathjs'
+import { mean, std, quantile, max, min } from 'psych-wasm'
 import { mode } from '@leaf/psych-lib'
 import { kmeans } from 'ml-kmeans'
 
@@ -89,10 +89,10 @@ export class Derive {
           min: 0,
           max: groups - 1,
           mean: mean(predictedNums),
-          q1: quantileSeq(predictedNums, 0.25),
-          q2: quantileSeq(predictedNums, 0.5),
-          q3: quantileSeq(predictedNums, 0.75),
-          std: Number(std(predictedNums)),
+          q1: quantile(predictedNums, 0.25),
+          q2: quantile(predictedNums, 0.5),
+          q3: quantile(predictedNums, 0.75),
+          std: std(predictedNums),
           mode: mode(predictedNums),
         })
         predictedData.forEach((v, i) => {

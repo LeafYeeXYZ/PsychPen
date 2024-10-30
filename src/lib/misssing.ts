@@ -3,7 +3,7 @@
  */
 
 import type { Variable, AllowedInterpolationMethods } from './types'
-import { mean, median } from 'mathjs'
+import { mean, median } from 'psych-wasm'
 
 /** 缺失值替换和插值 */
 export class Missing {

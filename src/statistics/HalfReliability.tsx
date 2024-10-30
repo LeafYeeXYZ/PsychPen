@@ -1,7 +1,7 @@
 import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
-import { corr } from 'mathjs'
+import { corr } from 'psych-wasm'
 import { flushSync } from 'react-dom'
 
 type Option = {

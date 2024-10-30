@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { min, max, mean, quantileSeq, std } from 'mathjs'
+import { min, max, mean, quantile, std } from 'psych-wasm'
 import { mode } from '@leaf/psych-lib'
 
 type AvialableStat = 'min' | 'max' | 'mean' | 'mode' | 'q1' | 'q2' | 'q3' | 'std' | 'count' | 'unique'
@@ -70,10 +70,10 @@ export function Description() {
               case 'max': return { value: +max(rows).toFixed(4), label: '最大值' }
               case 'mean': return { value: +mean(rows).toFixed(4), label: '均值' }
               case 'mode': return { value: +mode(rows).toFixed(4), label: '众数' }
-              case 'q1': return { value: +quantileSeq(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
-              case 'q2': return { value: +quantileSeq(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
-              case 'q3': return { value: +quantileSeq(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
-              case 'std': return { value: +Number(std(rows)).toFixed(4), label: '标准差' }
+              case 'q1': return { value: +quantile(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
+              case 'q2': return { value: +quantile(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
+              case 'q3': return { value: +quantile(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
+              case 'std': return { value: +std(rows).toFixed(4), label: '标准差' }
               case 'count': return { value: rows.length, label: '有效值数' }
               case 'unique': return { value: new Set(rows).size, label: '唯一值数' }
             }
@@ -95,10 +95,10 @@ export function Description() {
               case 'max': return { value: +max(rows).toFixed(4), label: '最大值' }
               case 'mean': return { value: +mean(rows).toFixed(4), label: '均值' }
               case 'mode': return { value: +mode(rows).toFixed(4), label: '众数' }
-              case 'q1': return { value: +quantileSeq(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
-              case 'q2': return { value: +quantileSeq(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
-              case 'q3': return { value: +quantileSeq(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
-              case 'std': return { value: +Number(std(rows)).toFixed(4), label: '标准差' }
+              case 'q1': return { value: +quantile(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
+              case 'q2': return { value: +quantile(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
+              case 'q3': return { value: +quantile(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
+              case 'std': return { value: +std(rows).toFixed(4), label: '标准差' }
               case 'count': return { value: rows.length, label: '有效值数' }
               case 'unique': return { value: new Set(rows).size, label: '唯一值数' }
             }

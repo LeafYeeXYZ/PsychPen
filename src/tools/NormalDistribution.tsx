@@ -2,7 +2,7 @@ import normal from '@stdlib/random/base/normal'
 import { Button, InputNumber, Tag, Space, Input } from 'antd'
 import { useState, useRef, useEffect } from 'react'
 import { DeleteOutlined, PauseOutlined, PlaySquareOutlined } from '@ant-design/icons'
-import * as math from 'mathjs'
+import { mean as m, std as s } from 'psych-wasm'
 import * as echarts from 'echarts'
 import { useZustand } from '../lib/useZustand'
 
@@ -110,11 +110,11 @@ export function NormalDistribution() {
               </tr>
               <tr>
                 <td><Tag color='pink'>样本</Tag>均值</td>
-                <td>{data.length ? math.mean(data).toFixed(3) : ''}</td>
+                <td>{data.length ? m(data).toFixed(3) : ''}</td>
               </tr>
               <tr>
                 <td><Tag color='pink'>样本</Tag>标准差</td>
-                <td>{data.length ? Number(math.std(data)).toFixed(3) : ''}</td>
+                <td>{data.length ? s(data).toFixed(3) : ''}</td>
               </tr>
               <tr>
                 <td><Tag color='blue'>总体</Tag>均值</td>

@@ -3,8 +3,8 @@ import { Select, Button, Form, Tag, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { LinearRegressionTwo, LinearRegressionOne, bootstrapTest } from '@leaf/psych-lib'
-import { abs, mean } from 'mathjs'
+import { LinearRegressionTwo, LinearRegressionOne } from '@leaf/psych-lib'
+import { mean, bootstrapTest } from 'psych-wasm'
 // @ts-expect-error jstat 没有类型定义
 import * as jstat from 'jstat'
 
@@ -69,7 +69,7 @@ export function SimpleMediatorTest() {
 
       const sobel_SEab = Math.sqrt((SEa ** 2) * (b ** 2) + (SEb ** 2) * (a ** 2))
       const sobel_z = (a * b) / sobel_SEab
-      const sobel_p = (1 - jstat.normal.cdf(abs(sobel_z), 0, 1)) * 2
+      const sobel_p = (1 - jstat.normal.cdf(Math.abs(sobel_z), 0, 1)) * 2
 
       const getAB = (x: number[], m: number[], y: number[]) => {
         return (new LinearRegressionOne(x, m)).b1 * (new LinearRegressionTwo(x, m, y)).b2

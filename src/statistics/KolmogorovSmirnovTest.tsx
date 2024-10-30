@@ -4,7 +4,7 @@ import { useState } from 'react'
 import kstest from '@stdlib/stats/kstest'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { mean, std } from 'mathjs'
+import { mean, std } from 'psych-wasm'
 
 type Option = {
   /** 类型 */
@@ -43,7 +43,7 @@ export function KolmogorovSmirnovTest() {
         )
         const result = data.map((arr, index) => {
           const _mean = mean(arr)
-          const _std = Number(std(arr))
+          const _std = std(arr)
           const { pValue, statistic } = kstest(arr.map((v) => ((v - _mean) / _std)), 'normal', 0, 1, {
             alpha: 0.05,
             alternative: 'two-sided',
@@ -62,7 +62,7 @@ export function KolmogorovSmirnovTest() {
         )
         const result = data.map((arr, index) => {
           const _mean = mean(arr)
-          const _std = Number(std(arr))
+          const _std = std(arr)
           const { pValue, statistic } = kstest(arr.map((v) => ((v - _mean) / _std)), 'normal', 0, 1, {
             alpha: 0.05,
             alternative: 'two-sided',

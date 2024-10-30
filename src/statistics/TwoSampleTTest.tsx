@@ -4,7 +4,7 @@ import { useState } from 'react'
 import ttest2 from '@stdlib/stats/ttest2'
 import { flushSync } from 'react-dom'
 import { generatePResult, getCohenDOfTTest2 } from '../lib/utils'
-import { std } from 'mathjs'
+import { std } from 'psych-wasm'
 
 type Option = {
   /** 数据变量 */
@@ -49,8 +49,8 @@ export function TwoSampleTTest() {
         expect: +values.expect,
         groups,
         std: [
-          Number(std(data1)),
-          Number(std(data2)),
+          std(data1),
+          std(data2),
         ],
         count: [
           data1.length,

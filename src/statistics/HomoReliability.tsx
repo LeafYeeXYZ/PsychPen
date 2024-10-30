@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { variance } from 'mathjs'
+import { vari } from 'psych-wasm'
 
 type Option = {
   /** 变量名 */
@@ -30,8 +30,8 @@ export function HomoReliability() {
       if (!values.group) {
         const items = values.variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
         const total = filteredRows.map((row) => values.variables.reduce((acc, variable) => acc + Number(row[variable]), 0))
-        const itemsVariance = items.map((item) => Number(variance(item))).reduce((acc, variance) => acc + variance, 0)
-        const totalVariance = Number(variance(total))
+        const itemsVariance = items.map((item) => vari(item)).reduce((acc, variance) => acc + variance, 0)
+        const totalVariance = vari(total)
         const k = values.variables.length
         const alpha = (k / (k - 1)) * (1 - itemsVariance / totalVariance)
         setResult({ alpha: [alpha], groups: ['-'], ...values })
@@ -42,8 +42,8 @@ export function HomoReliability() {
           const filteredRowsByGroup = filteredRows.filter((row) => row[values.group!] == group)
           const items = values.variables.map((variable) => filteredRowsByGroup.map((row) => Number(row[variable])))
           const total = filteredRowsByGroup.map((row) => values.variables.reduce((acc, variable) => acc + Number(row[variable]), 0))
-          const itemsVariance = items.map((item) => Number(variance(item))).reduce((acc, variance) => acc + variance, 0)
-          const totalVariance = Number(variance(total))
+          const itemsVariance = items.map((item) => vari(item)).reduce((acc, variance) => acc + variance, 0)
+          const totalVariance = vari(total)
           const k = values.variables.length
           const alpha = (k / (k - 1)) * (1 - itemsVariance / totalVariance)
           result.alpha.push(alpha)

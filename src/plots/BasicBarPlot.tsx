@@ -4,7 +4,7 @@ import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
-import * as math from 'mathjs'
+import { mean, std as sd } from 'psych-wasm'
 import { downloadImage } from '../lib/utils'
 
 type Option = {
@@ -69,10 +69,10 @@ export function BasicBarPlot() {
             .map((value) => Number(value))
           )
         rows.map((row, i) => {
-          const mean = +math.mean(row).toFixed(4)
-          const sd = +Number(math.std(row)).toFixed(4)
-          data.push(mean)
-          std.push([i, mean - error * sd, mean + error * sd, sd])
+          const _mean = +mean(row).toFixed(4)
+          const _std = +sd(row).toFixed(4)
+          data.push(_mean)
+          std.push([i, _mean - error * _std, _mean + error * _std, _std])
         })
         const option: EChartsOption = {
           title: [
@@ -175,10 +175,10 @@ export function BasicBarPlot() {
             .map((row) => row[variable])
             .filter((value) => typeof value !== 'undefined' && !isNaN(Number(value)))
             .map((value) => Number(value))
-          const mean = +math.mean(row).toFixed(4)
-          const sd = +Number(math.std(row)).toFixed(4)
-          data.push(mean)
-          std.push([i, mean - error * sd, mean + error * sd, sd])
+          const _mean = +mean(row).toFixed(4)
+          const _std = +sd(row).toFixed(4)
+          data.push(_mean)
+          std.push([i, _mean - error * _std, _mean + error * _std, _std])
         })
         const option: EChartsOption = {
           title: [
