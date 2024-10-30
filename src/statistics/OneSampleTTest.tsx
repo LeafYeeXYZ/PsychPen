@@ -11,8 +11,6 @@ type Option = {
   variable: string
   /** 检验值, 默认 0 */
   expect: number
-  /** 显著性水平, 默认 0.05 */
-  alpha: number
   /** 单双尾检验, 默认 two-sided */
   alternative: 'two-sided' | 'less' | 'greater'
 }
@@ -33,7 +31,7 @@ export function OneSampleTTest() {
         .map((row) => row[values.variable])
         .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
         .map((v) => Number(v))
-      const result = ttest(data, { mu: +values.expect, alpha: +values.alpha, alternative: values.alternative })
+      const result = ttest(data, { mu: +values.expect, alternative: values.alternative })
       setResult({ 
         variable: values.variable, 
         expect: +values.expect,
@@ -64,7 +62,6 @@ export function OneSampleTTest() {
           autoComplete='off'
           initialValues={{
             expect: 0,
-            alpha: 0.05,
             alternative: 'two-sided',
           }}
           disabled={disabled}
@@ -93,17 +90,6 @@ export function OneSampleTTest() {
             <Input
               className='w-full'
               placeholder='请输入检验值'
-              type='number'
-            />
-          </Form.Item>
-          <Form.Item
-            label='显著性水平'
-            name='alpha'
-            rules={[{ required: true, message: '请输入显著性水平' }]}
-          >
-            <Input
-              className='w-full'
-              placeholder='请输入显著性水平'
               type='number'
             />
           </Form.Item>
@@ -140,7 +126,7 @@ export function OneSampleTTest() {
           <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>单样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
-            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值={result.expect} | 显著性水平(α): {result.alpha}</p>
+            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值={result.expect} | 显著性水平(α): 0.05</p>
             <table className='three-line-table'>
               <thead>
                 <tr>

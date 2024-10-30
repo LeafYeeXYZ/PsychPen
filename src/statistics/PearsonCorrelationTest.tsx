@@ -1,5 +1,5 @@
 import { useZustand } from '../lib/useZustand'
-import { Select, Input, Button, Form } from 'antd'
+import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
 import pearsonTest from '@stdlib/stats/pcorrtest'
 import { flushSync } from 'react-dom'
@@ -8,8 +8,6 @@ import { generatePResult } from '../lib/utils'
 type Option = {
   /** 变量名 */
   variable: string[]
-  /** 显著性水平, 默认 0.05 */
-  alpha: number
   /** 单双尾检验, 默认 two-sided */
   alternative: 'two-sided' | 'less' | 'greater'
 }
@@ -40,7 +38,6 @@ export function PearsonCorrelationTest() {
         for (let j = i + 1; j < values.variable.length; j++) {
           const data = [values.variable[i], values.variable[j]].map((variable) => filteredRows.map((row) => Number(row[variable])))
           const result = pearsonTest(data[0], data[1], {
-            alpha: values.alpha,
             alternative: values.alternative,
           })
           const r = generatePResult(result.pcorr, result.pValue)
@@ -83,7 +80,6 @@ export function PearsonCorrelationTest() {
           autoComplete='off'
           initialValues={{
             expect: 'normal',
-            alpha: 0.05,
             alternative: 'two-sided',
           }}
           disabled={disabled}
@@ -107,17 +103,6 @@ export function PearsonCorrelationTest() {
                 </Select.Option>
               ))}
             </Select>
-          </Form.Item>
-          <Form.Item
-            label='显著性水平'
-            name='alpha'
-            rules={[{ required: true, message: '请输入显著性水平' }]}
-          >
-            <Input
-              className='w-full'
-              placeholder='请输入显著性水平'
-              type='number'
-            />
           </Form.Item>
           <Form.Item
             label='单双尾检验'
@@ -152,7 +137,7 @@ export function PearsonCorrelationTest() {
           <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>Pearson 相关系数检验</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 两个变量的相关系数{result.alternative === 'two-sided' ? '等于' : result.alternative === 'less' ? '小于' : '大于'}零 | 显著性水平(α): {result.alpha}</p>
+            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 两个变量的相关系数{result.alternative === 'two-sided' ? '等于' : result.alternative === 'less' ? '小于' : '大于'}零 | 显著性水平(α): 0.05</p>
             <table className='three-line-table'>
               <thead>
                 <tr>

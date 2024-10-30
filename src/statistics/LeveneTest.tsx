@@ -1,5 +1,5 @@
 import { useZustand } from '../lib/useZustand'
-import { Select, Input, Button, Form, Radio } from 'antd'
+import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import leveneTest from '@stdlib/stats/levene-test'
 import { flushSync } from 'react-dom'
@@ -12,8 +12,6 @@ type Option = {
   variable?: string
   /** 被试内变量名 */
   variables?: string[]
-  /** 显著性水平, 默认 0.05 */
-  alpha: number
   /** 分组变量 */
   group?: string
 }
@@ -61,8 +59,8 @@ export function LeveneTest() {
           .map((v) => Number(v))
         ) // 理论上这里也要过滤掉空数组, 但是正常使用不会出现这种情况, 故为了性能暂不处理
       }
-      // @ts-expect-error 类型推断错误, 实际没写错
-      const { statistic, pValue, df } = leveneTest.apply(null, [...data, { alpha: values.alpha }])
+      // @ts-expect-error 函数可以接受多个数组作为参数
+      const { statistic, pValue, df } = leveneTest(...data)
       const result = generatePResult(statistic, pValue)
       setResult({
         ...values,
@@ -96,7 +94,6 @@ export function LeveneTest() {
           autoComplete='off'
           initialValues={{
             expect: 'normal',
-            alpha: 0.05,
             alternative: 'two-sided',
             type: 'peer',
           }}
@@ -178,17 +175,6 @@ export function LeveneTest() {
               </Form.Item>
             </>
           )}
-          <Form.Item
-            label='显著性水平'
-            name='alpha'
-            rules={[{ required: true, message: '请输入显著性水平' }]}
-          >
-            <Input
-              className='w-full'
-              placeholder='请输入显著性水平'
-              type='number'
-            />
-          </Form.Item>
           <Form.Item>
             <Button
               className='w-full mt-4'
@@ -208,7 +194,7 @@ export function LeveneTest() {
           <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>Levene 检验</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 各变量/组满足方差齐性 | 显著性水平(α): {result.alpha}</p>
+            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 各变量/组满足方差齐性 | 显著性水平(α): 0.05</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
