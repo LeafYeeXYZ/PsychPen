@@ -3,8 +3,8 @@ import { Select, Button, Form, Tag, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { LinearRegressionTwo, LinearRegressionOne, bootstrap } from '@leaf/psych-lib'
-import { abs, quantileSeq, mean } from 'mathjs'
+import { LinearRegressionTwo, LinearRegressionOne, bootstrapTest } from '@leaf/psych-lib'
+import { abs, mean } from 'mathjs'
 // @ts-expect-error jstat 没有类型定义
 import * as jstat from 'jstat'
 
@@ -46,7 +46,7 @@ export function SimpleMediatorTest() {
     try {
       messageApi?.loading('正在处理数据...')
       const { x, m, y, B } = values
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      B > 1000 && await new Promise((resolve) => setTimeout(resolve, 500))
       const timestamp = Date.now()
       const filteredRows = dataRows.filter((row) => [x, m, y].every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
 
@@ -72,16 +72,7 @@ export function SimpleMediatorTest() {
       const getAB = (x: number[], m: number[], y: number[]) => {
         return (new LinearRegressionOne(x, m)).b1 * (new LinearRegressionTwo(x, m, y)).b2
       }
-      const bootstrapAB: number[] = []
-      for (let i = 0; i < B; i++) {
-        const sample = bootstrap(filteredRows)
-        const sampleA = sample.map((row) => Number(row[x]))
-        const sampleM = sample.map((row) => Number(row[m]))
-        const sampleY = sample.map((row) => Number(row[y]))
-        bootstrapAB.push(getAB(sampleA, sampleM, sampleY))
-      }
-      const lower = quantileSeq(bootstrapAB, 0.025)
-      const upper = quantileSeq(bootstrapAB, 0.975)
+      const [lower, upper] = bootstrapTest(xData, mData, yData, B, 0.05)
 
       setResult({ 
         ...values, 
