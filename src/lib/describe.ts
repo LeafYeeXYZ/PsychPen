@@ -3,8 +3,7 @@
  */
 
 import type { Variable } from './types'
-import { min, max, mean, quantile, std } from 'psych-wasm'
-import { mode } from '@leaf/psych-lib'
+import { min, max, mean, quantile, std, mode } from 'psych-wasm/as'
 
 /** 生成描述统计量 */
 export class Describe {

@@ -3,7 +3,7 @@ import { Select, Button, Form, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { LinearRegressionOne } from '@leaf/psych-lib'
+import { LinearRegressionOne } from 'psych-wasm/ts'
 
 type Option = {
   /** x 变量 */

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { InputNumber, Space, Form, Tag } from 'antd'
-// @ts-expect-error 包未提供类型定义
-import { jStat } from 'jstat'
+import { z2p, p2z, t2p, p2t, f2p, p2f } from 'psych-wasm/as'
 
 const DEFAULT_VALUES = {
   zS: 0,
@@ -54,7 +53,7 @@ export function StatisticToPvalue() {
           className='w-full max-w-96'
         >
           <Form.Item label={<span>
-            标准正态分布 <Tag color='pink'>p = {jStat.normal.cdf(zS, 0, 1).toFixed(6)}</Tag>
+            标准正态分布 <Tag color='pink'>p = {z2p(zS).toFixed(6)}</Tag>
           </span>}>
             <InputNumber
               className='w-full'
@@ -69,7 +68,7 @@ export function StatisticToPvalue() {
             />
           </Form.Item>
           <Form.Item label={<span>
-            T分布(单尾) <Tag color='pink'>p = {jStat.studentt.cdf(-tS1, tDf1a).toFixed(6)}</Tag>
+            T分布(单尾) <Tag color='pink'>p = {t2p(tS1, tDf1a, false).toFixed(6)}</Tag>
           </span>}>
             <Space.Compact block>
               <InputNumber
@@ -94,7 +93,7 @@ export function StatisticToPvalue() {
             </Space.Compact>
           </Form.Item>
           <Form.Item label={<span>
-            T分布(双尾) <Tag color='pink'>p = {jStat.studentt.cdf(-Math.abs(tS2), tDf2a).toFixed(6) * 2}</Tag>
+            T分布(双尾) <Tag color='pink'>p = {t2p(tS2, tDf2a).toFixed(6)}</Tag>
           </span>}>
             <Space.Compact block>
               <InputNumber
@@ -119,12 +118,13 @@ export function StatisticToPvalue() {
             </Space.Compact>
           </Form.Item>
           <Form.Item label={<span>
-            F分布(单尾) <Tag color='pink'>p = {(1 - jStat.centralF.cdf(fS1, fDf1a[0], fDf1a[1])).toFixed(6)}</Tag>
+            F分布(单尾) <Tag color='pink'>p = {f2p(fS1, fDf1a[0], fDf1a[1], false).toFixed(6)}</Tag>
           </span>}>
             <InputNumber
               className='w-full mb-2'
               addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>F</Tag></span>}
               step={0.01}
+              min={0}
               defaultValue={DEFAULT_VALUES.fS}
               onChange={(value) => {
                 typeof value === 'number' && setFS1(value)
@@ -152,7 +152,7 @@ export function StatisticToPvalue() {
             />
           </Form.Item>
           <Form.Item label={<span>
-            F分布(双尾) <Tag color='pink'>p = {+(1 - jStat.centralF.cdf(fS2, fDf2a[0], fDf2a[1])).toFixed(6) * 2}</Tag>
+            F分布(双尾) <Tag color='pink'>p = {f2p(fS2, fDf2a[0], fDf2a[1]).toFixed(6)}</Tag>
           </span>}>
             <InputNumber
               className='w-full mb-2'
@@ -193,7 +193,7 @@ export function StatisticToPvalue() {
           className='w-full max-w-96'
         >
           <Form.Item label={<span>
-            标准正态分布 <Tag color='pink'>Z = {zP === 1 ? '+∞' : zP === 0 ? '-∞' : jStat.normal.inv(zP, 0, 1).toFixed(6)}</Tag>
+            标准正态分布 <Tag color='pink'>Z = {zP === 1 ? '+∞' : zP === 0 ? '-∞' : p2z(zP).toFixed(6)}</Tag>
           </span>}>
             <InputNumber
               className='w-full'
@@ -208,7 +208,7 @@ export function StatisticToPvalue() {
             />
           </Form.Item>
           <Form.Item label={<span>
-            T分布(单尾) <Tag color='pink'>T = {tP1 === 1 ? '-∞' : tP1 === 0 ? '+∞' : -jStat.studentt.inv(tP1, tDf1b).toFixed(6)}</Tag>
+            T分布(单尾) <Tag color='pink'>T = {tP1 === 1 ? '-∞' : tP1 === 0 ? '+∞' : p2t(tP1, tDf1b, false).toFixed(6)}</Tag>
           </span>}>
             <Space.Compact block>
               <InputNumber
@@ -233,7 +233,7 @@ export function StatisticToPvalue() {
             </Space.Compact>
           </Form.Item>
           <Form.Item label={<span>
-            T分布(双尾) <Tag color='pink'>T = {tP2 === 1 ? '-∞' : tP2 === 0 ? '+∞' : -jStat.studentt.inv(tP2 / 2, tDf2b).toFixed(6)}</Tag>
+            T分布(双尾) <Tag color='pink'>T = {tP2 === 1 ? '-∞' : tP2 === 0 ? '+∞' : p2t(tP2, tDf2b).toFixed(6)}</Tag>
           </span>}>
             <Space.Compact block>
               <InputNumber
@@ -258,7 +258,7 @@ export function StatisticToPvalue() {
             </Space.Compact>
           </Form.Item>
           <Form.Item label={<span>
-            F分布(单尾) <Tag color='pink'>F = {fP1 === 1 ? '0' : fP1 === 0 ? '+∞' : jStat.centralF.inv(1 - fP1, fDf1b[0], fDf1b[1]).toFixed(6)}</Tag>
+            F分布(单尾) <Tag color='pink'>F = {fP1 === 1 ? '0' : fP1 === 0 ? '+∞' : p2f(fP1, fDf1b[0], fDf1b[1], false).toFixed(6)}</Tag>
           </span>}>
             <InputNumber
               className='w-full mb-2'
@@ -293,7 +293,7 @@ export function StatisticToPvalue() {
             />
           </Form.Item>
           <Form.Item label={<span>
-            F分布(双尾) <Tag color='pink'>F = {fP2 === 1 ? '0' : fP2 === 0 ? '+∞' : jStat.centralF.inv(1 - fP2 / 2, fDf2b[0], fDf2b[1]).toFixed(6)}</Tag>
+            F分布(双尾) <Tag color='pink'>F = {fP2 === 1 ? '0' : fP2 === 0 ? '+∞' : p2f(fP2, fDf2b[0], fDf2b[1]).toFixed(6)}</Tag>
           </span>}>
             <InputNumber
               className='w-full mb-2'

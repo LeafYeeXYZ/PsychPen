@@ -33,7 +33,6 @@ export default defineConfig({
             '@stdlib/random/base/normal',
           ],
           'utils': [
-            'jstat',
             'html2canvas', 
             'echarts-wordcloud', 
             'jieba-wasm', 
@@ -42,9 +41,8 @@ export default defineConfig({
             'bowser',
             'ml-kmeans',
             'hyparquet',
-            'psych-wasm',
-            '@leaf/psych-lib',
             '@leaf/sav-reader',
+            'psych-wasm',
           ],
         }
       }

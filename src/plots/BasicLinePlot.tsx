@@ -4,7 +4,7 @@ import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
-import { min, max, mean, median, sum } from 'psych-wasm'
+import { min, max, mean, median, sum } from 'psych-wasm/as'
 import { downloadImage } from '../lib/utils'
 
 type Statistic = 'mean' | 'median' | 'max' | 'min' | 'sum' | 'count'

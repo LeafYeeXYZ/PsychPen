@@ -1,7 +1,7 @@
 import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
-import { corr } from 'psych-wasm'
+import { corr } from 'psych-wasm/as'
 import { flushSync } from 'react-dom'
 
 type Option = {
@@ -32,7 +32,7 @@ export function HalfReliability() {
       if (!values.group) {
         const meansA = filteredRows.map((row) => values.variablesA.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesA.length)
         const meansB = filteredRows.map((row) => values.variablesB.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesB.length)
-        const r = Number(corr(meansA, meansB))
+        const r = corr(meansA, meansB)
         const correctedR = 2 * r / (1 + r)
         setResult({ correctedR: [correctedR], groups: ['-'], ...values })
       } else {
@@ -42,7 +42,7 @@ export function HalfReliability() {
           const filteredRowsByGroup = filteredRows.filter((row) => row[values.group!] == group)
           const meansA = filteredRowsByGroup.map((row) => values.variablesA.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesA.length)
           const meansB = filteredRowsByGroup.map((row) => values.variablesB.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesB.length)
-          const r = Number(corr(meansA, meansB))
+          const r = corr(meansA, meansB)
           const correctedR = 2 * r / (1 + r)
           result.correctedR.push(correctedR)
           result.groups.push(String(group))

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import kstest from '@stdlib/stats/kstest'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { mean, std } from 'psych-wasm'
+import { mean, std } from 'psych-wasm/as'
 
 type Option = {
   /** 类型 */

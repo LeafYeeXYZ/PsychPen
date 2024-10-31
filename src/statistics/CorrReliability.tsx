@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { corr } from 'psych-wasm'
+import { corr } from 'psych-wasm/as'
 
 type Option = {
   /** 变量名 */
@@ -29,14 +29,14 @@ export function CorrReliability() {
       const filteredRows = dataRows.filter((row) => values.variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
       if (!values.group) {
         const data = values.variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
-        const r = Number(corr(data[0], data[1]))
+        const r = corr(data[0], data[1])
         setResult({ r: [r], groups: ['-'], ...values })
       } else {
         const groups = Array.from(new Set(filteredRows.map((row) => row[values.group!])))
         const result: Result = { r: [], groups: [], ...values }
         for (const group of groups) {
           const data = values.variables.map((variable) => filteredRows.filter((row) => row[values.group!] == group).map((row) => Number(row[variable])))
-          const r = Number(corr(data[0], data[1]))
+          const r = corr(data[0], data[1])
           result.r.push(r)
           result.groups.push(String(group))
         }

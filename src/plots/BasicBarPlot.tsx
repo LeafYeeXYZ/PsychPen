@@ -4,7 +4,7 @@ import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
-import { mean, std as sd } from 'psych-wasm'
+import { mean, std as sd } from 'psych-wasm/as'
 import { downloadImage } from '../lib/utils'
 
 type Option = {

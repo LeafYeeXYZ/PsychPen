@@ -2,8 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { min, max, mean, quantile, std } from 'psych-wasm'
-import { mode } from '@leaf/psych-lib'
+import { min, max, mean, quantile, std, mode } from 'psych-wasm/as'
 
 type AvialableStat = 'min' | 'max' | 'mean' | 'mode' | 'q1' | 'q2' | 'q3' | 'std' | 'count' | 'unique'
 
