@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { vari } from 'psych-wasm/as'
+import { vari } from 'psych-wasm'
 
 type Option = {
   /** 变量名 */

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import ttest2 from '@stdlib/stats/ttest2'
 import { flushSync } from 'react-dom'
 import { generatePResult, getCohenDOfTTest2 } from '../lib/utils'
-import { std } from 'psych-wasm/as'
+import { std } from 'psych-wasm'
 
 type Option = {
   /** 数据变量 */

@@ -3,7 +3,7 @@
  */
 
 import type { Variable, AllowedDiscreteMethods } from './types'
-import { mean, std, quantile, max, min, mode } from 'psych-wasm/as'
+import { mean, std, quantile, max, min, mode } from 'psych-wasm'
 import { kmeans } from 'ml-kmeans'
 
 /** 生成子变量 */
