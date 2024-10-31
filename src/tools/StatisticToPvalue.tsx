@@ -124,7 +124,7 @@ export function StatisticToPvalue() {
               className='w-full mb-2'
               addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>F</Tag></span>}
               step={0.01}
-              min={0}
+              min={0.0001}
               defaultValue={DEFAULT_VALUES.fS}
               onChange={(value) => {
                 typeof value === 'number' && setFS1(value)
@@ -158,6 +158,7 @@ export function StatisticToPvalue() {
               className='w-full mb-2'
               addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>F</Tag></span>}
               step={0.01}
+              min={0.0001}
               defaultValue={DEFAULT_VALUES.fS}
               onChange={(value) => {
                 typeof value === 'number' && setFS2(value)
