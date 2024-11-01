@@ -3,7 +3,7 @@ import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { kurtosis, skewness } from 'psych-wasm'
+import { kurtosisTest, skewnessTest } from 'psych-wasm'
 
 type Option = {
   /** 类型 */
@@ -38,8 +38,8 @@ export function KurtosisSkewness() {
           .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
           .map((v) => Number(v))
         )
-        const k = data.map((arr) => kurtosis(arr))
-        const s = data.map((arr) => skewness(arr))
+        const k = data.map((arr) => kurtosisTest(arr))
+        const s = data.map((arr) => skewnessTest(arr))
         setResult({ kurtosis: k, skewness: s, labels: variables!, counts: data.map((arr) => arr.length), ...values })
       } else {
         const groups = Array.from(new Set(dataRows.map((row) => row[group!]))).map(String)
@@ -49,8 +49,8 @@ export function KurtosisSkewness() {
           .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
           .map((v) => Number(v))
         )
-        const k = data.map((arr) => kurtosis(arr))
-        const s = data.map((arr) => skewness(arr))
+        const k = data.map((arr) => kurtosisTest(arr))
+        const s = data.map((arr) => skewnessTest(arr))
         setResult({ kurtosis: k, skewness: s, labels: groups, counts: data.map((arr) => arr.length), ...values })
       }
       messageApi?.destroy()

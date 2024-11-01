@@ -42,7 +42,7 @@
     "hyparquet": "^1.5.0",
     "jieba-wasm": "^2.2.0",
     "ml-kmeans": "^6.0.0",
-    "psych-wasm": "^2.2.0",
+    "psych-wasm": "^2.3.0",
     "react": "rc",
     "react-dom": "rc",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
