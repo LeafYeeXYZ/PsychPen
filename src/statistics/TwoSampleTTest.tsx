@@ -1,10 +1,9 @@
 import { useZustand } from '../lib/useZustand'
-import { Select, Input, Button, Form } from 'antd'
+import { Select, Input, Button, Form, InputNumber, Space } from 'antd'
 import { useState } from 'react'
-import ttest2 from '@stdlib/stats/ttest2'
 import { flushSync } from 'react-dom'
-import { generatePResult, getCohenDOfTTest2 } from '../lib/utils'
-import { std } from 'psych-lib'
+import { generatePResult } from '../lib/utils'
+import { TwoSampleTTest as T } from 'psych-lib'
 
 type Option = {
   /** 数据变量 */
@@ -13,11 +12,14 @@ type Option = {
   groupVar: string
   /** 检验值, 默认 0 */
   expect: number
-  /** 单双尾检验, 默认 two-sided */
-  alternative: 'two-sided' | 'less' | 'greater'
+  /** 单双尾检验, 默认双尾 */
+  twoside: boolean
+  /** 显著性水平, 默认 0.05 */
+  alpha: number
 }
 type Result = {
-  [key: string]: unknown
+  groups: string[]
+  m: T
 } & Option
 
 export function TwoSampleTTest() {
@@ -29,35 +31,25 @@ export function TwoSampleTTest() {
     try {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
+      const { dataVar, groupVar, expect, twoside, alpha } = values
       const data1: number[] = []
       const data2: number[] = []
-      const groups = Array.from((new Set(dataRows.map((value) => value[values.groupVar]))).values())
+      const groups = Array.from((new Set(dataRows.map((value) => value[groupVar]))).values())
       for (const row of dataRows) {
         if (
-          typeof row[values.dataVar] !== 'undefined' 
-          && !isNaN(Number(row[values.dataVar]))
-          && typeof row[values.groupVar] !== 'undefined'
+          typeof row[dataVar] !== 'undefined' 
+          && !isNaN(Number(row[dataVar]))
+          && typeof row[groupVar] !== 'undefined'
         ) {
-          row[values.groupVar] === groups[0] && data1.push(Number(row[values.dataVar]))
-          row[values.groupVar] === groups[1] && data2.push(Number(row[values.dataVar]))
+          row[groupVar] == groups[0] && data1.push(Number(row[dataVar]))
+          row[groupVar] == groups[1] && data2.push(Number(row[dataVar]))
         }
       }
-      const result = ttest2(data1, data2, { difference: +values.expect, alternative: values.alternative })
       setResult({ 
-        dataVar: values.dataVar, 
-        groupVar: values.groupVar, 
-        expect: +values.expect,
-        groups,
-        std: [
-          std(data1),
-          std(data2),
-        ],
-        count: [
-          data1.length,
-          data2.length,
-        ],
-        ...result 
-      } as Result)
+        ...values, 
+        groups: groups.map(String),
+        m: new T(data1, data2, twoside, expect, alpha),
+      })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -82,7 +74,8 @@ export function TwoSampleTTest() {
           autoComplete='off'
           initialValues={{
             expect: 0,
-            alternative: 'two-sided',
+            twoside: true,
+            alpha: 0.05,
           }}
           disabled={disabled}
         >
@@ -149,19 +142,35 @@ export function TwoSampleTTest() {
               type='number'
             />
           </Form.Item>
-          <Form.Item
-            label='单双尾检验'
-            name='alternative'
-            rules={[{ required: true, message: '请选择单双尾检验' }]}
-          >
-            <Select
-              className='w-full'
-              placeholder='请选择单双尾检验'
-            >
-              <Select.Option value='two-sided'>双尾检验</Select.Option>
-              <Select.Option value='less'>单尾检验(左)</Select.Option>
-              <Select.Option value='greater'>单尾检验(右)</Select.Option>
-            </Select>
+          <Form.Item label='单双尾检验和显著性水平'>
+            <Space.Compact block>
+              <Form.Item
+                noStyle
+                name='twoside'
+                rules={[{ required: true, message: '请选择单双尾检验' }]}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='请选择单双尾检验'
+                >
+                  <Select.Option value={true}>双尾检验</Select.Option>
+                  <Select.Option value={false}>单尾检验</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                noStyle
+                name='alpha'
+                rules={[{ required: true, message: '请输入显著性水平' }]}
+              >
+                <InputNumber
+                  className='w-full'
+                  placeholder='请输入显著性水平'
+                  min={0}
+                  max={1}
+                  step={0.01}
+                />
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
           <Form.Item>
             <Button
@@ -181,8 +190,8 @@ export function TwoSampleTTest() {
         {result ? (
           <div className='w-full h-full overflow-auto'>
            
-            <p className='text-lg mb-2 text-center w-full'>独立样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
-            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值差异={result.expect} | 显著性水平(α): 0.05</p>
+            <p className='text-lg mb-2 text-center w-full'>独立样本T检验 ({result.twoside ? '双尾' : '单尾'})</p>
+            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值差异={result.expect} | 显著性水平(α): {result.alpha}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -190,20 +199,20 @@ export function TwoSampleTTest() {
                   <td>自由度</td>
                   <td>t</td>
                   <td>p</td>
-                  <td>95%置信区间</td>
+                  <td>{(100 - result.alpha * 100).toFixed(3)}%置信区间</td>
                   <td>效应量 (Cohen's d)</td>
                   <td>测定系数 (R<sup>2</sup>)</td>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>{((result.xmean as number) - (result.ymean as number)).toFixed(3)}</td>
-                  <td>{(result.df as number).toFixed(3)}</td>
-                  <td>{generatePResult(result.statistic, result.pValue).statistic}</td>
-                  <td>{generatePResult(result.statistic, result.pValue).p}</td>
-                  <td>{`[${(result.ci as [number, number])[0].toFixed(3)}, ${(result.ci as [number, number])[1].toFixed(3)})`}</td>
-                  <td>{(getCohenDOfTTest2(result.xmean as number, result.ymean as number, (result.std as number[])[0], (result.std as number[])[1], (result.count as number[])[0] - 1, (result.count as number[])[1] - 1)).toFixed(3)}</td>
-                  <td>{(((result.statistic as number) ** 2) / (((result.statistic as number) ** 2) + (result.df as number))).toFixed(3)}</td>
+                  <td>{result.m.meanDiff.toFixed(3)}</td>
+                  <td>{result.m.df.toFixed(3)}</td>
+                  <td>{generatePResult(result.m.t, result.m.p).statistic}</td>
+                  <td>{generatePResult(result.m.t, result.m.p).p}</td>
+                  <td>{`[${result.m.ci[0].toFixed(3)}, ${result.m.ci[1].toFixed(3)})`}</td>
+                  <td>{result.m.cohenD.toFixed(3)}</td>
+                  <td>{result.m.r2.toFixed(3)}</td>
                 </tr>
               </tbody>
             </table>
@@ -222,18 +231,18 @@ export function TwoSampleTTest() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{String((result.groups as unknown[])[0])}</td>
-                  <td>{(result.xmean as number).toFixed(3)}</td>
-                  <td>{(result.std as number[])[0].toFixed(3)}</td>
-                  <td>{(result.count as number[])[0]}</td>
-                  <td>{(result.count as number[])[0] - 1}</td>
+                  <td>{result.groups[0]}</td>
+                  <td>{result.m.meanA.toFixed(3)}</td>
+                  <td>{result.m.stdA.toFixed(3)}</td>
+                  <td>{result.m.dfA + 1}</td>
+                  <td>{result.m.dfA}</td>
                 </tr>
                 <tr>
-                  <td>{String((result.groups as unknown[])[1])}</td>
-                  <td>{(result.ymean as number).toFixed(3)}</td>
-                  <td>{(result.std as number[])[1].toFixed(3)}</td>
-                  <td>{(result.count as number[])[1]}</td>
-                  <td>{(result.count as number[])[1] - 1}</td>
+                  <td>{result.groups[1]}</td>
+                  <td>{result.m.meanB.toFixed(3)}</td>
+                  <td>{result.m.stdB.toFixed(3)}</td>
+                  <td>{result.m.dfB + 1}</td>
+                  <td>{result.m.dfB}</td>
                 </tr>
               </tbody>
             </table>

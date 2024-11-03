@@ -1,21 +1,22 @@
 import { useZustand } from '../lib/useZustand'
-import { Select, Input, Button, Form } from 'antd'
+import { Select, Input, Button, Form, InputNumber, Space } from 'antd'
 import { useState } from 'react'
-import ttest from '@stdlib/stats/ttest'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { std } from 'psych-lib'
+import { OneSampleTTest as T } from 'psych-lib'
 
 type Option = {
   /** 变量名 */
   variable: string
   /** 检验值, 默认 0 */
   expect: number
-  /** 单双尾检验, 默认 two-sided */
-  alternative: 'two-sided' | 'less' | 'greater'
+  /** 单双尾检验, 默认双尾 */
+  twoside: boolean
+  /** 显著性水平, 默认 0.05 */
+  alpha: number
 }
 type Result = {
-  [key: string]: unknown
+  m: T
 } & Option
 
 export function OneSampleTTest() {
@@ -27,17 +28,12 @@ export function OneSampleTTest() {
     try {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
+      const { variable, expect, twoside, alpha } = values
       const data = dataRows
-        .map((row) => row[values.variable])
+        .map((row) => row[variable])
         .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
         .map((v) => Number(v))
-      const result = ttest(data, { mu: +values.expect, alternative: values.alternative })
-      setResult({ 
-        variable: values.variable, 
-        expect: +values.expect,
-        std: std(data),
-        ...result 
-      } as Result)
+      setResult({ ...values, m:  new T(data, expect, twoside, alpha) })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -62,7 +58,8 @@ export function OneSampleTTest() {
           autoComplete='off'
           initialValues={{
             expect: 0,
-            alternative: 'two-sided',
+            twoside: true,
+            alpha: 0.05,
           }}
           disabled={disabled}
         >
@@ -93,19 +90,35 @@ export function OneSampleTTest() {
               type='number'
             />
           </Form.Item>
-          <Form.Item
-            label='单双尾检验'
-            name='alternative'
-            rules={[{ required: true, message: '请选择单双尾检验' }]}
-          >
-            <Select
-              className='w-full'
-              placeholder='请选择单双尾检验'
-            >
-              <Select.Option value='two-sided'>双尾检验</Select.Option>
-              <Select.Option value='less'>单尾检验(左)</Select.Option>
-              <Select.Option value='greater'>单尾检验(右)</Select.Option>
-            </Select>
+          <Form.Item label='单双尾检验和显著性水平'>
+            <Space.Compact block>
+              <Form.Item
+                noStyle
+                name='twoside'
+                rules={[{ required: true, message: '请选择单双尾检验' }]}
+              >
+                <Select
+                  className='w-full'
+                  placeholder='请选择单双尾检验'
+                >
+                  <Select.Option value={true}>双尾检验</Select.Option>
+                  <Select.Option value={false}>单尾检验</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                noStyle
+                name='alpha'
+                rules={[{ required: true, message: '请输入显著性水平' }]}
+              >
+                <InputNumber
+                  className='w-full'
+                  placeholder='请输入显著性水平'
+                  min={0}
+                  max={1}
+                  step={0.01}
+                />
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
           <Form.Item>
             <Button
@@ -125,8 +138,8 @@ export function OneSampleTTest() {
         {result ? (
           <div className='w-full h-full overflow-auto'>
 
-            <p className='text-lg mb-2 text-center w-full'>单样本T检验 ({result.alternative === 'two-sided' ? '双尾' : '单尾'})</p>
-            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值={result.expect} | 显著性水平(α): 0.05</p>
+            <p className='text-lg mb-2 text-center w-full'>单样本T检验 ({result.twoside ? '双尾' : '单尾'})</p>
+            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值={result.expect} | 显著性水平(α): {result.alpha}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -134,20 +147,20 @@ export function OneSampleTTest() {
                   <td>自由度</td>
                   <td>t</td>
                   <td>p</td>
-                  <td>95%置信区间</td>
+                  <td>{(100 - result.alpha * 100).toFixed(3)}%置信区间</td>
                   <td>效应量 (Cohen's d)</td>
                   <td>测定系数 (R<sup>2</sup>)</td>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>{(result.mean as number).toFixed(3)}</td>
-                  <td>{(result.df as number).toFixed(3)}</td>
-                  <td>{generatePResult(result.statistic, result.pValue).statistic}</td>
-                  <td>{generatePResult(result.statistic, result.pValue).p}</td>
-                  <td>{`[${(result.ci as [number, number])[0].toFixed(3)}, ${(result.ci as [number, number])[1].toFixed(3)})`}</td>
-                  <td>{(((result.mean as number) - result.expect) / (result.std as number)).toFixed(3)}</td>
-                  <td>{(((result.statistic as number) ** 2) / (((result.statistic as number) ** 2) + (result.df as number))).toFixed(3)}</td>
+                  <td>{result.m.mean.toFixed(3)}</td>
+                  <td>{result.m.df.toFixed(3)}</td>
+                  <td>{generatePResult(result.m.t, result.m.p).statistic}</td>
+                  <td>{generatePResult(result.m.t, result.m.p).p}</td>
+                  <td>{`[${result.m.ci[0].toFixed(3)}, ${result.m.ci[1].toFixed(3)})`}</td>
+                  <td>{result.m.cohenD.toFixed(3)}</td>
+                  <td>{result.m.r2.toFixed(3)}</td>
                 </tr>
               </tbody>
             </table>
@@ -164,10 +177,10 @@ export function OneSampleTTest() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{(result.mean as number).toFixed(3)}</td>
-                  <td>{(result.std as number).toFixed(3)}</td>
-                  <td>{(result.df as number) + 1}</td>
-                  <td>{(result.df as number)}</td>
+                  <td>{result.m.mean.toFixed(3)}</td>
+                  <td>{result.m.std.toFixed(3)}</td>
+                  <td>{result.m.df + 1}</td>
+                  <td>{result.m.df}</td>
                 </tr>
               </tbody>
             </table>
