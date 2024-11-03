@@ -3,7 +3,7 @@
  */
 
 import type { Variable } from './types'
-import { min, max, mean, quantile, std, mode } from 'psych-wasm'
+import { min, max, mean, quantile, std, mode } from 'psych-lib'
 
 /** 生成描述统计量 */
 export class Describe {

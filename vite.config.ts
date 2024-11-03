@@ -10,7 +10,7 @@ export default defineConfig({
   })],
   optimizeDeps: {
     exclude: [
-      'psych-wasm',
+      'psych-lib',
       'jieba-wasm',
     ],
   },
@@ -42,7 +42,7 @@ export default defineConfig({
             'ml-kmeans',
             'hyparquet',
             '@leaf/sav-reader',
-            'psych-wasm',
+            'psych-lib',
           ],
         }
       }

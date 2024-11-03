@@ -4,7 +4,7 @@ import { useState } from 'react'
 import ttest from '@stdlib/stats/ttest'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { std, mean } from 'psych-wasm'
+import { std, mean } from 'psych-lib'
 
 type Option = {
   /** 变量名1 */

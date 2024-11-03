@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
 import { downloadImage } from '../lib/utils'
-import { median, mean, max, min } from 'psych-wasm'
+import { median, mean, max, min } from 'psych-lib'
 
 type Statistic = 'mean' | 'median' | 'max' | 'min' | 'sum' | 'count'
 
