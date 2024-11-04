@@ -24,7 +24,6 @@ export default defineConfig({
           'stdlib': [
             '@stdlib/stats/kstest',
             '@stdlib/stats/levene-test',
-            '@stdlib/stats/pcorrtest',
             '@stdlib/random/base/normal',
           ],
           'utils': [

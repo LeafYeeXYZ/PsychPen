@@ -1,24 +1,24 @@
 import { useZustand } from '../lib/useZustand'
-import { Select, Button, Form } from 'antd'
+import { Select, Button, Form, InputNumber } from 'antd'
 import { useState } from 'react'
-import pearsonTest from '@stdlib/stats/pcorrtest'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
+import { PearsonCorrTest } from '@psych/lib'
 
 type Option = {
   /** 变量名 */
   variable: string[]
-  /** 单双尾检验, 默认 two-sided */
-  alternative: 'two-sided' | 'less' | 'greater'
+  /** 显著性水平 */
+  alpha: number
 }
 type Result = {
   data: {
     peer: string[]
     r: string
+    r2: string
     p: string
     t: string
     df: number
-    /** 95%置信区间 */
     ci: string
   }[]
 } & Option
@@ -32,22 +32,23 @@ export function PearsonCorrelationTest() {
     try {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
-      const filteredRows = dataRows.filter((row) => values.variable.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
+      const { variable, alpha } = values
+      const filteredRows = dataRows.filter((row) => variable.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
       const results: Result['data'] = []
-      for (let i = 0; i < values.variable.length - 1; i++) {
-        for (let j = i + 1; j < values.variable.length; j++) {
-          const data = [values.variable[i], values.variable[j]].map((variable) => filteredRows.map((row) => Number(row[variable])))
-          const result = pearsonTest(data[0], data[1], {
-            alternative: values.alternative,
-          })
-          const r = generatePResult(result.pcorr, result.pValue)
-          const t = generatePResult(result.statistic, result.pValue)
+      for (let i = 0; i < variable.length - 1; i++) {
+        for (let j = i + 1; j < variable.length; j++) {
+          const data = [variable[i], variable[j]].map((variable) => filteredRows.map((row) => Number(row[variable])))
+          const result = new PearsonCorrTest(data[0], data[1], alpha)
+          const r2 = generatePResult(result.r2, result.p)
+          const r = generatePResult(result.r, result.p)
+          const t = generatePResult(result.t, result.p)
           results.push({
             peer: [values.variable[i], values.variable[j]],
+            r2: r2.statistic,
             r: r.statistic,
             t: t.statistic,
             p: r.p,
-            df: data[0].length - 2,
+            df: result.df,
             ci: `[${result.ci[0].toFixed(3)}, ${result.ci[1].toFixed(3)})`,
           })
         }
@@ -79,8 +80,7 @@ export function PearsonCorrelationTest() {
           }}
           autoComplete='off'
           initialValues={{
-            expect: 'normal',
-            alternative: 'two-sided',
+            alpha: 0.05,
           }}
           disabled={disabled}
         >
@@ -105,18 +105,17 @@ export function PearsonCorrelationTest() {
             </Select>
           </Form.Item>
           <Form.Item
-            label='单双尾检验'
-            name='alternative'
-            rules={[{ required: true, message: '请选择单双尾检验' }]}
+            label='显著性水平'
+            name='alpha'
+            rules={[{ required: true, message: '请输入显著性水平' }]}
           >
-            <Select
+            <InputNumber
               className='w-full'
-              placeholder='请选择单双尾检验'
-            >
-              <Select.Option value='two-sided'>双尾检验</Select.Option>
-              <Select.Option value='less'>单尾检验(小于)</Select.Option>
-              <Select.Option value='greater'>单尾检验(大于)</Select.Option>
-            </Select>
+              placeholder='请输入显著性水平'
+              min={0}
+              max={1}
+              step={0.01}
+            />
           </Form.Item>
           <Form.Item>
             <Button
@@ -137,14 +136,15 @@ export function PearsonCorrelationTest() {
           <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>Pearson 相关系数检验</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 两个变量的相关系数{result.alternative === 'two-sided' ? '等于' : result.alternative === 'less' ? '小于' : '大于'}零 | 显著性水平(α): 0.05</p>
+            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 两个变量的相关系数等于零 | 显著性水平(α): {result.alpha}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
-                  <td>配对变量A</td>
-                  <td>配对变量B</td>
+                  <td>变量A</td>
+                  <td>变量B</td>
                   <td>相关系数(r)</td>
-                  <td>95%置信区间</td>
+                  <td>测定系数(r²)</td>
+                  <td>{(100 - result.alpha * 100).toFixed(3)}%置信区间</td>
                   <td>t</td>
                   <td>p</td>
                   <td>自由度</td>
@@ -156,6 +156,7 @@ export function PearsonCorrelationTest() {
                     <td>{row.peer[0]}</td>
                     <td>{row.peer[1]}</td>
                     <td>{row.r}</td>
+                    <td>{row.r2}</td>
                     <td>{row.ci}</td>
                     <td>{row.t}</td>
                     <td>{row.p}</td>
