@@ -9,10 +9,7 @@ export default defineConfig({
     },
   })],
   optimizeDeps: {
-    exclude: [
-      'psych-lib',
-      'jieba-wasm',
-    ],
+    exclude: ['jieba-wasm'],
   },
   build: {
     target: ['chrome110', 'firefox115', 'safari16', 'edge110'],
@@ -40,7 +37,7 @@ export default defineConfig({
             'ml-kmeans',
             'hyparquet',
             '@leaf/sav-reader',
-            'psych-lib',
+            '@psych/lib',
           ],
         }
       }

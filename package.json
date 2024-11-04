@@ -29,6 +29,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
     "@leaf/sav-reader": "npm:@jsr/leaf__sav-reader",
+    "@psych/lib": "npm:@jsr/psych__lib",
     "@stdlib/stdlib": "^0.3.0",
     "ag-grid-react": "^32.3.2",
     "antd": "^5.21.6",
@@ -42,7 +43,6 @@
     "hyparquet": "^1.5.0",
     "jieba-wasm": "^2.2.0",
     "ml-kmeans": "^6.0.0",
-    "psych-lib": "^3.1.1",
     "react": "rc",
     "react-dom": "rc",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",

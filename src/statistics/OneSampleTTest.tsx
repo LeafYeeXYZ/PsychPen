@@ -3,7 +3,7 @@ import { Select, Input, Button, Form, InputNumber, Space } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { OneSampleTTest as T } from 'psych-lib'
+import { OneSampleTTest as T } from '@psych/lib'
 
 type Option = {
   /** 变量名 */

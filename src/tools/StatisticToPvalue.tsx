@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { InputNumber, Space, Form, Tag } from 'antd'
-import { z2p, p2z, t2p, p2t, f2p, p2f } from 'psych-lib'
+import { z2p, p2z, t2p, p2t, f2p, p2f } from '@psych/lib'
 
 const DEFAULT_VALUES = {
   zS: 0,

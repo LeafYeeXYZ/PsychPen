@@ -3,7 +3,7 @@ import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { generatePResult } from '../lib/utils'
-import { kurtosisTest, skewnessTest } from 'psych-lib'
+import { kurtosisTest, skewnessTest } from '@psych/lib'
 
 type Option = {
   /** 类型 */
