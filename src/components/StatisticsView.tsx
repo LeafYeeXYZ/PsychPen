@@ -12,6 +12,7 @@ import { OneLinearRegression } from '../statistics/OneLinearRegression'
 import { TwoLinearRegression } from '../statistics/TwoLinearRegression'
 import { KurtosisSkewness } from '../statistics/KurtosisSkewness'
 import { SimpleMediatorTest } from '../statistics/SimpleMediatorTest'
+import { WelchTTest } from '../statistics/WelchTTest'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -42,6 +43,10 @@ const CASCADER_OPTIONS: Option[] = [
         value: 'PeerSampleTTest',
         label: '配对样本T检验',
       },
+      {
+        value: 'WelchTTest',
+        label: '不等方差T检验 (Welch\'s T Test)',
+      }
     ],
   },
   {
@@ -116,6 +121,9 @@ const CASCADER_OPTIONS: Option[] = [
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
+    case 'WelchTTest':
+      set(<WelchTTest />)
+      break
     case 'OneSampleTTest':
       set(<OneSampleTTest />)
       break
