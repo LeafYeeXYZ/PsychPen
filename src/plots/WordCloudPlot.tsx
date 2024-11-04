@@ -291,13 +291,13 @@ export function WordCloudPlot() {
               保存图片
             </Button>
           </div>
+          <p className='w-full text-center text-xs text-gray-400 mt-5'>
+            如果启用词语切分, 首次生成时会加载分词模块, 请耐心等待
+          </p>
+          <p className='w-full text-center text-xs text-gray-400 mt-1'>
+            如果形状不明显, 请调小最小单词尺寸
+          </p>
         </Form>
-        <p className='text-xs text-gray-400 mt-1'>
-          如果启用词语切分, 首次生成时会加载分词模块, 请耐心等待
-        </p>
-        <p className='text-xs text-gray-400 mt-1 mb-4'>
-          如果形状不明显, 请调小最小单词尺寸
-        </p>
 
       </div>
 
