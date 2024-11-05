@@ -1,8 +1,7 @@
-import normal from '@stdlib/random/base/normal'
 import { Button, InputNumber, Tag, Space, Input } from 'antd'
 import { useState, useRef, useEffect } from 'react'
 import { DeleteOutlined, PauseOutlined, PlaySquareOutlined } from '@ant-design/icons'
-import { mean as m, std as s } from '@psych/lib'
+import { mean as m, std as s, randomNormal } from '@psych/lib'
 import * as echarts from 'echarts'
 import { useZustand } from '../lib/useZustand'
 
@@ -36,7 +35,7 @@ export function NormalDistribution() {
   const generate = (times: number = 1) => {
     const result: number[] = []
     for (let i = 0; i < times; i++) {
-      result.push(normal(mean, std))
+      result.push(randomNormal(mean, std))
     }
     setData(draft => [...draft, ...result])
   }
