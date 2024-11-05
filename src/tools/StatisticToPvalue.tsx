@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { InputNumber, Space, Form, Tag } from 'antd'
-import { z2p, p2z, t2p, p2t, f2p, p2f } from '@psych/lib'
+import { z2p, p2z, t2p, p2t, f2p, p2f, c2p, p2c } from '@psych/lib'
 
 const DEFAULT_VALUES = {
   zS: 0,
@@ -11,6 +11,9 @@ const DEFAULT_VALUES = {
   fDf: [1, 30] as [number, number],
   fS: 1,
   fP: 0.05,
+  chi: 1,
+  chiDf: 5,
+  chiP: 0.05
 }
 
 export function StatisticToPvalue() {
@@ -43,6 +46,11 @@ export function StatisticToPvalue() {
   // p -> f (双尾)
   const [fDf2b, setFDf2b] = useState<[number, number]>(DEFAULT_VALUES.fDf)
   const [fP2, setFP2] = useState<number>(DEFAULT_VALUES.fP)
+  // chi -> p
+  const [chiDf, setChiDf] = useState<number>(DEFAULT_VALUES.chiDf)
+  const [chi, setChi] = useState<number>(DEFAULT_VALUES.chi)
+  // p -> chi
+  const [chiP, setChiP] = useState<number>(DEFAULT_VALUES.chiP)
 
   return (
     <div className='w-full h-full flex flex-col sm:flex-row justify-center items-center gap-4 p-4 text-rose-950 dark:text-white'>
@@ -152,7 +160,7 @@ export function StatisticToPvalue() {
             />
           </Form.Item>
           <Form.Item label={<span>
-            F分布(双尾) <Tag color='pink'>p = {f2p(fS2, fDf2a[0], fDf2a[1]).toFixed(6)}</Tag>
+            F分布(双尾) <Tag color='pink'>p = {f2p(fS2, fDf2a[0], fDf2a[1], true).toFixed(6)}</Tag>
           </span>}>
             <InputNumber
               className='w-full mb-2'
@@ -184,6 +192,30 @@ export function StatisticToPvalue() {
                 typeof value === 'number' && setFDf2a([fDf2a[0], value])
               }}
             />
+          </Form.Item>
+          <Form.Item label={<span>
+            卡方分布 <Tag color='pink'>p = {c2p(chi, chiDf).toFixed(6)}</Tag>
+          </span>}>
+            <Space.Compact block>
+              <InputNumber
+                addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>χ²</Tag></span>}
+                step={0.01}
+                min={0}
+                defaultValue={DEFAULT_VALUES.chi}
+                onChange={(value) => {
+                  typeof value === 'number' && setChi(value)
+                }}
+              />
+              <InputNumber
+                addonBefore={<span>自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+                step={1}
+                min={1}
+                defaultValue={DEFAULT_VALUES.chiDf}
+                onChange={(value) => {
+                  typeof value === 'number' && setChiDf(value)
+                }}
+              />
+            </Space.Compact>
           </Form.Item>
         </Form>
       </div>
@@ -294,7 +326,7 @@ export function StatisticToPvalue() {
             />
           </Form.Item>
           <Form.Item label={<span>
-            F分布(双尾) <Tag color='pink'>F = {fP2 === 1 ? '0' : fP2 === 0 ? '+∞' : p2f(fP2, fDf2b[0], fDf2b[1]).toFixed(6)}</Tag>
+            F分布(双尾) <Tag color='pink'>F = {fP2 === 1 ? '0' : fP2 === 0 ? '+∞' : p2f(fP2, fDf2b[0], fDf2b[1], true).toFixed(6)}</Tag>
           </span>}>
             <InputNumber
               className='w-full mb-2'
@@ -327,6 +359,31 @@ export function StatisticToPvalue() {
                 typeof value === 'number' && setFDf2b([fDf2b[0], value])
               }}
             />
+          </Form.Item>
+          <Form.Item label={<span>
+            卡方分布(仅供参考) <Tag color='pink'>χ² = {chiP === 1 ? '0' : chiP === 0 ? '+∞' : p2c(chiP, chiDf).toFixed(3)}</Tag>
+          </span>}>
+            <Space.Compact block>
+              <InputNumber
+                addonBefore={<span>显著性 <Tag className='mr-0' color='blue'>p</Tag></span>}
+                step={0.01}
+                min={0}
+                max={1}
+                defaultValue={DEFAULT_VALUES.chiP}
+                onChange={(value) => {
+                  typeof value === 'number' && setChiP(value)
+                }}
+              />
+              <InputNumber
+                addonBefore={<span>自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+                step={1}
+                min={1}
+                defaultValue={DEFAULT_VALUES.chiDf}
+                onChange={(value) => {
+                  typeof value === 'number' && setChiDf(value)
+                }}
+              />
+            </Space.Compact>
           </Form.Item>
         </Form>
       </div>
