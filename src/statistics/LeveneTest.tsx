@@ -3,7 +3,7 @@ import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import leveneTest from '@stdlib/stats/levene-test'
 import { flushSync } from 'react-dom'
-import { generatePResult } from '../lib/utils'
+import { markP, markS } from '../lib/utils'
 
 type Option = {
   /** 类别 */
@@ -61,11 +61,10 @@ export function LeveneTest() {
       }
       // @ts-expect-error 函数可以接受多个数组作为参数
       const { statistic, pValue, df } = leveneTest(...data)
-      const result = generatePResult(statistic, pValue)
       setResult({
         ...values,
-        F: result.statistic,
-        p: result.p,
+        F: markS(statistic, pValue),
+        p: markP(pValue),
         df: df as unknown as number[],
         groups,
       })

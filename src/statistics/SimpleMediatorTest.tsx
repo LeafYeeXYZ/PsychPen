@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Tag, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { generatePResult } from '../lib/utils'
+import { markP, markS } from '../lib/utils'
 import { LinearRegressionTwo, LinearRegressionOne, mean, bootstrapTest, z2p } from '@psych/lib'
 
 type Option = {
@@ -218,26 +218,26 @@ export function SimpleMediatorTest() {
                 <tr>
                   <td>c (x 对 y 的总效应)</td>
                   <td>{result.x_y.b1.toFixed(3)}</td>
-                  <td>{generatePResult(result.x_y.t, result.x_y.p).statistic}</td>
-                  <td>{generatePResult(result.x_y.t, result.x_y.p).p}</td>
+                  <td>{markS(result.x_y.t, result.x_y.p)}</td>
+                  <td>{markP(result.x_y.p)}</td>
                 </tr>
                 <tr>
                   <td>c' (控制 m 后 x 对 y 的效应 / x 对 y 的直接效应)</td>
                   <td>{result.xm_y.b1.toFixed(3)}</td>
-                  <td>{generatePResult(result.xm_y.b1t, result.xm_y.b1p).statistic}</td>
-                  <td>{generatePResult(result.xm_y.b1t, result.xm_y.b1p).p}</td>
+                  <td>{markS(result.xm_y.b1t!, result.xm_y.b1p)}</td>
+                  <td>{markP(result.xm_y.b1p)}</td>
                 </tr>
                 <tr>
                   <td>a (x 对 m 的效应)</td>
                   <td>{result.x_m.b1.toFixed(3)}</td>
-                  <td>{generatePResult(result.x_m.t, result.x_m.p).statistic}</td>
-                  <td>{generatePResult(result.x_m.t, result.x_m.p).p}</td>
+                  <td>{markS(result.x_m.t, result.x_m.p)}</td>
+                  <td>{markP(result.x_m.p)}</td>
                 </tr>
                 <tr>
                   <td>b (控制 x 后 m 对 y 的效应)</td>
                   <td>{result.xm_y.b2.toFixed(3)}</td>
-                  <td>{generatePResult(result.xm_y.b2t, result.xm_y.b2p).statistic}</td>
-                  <td>{generatePResult(result.xm_y.b2t, result.xm_y.b2p).p}</td>
+                  <td>{markS(result.xm_y.b2t!, result.xm_y.b2p)}</td>
+                  <td>{markP(result.xm_y.b2p)}</td>
                 </tr>
                 <tr>
                   <td>ab (x 对 y 的中介效应)</td>
@@ -269,7 +269,7 @@ export function SimpleMediatorTest() {
                 <tr>
                   <td>Sobel 检验</td>
                   <td>ab = 0</td>
-                  <td>z = {generatePResult(result.sobel.z, result.sobel.p).statistic}, p = {generatePResult(result.sobel.z, result.sobel.p).p}</td>
+                  <td>z = {markS(result.sobel.z, result.sobel.p)}, p = {markP(result.sobel.p)}</td>
                   <td>{result.sobel.p < 0.05 ? '拒绝原假设' : '不通过'}</td>
                 </tr>
                 <tr>

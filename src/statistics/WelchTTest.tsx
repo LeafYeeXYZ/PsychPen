@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Input, Button, Form, InputNumber, Space } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { generatePResult } from '../lib/utils'
+import { markP, markS } from '../lib/utils'
 import { WelchTTest as T } from '@psych/lib'
 
 type Option = {
@@ -214,8 +214,8 @@ export function WelchTTest() {
                 <tr>
                   <td>{result.m.meanDiff.toFixed(3)}</td>
                   <td>{result.m.df.toFixed(3)}</td>
-                  <td>{generatePResult(result.m.t, result.m.p).statistic}</td>
-                  <td>{generatePResult(result.m.t, result.m.p).p}</td>
+                  <td>{markS(result.m.t, result.m.p)}</td>
+                  <td>{markP(result.m.p)}</td>
                   <td>{`[${result.m.ci[0].toFixed(3)}, ${result.m.ci[1].toFixed(3)})`}</td>
                   <td>{result.m.cohenD.toFixed(3)}</td>
                   <td>{result.m.r2.toFixed(3)}</td>

@@ -13,6 +13,7 @@ import { TwoLinearRegression } from '../statistics/TwoLinearRegression'
 import { KurtosisSkewness } from '../statistics/KurtosisSkewness'
 import { SimpleMediatorTest } from '../statistics/SimpleMediatorTest'
 import { WelchTTest } from '../statistics/WelchTTest'
+import { OneWayANOVA } from '../statistics/OneWayANOVA'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -52,7 +53,12 @@ const CASCADER_OPTIONS: Option[] = [
   {
     value: 'ANOVA',
     label: '方差分析',
-    disabled: true,
+    children: [
+      {
+        value: 'OneWayANOVA',
+        label: '单因素方差分析',
+      },
+    ],
   },
   {
     value: 'NonParametricTest',
@@ -121,6 +127,9 @@ const CASCADER_OPTIONS: Option[] = [
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
+    case 'OneWayANOVA':
+      set(<OneWayANOVA />)
+      break
     case 'WelchTTest':
       set(<WelchTTest />)
       break

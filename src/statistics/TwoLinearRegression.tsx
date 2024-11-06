@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { generatePResult } from '../lib/utils'
+import { markP, markS } from '../lib/utils'
 import { LinearRegressionTwo } from '@psych/lib'
 
 type Option = {
@@ -183,22 +183,22 @@ export function TwoLinearRegression() {
                   <td>模型</td>
                   <td>b0: {result.m.b0.toFixed(4)} | b1: {result.m.b1.toFixed(4)} | b2: {result.m.b2.toFixed(4)}</td>
                   <td>b1 = b2 = 0</td>
-                  <td>F = {generatePResult(result.m.F, result.m.p).statistic}</td>
-                  <td>{generatePResult(result.m.F, result.m.p).p}</td>
+                  <td>F = {markS(result.m.F, result.m.p)}</td>
+                  <td>{markP(result.m.p)}</td>
                 </tr>
                 <tr>
                   <td>b1</td>
                   <td>{result.m.b1.toFixed(4)}{result.method === 'standard' ? ' (偏回归系数)' : ' (含两自变量的共同效应)'}</td>
                   <td>b1 = 0</td>
                   <td>{result.method === 'standard' ? (
-                    `t = ${generatePResult(result.m.b1t, result.m.b1p).statistic}`
+                    `t = ${markS(result.m.b1t!, result.m.b1p)}`
                   ) : (
-                    `F = ${generatePResult(result.m.b1F, result.m.b1p).statistic}`
+                    `F = ${markS(result.m.b1F!, result.m.b1p)}`
                   )}</td>
                   <td>{result.method === 'standard' ? (
-                    generatePResult(result.m.b1t, result.m.b1p).p
+                    markP(result.m.b1p)
                   ) : (
-                    generatePResult(result.m.b1F, result.m.b1p).p
+                    markP(result.m.b1p)
                   )}</td>
                 </tr>
                 <tr>
@@ -206,14 +206,14 @@ export function TwoLinearRegression() {
                   <td>{result.m.b2.toFixed(4)}{result.method === 'standard' ? ' (偏回归系数)' : ' (不含两自变量的共同效应)'}</td>
                   {result.method === 'standard' ? (<td>b2 = 0</td>) : (<td>加入 x2 后 r2 变化量为 0</td>)}
                   <td>{result.method === 'standard' ? (
-                    `t = ${generatePResult(result.m.b2t, result.m.b2p).statistic}`
+                    `t = ${markS(result.m.b2t!, result.m.b2p)}`
                   ) : (
-                    `F = ${generatePResult(result.m.b2F, result.m.b2p).statistic}`
+                    `F = ${markS(result.m.b2F!, result.m.b2p)}`
                   )}</td>
                   <td>{result.method === 'standard' ? (
-                    generatePResult(result.m.b2t, result.m.b2p).p
+                    markP(result.m.b2p)
                   ) : (
-                    generatePResult(result.m.b2F, result.m.b2p).p
+                    markP(result.m.b2p)
                   )}</td>
                 </tr>
               </tbody>

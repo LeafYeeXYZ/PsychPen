@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { generatePResult } from '../lib/utils'
+import { markP, markS } from '../lib/utils'
 import { kurtosisTest, skewnessTest } from '@psych/lib'
 
 type Option = {
@@ -190,11 +190,11 @@ export function KurtosisSkewness() {
                     <td>{label}</td>
                     <td>{result.counts[i]}</td>
                     <td>{result.kurtosis[i].kurtosis.toFixed(3)}</td>
-                    <td>{generatePResult(result.kurtosis[i].z, result.kurtosis[i].p).statistic}</td>
-                    <td>{generatePResult(result.kurtosis[i].z, result.kurtosis[i].p).p}</td>
+                    <td>{markS(result.kurtosis[i].z, result.kurtosis[i].p)}</td>
+                    <td>{markP(result.kurtosis[i].p)}</td>
                     <td>{result.skewness[i].skewness.toFixed(3)}</td>
-                    <td>{generatePResult(result.skewness[i].z, result.skewness[i].p).statistic}</td>
-                    <td>{generatePResult(result.skewness[i].z, result.skewness[i].p).p}</td>
+                    <td>{markS(result.skewness[i].z, result.skewness[i].p)}</td>
+                    <td>{markP(result.skewness[i].p)}</td>
                   </tr>
                 ))}
               </tbody>

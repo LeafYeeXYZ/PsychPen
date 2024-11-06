@@ -3,7 +3,7 @@ import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import kstest from '@stdlib/stats/kstest'
 import { flushSync } from 'react-dom'
-import { generatePResult } from '../lib/utils'
+import { markP, markS } from '../lib/utils'
 import { mean, std } from '@psych/lib'
 
 type Option = {
@@ -48,8 +48,12 @@ export function KolmogorovSmirnovTest() {
             alpha: 0.05,
             alternative: 'two-sided',
           })
-          const text = generatePResult(statistic, pValue)
-          return { name: variables![index], count: arr.length, D: text.statistic, p: text.p }
+          return { 
+            name: variables![index], 
+            count: arr.length, 
+            D: markS(statistic, pValue),
+            p: markP(pValue)
+          }
         })
         setResult({ data: result, ...values })
       } else {
@@ -67,8 +71,12 @@ export function KolmogorovSmirnovTest() {
             alpha: 0.05,
             alternative: 'two-sided',
           })
-          const text = generatePResult(statistic, pValue)
-          return { name: groups[index], count: arr.length, D: text.statistic, p: text.p }
+          return { 
+            name: groups[index], 
+            count: arr.length, 
+            D: markS(statistic, pValue),
+            p: markP(pValue),
+          }
         })
         setResult({ data: result, ...values })
       }

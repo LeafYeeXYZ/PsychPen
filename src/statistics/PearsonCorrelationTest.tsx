@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { generatePResult } from '../lib/utils'
+import { markP, markS } from '../lib/utils'
 import { PearsonCorrTest } from '@psych/lib'
 
 type Option = {
@@ -39,15 +39,12 @@ export function PearsonCorrelationTest() {
         for (let j = i + 1; j < variable.length; j++) {
           const data = [variable[i], variable[j]].map((variable) => filteredRows.map((row) => Number(row[variable])))
           const result = new PearsonCorrTest(data[0], data[1], alpha)
-          const r2 = generatePResult(result.r2, result.p)
-          const r = generatePResult(result.r, result.p)
-          const t = generatePResult(result.t, result.p)
           results.push({
             peer: [values.variable[i], values.variable[j]],
-            r2: r2.statistic,
-            r: r.statistic,
-            t: t.statistic,
-            p: r.p,
+            r2: markS(result.r2, result.p),
+            r: markS(result.r, result.p),
+            t: markS(result.t, result.p),
+            p: markP(result.p),
             df: result.df,
             ci: `[${result.ci[0].toFixed(3)}, ${result.ci[1].toFixed(3)})`,
           })

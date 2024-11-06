@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { generatePResult } from '../lib/utils'
+import { markP, markS } from '../lib/utils'
 import { LinearRegressionOne } from '@psych/lib'
 
 type Option = {
@@ -137,9 +137,9 @@ export function OneLinearRegression() {
                 <tr>
                   <td>{result.m.b0.toFixed(4)}</td>
                   <td>{result.m.b1.toFixed(4)}</td>
-                  <td>{generatePResult(result.m.F, result.m.p).statistic}</td>
-                  <td>{generatePResult(result.m.t, result.m.p).statistic}</td>
-                  <td>{generatePResult(result.m.F, result.m.p).p}</td>
+                  <td>{markS(result.m.F, result.m.p)}</td>
+                  <td>{markS(result.m.t, result.m.p)}</td>
+                  <td>{markP(result.m.p)}</td>
                   <td>{result.m.r2.toFixed(4)}</td>
                 </tr>
               </tbody>
