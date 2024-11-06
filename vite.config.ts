@@ -23,7 +23,6 @@ export default defineConfig({
           'chart-gl': ['echarts-gl'],
           'stdlib': [
             '@stdlib/stats/kstest',
-            '@stdlib/stats/levene-test',
           ],
           'utils': [
             'html2canvas', 

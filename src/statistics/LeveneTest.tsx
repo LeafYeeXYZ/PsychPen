@@ -1,7 +1,7 @@
 import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
-import leveneTest from '@stdlib/stats/levene-test'
+import { LeveneTest as T } from '@psych/lib'
 import { flushSync } from 'react-dom'
 import { markP, markS } from '../lib/utils'
 
@@ -14,12 +14,11 @@ type Option = {
   variables?: string[]
   /** 分组变量 */
   group?: string
+  /** 中心化方法 */
+  center: 'mean' | 'median'
 }
 type Result = {
-  F: string,
-  p: string,
-  df: number[],
-  groups: string[],
+  m: T
 } & Option
 
 export function LeveneTest() {
@@ -31,42 +30,29 @@ export function LeveneTest() {
     try {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
-      let groups: string[] = []
-      let data: number[][] = []
+      const { type, variable, variables, group: groups, center } = values
+      let group: string[]
+      let value: number[]
       // 处理被试间变量
-      if (values.type === 'independent') {
-        const emptyIndex: number[] = []
-        groups = Array.from(new Set(dataRows.map((row) => row[values.group!]))).map(String)
-        data = groups.map((group) => dataRows
-          .filter((row) => row[values.group!] == group)
-          .map((row) => row[values.variable!])
-          .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
-          .map((v) => Number(v))
-        ).filter((arr, index) => {
-          if (arr.length === 0) {
-            emptyIndex.push(index)
-            return false
-          }
-          return true
-        })
-        groups = groups.filter((_, index) => !emptyIndex.includes(index))
-      // 处理被试内变量
+      if (type === 'independent') {
+        const filteredRows = dataRows.filter((row) => row[variable!] !== undefined && !isNaN(Number(row[variable!])) && row[groups!] !== undefined)
+        group = filteredRows.map((row) => String(row[groups!]))
+        value = filteredRows.map((row) => Number(row[variable!]))
       } else {
-        groups = values.variables!
-        data = (values.variables!).map((variable) => dataRows
-          .map((row) => row[variable])
-          .filter((v) => typeof v !== 'undefined' && !isNaN(Number(v)))
-          .map((v) => Number(v))
-        ) // 理论上这里也要过滤掉空数组, 但是正常使用不会出现这种情况, 故为了性能暂不处理
+        group = []
+        value = []
+        for (const variable of variables!) {
+          const filteredRows = dataRows.filter((row) => row[variable] !== undefined && !isNaN(Number(row[variable])))
+          filteredRows.forEach((row) => {
+            group.push(String(variable))
+            value.push(Number(row[variable]))
+          })
+        }
       }
-      // @ts-expect-error 函数可以接受多个数组作为参数
-      const { statistic, pValue, df } = leveneTest(...data)
+      const m = new T(value, group, center)
       setResult({
         ...values,
-        F: markS(statistic, pValue),
-        p: markP(pValue),
-        df: df as unknown as number[],
-        groups,
+        m,
       })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -92,8 +78,7 @@ export function LeveneTest() {
           }}
           autoComplete='off'
           initialValues={{
-            expect: 'normal',
-            alternative: 'two-sided',
+            center: 'mean',
             type: 'peer',
           }}
           disabled={disabled}
@@ -174,6 +159,21 @@ export function LeveneTest() {
               </Form.Item>
             </>
           )}
+          <Form.Item
+            name='center'
+            label='中心化方法'
+            rules={[{ required: true, message: '请选择中心化方法' }]}
+          >
+            <Radio.Group
+              className='w-full'
+              block
+              optionType='button'
+              buttonStyle='solid'
+            >
+              <Radio value='mean'>均值</Radio>
+              <Radio value='median'>中位数</Radio>
+            </Radio.Group>
+          </Form.Item>
           <Form.Item>
             <Button
               className='w-full mt-4'
@@ -193,24 +193,50 @@ export function LeveneTest() {
           <div className='w-full h-full overflow-auto'>
 
             <p className='text-lg mb-2 text-center w-full'>Levene 检验</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 各变量/组满足方差齐性 | 显著性水平(α): 0.05</p>
+            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 各变量/组满足方差齐性</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
                   <td>自由度</td>
-                  <td>F</td>
+                  <td>F (w)</td>
                   <td>p</td>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>{result.df.join(', ')}</td>
-                  <td>{result.F}</td>
-                  <td>{result.p}</td>
+                  <td>{result.m.dfB}, {result.m.dfW}</td>
+                  <td>{markS(result.m.w, result.m.p)}</td>
+                  <td>{markP(result.m.p)}</td>
                 </tr>
               </tbody>
             </table>
-            <p className='text-xs mt-3 text-center w-full'>检验变量/组: {result.groups.sort().join(', ')}</p>
+
+            <p className='text-lg mb-2 mt-8 text-center w-full'>描述统计</p>
+            <table className='three-line-table'>
+              <thead>
+                <tr>
+                  <td>变量/组</td>
+                  <td>样本量</td>
+                  <td>原始均值</td>
+                  <td>中心化均值</td>
+                  <td>原始中位数</td>
+                  <td>中心化中位数</td>
+                </tr>
+              </thead>
+              <tbody>
+                {result.m.groups.map((group, index) => (
+                  <tr key={Math.random()}>
+                    <td>{group}</td>
+                    <td>{result.m.groupsCount[index]}</td>
+                    <td>{result.m.groupsMeanR[index].toFixed(3)}</td>
+                    <td>{result.m.groupsMeanC[index].toFixed(3)}</td>
+                    <td>{result.m.groupsMedianR[index].toFixed(3)}</td>
+                    <td>{result.m.groupsMedianC[index].toFixed(3)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className='text-xs mt-3 text-center w-full'>注: 此处中心化指离中心的"距离" (即差异的绝对值)</p>
 
           </div>
         ) : (
