@@ -21,9 +21,6 @@ export default defineConfig({
           'chart': ['echarts'],
           'table': ['ag-grid-react'],
           'chart-gl': ['echarts-gl'],
-          'stdlib': [
-            '@stdlib/stats/kstest',
-          ],
           'utils': [
             'html2canvas', 
             'echarts-wordcloud', 

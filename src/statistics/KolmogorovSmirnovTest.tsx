@@ -1,10 +1,8 @@
 import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
-import kstest from '@stdlib/stats/kstest'
 import { flushSync } from 'react-dom'
-import { markP, markS } from '../lib/utils'
-import { mean, std } from '@psych/lib'
+import { OneSampleKSTest } from '@psych/lib'
 
 type Option = {
   /** 类型 */
@@ -17,12 +15,7 @@ type Option = {
   group?: string
 }
 type Result = {
-  data: {
-    name: string,
-    count: number
-    D: string,
-    p: string,
-  }[]
+  m: (OneSampleKSTest & { name: string })[]
 } & Option
 
 export function KolmogorovSmirnovTest() {
@@ -42,22 +35,18 @@ export function KolmogorovSmirnovTest() {
           .map((v) => Number(v))
         )
         const result = data.map((arr, index) => {
-          const _mean = mean(arr)
-          const _std = std(arr)
-          const { pValue, statistic } = kstest(arr.map((v) => ((v - _mean) / _std)), 'normal', 0, 1, {
-            alpha: 0.05,
-            alternative: 'two-sided',
-          })
+          const m = new OneSampleKSTest(arr)
           return { 
+            ...m,
             name: variables![index], 
-            count: arr.length, 
-            D: markS(statistic, pValue),
-            p: markP(pValue)
           }
         })
-        setResult({ data: result, ...values })
+        setResult({ ...values, m: result })
       } else {
-        const groups = Array.from(new Set(dataRows.map((row) => row[group!]))).map(String)
+        const groups = Array
+          .from(new Set(dataRows.map((row) => row[group!])))
+          .map(String)
+          .sort((a, b) => a > b ? 1 : -1)
         const data: number[][] = groups.map((g) => dataRows
           .filter((row) => row[group!] === g)
           .map((row) => row[variable!])
@@ -65,20 +54,13 @@ export function KolmogorovSmirnovTest() {
           .map((v) => Number(v))
         )
         const result = data.map((arr, index) => {
-          const _mean = mean(arr)
-          const _std = std(arr)
-          const { pValue, statistic } = kstest(arr.map((v) => ((v - _mean) / _std)), 'normal', 0, 1, {
-            alpha: 0.05,
-            alternative: 'two-sided',
-          })
+          const m = new OneSampleKSTest(arr)
           return { 
+            ...m,
             name: groups[index], 
-            count: arr.length, 
-            D: markS(statistic, pValue),
-            p: markP(pValue),
           }
         })
-        setResult({ data: result, ...values })
+        setResult({ ...values, m: result })
       }
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -204,21 +186,23 @@ export function KolmogorovSmirnovTest() {
                   <td>{result.type === 'paired' ? '变量' : '组别'}</td>
                   <td>样本量</td>
                   <td>D</td>
-                  <td>p</td>
+                  <td>D临界值</td>
+                  <td>结果</td>
                 </tr>
               </thead>
               <tbody>
-                {result.data.map((row, index) => (
+                {result.m.map((row, index) => (
                   <tr key={index}>
                     <td>{row.name}</td>
-                    <td>{row.count}</td>
-                    <td>{row.D}</td>
-                    <td>{row.p}</td>
+                    <td>{row?.count}</td>
+                    <td>{row.d?.toFixed(3)}</td>
+                    <td>{row.decide?.toFixed(3)}</td>
+                    <td>{row?.rejected ? '不符合正态分布' : '符合正态分布'} <span className='text-xs opacity-40'>p: {row.p?.toFixed(3)}</span></td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {result.type === 'independent' && (<p className='text-xs mt-3 text-center w-full'>分组变量: {result.group}</p>)}
+            <p className='text-xs mt-3 text-center w-full'>P值使用渐进估计, 请以D临界值结果为准{result.type === 'independent' && ` | 分组变量: ${result.group}`}</p>
 
           </div>
         ) : (
