@@ -71,7 +71,7 @@ export function SimpleMediatorTest() {
       const getAB = (x: number[], m: number[], y: number[]) => {
         return (new LinearRegressionOne(x, m)).b1 * (new LinearRegressionTwo(x, m, y)).b2
       }
-      const [lower, upper] = bootstrapTest(xData, mData, yData, B, 0.05)
+      const [lower, upper] = bootstrapTest('ab', B, 0.05, xData, mData, yData)
 
       setResult({ 
         ...values, 
