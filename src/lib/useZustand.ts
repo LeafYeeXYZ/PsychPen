@@ -3,10 +3,9 @@
  */
 
 import { create } from 'zustand'
-import { utils } from 'xlsx'
 import { Variable } from './types'
+import type { Row } from '@psych/sheet'
 import type { MessageInstance } from 'antd/es/message/interface'
-import type { WorkBook } from 'xlsx'
 import { Derive } from './derive'
 import { Missing } from './misssing'
 import { Describe } from './describe'
@@ -37,25 +36,22 @@ export const useZustand = create<GlobalState>()((set) => ({
   dataCols: [],
   isLargeData: false,
   _DataView_setIsLargeData: (isLarge) => set({ isLargeData: isLarge }),
-  _DataView_setData: (data) => {
-    if (data) {
-      const sheet = data.Sheets[data.SheetNames[0]]
-      const rows = utils.sheet_to_json(sheet) as { [key: string]: unknown }[]
+  _DataView_setData: (rows) => {
+    if (rows) {
       const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
       const { calculatedCols, calculatedRows } = calculator(cols, rows)
       set({ 
-        data,
+        data: rows,
         dataRows: calculatedRows,
         dataCols: calculatedCols,
       })
     } else {
-      set({ data, dataRows: [], dataCols: [] })
+      set({ data: rows, dataRows: [], dataCols: [] })
     }
   },
   _VariableView_updateData: (cols) => {
     set((state) => {
-      const sheet = state.data!.Sheets[state.data!.SheetNames[0]]
-      const rows = utils.sheet_to_json(sheet) as { [key: string]: unknown }[]
+      const rows = state.data!
       const { calculatedCols, calculatedRows } = calculator(cols, rows)
       return { dataCols: calculatedCols, dataRows: calculatedRows }
     })
@@ -72,13 +68,13 @@ type GlobalState = {
   /**
    * 原始数据
    */
-  data: WorkBook | null
+  data: Row[] | null
   /**
    * 设置原始数据
    * @param data 原始数据 (WorkBook 类型)
    * @important 仅在 DataView.tsx 中使用
    */
-  _DataView_setData: (data: WorkBook | null) => void
+  _DataView_setData: (data: Row[] | null) => void
   /**
    * 更新数据
    * @param cols 变量列表

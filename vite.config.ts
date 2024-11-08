@@ -17,7 +17,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'antd': ['antd'],
-          'xlsx': ['xlsx', 'dta'],
+          'data': ['@psych/sheet'],
           'chart': ['echarts'],
           'table': ['ag-grid-react'],
           'chart-gl': ['echarts-gl'],
@@ -29,8 +29,6 @@ export default defineConfig({
             '@ant-design/icons',
             'bowser',
             'ml-kmeans',
-            'hyparquet',
-            '@leaf/sav-reader',
             '@psych/lib',
           ],
         }

@@ -1,21 +1,17 @@
-import { read, utils, writeFile } from 'xlsx'
 import { useZustand } from '../lib/useZustand'
 import { Upload, Button, Tag, Popconfirm, Modal, Input, Select } from 'antd'
 import { SlidersOutlined, DeleteOutlined, SaveOutlined, FilterOutlined } from '@ant-design/icons'
-import { parse, set_utils } from 'dta'
 import { flushSync } from 'react-dom'
 import { useRef } from 'react'
-import XLSX_ZAHL_PAYLOAD from 'xlsx/dist/xlsx.zahl.mjs'
-import { SavParser, Feeder } from '@leaf/sav-reader'
-import { parquetRead } from 'hyparquet'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
+import { importSheet, downloadSheet, type ImportTypes, type ExportTypes } from '@psych/sheet'
 
 /** 可导入的文件类型 */
-const ACCEPT_FILE_TYPES = ['.xls', '.xlsx', '.csv', '.txt', '.json', '.numbers', '.dta', '.sav', '.parquet']
+const ACCEPT_FILE_TYPES: ImportTypes[] = ['xls', 'xlsx', 'csv', 'txt', 'json', 'numbers', 'dta', 'sav', 'parquet']
 /** 可导出的文件类型 */
-const EXPORT_FILE_TYPES = ['.xlsx', '.csv', '.numbers']
+const EXPORT_FILE_TYPES: ExportTypes[] = ['xlsx', 'csv', 'numbers', 'json']
 /** 数据量较大的阈值 */
 const LARGE_DATA_SIZE = 512 * 1024
 
@@ -25,12 +21,7 @@ export function DataView() {
   const [modalApi, contextHolder] = Modal.useModal()
   // 导出数据相关
   const handleExport = async (filename: string, type: string) => {
-    const worksheet = utils.json_to_sheet(dataRows)
-    const workbook = utils.book_new(worksheet, 'psychpen')
-    writeFile(workbook, filename + type, {
-      compression: true,
-      numbers: XLSX_ZAHL_PAYLOAD,
-    })
+    downloadSheet(dataRows, type as ExportTypes, filename)
   }
   const handleExportParams = useRef<{ filename?: string; type?: string }>({})
   
@@ -124,10 +115,10 @@ export function DataView() {
             请先导入数据文件
           </p>
           <p className='text-sm p-4'>
-            支持 {ACCEPT_FILE_TYPES.map((type) => <Tag key={type} color='pink'>{type}</Tag>)} 格式
+            支持 {ACCEPT_FILE_TYPES.map((type) => <Tag key={type} color='pink'>.{type}</Tag>)} 格式
           </p>
           <Upload
-            accept={ACCEPT_FILE_TYPES.join(',')}
+            accept={ACCEPT_FILE_TYPES.map((type) => `.${type}`).join(',')}
             beforeUpload={async (file) => {
               try {
                 messageApi?.open({
@@ -149,28 +140,11 @@ export function DataView() {
                     if (!e.target?.result) {
                       messageApi?.destroy('uploading')
                       messageApi?.error('文件读取失败, 请检查文件是否损坏')
-                    } else if (ext === 'dta') {
-                      set_utils(utils)
-                      _DataView_setData(parse(new Uint8Array(e.target.result as ArrayBuffer)))
-                    } else if (ext === 'sav') {
-                      const parser = new SavParser()
-                      const feeder = new Feeder(e.target.result as ArrayBuffer)
-                      const data = (await parser.all(feeder)).rows.map((map: Map<string, unknown>) => Object.fromEntries(map))
-                      _DataView_setData(utils.book_new(utils.json_to_sheet(data), 'psychpen'))
-                    } else if (ext === 'txt') {
-                      // SheetJS 默认对 TXT 的编码是 UTF-16, 这里让它用 UTF-8 解析
-                      const text = new TextDecoder('utf-8').decode(e.target.result as ArrayBuffer)
-                      _DataView_setData(read(text, { type: 'string' }))
-                    } else if (ext === 'parquet') {
-                      await parquetRead({ 
-                        file: e.target.result as ArrayBuffer ,
-                        rowFormat: 'object',
-                        onComplete: (data) => {
-                          _DataView_setData(utils.book_new(utils.json_to_sheet(data), 'psychpen'))
-                        },
-                      })
+                    } else if (ACCEPT_FILE_TYPES.indexOf(ext as ImportTypes) === -1) {
+                      messageApi?.destroy('uploading')
+                      messageApi?.error('文件读取失败, 不支持该文件格式')
                     } else {
-                      _DataView_setData(read(e.target.result))
+                      _DataView_setData(await importSheet(e.target.result as ArrayBuffer, ext as ImportTypes))
                     }
                     messageApi?.destroy('uploading')
                     messageApi?.success('数据导入完成', 0.5)
