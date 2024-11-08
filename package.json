@@ -20,7 +20,6 @@
   "scripts": {
     "dev": "bunx --bun vite",
     "build": "bunx --bun vite build",
-    "wasm": "wasm-pack build ./wasm --target web --out-dir ../src/lib/wasm",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "bunx --bun vite preview",
     "release": "commit-and-tag-version",
