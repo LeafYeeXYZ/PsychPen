@@ -13,6 +13,7 @@ export default defineConfig({
   },
   build: {
     target: ['chrome110', 'firefox115', 'safari16', 'edge110'],
+    chunkSizeWarningLimit: 1100,
     rollupOptions: {
       output: {
         manualChunks: {
