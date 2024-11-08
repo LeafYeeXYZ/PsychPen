@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.6.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.5.0...v1.6.0) (2024-11-08)
+
+
+### Features
+
+* 添加 Welch T 检验 ([1ca0ec9](https://github.com/LeafYeeXYZ/PsychPen/commit/1ca0ec92ff82a90186a5410f9052d3edcbe97492))
+* 新增单因素方差分析及其事后检验 ([f233ac8](https://github.com/LeafYeeXYZ/PsychPen/commit/f233ac8870b488fbde3b65285f5c51cd5c6db5e8))
+* 新增卡方分布统计量和P值互转 ([aa57067](https://github.com/LeafYeeXYZ/PsychPen/commit/aa570679ac71a48b8f48c2fe5f397b8289be7dcc))
+
+
+### Bug Fixes
+
+* 更新PsychWasm, 修复F检验单双尾设置错误 ([525b844](https://github.com/LeafYeeXYZ/PsychPen/commit/525b8445378dd111460442c0f64cfa9cd0901ba0))
+* 将所有WASM模块排除出VITE的依赖优化 ([0cc0a77](https://github.com/LeafYeeXYZ/PsychPen/commit/0cc0a77bce3d689e0aa62d8bf44bd9086addbeb5))
+* 数值排序错误 ([03e6a62](https://github.com/LeafYeeXYZ/PsychPen/commit/03e6a6238feb264cdd3386d74e15b83d3b497710))
+* 修复大数据量时中介检验卡顿 ([d08a6f7](https://github.com/LeafYeeXYZ/PsychPen/commit/d08a6f7c33fcd94fdfed810dd2c9f32915238240))
+* 修复样式错误 ([f517792](https://github.com/LeafYeeXYZ/PsychPen/commit/f517792926025f6d25fafdd0f6f0b41afd0b95e8))
+* 移除所有显著性输入框 ([0731111](https://github.com/LeafYeeXYZ/PsychPen/commit/0731111431e9180ed60f9890feb76966d1b68b5e))
+
+
+### Refactoring
+
+* 换用 psych-lib 进行 Levene 检验 ([1aebaa7](https://github.com/LeafYeeXYZ/PsychPen/commit/1aebaa7af436f4f0a940988fed33695f7fbaa70e))
+* 换用 psych-lib 进行单样本 KS 检验 ([6ed7342](https://github.com/LeafYeeXYZ/PsychPen/commit/6ed73423b4570ee5a49381093c52db90b92e74b9))
+* 换用 psych-lib 进行皮尔逊相关检验 ([4fd755b](https://github.com/LeafYeeXYZ/PsychPen/commit/4fd755b196d7bcc1ea5373566dd23f8f53315f04))
+* 换用 psych-lib 进行正态分布生成 ([5ce04ec](https://github.com/LeafYeeXYZ/PsychPen/commit/5ce04ec0717979895e82bd11ff0221516c34b500))
+* 换用 psych-lib 进行T检验 ([e4529b3](https://github.com/LeafYeeXYZ/PsychPen/commit/e4529b3463c61361d78b9fb882db4cf4c8f915b8))
+* 换用 psych-sheet 进行数据导入导出 ([6309004](https://github.com/LeafYeeXYZ/PsychPen/commit/63090047d61583e9efff4beb135a61e7cf133be9))
+* 删除 jstat 和 mathjs 依赖 ([54863a8](https://github.com/LeafYeeXYZ/PsychPen/commit/54863a816c35eebf191edc845ab35203ffc06394))
+
+
+### Performance
+
+* 大幅优化Bootstrap检验运算速度 ([55f53f4](https://github.com/LeafYeeXYZ/PsychPen/commit/55f53f49144bc1333d6c5e55dae58ff911e15cd0))
+* 全面换用Web Assembly进行数学计算 ([d3c1a38](https://github.com/LeafYeeXYZ/PsychPen/commit/d3c1a3891c20afba8bf0bff06265ac53a1e2cc28))
+
 ## [1.5.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.4.0...v1.5.0) (2024-10-29)
 
 
