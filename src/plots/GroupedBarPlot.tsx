@@ -101,6 +101,10 @@ export function GroupedBarPlot() {
                 return ''
               },
               rotate: 90,
+              align: 'left',
+              verticalAlign: 'middle',
+              position: 'insideBottom',
+              distance: 15,
             },
             emphasis: {
               label: {
