@@ -361,7 +361,7 @@ export function StatisticToPvalue() {
             />
           </Form.Item>
           <Form.Item label={<span>
-            卡方分布(仅供参考) <Tag color='pink'>χ² = {chiP === 1 ? '0' : chiP === 0 ? '+∞' : p2c(chiP, chiDf).toFixed(3)}</Tag>
+            卡方分布 <Tag color='pink'>χ² = {chiP === 1 ? '0' : chiP === 0 ? '+∞' : p2c(chiP, chiDf).toFixed(6)}</Tag>
           </span>}>
             <Space.Compact block>
               <InputNumber

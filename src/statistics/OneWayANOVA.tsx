@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { markP, markS } from '../lib/utils'
 import { OneWayAnova, std } from '@psych/lib'
-import type { ScheffeResult, BonferroniResult } from '@psych/lib'
+import type { ScheffeResult, BonferroniResult, TukeyResult } from '@psych/lib'
 
 type Option = {
   /** 因变量 */
@@ -12,16 +12,18 @@ type Option = {
   /** 分组变量 */
   group: string
   /** 事后检验方法 */
-  method: ('Scheffe' | 'Bonferroni')[]
+  method: ('Scheffe' | 'Bonferroni' | 'Tukey')[]
 }
 const METHODS = {
   Scheffe: 'Scheffe 事后检验',
   Bonferroni: 'Bonferroni 事后检验',
+  Tukey: 'Tukey\'s HSD 事后检验',
 }
 type Result = {
   m: OneWayAnova
   scheffe?: ScheffeResult[]
   bonferroni?: BonferroniResult[]
+  tukey?: TukeyResult[]
 } & Option
 
 export function OneWayANOVA() {
@@ -37,13 +39,14 @@ export function OneWayANOVA() {
       const filteredRows = dataRows.filter((row) => typeof row[value] !== 'undefined' && !isNaN(Number(row[value])) && typeof row[group] !== 'undefined')
       const valueData = filteredRows.map((row) => Number(row[value]))
       const groupData = filteredRows.map((row) => String(row[group]))
-      const result = new OneWayAnova(valueData, groupData)
-      setResult({
-        ...values,
-        m: result,
-        scheffe: method && (method.includes('Scheffe') ? result.scheffe() : undefined),
-        bonferroni: method && (method.includes('Bonferroni') ? result.bonferroni() : undefined),
-      })
+      const m = new OneWayAnova(valueData, groupData)
+      const scheffe = method && method.includes('Scheffe') ? m.scheffe() : undefined
+      const bonferroni = method && method.includes('Bonferroni') ? m.bonferroni() : undefined
+      if (method && method.includes('Tukey') && m.groupsCount.some((count) => count !== m.groupsCount[0])) {
+        throw new Error('Tukey\'s HSD 要求每组样本量相等, 请移除此检验后重试')
+      }
+      const tukey = method && method.includes('Tukey') ? m.tukey() : undefined
+      setResult({ ...values, m, scheffe, bonferroni, tukey })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -281,6 +284,36 @@ export function OneWayANOVA() {
                 </table>
                 <p className='text-xs mt-3 text-center w-full'>分组变量: {result.group} | 使用 MS<sub>within</sub> 代替 S<sub>p</sub><sup>2</sup> (检验更严格)</p>
                 <p className='text-xs mt-2 text-center w-full'>临界显著性水平应为: <span className='text-red-500'>{result.bonferroni[0].sig.toFixed(4)}</span> (即 0.05 除以成对比较次数)</p>
+              </>
+            )}
+
+            {result.tukey && (
+              <>
+                <p className='text-lg mb-2 text-center w-full mt-8'>Tukey's HSD 事后检验</p>
+                <p className='text-xs mb-3 text-center w-full'>均值差异显著的临界值 HSD = {result.tukey[0].HSD.toFixed(3)}</p>
+                <table className='three-line-table'>
+                  <thead>
+                    <tr>
+                      <td>组A</td>
+                      <td>组B</td>
+                      <td>均值差异</td>
+                      <td>q</td>
+                      <td>p</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.tukey.map((row) => (
+                      <tr key={Math.random()}>
+                        <td>{row.groupA}</td>
+                        <td>{row.groupB}</td>
+                        <td>{row.diff.toFixed(3)}</td>
+                        <td>{markS(row.q, row.p)}</td>
+                        <td>{markP(row.p)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className='text-xs mt-3 text-center w-full'>分组变量: {result.group}</p>
               </>
             )}
 

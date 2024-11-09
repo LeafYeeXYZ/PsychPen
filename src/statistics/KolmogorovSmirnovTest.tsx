@@ -202,7 +202,7 @@ export function KolmogorovSmirnovTest() {
                 ))}
               </tbody>
             </table>
-            <p className='text-xs mt-3 text-center w-full'>P值使用渐进估计, 请以D临界值结果为准{result.type === 'independent' && ` | 分组变量: ${result.group}`}</p>
+            <p className='text-xs mt-3 text-center w-full'>P值使用渐进估计, 小样本时请以D临界值结果为准{result.type === 'independent' && ` | 分组变量: ${result.group}`}</p>
 
           </div>
         ) : (
