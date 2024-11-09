@@ -33,7 +33,7 @@ type Option = {
   /** 自定义标题 */
   title?: string
   /** 是否显示数据标签 */
-  label: boolean
+  label: 'mean' | 'std' | 'both' | 'none'
   /** 误差棒数据 */
   error: 0 | 1 | 2 | 3
   /** 自定义 y 轴最大值 */
@@ -101,8 +101,16 @@ export function BasicBarPlot() {
               type: 'bar',
               data: data,
               label: {
-                show: label,
-                formatter: (params) => `均值: ${params.value}\n标准差: ${std[params.dataIndex][3]}`,
+                show: label !== 'none',
+                formatter: (params) => {
+                  if (label === 'mean') {
+                    return `均值: ${params.value}`
+                  } else if (label === 'std') {
+                    return `标准差: ${std[params.dataIndex][3]}`
+                  } else {
+                    return `均值: ${params.value}\n标准差: ${std[params.dataIndex][3]}`
+                  }
+                }
               },
               emphasis: {
                 label: {
@@ -207,8 +215,16 @@ export function BasicBarPlot() {
               type: 'bar',
               data: data,
               label: {
-                show: label,
-                formatter: (params) => `均值: ${params.value}\n标准差: ${std[params.dataIndex][3]}`,
+                show: label !== 'none',
+                formatter: (params) => {
+                  if (label === 'mean') {
+                    return `均值: ${params.value}`
+                  } else if (label === 'std') {
+                    return `标准差: ${std[params.dataIndex][3]}`
+                  } else {
+                    return `均值: ${params.value}\n标准差: ${std[params.dataIndex][3]}`
+                  }
+                }
               },
               emphasis: {
                 label: {
@@ -303,8 +319,8 @@ export function BasicBarPlot() {
           disabled={disabled}
           initialValues={{
             type: 'independent',
-            label: false,
-            error: 3,
+            label: 'none',
+            error: 1,
           }}
         >
           <Form.Item
@@ -430,7 +446,7 @@ export function BasicBarPlot() {
               </Form.Item>
             </>
           )}
-          <Form.Item label='数据标签和标题设置'>
+          <Form.Item label='数据标签内容和标题设置'>
             <Space.Compact className='w-full'>
               <Form.Item
                 noStyle
@@ -438,11 +454,14 @@ export function BasicBarPlot() {
               >
                 <Select
                   className='w-full'
-                  placeholder='数据标签'
-                >
-                  <Select.Option value={true}>显示数据标签</Select.Option>
-                  <Select.Option value={false}>隐藏数据标签</Select.Option>
-                </Select>
+                  placeholder='数据标签内容'
+                  options={[
+                    { label: '只显示均值', value: 'mean' },
+                    { label: '只显示标准差', value: 'std' },
+                    { label: '均值和标准差', value: 'both' },
+                    { label: '隐藏数据标签', value: 'none' },
+                  ]}
+                />
               </Form.Item>
               <Form.Item
                 noStyle

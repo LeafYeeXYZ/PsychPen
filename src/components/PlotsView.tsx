@@ -7,6 +7,7 @@ import { ThreeDBarPlot } from '../plots/ThreeDBarPlot'
 import { ParallelLinePlot } from '../plots/ParallelLinePlot'
 import { BasicPiePlot } from '../plots/BasicPiePlot'
 import { BasicBarPlot } from '../plots/BasicBarPlot'
+import { GroupedBarPlot } from '../plots/GroupedBarPlot'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -67,6 +68,10 @@ const CASCADER_OPTIONS: Option[] = [
         value: 'ThreeDBarPlot',
         label: '三维柱状图',
       },
+      {
+        value: 'GroupedBarPlot',
+        label: '分组柱状图',
+      },
     ],
   },
   {
@@ -92,6 +97,9 @@ const CASCADER_OPTIONS: Option[] = [
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
+    case 'GroupedBarPlot':
+      set(<GroupedBarPlot />)
+      break
     case 'BasicBoxPlot':
       set(<BasicBoxPlot />)
       break
