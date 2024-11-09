@@ -14,6 +14,8 @@ import { KurtosisSkewness } from '../statistics/KurtosisSkewness'
 import { SimpleMediatorTest } from '../statistics/SimpleMediatorTest'
 import { WelchTTest } from '../statistics/WelchTTest'
 import { OneWayANOVA } from '../statistics/OneWayANOVA'
+import { KMOTest } from '../statistics/KMOTest'
+import { BartlettSphericityTest } from '../statistics/BartlettSphericityTest'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -79,13 +81,27 @@ const CASCADER_OPTIONS: Option[] = [
     ],
   },
   {
-    value: 'CorrelationOrRegression',
-    label: '相关和回归',
+    value: 'Correlation',
+    label: '相关',
     children: [
       {
         value: 'PearsonCorrelationTest',
         label: 'Pearson 相关检验',
       },
+      {
+        value: 'BartlettSphericityTest',
+        label: 'Bartlett 球形度检验',
+      },
+      {
+        value: 'KMOTest',
+        label: 'KMO 测试',
+      },
+    ],
+  },
+  {
+    value: 'Regression',
+    label: '回归',
+    children: [
       {
         value: 'OneLinearRegression',
         label: '一元线性回归',
@@ -127,6 +143,12 @@ const CASCADER_OPTIONS: Option[] = [
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
+    case 'KMOTest':
+      set(<KMOTest />)
+      break
+    case 'BartlettSphericityTest':
+      set(<BartlettSphericityTest />)
+      break
     case 'OneWayANOVA':
       set(<OneWayANOVA />)
       break
