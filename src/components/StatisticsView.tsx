@@ -14,8 +14,7 @@ import { KurtosisSkewness } from '../statistics/KurtosisSkewness'
 import { SimpleMediatorTest } from '../statistics/SimpleMediatorTest'
 import { WelchTTest } from '../statistics/WelchTTest'
 import { OneWayANOVA } from '../statistics/OneWayANOVA'
-import { KMOTest } from '../statistics/KMOTest'
-import { BartlettSphericityTest } from '../statistics/BartlettSphericityTest'
+import { CheckFactorAnalysis } from '../statistics/CheckFactorAnalysis'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -68,7 +67,7 @@ const CASCADER_OPTIONS: Option[] = [
     children: [
       {
         value: 'KolmogorovSmirnovTest',
-        label: 'Kolmogorov-Smirnov 检验 (正态分布检验)',
+        label: '单样本 KS 检验 (正态分布检验)',
       },
       {
         value: 'KurtosisSkewness',
@@ -81,27 +80,13 @@ const CASCADER_OPTIONS: Option[] = [
     ],
   },
   {
-    value: 'Correlation',
-    label: '相关',
+    value: 'CorrelationRegression',
+    label: '相关和回归',
     children: [
       {
         value: 'PearsonCorrelationTest',
         label: 'Pearson 相关检验',
       },
-      {
-        value: 'BartlettSphericityTest',
-        label: 'Bartlett 球形度检验',
-      },
-      {
-        value: 'KMOTest',
-        label: 'KMO 测试',
-      },
-    ],
-  },
-  {
-    value: 'Regression',
-    label: '回归',
-    children: [
       {
         value: 'OneLinearRegression',
         label: '一元线性回归',
@@ -140,14 +125,21 @@ const CASCADER_OPTIONS: Option[] = [
       },
     ],
   },
+  {
+    value: 'FactorAnalysis',
+    label: '因子分析',
+    children: [
+      {
+        value: 'CheckFactorAnalysis',
+        label: '因子分析前提检验',
+      },
+    ],
+  },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
-    case 'KMOTest':
-      set(<KMOTest />)
-      break
-    case 'BartlettSphericityTest':
-      set(<BartlettSphericityTest />)
+    case 'CheckFactorAnalysis':
+      set(<CheckFactorAnalysis />)
       break
     case 'OneWayANOVA':
       set(<OneWayANOVA />)

@@ -19,19 +19,12 @@ export default defineConfig({
         manualChunks: {
           'antd': ['antd'],
           'data': ['@psych/sheet'],
-          'chart': ['echarts'],
+          'chart-a': ['echarts'],
+          'chart-b': ['echarts-gl'],
+          'chart-c': ['echarts-wordcloud', 'echarts-stat'],
           'table': ['ag-grid-react'],
-          'chart-gl': ['echarts-gl'],
-          'utils': [
-            'html2canvas', 
-            'echarts-wordcloud', 
-            'jieba-wasm', 
-            'echarts-stat',
-            '@ant-design/icons',
-            'bowser',
-            'ml-kmeans',
-            '@psych/lib',
-          ],
+          'stats': ['@psych/lib', 'ml-kmeans', 'jieba-wasm'],
+          'utils': ['html2canvas', '@ant-design/icons', 'bowser'],
         }
       }
     }
