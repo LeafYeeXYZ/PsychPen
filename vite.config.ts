@@ -13,7 +13,7 @@ export default defineConfig({
   },
   build: {
     target: ['chrome110', 'firefox115', 'safari16', 'edge110'],
-    chunkSizeWarningLimit: 1100,
+    chunkSizeWarningLimit: 1050,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -21,10 +21,12 @@ export default defineConfig({
           'data': ['@psych/sheet'],
           'chart-a': ['echarts'],
           'chart-b': ['echarts-gl'],
-          'chart-c': ['echarts-wordcloud', 'echarts-stat'],
           'table': ['ag-grid-react'],
-          'stats': ['@psych/lib', 'ml-kmeans', 'jieba-wasm'],
-          'utils': ['html2canvas', '@ant-design/icons', 'bowser'],
+          'utils': [
+            'html2canvas', '@ant-design/icons', 'bowser',
+            'echarts-wordcloud', 'echarts-stat',
+            '@psych/lib', 'ml-kmeans', 'jieba-wasm',
+          ],
         }
       }
     }

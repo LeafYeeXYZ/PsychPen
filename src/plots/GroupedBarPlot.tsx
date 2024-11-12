@@ -261,30 +261,6 @@ export function GroupedBarPlot() {
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item label='自定义不同组的标签和组内不同变量的标签'>
-            <Space.Compact block>
-              <Form.Item
-                noStyle
-                name='gLabel'
-              >
-                <Select
-                  className='w-full'
-                  placeholder='默认为分组变量值'
-                  mode='tags'
-                />
-              </Form.Item>
-              <Form.Item
-                noStyle
-                name='iLabel'
-              >
-                <Select
-                  className='w-full'
-                  placeholder='默认为数据变量名'
-                  mode='tags'
-                />
-              </Form.Item>
-            </Space.Compact>
-          </Form.Item>
           <Form.Item label='数据标签和误差棒内容'>
             <Space.Compact className='w-full'>
               <Form.Item
@@ -315,6 +291,30 @@ export function GroupedBarPlot() {
                     { label: '上下1倍标准差', value: 1 },
                     { label: '不显示误差棒', value: 0 },
                   ]}
+                />
+              </Form.Item>
+            </Space.Compact>
+          </Form.Item>
+          <Form.Item label='自定义不同组的标签和组内不同变量的标签'>
+            <Space.Compact block>
+              <Form.Item
+                noStyle
+                name='gLabel'
+              >
+                <Select
+                  className='w-full'
+                  placeholder='默认为分组变量值'
+                  mode='tags'
+                />
+              </Form.Item>
+              <Form.Item
+                noStyle
+                name='iLabel'
+              >
+                <Select
+                  className='w-full'
+                  placeholder='默认为数据变量名'
+                  mode='tags'
                 />
               </Form.Item>
             </Space.Compact>
