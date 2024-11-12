@@ -122,8 +122,6 @@ export function GroupedBarPlot() {
               const currentSeriesIndices = api.currentSeriesIndices()
               // 获取柱状图布局信息
               const barLayout = api.barLayout({
-                barGap: '30%', 
-                barCategoryGap: '20%',
                 count: variables.length
               })
               // 获取当前系列在所有柱状图系列中的索引
