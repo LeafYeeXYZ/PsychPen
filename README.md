@@ -2,7 +2,7 @@
 
 **在线进行心理学/教育学统计分析和数据可视化**, **立即体验: <https://psychpen.leafyee.xyz>**
 
-**See also [PsychLib](https://github.com/LeafYeeXYZ/PsychLib) for the backend of PsychPen**
+> PsychPen 基于 [PsychLib](https://github.com/LeafYeeXYZ/PsychLib) 进行统计分析, 基于 [PsychSheet](https://github.com/LeafYeeXYZ/PsychSheet) 进行数据导入导出, 欢迎也关注这两个项目~
 
 - [PsychPen 使用文档](#psychpen-使用文档)
   - [1 项目简介](#1-项目简介)
