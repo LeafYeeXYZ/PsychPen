@@ -3,7 +3,7 @@ import { Select, Button, Form, Tag, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { markP, markS } from '../lib/utils'
-import { LinearRegressionTwo, LinearRegressionOne, mean, bootstrapTest, z2p } from '@psych/lib'
+import { LinearRegressionTwo, LinearRegressionOne, mean, bootstrapTest, z2p, standardize } from '@psych/lib'
 
 type Option = {
   /** 自变量 */
@@ -82,9 +82,9 @@ export function SimpleMediatorTest() {
         sobel: { z: sobel_z, p: sobel_p },
         bootstrap: { lower, upper },
         standardizedAB: getAB(
-          xData.map((value) => (value - xMean) / xData.length),
-          mData.map((value) => (value - mMean) / mData.length),
-          yData.map((value) => (value - yMean) / yData.length),
+          standardize(xData, true, false, xMean),
+          standardize(mData, true, false, mMean),
+          standardize(yData, true, false, yMean)
         )
       })
       messageApi?.destroy()
