@@ -3,7 +3,7 @@ import { Select, Button, Form, Tag, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { markP, markS } from '../lib/utils'
-import { LinearRegressionTwo, LinearRegressionOne, mean, bootstrapTest, z2p, standardize } from '@psych/lib'
+import { LinearRegressionTwo, LinearRegressionOne, mean, bootstrapTest, standardize } from '@psych/lib'
 
 type Option = {
   /** 自变量 */
@@ -20,10 +20,6 @@ type Result = {
   x_y: LinearRegressionOne
   xm_y: LinearRegressionTwo
   count: number
-  /**
-   * Sobel 中介效应检验
-   */
-  sobel: { z: number, p: number }
   /**
    * 非参数 Bootstrap 检验
    */
@@ -58,34 +54,18 @@ export function SimpleMediatorTest() {
       const x_m = new LinearRegressionOne(xData, mData)
       const x_y = new LinearRegressionOne(mData, yData)
       const xm_y = new LinearRegressionTwo(xData, mData, yData)
-
-      const a = x_m.b1
-      const b = xm_y.b2
-      const SEa = x_m.SEb1
-      const SEb = xm_y.SEb2!
-
-      const sobel_SEab = Math.sqrt((SEa ** 2) * (b ** 2) + (SEb ** 2) * (a ** 2))
-      const sobel_z = (a * b) / sobel_SEab
-      const sobel_p = (1 - z2p(Math.abs(sobel_z))) * 2
-
-      const getAB = (x: number[], m: number[], y: number[]) => {
-        return (new LinearRegressionOne(x, m)).b1 * (new LinearRegressionTwo(x, m, y)).b2
-      }
+      const stded_x = standardize(xData, true, false, xMean)
+      const stded_m = standardize(mData, true, false, mMean)
+      const stded_y = standardize(yData, true, false, yMean)
       const [lower, upper] = bootstrapTest('ab', B, 0.05, xData, mData, yData)
-
       setResult({ 
         ...values, 
         x_m, 
         x_y, 
         xm_y,
         count: filteredRows.length,
-        sobel: { z: sobel_z, p: sobel_p },
         bootstrap: { lower, upper },
-        standardizedAB: getAB(
-          standardize(xData, true, false, xMean),
-          standardize(mData, true, false, mMean),
-          standardize(yData, true, false, yMean)
-        )
+        standardizedAB: (new LinearRegressionOne(stded_x, stded_m).b1) * (new LinearRegressionTwo(stded_x, stded_m, stded_y).b2)
       })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -265,12 +245,6 @@ export function SimpleMediatorTest() {
                   <td>a = 0 或 b = 0</td>
                   <td>p<sub>a</sub>: {result.x_m.p.toFixed(3)}, p<sub>b</sub>: {result.xm_y.b2p.toFixed(3)}</td>
                   <td>{(result.x_m.p < 0.025 && result.xm_y.b2p < 0.025) ? '拒绝原假设' : '不通过'}</td>
-                </tr>
-                <tr>
-                  <td>Sobel 检验</td>
-                  <td>ab = 0</td>
-                  <td>z = {markS(result.sobel.z, result.sobel.p)}, p = {markP(result.sobel.p)}</td>
-                  <td>{result.sobel.p < 0.05 ? '拒绝原假设' : '不通过'}</td>
                 </tr>
                 <tr>
                   <td>非参数 Bootstrap 检验</td>
