@@ -24,7 +24,7 @@ const ROTATION_OPTIONS = [
   { value: 'z', label: '水平/垂直/倾斜', rotationRange: [-90, 90], rotationStep: 45 },
 ]
 const FILTER_OPTIONS = [
-  { value: 'punctuation', label: '标点符号', reg: /[\p{P}\u2000-\u206F\u2E00-\u2E7F]/u },
+  { value: 'punctuation', label: '标点符号', reg: /[\p{P}\p{S}\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F]/u },
   { value: 'number', label: '数字', reg: /\d/ },
   { value: 'english', label: '英文', reg: /[a-zA-Z]/ },
 ]
@@ -65,10 +65,7 @@ export function WordCloudPlot() {
       let data: string[] = []
       if (split) {
         await init()
-        for (const text of raw) {
-          const words = cut(text, true)
-          data.push(...words)
-        }
+        data = cut(raw.join('\n'), true)
       } else {
         data = raw
       }
@@ -244,6 +241,16 @@ export function WordCloudPlot() {
           <Form.Item
             label='内容过滤设置'
             name='filter'
+            rules={[ 
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!getFieldValue('split') && value) {
+                    return Promise.reject('如果需要进行内容过滤, 请启用词语切分')
+                  }
+                  return Promise.resolve()
+                },
+              }),
+            ]}
           >
             <Select
               className='w-full'
