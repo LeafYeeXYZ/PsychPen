@@ -5,8 +5,6 @@ import { useZustand } from '../lib/useZustand'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { downloadImage } from '../lib/utils'
-// 开发模式下, Vite 没有返回 .wasm 文件的正确 MIME 类型, 会报错
-// 但打包后, 运行 vite preview 时, 可以正常加载 .wasm 文件
 import init, { cut } from 'jieba-wasm'
 
 const SPAPE_OPTIONS = [
@@ -24,9 +22,11 @@ const ROTATION_OPTIONS = [
   { value: 'z', label: '水平/垂直/倾斜', rotationRange: [-90, 90], rotationStep: 45 },
 ]
 const FILTER_OPTIONS = [
-  { value: 'punctuation', label: '标点符号', reg: /[\p{P}\p{S}\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F]/u },
-  { value: 'number', label: '数字', reg: /\d/ },
-  { value: 'english', label: '英文', reg: /[a-zA-Z]/ },
+  { value: '__punctuation', label: '标点符号', reg: /[\p{P}\p{S}\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F]/u },
+  { value: '__number', label: '数字', reg: /\d/ },
+  { value: '__english', label: '英文', reg: /[a-zA-Z]/ },
+  { value: '__single', label: '单个字', reg: /^.$/ },
+  { value: '__nonChinese', label: '非中文常见字', reg: /[^\u4e00-\u9fa5]/ },
 ]
 
 type Option = {
@@ -71,7 +71,8 @@ export function WordCloudPlot() {
       }
       if (filter) {
         for (const f of filter) {
-          data = data.filter((word) => !FILTER_OPTIONS.find((filter) => filter.value === f)?.reg.test(word))
+          const reg = FILTER_OPTIONS.find((filter) => filter.value === f)?.reg ?? new RegExp(f)
+          data = data.filter((word) => !reg.test(word))
         }
       }
       const counts = data.reduce((acc, cur) => {
@@ -123,7 +124,7 @@ export function WordCloudPlot() {
             min: 12,
             max: 60,
             rotation: 'x',
-            filter: ['punctuation'],
+            filter: ['__punctuation'],
             color: isDarkMode ? '#ffffff' : '#000000',
             split: true,
           }}
@@ -239,7 +240,7 @@ export function WordCloudPlot() {
             </Space.Compact>
           </Form.Item>
           <Form.Item
-            label='内容过滤设置'
+            label='内容过滤设置(可输入正则表达式)'
             name='filter'
             rules={[ 
               ({ getFieldValue }) => ({
@@ -255,14 +256,9 @@ export function WordCloudPlot() {
             <Select
               className='w-full'
               placeholder='留空则不过滤'
-              mode='multiple'
-            >
-              {FILTER_OPTIONS.map((filter) => (
-                <Select.Option key={filter.value} value={filter.value}>
-                  {filter.label}
-                </Select.Option>
-              ))}
-            </Select>
+              mode='tags'
+              options={FILTER_OPTIONS.map((filter) => ({ label: filter.label, value: filter.value }))}
+            />
           </Form.Item>
           <Form.Item
             label='词语切分'
