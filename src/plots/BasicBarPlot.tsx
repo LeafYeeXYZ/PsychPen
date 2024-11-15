@@ -56,17 +56,15 @@ export function BasicBarPlot() {
       const data: number[] = []
       const std: [number, number, number, number][] = []
       if (type === 'independent') {
+        const filteredRows = dataRows.filter((row) => row[dataVar!] !== undefined && row[groupVar!] !== undefined && !isNaN(Number(row[dataVar!])))
         // 被试间数据处理
         const cols = Array
-          .from(new Set(dataRows.map((row) => row[groupVar!])).values())
-          .filter((value) => typeof value !== 'undefined')
+          .from(new Set(filteredRows.map((row) => row[groupVar!])).values())
           .sort()
         const rows: number[][] = cols
-          .map((col) => dataRows
+          .map((col) => filteredRows
             .filter((row) => row[groupVar!] === col)
-            .map((row) => row[dataVar!])
-            .filter((value) => typeof value !== 'undefined' && !isNaN(Number(value)))
-            .map((value) => Number(value))
+            .map((row) => Number(row[dataVar!]))
           )
         rows.map((row, i) => {
           const _mean = +mean(row).toFixed(4)
@@ -177,11 +175,11 @@ export function BasicBarPlot() {
         }
         chart.setOption(option, true)
       } else {
+        const filteredRows = dataRows.filter((row) => variables!.every((variable) => row[variable] !== undefined && !isNaN(Number(row[variable]))))
         // 被试内数据处理
         variables!.map((variable, i) => {
-          const row = dataRows
+          const row = filteredRows
             .map((row) => row[variable])
-            .filter((value) => typeof value !== 'undefined' && !isNaN(Number(value)))
             .map((value) => Number(value))
           const _mean = +mean(row).toFixed(4)
           const _std = +sd(row).toFixed(4)
