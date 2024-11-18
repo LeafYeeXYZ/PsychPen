@@ -2,21 +2,24 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { min, max, mean, quantile, std, mode } from '@psych/lib'
+import { min, max, mean, quantile, std, mode, median, range, vari as _vari } from '@psych/lib'
 
-type AvialableStat = 'min' | 'max' | 'mean' | 'mode' | 'q1' | 'q2' | 'q3' | 'std' | 'count' | 'unique'
+type AvialableStat = 'min' | 'max' | 'mean' | 'mode' | 'q1' | 'q2' | 'q3' | 'std' | 'count' | 'unique' | 'median' | 'range' | 'variance'
 
 const STAT_OPTIONS: { value: AvialableStat, label: string }[] = [
   { value: 'count', label: '有效值数' },
   { value: 'unique', label: '唯一值数' },
   { value: 'mean', label: '均值' },
+  { value: 'median', label: '中位数' },
   { value: 'std', label: '标准差' },
+  { value: 'variance', label: '方差' },
   { value: 'q1', label: 'Q1(25%分位数)' },
-  { value: 'q2', label: 'Q2(中位数)' },
+  { value: 'q2', label: 'Q2(50%分位数)' },
   { value: 'q3', label: 'Q3(75%分位数)' },
   { value: 'mode', label: '众数' },
   { value: 'min', label: '最小值' },
   { value: 'max', label: '最大值' },
+  { value: 'range', label: '极差' },
 ]
 
 type Option = {
@@ -70,11 +73,14 @@ export function Description() {
               case 'mean': return { value: +mean(rows).toFixed(4), label: '均值' }
               case 'mode': return { value: +mode(rows).toFixed(4), label: '众数' }
               case 'q1': return { value: +quantile(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
-              case 'q2': return { value: +quantile(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
+              case 'q2': return { value: +quantile(rows, 0.5).toFixed(4), label: 'Q2(50%分位数)' }
               case 'q3': return { value: +quantile(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
               case 'std': return { value: +std(rows).toFixed(4), label: '标准差' }
               case 'count': return { value: rows.length, label: '有效值数' }
               case 'unique': return { value: new Set(rows).size, label: '唯一值数' }
+              case 'median': return { value: +median(rows).toFixed(4), label: '中位数' }
+              case 'range': return { value: +range(rows).toFixed(4), label: '极差' }
+              case 'variance': return { value: +_vari(rows).toFixed(4), label: '方差' }
             }
           })
           return { var: vari, data }
@@ -95,11 +101,14 @@ export function Description() {
               case 'mean': return { value: +mean(rows).toFixed(4), label: '均值' }
               case 'mode': return { value: +mode(rows).toFixed(4), label: '众数' }
               case 'q1': return { value: +quantile(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
-              case 'q2': return { value: +quantile(rows, 0.5).toFixed(4), label: 'Q2(中位数)' }
+              case 'q2': return { value: +quantile(rows, 0.5).toFixed(4), label: 'Q2(50%分位数)' }
               case 'q3': return { value: +quantile(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
               case 'std': return { value: +std(rows).toFixed(4), label: '标准差' }
               case 'count': return { value: rows.length, label: '有效值数' }
               case 'unique': return { value: new Set(rows).size, label: '唯一值数' }
+              case 'median': return { value: +median(rows).toFixed(4), label: '中位数' }
+              case 'range': return { value: +range(rows).toFixed(4), label: '极差' }
+              case 'variance': return { value: +_vari(rows).toFixed(4), label: '方差' }
             }
           })
           return { var: String(g), data }
