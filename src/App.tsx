@@ -26,15 +26,11 @@ const ANTD_THEME_DARK: ThemeConfig = {
 
 export function App() {
 
-  const { data, _App_setMessageApi, disabled, isDarkMode } = useZustand()
+  const { data, _App_setMessageApi, disabled, isDarkMode, _App_setIsDarkMode } = useZustand()
   // 加载完成后切换页面标题
   useEffect(() => {
     document.title = 'PsychPen'
   }, [])
-  // 黑暗模式
-  useEffect(() => {
-    isDarkMode ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark')
-  }, [isDarkMode])
   // 页面切换
   const [page, setPage] = useState<React.ReactElement>(<DataView />)
   const [activePage, setActivePage] = useState<string>('data')
@@ -52,6 +48,13 @@ export function App() {
     })
     valid || messageApi.warning('当前浏览器版本较低, 可能会导致部分功能无法正常使用, 请使用最新版本的 Chrome, Firefox, Safari 或 Edge 浏览器', 8)
   }, [messageApi, _App_setMessageApi])
+  // 动态设置主题
+  useEffect(() => {
+    const getIsDarkMode = () => window.matchMedia('(prefers-color-scheme: dark)').matches
+    const subIsDarkMode = () => _App_setIsDarkMode(getIsDarkMode())
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', subIsDarkMode)
+    return () => window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', subIsDarkMode)
+  }, [_App_setIsDarkMode])
 
   return (
     <ConfigProvider theme={isDarkMode ? ANTD_THEME_DARK : ANTD_THEME_LIGHT}>

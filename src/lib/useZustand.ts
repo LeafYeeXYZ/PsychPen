@@ -60,9 +60,9 @@ export const useZustand = create<GlobalState>()((set) => ({
   _App_setMessageApi: (api) => set({ messageApi: api }),
   disabled: false,
   setDisabled: (disabled) => set({ disabled }),
-  isDarkMode: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
+  isDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
+  _App_setIsDarkMode: (isDarkMode) => set({ isDarkMode }),
 }))
-
 
 type GlobalState = {
   /**
@@ -111,6 +111,11 @@ type GlobalState = {
    * 是否是黑暗模式
    */
   isDarkMode: boolean
+  /**
+   * 设置是否是黑暗模式
+   * @param isDarkMode 是否是黑暗模式
+   */
+  _App_setIsDarkMode: (isDarkMode: boolean) => void
   /**
    * 是否禁用各种按钮等
    */
