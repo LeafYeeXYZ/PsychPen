@@ -140,7 +140,7 @@ export function WordCloudPlot() {
             >
               {dataCols.map((col) => (
                 <Select.Option key={col.name} value={col.name}>
-                  {col.name} (唯一值占比: {((col.unique! / col.count!)*100).toFixed()}%)
+                  {col.name} (重复值占比: {(100 - (col.unique! / col.count!) * 100).toFixed(2)})
                 </Select.Option>
               ))}
             </Select>

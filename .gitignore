@@ -1,6 +1,7 @@
 .VSCodeCounter
 .venv
 local
+script/code.md
 
 # Logs
 logs
