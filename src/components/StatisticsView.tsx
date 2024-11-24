@@ -14,7 +14,6 @@ import { KurtosisSkewness } from '../statistics/KurtosisSkewness'
 import { SimpleMediatorTest } from '../statistics/SimpleMediatorTest'
 import { WelchTTest } from '../statistics/WelchTTest'
 import { OneWayANOVA } from '../statistics/OneWayANOVA'
-import { CheckFactorAnalysis } from '../statistics/CheckFactorAnalysis'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -125,22 +124,9 @@ const CASCADER_OPTIONS: Option[] = [
       },
     ],
   },
-  {
-    value: 'FactorAnalysis',
-    label: '因子分析',
-    children: [
-      {
-        value: 'CheckFactorAnalysis',
-        label: '因子分析前提检验',
-      },
-    ],
-  },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
-    case 'CheckFactorAnalysis':
-      set(<CheckFactorAnalysis />)
-      break
     case 'OneWayANOVA':
       set(<OneWayANOVA />)
       break
