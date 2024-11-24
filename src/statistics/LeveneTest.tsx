@@ -212,14 +212,15 @@ export function LeveneTest() {
             </table>
 
             <p className='text-lg mb-2 mt-8 text-center w-full'>描述统计</p>
+            <p className='text-xs mb-3 text-center w-full'>中心化方法: {result.center === 'mean' ? '均值' : '中位数'}</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
                   <td>变量/组</td>
                   <td>样本量</td>
                   <td>原始均值</td>
-                  <td>中心化均值</td>
                   <td>原始中位数</td>
+                  <td>中心化均值</td>
                   <td>中心化中位数</td>
                 </tr>
               </thead>
@@ -229,8 +230,8 @@ export function LeveneTest() {
                     <td>{group}</td>
                     <td>{result.m.groupsCount[index]}</td>
                     <td>{result.m.groupsMeanR[index].toFixed(3)}</td>
-                    <td>{result.m.groupsMeanC[index].toFixed(3)}</td>
                     <td>{result.m.groupsMedianR[index].toFixed(3)}</td>
+                    <td>{result.m.groupsMeanC[index].toFixed(3)}</td>
                     <td>{result.m.groupsMedianC[index].toFixed(3)}</td>
                   </tr>
                 ))}
