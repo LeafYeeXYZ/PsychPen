@@ -6,8 +6,10 @@
   scrollbar-width: thin;
   scrollbar-color: theme(colors.gray.400) theme(colors.gray.50);
 }
-.dark, .dark * {
-  scrollbar-color: theme(colors.gray.600) theme(colors.gray.800);
+@media (prefers-color-scheme: dark) {
+  * {
+    scrollbar-color: theme(colors.gray.600) theme(colors.gray.800);
+  }
 }
 
 table.three-line-table {

@@ -1,7 +1,7 @@
 import { useZustand } from '../lib/useZustand'
 import { Button } from 'antd'
 import { useState } from 'react'
-import { CalculatorOutlined, ZoomOutOutlined, BoxPlotOutlined, TableOutlined } from '@ant-design/icons'
+import { CalculatorOutlined, ZoomOutOutlined, BoxPlotOutlined, TableOutlined, FilterOutlined, AppstoreAddOutlined } from '@ant-design/icons'
 import { VariableTable } from '../variable/VariableTable'
 import { Interpolate } from '../variable/Interpolate'
 import { MissingValue } from '../variable/MissingValue'
@@ -18,7 +18,7 @@ export function VariableView() {
     <div className='w-full h-full overflow-hidden'>
       <div className='flex flex-col justify-start items-center w-full h-full p-4'>
         {/* 上方工具栏 */}
-        <div className='w-full flex justify-start items-center gap-3 mb-4'>
+        <div className='w-full flex justify-start items-center gap-3 mb-4 flex-wrap'>
           <Button
             icon={<TableOutlined />}
             disabled={disabled}
@@ -70,6 +70,18 @@ export function VariableView() {
             autoInsertSpace={false}
           >
             中心化/标准化/离散化
+          </Button>
+          <Button
+            icon={<FilterOutlined />}
+            disabled
+          >
+            数据筛选
+          </Button>
+          <Button
+            icon={<AppstoreAddOutlined />}
+            disabled
+          >
+            生成新变量
           </Button>
         </div>
         {/* 页面内容 */}

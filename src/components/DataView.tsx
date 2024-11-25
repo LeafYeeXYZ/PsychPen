@@ -1,6 +1,6 @@
 import { useZustand } from '../lib/useZustand'
 import { Upload, Button, Tag, Popconfirm, Modal, Input, Select } from 'antd'
-import { SlidersOutlined, DeleteOutlined, SaveOutlined, FilterOutlined } from '@ant-design/icons'
+import { SlidersOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
 import { flushSync } from 'react-dom'
 import { useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
@@ -87,12 +87,6 @@ export function DataView() {
               }}
             >
               导出数据
-            </Button>
-            <Button
-              icon={<FilterOutlined />}
-              disabled={true}
-            >
-              数据过滤
             </Button>
           </div>
           {/* 数据表格 */}
