@@ -451,6 +451,6 @@ lib/types.ts # 类型定义
 ## 4 参考文献
 
 - `基础统计` 刘红云. (2023). 教育与心理统计学. 北京师范大学出版社.
-- `进阶统计` 高级心理统计（新编21世纪心理学系列教材）. (2019). 中国人民大学出版社.
-- `图表库` Li, D., Mei, H., Shen, Y., Su, S., Zhang, W., Wang, J., Zu, M., & Chen, W. (2018). ECharts: A declarative framework for rapid construction of web-based visualization. Visual Informatics, 2(2), 136–146. https://doi.org/10.1016/j.visinf.2018.04.011
+- `进阶统计` 刘红云. (2019). 高级心理统计. 中国人民大学出版社.
 - `中介效应检验` 方杰, 张敏强, 李晓鹏. (2011). 中介效应的三类区间估计方法. 心理科学进展, 19(5), 765–774.
+- `图表库` Li, D., Mei, H., Shen, Y., Su, S., Zhang, W., Wang, J., Zu, M., & Chen, W. (2018). ECharts: A declarative framework for rapid construction of web-based visualization. Visual Informatics, 2(2), 136–146. https://doi.org/10.1016/j.visinf.2018.04.011
