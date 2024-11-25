@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.7.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.6.0...v1.7.0) (2024-11-25)
+
+
+### Features
+
+* 单因素方差分析新增Tukey'HSD事后检验 ([d6d5ba1](https://github.com/LeafYeeXYZ/PsychPen/commit/d6d5ba1226820eeb99f08a8557c177dbb0b78bc3))
+* 定义缺失值插值时支持多选 ([418e94f](https://github.com/LeafYeeXYZ/PsychPen/commit/418e94fadc918a7ddff5f44f5fb3b179f18e6ac7))
+* 分组直方图 ([60885c1](https://github.com/LeafYeeXYZ/PsychPen/commit/60885c168b81f1b511fcef56bac0ca4f70732c00))
+* 分组直方图可以绘制误差线 ([75bcd9d](https://github.com/LeafYeeXYZ/PsychPen/commit/75bcd9dca4d66a06b3062c0f8234bc09863bb026))
+* 描述统计增加更多统计量 ([814b97e](https://github.com/LeafYeeXYZ/PsychPen/commit/814b97e1e7b619c296fce74ab1e57315df524fa9))
+* 球形度和KMO检验 ([a75d7a1](https://github.com/LeafYeeXYZ/PsychPen/commit/a75d7a1691ed6e1cd8b18b8673a5c0939148acfe))
+* 数据筛选/过滤 ([4c99d3a](https://github.com/LeafYeeXYZ/PsychPen/commit/4c99d3acf810f43e49e27b773c214ced58beedc2))
+* 新增数个词云图过滤规则并支持用户输入 ([7da7ebf](https://github.com/LeafYeeXYZ/PsychPen/commit/7da7ebffe8225b9e977dfa94417a092e7cefa956))
+* 主题现在可动态变化 ([b3e21f8](https://github.com/LeafYeeXYZ/PsychPen/commit/b3e21f86c3a041d6d69fbb32423df7d877c09eaf))
+
+
+### Bug Fixes
+
+* 避免唯一值占比过小时显示零 ([f43ca61](https://github.com/LeafYeeXYZ/PsychPen/commit/f43ca6124d6d3564074fd52025d79f9342d080dc))
+* 修复黑暗模式下滚动条颜色异常 ([13ccfa0](https://github.com/LeafYeeXYZ/PsychPen/commit/13ccfa0934a5b5de3fb2a09953e6bfa4e070a8d3))
+* 修复基础柱状图未正确过滤缺失值的问题 ([ad53044](https://github.com/LeafYeeXYZ/PsychPen/commit/ad5304437b2866730582d510d5bf5fc6cc33d8b7))
+* 修复误差棒偏移 ([1dd644d](https://github.com/LeafYeeXYZ/PsychPen/commit/1dd644d8e7adc43adfc894aedc28b7fc654f1669))
+* 修复中介检验的标准化ab计算错误 ([f4f0e1b](https://github.com/LeafYeeXYZ/PsychPen/commit/f4f0e1bbb4d47d5bbf77d7b682f86c6698fc526c))
+* bootstrap 置信区间计算错误 ([2f4e694](https://github.com/LeafYeeXYZ/PsychPen/commit/2f4e6947b52ea1f0e8e3f6449f33f6c2f10e7ae6))
+
+
+### Improvements
+
+* 优化词云图分词和标点过滤 ([eb45063](https://github.com/LeafYeeXYZ/PsychPen/commit/eb450637c1bf0ce16d005bc633220e163c9fd4d6))
+* 优化样式 ([bbb1e49](https://github.com/LeafYeeXYZ/PsychPen/commit/bbb1e49a4dae9661002f0fd6bff2bbba89b335ae))
+* Levene检验增加文字描述以避免误解 ([0c90543](https://github.com/LeafYeeXYZ/PsychPen/commit/0c9054360a464e30ed2ce24cc71f7af5326b4a5c))
+
 ## [1.6.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.5.0...v1.6.0) (2024-11-08)
 
 
