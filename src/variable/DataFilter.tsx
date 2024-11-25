@@ -1,5 +1,5 @@
 import { useZustand } from '../lib/useZustand'
-import { Button, Select, Form, Input, InputNumber, Space } from 'antd'
+import { Button, Select, Form, Input, InputNumber, Space, Popconfirm } from 'antd'
 import type { FormInstance } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -25,8 +25,27 @@ export function DataFilter() {
 
   const { dataCols, dataRows, messageApi, isLargeData, disabled, setDisabled, _VariableView_updateData } = useZustand()
   const [form] = Form.useForm()
-
-  // 处理插值
+  const handleClear = async () => {
+    try {
+      messageApi?.loading('正在处理数据...')
+      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      const timestamp = Date.now()
+      _VariableView_updateData(
+        dataCols.map((col) => ({ 
+          ...col, 
+          filterMethod: undefined, 
+          filterValue: undefined, 
+          filterRange: undefined, 
+          filterRegex: undefined 
+        }))
+      )
+      messageApi?.destroy()
+      messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
+    } catch (error) {
+      messageApi?.destroy()
+      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+    }
+  }
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
@@ -207,16 +226,36 @@ export function DataFilter() {
               <Select disabled />
             </Form.Item>
           )}
-          <Form.Item>
+          <div
+            className='flex flex-row flex-nowrap justify-center items-center gap-4'
+          >
             <Button
-              className='mt-4'
+              className='mt-4 w-full'
               htmlType='submit'
+              autoInsertSpace={false}
               disabled={disabled}
-              block
             >
               确定
             </Button>
-          </Form.Item>
+            <Popconfirm
+              title={<span>是否确认清除所有过滤规则</span>}
+              onConfirm={async () => {
+                flushSync(() => setDisabled(true))
+                await handleClear()
+                flushSync(() => setDisabled(false))
+              }}
+              okText='确定'
+              cancelText='取消'
+            >
+              <Button
+                className='mt-4 w-full'
+                autoInsertSpace={false}
+                disabled={disabled}
+              >
+                清除所有过滤规则
+              </Button>
+            </Popconfirm>
+          </div>
         </Form>
       </div>
 
