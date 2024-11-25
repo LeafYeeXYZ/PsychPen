@@ -2,6 +2,7 @@
  * @file 全局自定义类型定义
  */
 
+export type AllowedFilterMethods = '等于' | '不等于' | '大于' | '大于等于' | '小于' | '小于等于' | '区间' | '正则表达式' | '高于平均值' | '低于平均值' | '高于中位数' | '低于中位数'
 export type AllowedInterpolationMethods = '均值插值' | '中位数插值' | '最临近点插值法' | '拉格朗日插值法'
 export type AllowedDiscreteMethods = '等频' | '等宽' | '聚类分析'
 export type Variable = {
@@ -34,17 +35,23 @@ export type Variable = {
   /** 标准差 */
   std?: number
   /** 
+   * 自定义的过滤方法  
+   * 默认为空, 即不过滤  
+   */
+  filterMethod?: AllowedFilterMethods
+  filterValue?: (number | string)[]
+  filterRange?: [number, number]
+  filterRegex?: string
+  /** 
    * 自定义的缺失值   
    * 默认为空, 即只把本来就是 undefined 的值作为缺失值  
    * 在比较时故意使用 == 而不是 ===, 以规避数字和字符串的比较问题  
-   * 缺失值设置只改变 dataRows 和 dataCols 的值, 不改变 data 的值
    */
   missingValues?: unknown[]
   /**
    * 自定义的插值方法  
    * 默认为空, 即不插值, 直接删除缺失值  
    * 先进行缺失值处理, 再进行插值处理  
-   * 插值处理只改变 dataRows 和 dataCols 的值, 不改变 data 的值
    */
   missingMethod?: AllowedInterpolationMethods
   /** 

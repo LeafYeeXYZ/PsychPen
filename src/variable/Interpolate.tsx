@@ -76,7 +76,7 @@ export function Interpolate() {
             />
           </Form.Item>
           <Form.Item 
-            label='插值方法 (留空则为直接删除缺失值)'
+            label='插值方法(留空则为直接删除缺失值)'
             name='method'
           >
             <Select
@@ -87,7 +87,7 @@ export function Interpolate() {
             />
           </Form.Item>
           <Form.Item 
-            label='插值参考变量 (仅部分插值方法需要)'
+            label='插值参考变量(仅部分插值方法需要)'
             name='peer'
             rules={[
               ({ getFieldValue }) => ({

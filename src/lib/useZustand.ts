@@ -9,6 +9,7 @@ import type { MessageInstance } from 'antd/es/message/interface'
 import { Derive } from './derive'
 import { Missing } from './misssing'
 import { Describe } from './describe'
+import { Filter } from './filter'
 
 /**
  * 处理原始数据
@@ -24,10 +25,15 @@ const calculator = (
   calculatedCols: Variable[], 
   calculatedRows: { [key: string]: unknown }[] 
 } => {
-  const missinged = new Missing(dataCols.filter((col) => !col.derived), dataRows)
-  const described = new Describe(missinged.updatedCols, missinged.updatedRows)
-  const derived = new Derive(described.updatedCols, described.updatedRows)
-  return { calculatedCols: derived.updatedCols, calculatedRows: derived.updatedRows }
+  const TASKS = [Missing, Derive, Filter, Describe]
+  let calculatedCols = dataCols
+  let calculatedRows = dataRows
+  for (let i = 0; i < TASKS.length; i++) {
+    const instance = new TASKS[i](calculatedCols, calculatedRows)
+    calculatedCols = instance.updatedCols
+    calculatedRows = instance.updatedRows
+  }
+  return { calculatedCols, calculatedRows }
 }
 
 export const useZustand = create<GlobalState>()((set) => ({

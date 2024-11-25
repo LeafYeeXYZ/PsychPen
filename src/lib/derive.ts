@@ -3,7 +3,7 @@
  */
 
 import type { Variable, AllowedDiscreteMethods } from './types'
-import { mean, std, quantile, max, min, mode } from '@psych/lib'
+import { max, min } from '@psych/lib'
 import { kmeans } from 'ml-kmeans'
 
 /** 生成子变量 */
@@ -32,14 +32,6 @@ export class Derive {
           valid: col.valid,
           unique: col.unique,
           type: col.type,
-          min: (col.min! - col.mean!) / col.std!,
-          max: (col.max! - col.mean!) / col.std!,
-          mean: 0,
-          q1: (col.q1! - col.mean!) / col.std!,
-          q2: (col.q2! - col.mean!) / col.std!,
-          q3: (col.q3! - col.mean!) / col.std!,
-          std: 1,
-          mode: (col.mode! - col.mean!) / col.std!,
         })
         dataRows.forEach((row) => {
           row[`${col.name}_标准化`] = (Number(row[col.name]) - col.mean!) / col.std!
@@ -54,14 +46,6 @@ export class Derive {
           valid: col.valid,
           unique: col.unique,
           type: col.type,
-          min: col.min! - col.mean!,
-          max: col.max! - col.mean!,
-          mean: 0,
-          q1: col.q1! - col.mean!,
-          q2: col.q2! - col.mean!,
-          q3: col.q3! - col.mean!,
-          std: col.std,
-          mode: col.mode! - col.mean!,
         })
         dataRows.forEach((row) => {
           row[`${col.name}_中心化`] = Number(row[col.name]) - col.mean!
@@ -76,7 +60,6 @@ export class Derive {
           method
         )
         const predictedData = dataRows.map((row) => discrete.predictor(typeof row[col.name] !== 'undefined' ? Number(row[col.name]) : undefined))
-        const predictedNums = predictedData.filter((v) => typeof v !== 'undefined') as number[]
         derivedCols.push({ 
           name: `${col.name}_${method}离散`, 
           derived: true,
@@ -85,14 +68,6 @@ export class Derive {
           valid: col.valid,
           unique: groups,
           type: col.type,
-          min: 0,
-          max: groups - 1,
-          mean: mean(predictedNums),
-          q1: quantile(predictedNums, 0.25),
-          q2: quantile(predictedNums, 0.5),
-          q3: quantile(predictedNums, 0.75),
-          std: std(predictedNums),
-          mode: mode(predictedNums),
         })
         predictedData.forEach((v, i) => {
           dataRows[i][`${col.name}_${method}离散`] = v

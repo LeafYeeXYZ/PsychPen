@@ -6,6 +6,7 @@ import { VariableTable } from '../variable/VariableTable'
 import { Interpolate } from '../variable/Interpolate'
 import { MissingValue } from '../variable/MissingValue'
 import { SubVariables } from '../variable/SubVariables'
+import { DataFilter } from '../variable/DataFilter'
 
 export function VariableView() {
 
@@ -73,7 +74,14 @@ export function VariableView() {
           </Button>
           <Button
             icon={<FilterOutlined />}
-            disabled
+            disabled={disabled}
+            onClick={() => {
+              if (activePage === 'DataFilter') return
+              setPage(<DataFilter />)
+              setActivePage('DataFilter')
+            }}
+            type={activePage === 'DataFilter' ? 'primary' : 'default'}
+            autoInsertSpace={false}
           >
             数据筛选
           </Button>
