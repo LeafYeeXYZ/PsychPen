@@ -5,7 +5,7 @@ import type { AllowedInterpolationMethods } from '../lib/types'
 
 type Option = {
   /** 变量名 */
-  variable: string
+  variables: string[]
   /** 插值方法 */
   method?: AllowedInterpolationMethods
   /** 插值参考变量 */
@@ -25,7 +25,7 @@ export function Interpolate() {
       isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
       const timestamp = Date.now()
       const cols = dataCols.map((col) => {
-        if (col.name === values.variable) {
+        if (values.variables.includes(col.name)) {
           return { 
             ...col, 
             missingMethod: values.method,
@@ -60,13 +60,14 @@ export function Interpolate() {
           disabled={disabled}
         >
           <Form.Item 
-            label='变量名'
-            name='variable'
+            label='变量名(可选择多个变量)'
+            name='variables'
             rules={[{ required: true, message: '请选择变量' }]}
           >
             <Select
               className='w-full'
               placeholder='请选择变量'
+              mode='multiple'
               options={dataCols
                 .filter((col) => col.derived !== true)
                 .filter((col) => col.type === '等距或等比数据')
