@@ -23,7 +23,7 @@ type Option = {
   /** 自定义标题 */
   title?: string
   /** 自定义点大小 */
-  dotSize?: number
+  dotSize: number
 }
 
 export function ThreeDScatterPlot() {
@@ -64,7 +64,7 @@ export function ThreeDScatterPlot() {
         // @ts-expect-error echarts-gl 没有提供类型定义
         series: [{
           type: 'scatter3D',
-          symbolSize: dotSize || 8,
+          symbolSize: dotSize,
           data: dataRows
             .filter((row) => 
               typeof row[xVar] !== 'undefined'
@@ -101,6 +101,9 @@ export function ThreeDScatterPlot() {
           }}
           autoComplete='off'
           disabled={disabled}
+          initialValues={{
+            dotSize: 8,
+          }}
         >
           <Form.Item label='X轴变量及其标签'>
             <Space.Compact className='w-full'>
@@ -211,16 +214,23 @@ export function ThreeDScatterPlot() {
             </Space.Compact>
           </Form.Item>
           <Form.Item
-            label='自定义标题'
-            name='title'
+            label='自定义标题和点大小'
           >
-            <Input className='w-full' placeholder='默认无标题' />
-          </Form.Item>
-          <Form.Item
-            label='自定义点大小'
-            name='dotSize'
-          >
-            <InputNumber className='w-full' placeholder='默认为 8' />
+            <Space.Compact block>
+              <Form.Item
+                name='title'
+                noStyle
+              >
+                <Input addonBefore='标题' className='w-full' placeholder='默认无标题' />
+              </Form.Item>
+              <Form.Item
+                name='dotSize'
+                noStyle
+                rules={[{ required: true, message: '请输入点大小' }]}
+              >
+                <InputNumber addonBefore='点大小' className='w-52' placeholder='默认8' min={1} step={1} />
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
           <div
             className='flex flex-row flex-nowrap justify-center items-center gap-4'

@@ -229,8 +229,9 @@ export function BasicScatterPlot() {
               <Form.Item
                 name='dotSize'
                 noStyle
+                rules={[{ required: true, message: '请输入点大小' }]}
               >
-                <InputNumber addonBefore='点大小' className='w-52' placeholder='默认为 10' min={1} step={1} />
+                <InputNumber addonBefore='点大小' className='w-52' placeholder='默认10' min={1} step={1} />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
