@@ -7,6 +7,7 @@ import { Interpolate } from '../variable/Interpolate'
 import { MissingValue } from '../variable/MissingValue'
 import { SubVariables } from '../variable/SubVariables'
 import { DataFilter } from '../variable/DataFilter'
+import { ComputeVar } from '../variable/ComputeVar'
 
 export function VariableView() {
 
@@ -87,7 +88,14 @@ export function VariableView() {
           </Button>
           <Button
             icon={<AppstoreAddOutlined />}
-            disabled
+            disabled={disabled}
+            onClick={() => {
+              if (activePage === 'ComputeVar') return
+              setPage(<ComputeVar />)
+              setActivePage('ComputeVar')
+            }}
+            type={activePage === 'ComputeVar' ? 'primary' : 'default'}
+            autoInsertSpace={false}
           >
             生成新变量
           </Button>

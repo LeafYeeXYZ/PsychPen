@@ -14,9 +14,8 @@ import { Filter } from './filter'
 /**
  * 处理原始数据
  * @param dataCols 数据变量列表, 必须提供 name 字段, 可选提供其他字段
- * @param dataRows 原始数据(sheet_to_json), 不要传入已经处理过的数据
+ * @param dataRows 原始数据, 不要传入已经处理过的数据
  * @returns 处理后的数据变量列表和数据行
- * @important 过滤派生变量 -> 缺失值处理 -> 描述统计量计算 -> 派生变量生成
  */
 const calculator = ( 
   dataCols: Variable[], 
@@ -25,7 +24,12 @@ const calculator = (
   calculatedCols: Variable[], 
   calculatedRows: { [key: string]: unknown }[] 
 } => {
-  const TASKS = [Missing, Derive, Filter, Describe]
+  const TASKS = [ // Order matters
+    Missing, 
+    Derive, 
+    Filter, 
+    Describe
+  ]
   let calculatedCols = dataCols
   let calculatedRows = dataRows
   for (let i = 0; i < TASKS.length; i++) {
@@ -41,7 +45,7 @@ export const useZustand = create<GlobalState>()((set) => ({
   dataRows: [],
   dataCols: [],
   isLargeData: false,
-  _DataView_setIsLargeData: (isLarge) => set({ isLargeData: isLarge }),
+  _DataView_setIsLargeData: (isLargeData) => set({ isLargeData }),
   _DataView_setData: (rows) => {
     if (rows) {
       const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
@@ -60,6 +64,41 @@ export const useZustand = create<GlobalState>()((set) => ({
       const rows = state.data!
       const { calculatedCols, calculatedRows } = calculator(cols, rows)
       return { dataCols: calculatedCols, dataRows: calculatedRows }
+    })
+  },
+  _VariableView_addNewVar: async (name, expression) => {
+    set((state) => {
+      const cols = state.dataCols
+      const rows = state.dataRows
+      if (cols.find((col) => col.name == name)) { // 故意使用 == 而不是 ===
+        throw new Error(`变量名 ${name} 已存在`)
+      }
+      const vars = expression.match(/:::.+?:::/g) ?? []
+      if (vars.length > 0) {
+        vars.forEach((v) => {
+          if (!cols.find(({ name }) => name == v.slice(3, -3))) { // 故意使用 == 而不是 ===
+            throw new Error(`变量 ${v} 不存在`)
+          }
+        })
+      }
+      const newRows = rows.map((row) => {
+        if (vars.some((v) => row[v.slice(3, -3)] === undefined)) {
+          return { [name]: undefined, ...row }
+        }
+        const expressionWithValues = expression.replace(/:::.+?:::/g, (v) => String(row[v.slice(3, -3)]))
+        try {
+          const result = eval(expressionWithValues)
+          return { [name]: result, ...row }
+        } catch (error) {
+          throw new Error(`执行表达式失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+        }
+      })
+      const describe = new Describe([{ name }], newRows)
+      return { 
+        dataCols: [...describe.updatedCols, ...cols], 
+        dataRows: newRows,
+        data: state.data!.map((row, i) => ({ [name]: newRows[i][name], ...row }))
+      }
     })
   },
   messageApi: null,
@@ -88,6 +127,13 @@ type GlobalState = {
    */
   _VariableView_updateData: (cols: Variable[]) => void
   /**
+   * 添加新变量
+   * @param name 新变量名
+   * @param expression 计算表达式
+   * @important 仅在 VariableView.tsx 中使用
+   */
+  _VariableView_addNewVar: (name: string, expression: string) => Promise<void>
+  /**
    * 数据列表
    */
   dataRows: { [key: string]: unknown }[]
@@ -101,9 +147,9 @@ type GlobalState = {
   isLargeData: boolean
   /**
    * 设置数据量是否较大
-   * @param isLarge 是否数据量较大
+   * @param isLargeData 是否数据量较大
    */
-  _DataView_setIsLargeData: (isLarge: boolean) => void
+  _DataView_setIsLargeData: (isLargeData: boolean) => void
   /**
    * 消息提示 API
    */
