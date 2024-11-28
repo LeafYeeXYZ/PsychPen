@@ -21,12 +21,20 @@ export function MissingValue() {
       const timestamp = Date.now()
       const { variable, missing } = values
       const cols = dataCols
-      variable.forEach((variable) => {
-        const col = cols.findIndex((col) => col.name === variable)
-        if (col !== -1) {
-          cols[col].missingValues = missing
-        }
-      })
+      if (variable.includes('__ALL_VARIABLES__')) {
+        cols.forEach((col) => {
+          if (col.derived !== true) {
+            col.missingValues = missing
+          }
+        })
+      } else {
+        variable.forEach((variable) => {
+          const col = cols.findIndex((col) => col.name === variable)
+          if (col !== -1) {
+            cols[col].missingValues = missing
+          }
+        })
+      }
       _VariableView_updateData(cols)
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -54,13 +62,28 @@ export function MissingValue() {
           <Form.Item 
             label='变量名(可选择多个变量)'
             name='variable'
-            rules={[{ required: true, message: '请选择变量' }]}
+            rules={[
+              { required: true, message: '请选择变量' },
+              () => ({
+                validator(_, value) {
+                  if (value?.includes('__ALL_VARIABLES__') && value?.length > 1) {
+                    return Promise.reject('已选择全部变量, 请不要再选择其他变量')
+                  }
+                  return Promise.resolve()
+                }
+              })
+            ]}
           >
             <Select
               className='w-full'
               placeholder='请选择变量'
               mode='multiple'
-              options={dataCols.filter((col) => col.derived !== true).map((col) => ({ label: col.name, value: col.name }))}
+              options={[
+                { label: `全部变量 (共${dataCols.filter((col) => col.derived !== true).length}个)`, value: '__ALL_VARIABLES__' },
+                ...dataCols
+                  .filter((col) => col.derived !== true)
+                  .map((col) => ({ label: col.name, value: col.name }))
+              ]}
             />
           </Form.Item>
           <Form.Item 
