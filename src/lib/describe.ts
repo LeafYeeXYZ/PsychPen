@@ -3,7 +3,7 @@
  */
 
 import type { Variable } from './types'
-import { min, max, mean, quantile, std, mode } from '@psych/lib'
+import { min, max, mean, quantile, std, mode, sort } from '@psych/lib'
 
 /** 生成描述统计量 */
 export class Describe {
@@ -32,14 +32,16 @@ export class Describe {
       ) {
         type = '等距或等比数据'
         const nums = data.filter((v) => typeof v !== 'undefined').map((v) => Number(v))
+        sort(nums, true, 'heapSort', true)
+        const _mean = mean(nums)
         return { ...col, count, missing, valid, unique, type, 
-          min: min(nums), 
-          max: max(nums), 
-          mean: mean(nums), 
-          std: std(nums), 
-          q1: quantile(nums, 0.25), 
-          q2: quantile(nums, 0.5), 
-          q3: quantile(nums, 0.75), 
+          min: min(nums, true),
+          max: max(nums, true),
+          mean: _mean,
+          std: std(nums, true, _mean),
+          q1: quantile(nums, 0.25, true),
+          q2: quantile(nums, 0.5, true),
+          q3: quantile(nums, 0.75, true),
           mode: mode(nums),
         }
       } else {
