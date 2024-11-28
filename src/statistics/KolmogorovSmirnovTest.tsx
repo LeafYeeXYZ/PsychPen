@@ -46,7 +46,7 @@ export function KolmogorovSmirnovTest() {
         const groups = Array
           .from(new Set(dataRows.map((row) => row[group!])))
           .map(String)
-          .sort((a, b) => a > b ? 1 : -1)
+          .sort((a, b) => Number(a) - Number(b))
         const data: number[][] = groups.map((g) => dataRows
           .filter((row) => row[group!] === g)
           .map((row) => row[variable!])

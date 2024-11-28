@@ -50,7 +50,9 @@ export function GroupedBarPlot() {
         .filter((row) => row[group] !== undefined)
         .filter((row) => variables.every((variable) => row[variable] !== undefined && !isNaN(Number(row[variable]))))
         .map((row) => ({ [group]: String(row[group]), ...variables.reduce((acc, cur) => { acc[cur] = Number(row[cur]); return acc }, {} as Record<string, number>) }))
-      let cols = Array.from(new Set(filteredRows.map((row) => row[group])).values()).sort()
+      let cols = Array
+        .from(new Set(filteredRows.map((row) => row[group])).values())
+        .sort((a, b) => Number(a) - Number(b))
       const mean: number[][] = Array.from({ length: variables.length }, () => [])
       const std: [number, number, number, number][][] = Array.from({ length: variables.length }, () => [])
       variables.forEach((variable, i) => {

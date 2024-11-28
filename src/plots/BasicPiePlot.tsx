@@ -50,7 +50,9 @@ export function BasicPiePlot() {
         .map((row) => row[variable])
         .filter((value) => typeof value !== 'undefined')
         .map((value) => String(value))
-      const value = Array.from(new Set(data)).toSorted()
+      const value = Array
+        .from(new Set(data))
+        .sort((a, b) => Number(a) - Number(b))
       const counts = value.map((v) => data.filter((d) => d === v).length)
       const option: EChartsOption = {
         title: {

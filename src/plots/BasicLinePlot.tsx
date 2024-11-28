@@ -60,7 +60,7 @@ export function BasicLinePlot() {
         const cols = Array
           .from(new Set(dataRows.map((row) => row[groupVar!])).values())
           .filter((value) => typeof value !== 'undefined')
-          .sort()
+          .sort((a, b) => Number(a) - Number(b))
         const data: number[] = []
         const rows: number[][] = cols
           .map((col) => dataRows

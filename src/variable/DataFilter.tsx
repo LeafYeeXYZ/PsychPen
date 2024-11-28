@@ -143,7 +143,7 @@ export function DataFilter() {
       const variable = form.getFieldValue('variable')
       const options = Array
         .from(new Set(dataRows.map((row) => row[variable])))
-        .toSorted((a, b) => Number(a) - Number(b))
+        .sort((a, b) => Number(a) - Number(b))
         .map((value) => ({ label: String(value), value }))
       return (
         <Form.Item 

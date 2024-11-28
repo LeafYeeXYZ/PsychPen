@@ -44,8 +44,14 @@ export function ThreeDBarPlot() {
       const timestamp = Date.now()
       const { xVar, yVar, zVar ,xLabel, yLabel, zLabel, title, statistic, opacity } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
-      const x: string[] = Array.from(new Set(dataRows.map((row) => row[xVar]))).sort().map(String)
-      const y: string[] = Array.from(new Set(dataRows.map((row) => row[yVar]))).sort().map(String)
+      const x: string[] = Array
+        .from(new Set(dataRows.map((row) => row[xVar])))
+        .sort((a, b) => Number(a) - Number(b))
+        .map(String)
+      const y: string[] = Array
+        .from(new Set(dataRows.map((row) => row[yVar])))
+        .sort((a, b) => Number(a) - Number(b))
+        .map(String)
       const z: number[][] = []
       dataRows.forEach((row) => {
         const i = x.indexOf(String(row[xVar]))

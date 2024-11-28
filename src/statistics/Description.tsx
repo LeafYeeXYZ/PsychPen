@@ -113,7 +113,7 @@ export function Description() {
           })
           return { var: String(g), data }
         })
-        setResult({ type, variable, group, data: data.sort((a, b) => a.var > b.var ? 1 : -1)})
+        setResult({ type, variable, group, data: data.sort((a, b) => Number(a.var) - Number(b.var))})
       }
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)

@@ -48,7 +48,10 @@ export function BasicBoxPlot() {
       const chart = echarts.init(document.getElementById('echarts-container')!)
       if (type === 'independent') {
         // 被试间数据处理
-        const cols = Array.from(new Set(dataRows.map((row) => row[groupVar!])).values()).filter((value) => typeof value !== 'undefined').sort()
+        const cols = Array
+          .from(new Set(dataRows.map((row) => row[groupVar!])).values())
+          .filter((value) => typeof value !== 'undefined')
+          .sort((a, b) => Number(a) - Number(b))
         const rows = cols.map((col) => dataRows.filter((row) => row[groupVar!] === col).map((row) => row[dataVar!]).filter((value) => typeof value === 'number'))
         const option: EChartsOption = {
           title: [

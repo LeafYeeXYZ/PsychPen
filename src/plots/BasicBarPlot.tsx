@@ -60,7 +60,7 @@ export function BasicBarPlot() {
         // 被试间数据处理
         const cols = Array
           .from(new Set(filteredRows.map((row) => row[groupVar!])).values())
-          .sort()
+          .sort((a, b) => Number(a) - Number(b))
         const rows: number[][] = cols
           .map((col) => filteredRows
             .filter((row) => row[groupVar!] === col)
