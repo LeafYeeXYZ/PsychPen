@@ -82,18 +82,8 @@ export const useZustand = create<GlobalState>()((set) => ({
         })
       }
       const newRows = rows.map((row) => {
-        if (vars.some((v) => {
-          const name = v.slice(3, -3)
-          // 如果参与计算的变量不存在
-          if (row[name] === undefined) {
-            return true
-          }
-          // 如果参与计算的变量是缺失值
-          if (cols.find((col) => col.name === name)!.missingValues?.includes(row[name])) {
-            return true
-          }
-          return false
-        })) {
+        // 如果参考的变量值不存在, 或已被按照缺失值定义删除, 则新变量值也是缺失值
+        if (vars.some((v) => row[v.slice(3, -3)] === undefined)) {
           return { [name]: undefined, ...row }
         }
         const expressionWithValues = expression.replace(/:::.+?:::/g, (v) => String(row[v.slice(3, -3)]))
