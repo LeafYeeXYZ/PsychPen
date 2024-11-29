@@ -1,7 +1,7 @@
 import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
-import { corr } from '@psych/lib'
+import { HalfRealiability } from '@psych/lib'
 import { flushSync } from 'react-dom'
 
 type Option = {
@@ -13,10 +13,7 @@ type Option = {
   group?: string
 }
 type Result = {
-  /** 矫正后的相关系数 */
-  correctedR: number[]
-  /** 分组名 */
-  groups: string[]
+  m: HalfRealiability
 } & Option
 
 export function HalfReliability() {
@@ -28,27 +25,12 @@ export function HalfReliability() {
     try {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
-      const filteredRows = dataRows.filter((row) => values.variablesA.concat(values.variablesB).every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
-      if (!values.group) {
-        const meansA = filteredRows.map((row) => values.variablesA.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesA.length)
-        const meansB = filteredRows.map((row) => values.variablesB.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesB.length)
-        const r = corr(meansA, meansB)
-        const correctedR = 2 * r / (1 + r)
-        setResult({ correctedR: [correctedR], groups: ['-'], ...values })
-      } else {
-        const groups = Array.from(new Set(filteredRows.map((row) => row[values.group!])))
-        const result: Result = { correctedR: [], groups: [], ...values }
-        for (const group of groups) {
-          const filteredRowsByGroup = filteredRows.filter((row) => row[values.group!] == group)
-          const meansA = filteredRowsByGroup.map((row) => values.variablesA.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesA.length)
-          const meansB = filteredRowsByGroup.map((row) => values.variablesB.reduce((acc, variable) => acc + Number(row[variable]), 0) / values.variablesB.length)
-          const r = corr(meansA, meansB)
-          const correctedR = 2 * r / (1 + r)
-          result.correctedR.push(correctedR)
-          result.groups.push(String(group))
-        }
-        setResult(result)
-      }
+      const { variablesA, variablesB, group } = values
+      const filteredRows = dataRows.filter((row) => variablesA.concat(variablesB).every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
+      const firstHalf = variablesA.map((variable) => filteredRows.map((row) => Number(row[variable])))
+      const lastHalf = variablesB.map((variable) => filteredRows.map((row) => Number(row[variable])))
+      const m = new HalfRealiability(firstHalf, lastHalf, typeof group === 'string' ? filteredRows.map((row) => String(row[group])) : undefined)
+      setResult({ m, ...values })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -167,9 +149,9 @@ export function HalfReliability() {
                 </tr>
               </thead>
               <tbody>
-                {result.correctedR.map((r, index) => (
-                  <tr key={index}>
-                    <td>{result.groups[index]}</td>
+                {result.m.r.map((r, i) => (
+                  <tr key={i}>
+                    <td>{result.m.group[i]}</td>
                     <td>{result.variablesA.length}</td>
                     <td>{result.variablesB.length}</td>
                     <td>{r.toFixed(3)}</td>

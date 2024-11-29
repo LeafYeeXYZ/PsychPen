@@ -26,7 +26,7 @@
     "dep": "git push --follow-tags origin main"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.5.1",
+    "@ant-design/icons": "^5.5.2",
     "@psych/lib": "npm:@jsr/psych__lib",
     "@psych/sheet": "npm:@jsr/psych__sheet",
     "ag-grid-react": "^32.3.3",

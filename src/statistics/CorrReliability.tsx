@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { corr } from '@psych/lib'
+import { CorrRealiability } from '@psych/lib'
 
 type Option = {
   /** 变量名 */
@@ -11,10 +11,7 @@ type Option = {
   group?: string
 }
 type Result = {
-  /** 相关系数 */
-  r: number[]
-  /** 组名 */
-  groups: string[]
+  m: CorrRealiability
 } & Option
 
 export function CorrReliability() {
@@ -27,21 +24,11 @@ export function CorrReliability() {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
       const filteredRows = dataRows.filter((row) => values.variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
-      if (!values.group) {
-        const data = values.variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
-        const r = corr(data[0], data[1])
-        setResult({ r: [r], groups: ['-'], ...values })
-      } else {
-        const groups = Array.from(new Set(filteredRows.map((row) => row[values.group!])))
-        const result: Result = { r: [], groups: [], ...values }
-        for (const group of groups) {
-          const data = values.variables.map((variable) => filteredRows.filter((row) => row[values.group!] == group).map((row) => Number(row[variable])))
-          const r = corr(data[0], data[1])
-          result.r.push(r)
-          result.groups.push(String(group))
-        }
-        setResult(result)
-      }
+      const x1 = filteredRows.map((row) => Number(row[values.variables[0]]))
+      const x2 = filteredRows.map((row) => Number(row[values.variables[1]]))
+      const group = typeof values.group === 'string' ? filteredRows.map((row) => String(row[values.group!])) : undefined
+      const m = new CorrRealiability(x1, x2, group)
+      setResult({ m, ...values })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -121,13 +108,15 @@ export function CorrReliability() {
                 <tr>
                   <td>分组</td>
                   <td>相关系数(r<sub>xx</sub>)</td>
+                  <td>测定系数(r<sub>xx</sub><sup>2</sup>)</td>
                 </tr>
               </thead>
               <tbody>
-                {result.r.map((r, index) => (
-                  <tr key={index}>
-                    <td>{result.groups[index]}</td>
-                    <td>{r.toFixed(3)}</td>
+                {result.m.r.map((_, i) => (
+                  <tr key={i}>
+                    <td>{result.m.group[i]}</td>
+                    <td>{result.m.r[i].toFixed(3)}</td>
+                    <td>{result.m.r2[i].toFixed(3)}</td>
                   </tr>
                 ))}
               </tbody>

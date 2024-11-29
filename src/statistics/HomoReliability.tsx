@@ -2,7 +2,7 @@ import { useZustand } from '../lib/useZustand'
 import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { vari } from '@psych/lib'
+import { AlphaRealiability } from '@psych/lib'
 
 type Option = {
   /** 变量名 */
@@ -11,10 +11,7 @@ type Option = {
   group?: string
 }
 type Result = {
-  /** alpha 系数 */
-  alpha: number[]
-  /** 分组 */
-  groups: string[]
+  m: AlphaRealiability
 } & Option
 
 export function HomoReliability() {
@@ -26,31 +23,11 @@ export function HomoReliability() {
     try {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
-      const filteredRows = dataRows.filter((row) => values.variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
-      if (!values.group) {
-        const items = values.variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
-        const total = filteredRows.map((row) => values.variables.reduce((acc, variable) => acc + Number(row[variable]), 0))
-        const itemsVariance = items.map((item) => vari(item)).reduce((acc, variance) => acc + variance, 0)
-        const totalVariance = vari(total)
-        const k = values.variables.length
-        const alpha = (k / (k - 1)) * (1 - itemsVariance / totalVariance)
-        setResult({ alpha: [alpha], groups: ['-'], ...values })
-      } else {
-        const groups = Array.from(new Set(filteredRows.map((row) => row[values.group!])))
-        const result: Result = { alpha: [], groups: [], ...values }
-        for (const group of groups) {
-          const filteredRowsByGroup = filteredRows.filter((row) => row[values.group!] == group)
-          const items = values.variables.map((variable) => filteredRowsByGroup.map((row) => Number(row[variable])))
-          const total = filteredRowsByGroup.map((row) => values.variables.reduce((acc, variable) => acc + Number(row[variable]), 0))
-          const itemsVariance = items.map((item) => vari(item)).reduce((acc, variance) => acc + variance, 0)
-          const totalVariance = vari(total)
-          const k = values.variables.length
-          const alpha = (k / (k - 1)) * (1 - itemsVariance / totalVariance)
-          result.alpha.push(alpha)
-          result.groups.push(String(group))
-        }
-        setResult(result)
-      }
+      const { variables, group } = values
+      const filteredRows = dataRows.filter((row) => variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
+      const items = variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
+      const m = new AlphaRealiability(items, typeof group === 'string' ? filteredRows.map((row) => String(row[group])) : undefined)
+      setResult({ m, ...values })
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -134,11 +111,11 @@ export function HomoReliability() {
                 </tr>
               </thead>
               <tbody>
-                {result.alpha.map((alpha, index) => (
-                  <tr key={index}>
-                    <td>{result.groups[index]}</td>
+                {result.m.alpha.map((a, i) => (
+                  <tr key={i}>
+                    <td>{result.m.group[i]}</td>
                     <td>{result.variables.length}</td>
-                    <td>{alpha.toFixed(3)}</td>
+                    <td>{a.toFixed(3)}</td>
                   </tr>
                 ))}
               </tbody>
