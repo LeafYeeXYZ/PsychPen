@@ -1,8 +1,15 @@
-/**
- * @file 工具函数
- */
-
 import html2canvas from 'html2canvas'
+
+export function jsObjectToRDataFrame(obj: Record<string, number[]>): string {
+  return `data.frame(\n${Object.entries(obj).map(([key, value]) => `${key} = c(${value.join(', ')})`).join(',\n')}\n)`
+}
+export function jsArrayToRMatrix(arr: number[][]): string {
+  return `matrix(c(${arr.flat().join(', ')}), nrow = ${arr.length})`
+}
+export function loadRPackage(pkg: string | string[]): string {
+  typeof pkg === 'string' && (pkg = [pkg])
+  return pkg.map((p) => `\nif (!requireNamespace("${p}", quietly = TRUE)) {\n  install.packages("${p}")\n}\nlibrary(${p})\n`).join('')
+}
 
 /**
  * 生成含 *, **, *** 的统计量

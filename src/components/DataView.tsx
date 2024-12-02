@@ -1,8 +1,8 @@
 import { useZustand } from '../lib/useZustand'
-import { Upload, Button, Tag, Popconfirm, Modal, Input, Select } from 'antd'
-import { SlidersOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
+import { Upload, Button, Tag, Popconfirm, Modal, Input, Select, Popover, Segmented } from 'antd'
+import { SlidersOutlined, DeleteOutlined, SaveOutlined, SettingOutlined } from '@ant-design/icons'
 import { flushSync } from 'react-dom'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
@@ -17,21 +17,31 @@ const LARGE_DATA_SIZE = 512 * 1024
 
 export function DataView() {
 
-  const { data, _DataView_setData, dataCols, dataRows, messageApi, _DataView_setIsLargeData, disabled, setDisabled } = useZustand()
+  const { data, _DataView_setData, dataCols, dataRows, messageApi, _DataView_setIsLargeData, disabled, setDisabled, Rurl, Rpassword, _DataView_setRurl, _DataView_setRpassword, Renable, _DataView_setRenable } = useZustand()
   const [modalApi, contextHolder] = Modal.useModal()
   // 导出数据相关
-  const handleExport = async (filename: string, type: string) => {
-    downloadSheet(dataRows, type as ExportTypes, filename)
-  }
+  const handleExport = async (filename: string, type: string) => { downloadSheet(dataRows, type as ExportTypes, filename) }
   const handleExportParams = useRef<{ filename?: string; type?: string }>({})
-  
+  // 设置 R 服务相关
+  const updateRenable = (enable: boolean) => { localStorage.setItem('Renable', enable ? 'true' : 'false'); _DataView_setRenable(enable) }
+  const updateRurl = (url: string) => { localStorage.setItem('Rurl', url); _DataView_setRurl(url) }
+  const updateRpassword = (password: string) => { localStorage.setItem('Rpassword', password); _DataView_setRpassword(password) }
+  useEffect(() => {
+    const Renable = localStorage.getItem('Renable') === 'true'
+    const Rurl = localStorage.getItem('Rurl') ?? ''
+    const Rpassword = localStorage.getItem('Rpassword') ?? ''
+    _DataView_setRenable(Renable)
+    _DataView_setRurl(Rurl)
+    _DataView_setRpassword(Rpassword)
+  }, [_DataView_setRenable, _DataView_setRurl, _DataView_setRpassword])
+
   return (
     <div className='w-full h-full overflow-hidden'>
       {data ? (
         // 有数据时的操作界面
         <div className='flex flex-col justify-start items-center w-full h-full p-4'>
           {/* 上方工具栏 */}
-          <div className='w-full flex justify-start items-center gap-3 mb-4'>
+          <div className='w-full flex justify-start items-center gap-3 mb-4 relative'>
             <Popconfirm
               title={<span>是否确认清除数据<br />本地数据不受影响</span>}
               onConfirm={() => _DataView_setData(null)}
@@ -88,6 +98,44 @@ export function DataView() {
             >
               导出数据
             </Button>
+            <Popover
+              title='联网功能设置 [测试功能]'
+              trigger={['click', 'hover']}
+              content={(
+                <div className='flex flex-col'>
+                  <Segmented
+                    block
+                    className='mb-4'
+                    defaultValue={Renable ? '启动联网功能' : '关闭联网功能'}
+                    options={['启动联网功能', '关闭联网功能']}
+                    onChange={(value) => updateRenable(value === '启动联网功能')}
+                  />
+                  <Input
+                    className='mb-4'
+                    placeholder='请输入服务器地址'
+                    defaultValue={Rurl}
+                    disabled={!Renable}
+                    onChange={(e) => updateRurl(e.target.value ?? '')}
+                  />
+                  <Input
+                    className='mb-4'
+                    placeholder='请输入服务器密码'
+                    defaultValue={Rpassword}
+                    disabled={!Renable}
+                    onChange={(e) => updateRpassword(e.target.value ?? '')}
+                  />
+                  <p className='w-full text-xs text-center px-2 mb-1'>如果启用联网功能, 则代表您同意将数据上传至服务器进行处理</p>
+                  <p className='w-full text-xs text-center px-2 mb-1'>请放心, PsychPen 的官方数据处理服务器不会记录您的数据</p>
+                </div>
+              )}
+            >
+              <Button 
+                className='absolute right-0'
+                icon={<SettingOutlined />}
+              >
+                联网功能设置
+              </Button>
+            </Popover>
           </div>
           {/* 数据表格 */}
           <AgGridReact

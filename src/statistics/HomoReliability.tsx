@@ -3,6 +3,7 @@ import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { AlphaRealiability } from '@psych/lib'
+import { loadRPackage, jsArrayToRMatrix } from '../lib/utils'
 
 type Option = {
   /** 变量名 */
@@ -12,22 +13,50 @@ type Option = {
 }
 type Result = {
   m: AlphaRealiability
+  omega?: number[]
 } & Option
 
 export function HomoReliability() {
 
-  const { dataCols, dataRows, messageApi } = useZustand()
+  const { dataCols, dataRows, messageApi, Renable, executeRCode } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
-  const handleCalculate = (values: Option) => {
+  const handleCalculate = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
+      messageApi?.loading('正在处理数据...', 0)
       const timestamp = Date.now()
       const { variables, group } = values
-      const filteredRows = dataRows.filter((row) => variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
+      const filteredRows = dataRows
+        .filter((row) => variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
+        .filter((row) => !group || (typeof row[group] !== 'undefined'))
       const items = variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
       const m = new AlphaRealiability(items, typeof group === 'string' ? filteredRows.map((row) => String(row[group])) : undefined)
-      setResult({ m, ...values })
+      if (Renable) {
+        const code = (data: number[][]) => `
+          ${loadRPackage(['psych', 'jsonlite', 'GPArotation'])}
+          data <- t(${jsArrayToRMatrix(data)})
+          omega_result <- omega(data)
+          json_result <- toJSON(omega_result$omega.tot)
+          json_result
+        `
+        if (m.group.length > 1) {
+          const omega: number[] = []
+          for (const g of m.group) {
+            const rows = filteredRows.filter((row) => row[group!] === g)
+            const items = variables.map((variable) => rows.map((row) => Number(row[variable])))
+            const result = JSON.parse(await executeRCode(code(items)))
+            const o = JSON.parse(result.result)
+            omega.push(...o as number[])
+          }
+          setResult({ m, omega, ...values })
+        } else {
+          const result = JSON.parse(await executeRCode(code(items)))
+          const omega = JSON.parse(result.result)
+          setResult({ m, omega, ...values })
+        }
+      } else {
+        setResult({ m, ...values })
+      }
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
@@ -44,9 +73,9 @@ export function HomoReliability() {
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
-          onFinish={(values) => {
+          onFinish={async (values) => {
             flushSync(() => setDisabled(true))
-            handleCalculate(values)
+            await handleCalculate(values)
             flushSync(() => setDisabled(false))
           }}
           autoComplete='off'
@@ -92,6 +121,12 @@ export function HomoReliability() {
               计算
             </Button>
           </Form.Item>
+          <p className='w-full text-center text-xs text-gray-400 mt-5'>
+            如果除了 Alpha 系数外, 还想计算 Omega 系数
+          </p>
+          <p className='w-full text-center text-xs text-gray-400 mt-1'>
+            请在数据视图右上角的设置中启用联网功能
+          </p>
         </Form>
 
       </div>
@@ -108,6 +143,7 @@ export function HomoReliability() {
                   <td>分组</td>
                   <td>量表题目数</td>
                   <td>alpha 系数</td>
+                  {Renable && <td>omega 系数</td>}
                 </tr>
               </thead>
               <tbody>
@@ -116,6 +152,7 @@ export function HomoReliability() {
                     <td>{result.m.group[i]}</td>
                     <td>{result.variables.length}</td>
                     <td>{a.toFixed(3)}</td>
+                    {Renable && <td>{result.omega![i]}</td>}
                   </tr>
                 ))}
               </tbody>

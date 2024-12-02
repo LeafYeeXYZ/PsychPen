@@ -536,8 +536,10 @@ docker build -t psych-pen-api .
 # 运行容器
 docker run -d -p 8000:8000 psych-pen-api
 # 访问接口
-bun test.ts # 探索性因素分析
+curl http://localhost:8000/execute -X POST -d '{"password": "123456", "code": "1 + 1"}'
 ```
+
+> 目前, 如果需要使用服务端功能, 请手动在本地运行服务器, 并在前端手动设置服务器地址和密码
 
 ## 4 参考文献
 
