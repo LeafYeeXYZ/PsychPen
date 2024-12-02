@@ -2,7 +2,6 @@
 .venv
 local
 script/code.md
-server/*
 
 # Logs
 logs

@@ -65,7 +65,8 @@
 - [PsychPen 开发文档](#psychpen-开发文档)
   - [1 项目结构](#1-项目结构)
   - [2 开发说明](#2-开发说明)
-  - [3 参考文献](#3-参考文献)
+  - [3 服务端](#3-服务端)
+  - [4 参考文献](#4-参考文献)
 
 ## 1 项目简介
 
@@ -484,6 +485,7 @@ Pearson 相关检验用于检验两组数据之间的线性相关性. 在 Pearso
 ## 1 项目结构
 
 ```bash
+src/
 App.tsx
 ├── DataView.tsx # 数据视图
 ├── VariableView.tsx # 变量视图
@@ -494,12 +496,10 @@ App.tsx
 |    ├── plot/*.tsx # 绘图视图的子组件
 ├── ToolView.tsx # 工具视图
 |    ├── tool/*.tsx # 工具视图的子组件
-
 lib/useZustand.tsx # 全局状态管理
 ├── lib/*.ts # 业务逻辑
 lib/utils.ts # 工具函数
 lib/types.ts # 类型定义
-
 main.tsx # 入口文件
 tailwind.css # 全局样式
 ```
@@ -524,7 +524,22 @@ tailwind.css # 全局样式
   bun run build
   ```
 
-## 3 参考文献
+## 3 服务端
+
+由于 `JavaScript` 的相关统计库较少, `PsychLib` 开发较缓慢, 因此基于 `Docker` 和 `R` 开发了一个简单的服务端, 用于提供执行 `R` 脚本的接口, 见 `server` 目录
+
+```bash
+# 进入服务端目录
+cd ./server
+# 构建镜像
+docker build -t psych-pen-api .
+# 运行容器
+docker run -d -p 8000:8000 psych-pen-api
+# 访问接口
+bun test.ts # 探索性因素分析
+```
+
+## 4 参考文献
 
 - `基础统计` 刘红云. (2023). 教育与心理统计学. 北京师范大学出版社.
 - `进阶统计` 刘红云. (2019). 高级心理统计. 中国人民大学出版社.
