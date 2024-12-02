@@ -1,9 +1,10 @@
 import { useZustand } from '../lib/useZustand'
+import { useRemoteR } from '../lib/useRemoteR'
 import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { AlphaRealiability } from '@psych/lib'
-import { loadRPackage, jsArrayToRMatrix } from '../lib/utils'
+import { jsArrayToRMatrix } from '../lib/utils'
 
 type Option = {
   /** 变量名 */
@@ -18,7 +19,8 @@ type Result = {
 
 export function HomoReliability() {
 
-  const { dataCols, dataRows, messageApi, Renable, executeRCode } = useZustand()
+  const { dataCols, dataRows, messageApi } = useZustand()
+  const { Renable, executeRCode } = useRemoteR()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = async (values: Option) => {
@@ -33,7 +35,6 @@ export function HomoReliability() {
       const m = new AlphaRealiability(items, typeof group === 'string' ? filteredRows.map((row) => String(row[group])) : undefined)
       if (Renable) {
         const code = (data: number[][]) => `
-          ${loadRPackage(['psych', 'jsonlite', 'GPArotation'])}
           data <- t(${jsArrayToRMatrix(data)})
           omega_result <- omega(data)
           json_result <- toJSON(omega_result$omega.tot)
@@ -44,13 +45,13 @@ export function HomoReliability() {
           for (const g of m.group) {
             const rows = filteredRows.filter((row) => row[group!] === g)
             const items = variables.map((variable) => rows.map((row) => Number(row[variable])))
-            const result = JSON.parse(await executeRCode(code(items)))
+            const result = JSON.parse(await executeRCode(code(items), ['psych', 'jsonlite', 'GPArotation']))
             const o = JSON.parse(result.result)
             omega.push(...o as number[])
           }
           setResult({ m, omega, ...values })
         } else {
-          const result = JSON.parse(await executeRCode(code(items)))
+          const result = JSON.parse(await executeRCode(code(items), ['psych', 'jsonlite', 'GPArotation']))
           const omega = JSON.parse(result.result)
           setResult({ m, omega, ...values })
         }

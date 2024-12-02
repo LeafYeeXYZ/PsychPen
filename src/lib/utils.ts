@@ -6,10 +6,6 @@ export function jsObjectToRDataFrame(obj: Record<string, number[]>): string {
 export function jsArrayToRMatrix(arr: number[][]): string {
   return `matrix(c(${arr.flat().join(', ')}), nrow = ${arr.length})`
 }
-export function loadRPackage(pkg: string | string[]): string {
-  typeof pkg === 'string' && (pkg = [pkg])
-  return pkg.map((p) => `\nif (!requireNamespace("${p}", quietly = TRUE)) {\n  install.packages("${p}")\n}\nlibrary(${p})\n`).join('')
-}
 
 /**
  * 生成含 *, **, *** 的统计量

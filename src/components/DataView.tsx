@@ -1,4 +1,5 @@
 import { useZustand } from '../lib/useZustand'
+import { useRemoteR } from '../lib/useRemoteR'
 import { Upload, Button, Tag, Popconfirm, Modal, Input, Select, Popover, Segmented } from 'antd'
 import { SlidersOutlined, DeleteOutlined, SaveOutlined, SettingOutlined } from '@ant-design/icons'
 import { flushSync } from 'react-dom'
@@ -17,7 +18,8 @@ const LARGE_DATA_SIZE = 512 * 1024
 
 export function DataView() {
 
-  const { data, _DataView_setData, dataCols, dataRows, messageApi, _DataView_setIsLargeData, disabled, setDisabled, Rurl, Rpassword, _DataView_setRurl, _DataView_setRpassword, Renable, _DataView_setRenable } = useZustand()
+  const { data, _DataView_setData, dataCols, dataRows, messageApi, _DataView_setIsLargeData, disabled, setDisabled } = useZustand()
+  const { Rurl, Rpassword, _DataView_setRurl, _DataView_setRpassword, Renable, _DataView_setRenable } = useRemoteR()
   const [modalApi, contextHolder] = Modal.useModal()
   // 导出数据相关
   const handleExport = async (filename: string, type: string) => { downloadSheet(dataRows, type as ExportTypes, filename) }
