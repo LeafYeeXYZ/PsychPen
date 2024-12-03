@@ -6,10 +6,10 @@ import { create } from 'zustand'
 import { Variable } from './types'
 import type { Row } from '@psych/sheet'
 import type { MessageInstance } from 'antd/es/message/interface'
-import { Derive } from './derive'
-import { Missing } from './misssing'
-import { Describe } from './describe'
-import { Filter } from './filter'
+import { Derive } from './calculates/derive'
+import { Missing } from './calculates/misssing'
+import { Describe } from './calculates/describe'
+import { Filter } from './calculates/filter'
 
 /**
  * 处理原始数据
