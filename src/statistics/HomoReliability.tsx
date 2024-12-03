@@ -122,6 +122,7 @@ export function HomoReliability() {
             <Radio.Group 
               block
               disabled={!Renable}
+              buttonStyle='solid'
             >
               <Radio.Button value={true}>计算</Radio.Button>
               <Radio.Button value={false}>不计算</Radio.Button>
