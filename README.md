@@ -541,7 +541,7 @@ docker run -d -p 8000:8000 -e PSYCH_PEN_API_PASSWORD=xxx psych-pen-api # 密码�
 curl http://localhost:8000/execute -X POST -d '{"password": "xxx", "code": "1 + 1"}'
 ```
 
-> 目前, 如果需要使用服务端功能, 请手动在本地运行服务器, 并在前端手动设置服务器地址和密码; 并请注意, `Safari` 浏览器可能会阻止 `localhost` 的请求, 请使用 `Chrome` 浏览器; 如果您熟悉 `R` 而不熟悉 `Docker`, 也可以用 `plumber` 直接运行 `api.R` 文件
+> 作者部署的服务端性能有限, 如需使用请联系作者获取服务器地址和密码 (推荐手动在本地部署服务). 获取服务端地址和密码后, 需要在 `变量视图 -> 高级设置` 中手动填写. 请注意, `Safari` 浏览器可能会阻止 `localhost` 的请求, 在本地部署服务端时, 请使用 `Chrome` 浏览器. 如果您熟悉 `R` 而不熟悉 `Docker`, 也可以直接运行 `api.R` 文件
 
 ## 4 参考文献
 
