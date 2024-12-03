@@ -66,6 +66,8 @@
   - [1 项目结构](#1-项目结构)
   - [2 开发说明](#2-开发说明)
   - [3 服务端](#3-服务端)
+    - [3.1 直接拉取镜像运行](#31-直接拉取镜像运行)
+    - [3.2 本地构建和运行](#32-本地构建和运行)
   - [4 参考文献](#4-参考文献)
 
 ## 1 项目简介
@@ -528,6 +530,26 @@ tailwind.css # 全局样式
 
 由于 `JavaScript` 的相关统计库较少, `PsychLib` 开发较缓慢, 因此基于 `Docker` 和 `R` 开发了一个简单的服务端, 用于提供执行 `R` 脚本的接口, 见 `server` 目录
 
+您既可以使用作者提供的服务端 `但当前作者部署的服务端资源有限, 如需使用请联系作者获取服务器地址和密码`, 也可以自行部署服务端 (见下文). 获取服务端地址和密码后, 需要在 `数据视图 -> 高级设置` 中手动填写
+
+> 请注意, `Safari` 浏览器可能会阻止 `localhost` 的请求, 在本地部署服务端时, 请使用 `Chrome` 浏览器. 如果您熟悉 `R` 而不熟悉 `Docker`, 也可以直接运行 `api.R` 文件
+
+### 3.1 直接拉取镜像运行
+
+```bash
+# 如果你的电脑是 arm64 架构
+docker run -d -p 8000:8000 leafyee/psych-pen-api:v1.0.1-arm64 # 密码默认为 psychpen
+# 如果你的电脑是 amd64 架构
+docker run -d -p 8000:8000 leafyee/psych-pen-api:v1.0.1-amd64 # 密码默认为 psychpen
+# 访问接口
+curl http://localhost:8000/execute -X POST -d '{"password": "psychpen", "code": "1 + 1"}'
+
+# 如果你想自定义密码
+docker run -d -p 8000:8000 -e PSYCH_PEN_API_PASSWORD=xxx leafyee/psych-pen-api:v1.0.1-arm64 # 密码为 xxx
+```
+
+### 3.2 本地构建和运行
+
 ```bash
 # 进入服务端目录
 cd ./server
@@ -536,12 +558,10 @@ docker build -t psych-pen-api . # 构建为当前架构的镜像
 docker build --platform linux/arm64 -t psych-pen-api . # 构建为 linux/arm64 架构的镜像
 docker build --platform linux/amd64 -t psych-pen-api . # 构建为 linux/amd64 架构的镜像
 # 运行容器
-docker run -d -p 8000:8000 -e PSYCH_PEN_API_PASSWORD=xxx psych-pen-api # 密码默认为 psychpen
+docker run -d -p 8000:8000 -e PSYCH_PEN_API_PASSWORD=xxx psych-pen-api
 # 访问接口
 curl http://localhost:8000/execute -X POST -d '{"password": "xxx", "code": "1 + 1"}'
 ```
-
-> 作者部署的服务端性能有限, 如需使用请联系作者获取服务器地址和密码 (推荐手动在本地部署服务). 获取服务端地址和密码后, 需要在 `变量视图 -> 高级设置` 中手动填写. 请注意, `Safari` 浏览器可能会阻止 `localhost` 的请求, 在本地部署服务端时, 请使用 `Chrome` 浏览器. 如果您熟悉 `R` 而不熟悉 `Docker`, 也可以直接运行 `api.R` 文件
 
 ## 4 参考文献
 
