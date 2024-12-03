@@ -1,6 +1,6 @@
 library(plumber)
 
-global_password <- "123456"
+global_password <- Sys.getenv("PSYCH_PEN_API_PASSWORD", "psychpen")
 
 # 配置中间件来添加CORS支持
 #* @filter cors

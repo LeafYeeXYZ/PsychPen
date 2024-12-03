@@ -532,11 +532,13 @@ tailwind.css # 全局样式
 # 进入服务端目录
 cd ./server
 # 构建镜像
-docker build -t psych-pen-api .
+docker build -t psych-pen-api . # 构建为当前架构的镜像
+docker build --platform linux/arm64 -t psych-pen-api . # 构建为 linux/arm64 架构的镜像
+docker build --platform linux/amd64 -t psych-pen-api . # 构建为 linux/amd64 架构的镜像
 # 运行容器
-docker run -d -p 8000:8000 psych-pen-api
+docker run -d -p 8000:8000 -e PSYCH_PEN_API_PASSWORD=xxx psych-pen-api # 密码默认为 psychpen
 # 访问接口
-curl http://localhost:8000/execute -X POST -d '{"password": "123456", "code": "1 + 1"}'
+curl http://localhost:8000/execute -X POST -d '{"password": "xxx", "code": "1 + 1"}'
 ```
 
 > 目前, 如果需要使用服务端功能, 请手动在本地运行服务器, 并在前端手动设置服务器地址和密码; 并请注意, `Safari` 浏览器可能会阻止 `localhost` 的请求, 请使用 `Chrome` 浏览器; 如果您熟悉 `R` 而不熟悉 `Docker`, 也可以用 `plumber` 直接运行 `api.R` 文件
