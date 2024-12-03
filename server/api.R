@@ -25,12 +25,18 @@ function(req, res, code = "", password = "") {
   # 验证密码
   if (password != global_password) {
     res$status <- 401
-    return(list(error = "Unauthorized"))
+    return(list(
+      status = "error",
+      message = "Invalid password"
+    ))
   }
   # 验证输入
   if (nchar(code) == 0) {
     res$status <- 400
-    return(list(error = "No code provided"))
+    return(list(
+      status = "error",
+      message = "No code provided"
+    ))
   }
   # 执行代码，捕获错误和输出
   tryCatch({

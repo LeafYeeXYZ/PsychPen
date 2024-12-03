@@ -1,10 +1,23 @@
 import html2canvas from 'html2canvas'
 
+/**
+ * 把数组对象转换为 R 的数据框
+ * @param obj 数组对象
+ * @returns R 的数据框
+ */
 export function jsObjectToRDataFrame(obj: Record<string, number[]>): string {
   return `data.frame(\n${Object.entries(obj).map(([key, value]) => `${key} = c(${value.join(', ')})`).join(',\n')}\n)`
 }
-export function jsArrayToRMatrix(arr: number[][]): string {
-  return `matrix(c(${arr.flat().join(', ')}), nrow = ${arr.length})`
+
+/**
+ * 把二维数组转换为 R 的矩阵
+ * @param arr 二维数组
+ * @param transpose 是否转置 (默认不转置)
+ * @returns R 的矩阵 
+ */
+export function jsArrayToRMatrix(arr: number[][], transpose = false): string {
+  const matrix = `matrix(c(${arr.flat().join(', ')}), nrow = ${arr.length})`
+  return transpose ? `t(${matrix})` : matrix
 }
 
 /**

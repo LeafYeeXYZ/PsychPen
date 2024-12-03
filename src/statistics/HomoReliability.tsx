@@ -1,6 +1,6 @@
 import { useZustand } from '../lib/useZustand'
 import { useRemoteR } from '../lib/useRemoteR'
-import { Select, Button, Form } from 'antd'
+import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { AlphaRealiability } from '@psych/lib'
@@ -11,6 +11,8 @@ type Option = {
   variables: string[]
   /** 分组变量 */
   group?: string
+  /** 是否计算 Omega 系数 */
+  calculateOmega?: boolean
 }
 type Result = {
   m: AlphaRealiability
@@ -27,15 +29,15 @@ export function HomoReliability() {
     try {
       messageApi?.loading('正在处理数据...', 0)
       const timestamp = Date.now()
-      const { variables, group } = values
+      const { variables, group, calculateOmega } = values
       const filteredRows = dataRows
         .filter((row) => variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
         .filter((row) => !group || (typeof row[group] !== 'undefined'))
       const items = variables.map((variable) => filteredRows.map((row) => Number(row[variable])))
       const m = new AlphaRealiability(items, typeof group === 'string' ? filteredRows.map((row) => String(row[group])) : undefined)
-      if (Renable) {
+      if (calculateOmega) {
         const code = (data: number[][]) => `
-          data <- t(${jsArrayToRMatrix(data)})
+          data <- ${jsArrayToRMatrix(data, true)}
           omega_result <- omega(data)
           json_result <- toJSON(omega_result$omega.tot)
           json_result
@@ -45,14 +47,12 @@ export function HomoReliability() {
           for (const g of m.group) {
             const rows = filteredRows.filter((row) => row[group!] === g)
             const items = variables.map((variable) => rows.map((row) => Number(row[variable])))
-            const result = JSON.parse(await executeRCode(code(items), ['psych', 'jsonlite', 'GPArotation']))
-            const o = JSON.parse(result.result)
-            omega.push(...o as number[])
+            const result = await executeRCode(code(items), ['psych', 'jsonlite', 'GPArotation']) as number[]
+            omega.push(result[0])
           }
           setResult({ m, omega, ...values })
         } else {
-          const result = JSON.parse(await executeRCode(code(items), ['psych', 'jsonlite', 'GPArotation']))
-          const omega = JSON.parse(result.result)
+          const omega = await executeRCode(code(items), ['psych', 'jsonlite', 'GPArotation']) as number[]
           setResult({ m, omega, ...values })
         }
       } else {
@@ -81,6 +81,7 @@ export function HomoReliability() {
           }}
           autoComplete='off'
           disabled={disabled}
+          initialValues={{ calculateOmega: false }}
         >
           <Form.Item
             label='量表的所有变量'
@@ -113,6 +114,19 @@ export function HomoReliability() {
               allowClear
             />
           </Form.Item>
+          <Form.Item
+            label='Omega 系数'
+            name='calculateOmega'
+            rules={[{ required: true, message: '请选择是否计算 Omega 系数' }]}
+          >
+            <Radio.Group 
+              block
+              disabled={!Renable}
+            >
+              <Radio.Button value={true}>计算</Radio.Button>
+              <Radio.Button value={false}>不计算</Radio.Button>
+            </Radio.Group>
+          </Form.Item>
           <Form.Item>
             <Button
               className='w-full mt-4'
@@ -144,7 +158,7 @@ export function HomoReliability() {
                   <td>分组</td>
                   <td>量表题目数</td>
                   <td>alpha 系数</td>
-                  {Renable && <td>omega 系数</td>}
+                  {result.omega && <td>omega 系数</td>}
                 </tr>
               </thead>
               <tbody>
@@ -153,7 +167,7 @@ export function HomoReliability() {
                     <td>{result.m.group[i]}</td>
                     <td>{result.variables.length}</td>
                     <td>{a.toFixed(3)}</td>
-                    {Renable && <td>{result.omega![i]}</td>}
+                    {result.omega && <td>{result.omega[i].toFixed(3)}</td>}
                   </tr>
                 ))}
               </tbody>

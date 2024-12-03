@@ -101,13 +101,16 @@ export function DataView() {
               导出数据
             </Button>
             <Popover
-              title='联网功能设置 [测试功能]'
+              title='高级设置'
               trigger={['click', 'hover']}
               content={(
                 <div className='flex flex-col'>
+                  <p className='w-full text-sm font-bold text-center px-2 mb-4'>
+                    联网功能设置
+                  </p>
                   <Segmented
                     block
-                    className='mb-4'
+                    className='mb-3 border dark:border-[#424242]'
                     defaultValue={Renable ? '启动联网功能' : '关闭联网功能'}
                     options={['启动联网功能', '关闭联网功能']}
                     onChange={(value) => updateRenable(value === '启动联网功能')}
@@ -126,8 +129,9 @@ export function DataView() {
                     disabled={!Renable}
                     onChange={(e) => updateRpassword(e.target.value ?? '')}
                   />
-                  <p className='w-full text-xs text-center px-2 mb-1'>如果启用联网功能, 则代表您同意将数据上传至服务器进行处理</p>
-                  <p className='w-full text-xs text-center px-2 mb-1'>请放心, PsychPen 的官方数据处理服务器不会记录您的数据</p>
+                  <p className='w-full text-xs text-center px-2 mb-1'>如果启用联网功能, 则代表您同意在执行部分统计功能时</p>
+                  <p className='w-full text-xs text-center px-2 mb-1'>将数据上传至上面填写的服务器进行处理</p>
+                  <p className='w-full text-xs text-center px-2 mb-1'>如果使用的不是官方或自部署服务器, 请注意信息安全</p>
                 </div>
               )}
             >
@@ -135,7 +139,7 @@ export function DataView() {
                 className='absolute right-0'
                 icon={<SettingOutlined />}
               >
-                联网功能设置
+                高级设置
               </Button>
             </Popover>
           </div>
