@@ -1,6 +1,6 @@
 import { useZustand } from '../lib/useZustand'
 import { useRemoteR } from '../lib/useRemoteR'
-import { Select, Button, Form, Radio } from 'antd'
+import { Select, Button, Form, Radio, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { AlphaRealiability } from '@psych/lib'
@@ -13,6 +13,8 @@ type Option = {
   group?: string
   /** 是否计算 Omega 系数 */
   calculateOmega?: boolean
+  /** Omega 系数的因子数 */
+  manualNFactors?: number
 }
 type Result = {
   m: AlphaRealiability
@@ -29,7 +31,7 @@ export function HomoReliability() {
     try {
       messageApi?.loading('正在处理数据...', 0)
       const timestamp = Date.now()
-      const { variables, group, calculateOmega } = values
+      const { variables, group, calculateOmega, manualNFactors } = values
       const filteredRows = dataRows
         .filter((row) => variables.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
         .filter((row) => !group || (typeof row[group] !== 'undefined'))
@@ -38,7 +40,7 @@ export function HomoReliability() {
       if (calculateOmega) {
         const code = (data: number[][]) => `
           data <- ${jsArrayToRMatrix(data, true)}
-          omega_result <- omega(data)
+          omega_result <- omega(data${manualNFactors ? `, nfactors = ${manualNFactors}` : ''})
           json_result <- toJSON(omega_result$omega.tot)
           json_result
         `
@@ -127,6 +129,18 @@ export function HomoReliability() {
               <Radio.Button value={true}>计算</Radio.Button>
               <Radio.Button value={false}>不计算</Radio.Button>
             </Radio.Group>
+          </Form.Item>
+          <Form.Item
+            label='手动指定 Omega 系数的因子数'
+            name='manualNFactors'
+          >
+            <InputNumber
+              placeholder='留空则自动计算'
+              className='w-full'
+              min={1}
+              step={1}
+              disabled={!Renable}
+            />
           </Form.Item>
           <Form.Item>
             <Button
