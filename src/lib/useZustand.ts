@@ -12,6 +12,36 @@ import { Describe } from './calculates/describe'
 import { Filter } from './calculates/filter'
 
 /**
+ * 检查计算变量的表达式的安全性
+ * @param expression 计算变量的表达式
+ * @throws 如果表达式不安全, 则抛出异常
+ */
+async function validateExpression(expression: string): Promise<void> {
+  // 先排除变量名
+  expression = expression.replace(/:::.+?:::/g, '')
+  if (
+    // 阻止数据泄露
+    expression.includes('http://') ||
+    expression.includes('https://') ||
+    expression.includes('//') ||
+    expression.includes('fetch') ||
+    expression.includes('XMLHttpRequest') ||
+    // 阻止外部代码执行
+    expression.includes('import') ||
+    expression.includes('eval') ||
+    expression.includes('Function') || 
+    expression.includes('setTimeout') ||
+    expression.includes('setInterval') ||
+    expression.includes('setImmediate') ||
+    // 阻止本地存储
+    expression.includes('localStorage') ||
+    expression.includes('sessionStorage')
+  ) {
+    throw new Error('表达式不安全, 拒绝执行')
+  }
+}
+
+/**
  * 处理原始数据
  * @param dataCols 数据变量列表, 必须提供 name 字段, 可选提供其他字段
  * @param dataRows 原始数据, 不要传入已经处理过的数据
@@ -67,6 +97,7 @@ export const useZustand = create<GlobalState>()((set) => ({
     })
   },
   _VariableView_addNewVar: async (name, expression) => {
+    await validateExpression(expression) // 检查表达式的安全性
     set((state) => {
       const cols = state.dataCols
       const rows = state.dataRows
