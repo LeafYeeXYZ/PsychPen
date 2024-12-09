@@ -2,7 +2,7 @@
  * @file 生成描述统计量
  */
 
-import type { Variable } from './types'
+import type { Variable } from '../types'
 import { min, max, mean, quantile, std, mode } from '@psych/lib'
 
 /** 生成描述统计量 */
