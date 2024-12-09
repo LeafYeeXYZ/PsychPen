@@ -27,10 +27,6 @@ const ANTD_THEME_DARK: ThemeConfig = {
 export function App() {
 
   const { data, _App_setMessageApi, disabled, isDarkMode, _App_setIsDarkMode } = useZustand()
-  // 加载完成后切换页面标题
-  useEffect(() => {
-    document.title = 'PsychPen'
-  }, [])
   // 页面切换
   const [page, setPage] = useState<React.ReactElement>(<DataView />)
   const [activePage, setActivePage] = useState<string>('data')
