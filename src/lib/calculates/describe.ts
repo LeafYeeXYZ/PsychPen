@@ -3,7 +3,7 @@
  */
 
 import type { Variable } from '../types'
-import { min, max, mean, quantile, std, mode } from '@psych/lib'
+import { min, max, mean, quantile, std, mode, sort } from '@psych/lib'
 
 /** 生成描述统计量 */
 export class Describe {
@@ -31,9 +31,8 @@ export class Describe {
         data.some((v) => !isNaN(Number(v)))
       ) {
         type = '等距或等比数据'
-        const nums = data
-          .filter((v) => typeof v !== 'undefined').map((v) => Number(v))
-          .sort((a, b) => a - b)
+        const nums = data.filter((v) => typeof v !== 'undefined').map((v) => Number(v))
+        sort(nums, true, 'iterativeQuickSort', true)
         const _mean = mean(nums)
         return { ...col, count, missing, valid, unique, type, 
           min: min(nums, true),
