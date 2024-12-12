@@ -121,6 +121,7 @@ export function App() {
           <a 
             href='https://github.com/LeafYeeXYZ/PsychPen' 
             target='_blank' 
+            rel='noreferrer'
             className='absolute right-4 text-sm hover:underline'
           >
             <LinkOutlined /> GitHub
