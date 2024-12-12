@@ -59,7 +59,7 @@ export function App() {
           <nav className='space-x-4'>
             <Button
               type={activePage === 'data' ? 'primary' : 'text'}
-              onClick={async () => {
+              onClick={() => {
                 if (activePage === 'data') return
                 setPage(<DataView />)
                 setActivePage('data')

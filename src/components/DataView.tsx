@@ -22,7 +22,7 @@ export function DataView() {
   const { Rurl, Rpassword, _DataView_setRurl, _DataView_setRpassword, Renable, _DataView_setRenable } = useRemoteR()
   const [modalApi, contextHolder] = Modal.useModal()
   // 导出数据相关
-  const handleExport = async (filename: string, type: string) => { downloadSheet(dataRows, type as ExportTypes, filename) }
+  const handleExport = (filename: string, type: string) => { downloadSheet(dataRows, type as ExportTypes, filename) }
   const handleExportParams = useRef<{ filename?: string; type?: string }>({})
   // 设置 R 服务相关
   const updateRenable = (enable: boolean) => { localStorage.setItem('Renable', enable ? 'true' : 'false'); _DataView_setRenable(enable) }
@@ -83,8 +83,8 @@ export function DataView() {
                       </Select>
                     </div>
                   ),
-                  onOk: async () => {
-                    await handleExport(
+                  onOk: () => {
+                    handleExport(
                       handleExportParams.current.filename?.length ? handleExportParams.current.filename : 'psychpen',
                       handleExportParams.current.type?.length ? handleExportParams.current.type : EXPORT_FILE_TYPES[0],
                     )

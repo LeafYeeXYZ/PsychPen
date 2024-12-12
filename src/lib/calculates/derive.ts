@@ -102,19 +102,21 @@ class Discrete {
     this.#min = min(data)
     this.#max = max(data)
     switch (methed) {
-      case '等宽':
+      case '等宽': {
         this.predictor = (data: number | undefined) => {
           if (typeof data === 'undefined') return undefined
           return Math.floor((data - this.#min) / (this.#range / this.groups))
         }
         break
-      case '等频':
+      }
+      case '等频': {
         this.predictor = (data: number | undefined) => {
           if (typeof data === 'undefined') return undefined
           return Math.floor(this.#data.findIndex((v) => v >= data) / (this.#count / this.groups))
         }
         break
-      case '聚类分析':
+      }
+      case '聚类分析': {
         const { clusters } = kmeans(data.map((v) => [v]), groups, {})
         this.#kmeans = new Map(clusters.map((v, i) => [data[i], v]))
         this.predictor = (index: number | undefined) => {
@@ -122,6 +124,7 @@ class Discrete {
           return this.#kmeans?.get(index)
         }
         break
+      }
     }
 
   }

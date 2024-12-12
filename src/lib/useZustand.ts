@@ -4,7 +4,6 @@
 
 import { create } from 'zustand'
 import { Variable } from './types'
-import type { Row } from '@psych/sheet'
 import type { MessageInstance } from 'antd/es/message/interface'
 import { Derive } from './calculates/derive'
 import { Missing } from './calculates/misssing'
@@ -16,7 +15,7 @@ import { Filter } from './calculates/filter'
  * @param expression 计算变量的表达式
  * @throws 如果表达式不安全, 则抛出异常
  */
-async function validateExpression(expression: string): Promise<void> {
+function validateExpression(expression: string): void {
   // 先排除变量名
   expression = expression.replace(/:::.+?:::/g, '')
   if (
@@ -96,8 +95,8 @@ export const useZustand = create<GlobalState>()((set) => ({
       return { dataCols: calculatedCols, dataRows: calculatedRows }
     })
   },
-  _VariableView_addNewVar: async (name, expression) => {
-    await validateExpression(expression) // 检查表达式的安全性
+  _VariableView_addNewVar: (name, expression) => {
+    validateExpression(expression) // 检查表达式的安全性
     set((state) => {
       const cols = state.dataCols
       const rows = state.dataRows
@@ -145,13 +144,13 @@ type GlobalState = {
   /**
    * 原始数据
    */
-  data: Row[] | null
+  data: Record<string, unknown>[] | null
   /**
    * 设置原始数据
    * @param data 原始数据 (WorkBook 类型)
    * @important 仅在 DataView.tsx 中使用
    */
-  _DataView_setData: (data: Row[] | null) => void
+  _DataView_setData: (data: Record<string, unknown>[] | null) => void
   /**
    * 更新数据
    * @param cols 变量列表
@@ -164,7 +163,7 @@ type GlobalState = {
    * @param expression 计算表达式
    * @important 仅在 VariableView.tsx 中使用
    */
-  _VariableView_addNewVar: (name: string, expression: string) => Promise<void>
+  _VariableView_addNewVar: (name: string, expression: string) => void
   /**
    * 数据列表
    */
