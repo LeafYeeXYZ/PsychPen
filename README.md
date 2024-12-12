@@ -2,7 +2,7 @@
 
 **在线进行心理学/教育学统计分析和数据可视化**, **立即体验: <https://psychpen.leafyee.xyz>**
 
-> PsychPen 基于 [PsychLib](https://github.com/LeafYeeXYZ/PsychLib) 进行统计分析, 基于 [PsychSheet](https://github.com/LeafYeeXYZ/PsychSheet) 进行数据导入导出, 欢迎也关注这两个项目~
+> PsychPen 基于 [PsychLib](https://github.com/LeafYeeXYZ/PsychLib) 进行统计分析, 基于 [PsychSheet](https://github.com/LeafYeeXYZ/PsychSheet) 进行数据导入导出, 欢迎也关注这两个项目
 
 - [PsychPen 使用文档](#psychpen-使用文档)
   - [1 项目简介](#1-项目简介)
@@ -73,7 +73,7 @@
 
 ## 1 项目简介
 
-PsychPen 是一个用于心理学/教育学专业的统计检验分析和图表绘制的在线工具. 相比于传统的心理学统计软件, PsychPen 具有无需下载安装、跨平台 (你甚至可以在平板和手机上使用)、安全可靠 (所有数据都在浏览器本地处理)、新手友好、开源免费等优势. 除此之外, PsychPen 依托于 Web 技术, 还实现了 SPSS 等老牌统计软件难以实现的3D图表、可交互图标、动态演示等功能, 可以帮助初学者更好地理解统计分布等概念
+PsychPen 是一个用于心理学/教育学专业的统计检验分析和图表绘制的在线工具. 相比于传统的心理学统计软件, PsychPen 具有无需下载安装、跨平台 (你甚至可以在平板和手机上使用)、新手友好、开源免费等优势. 除此之外, PsychPen 依托于 Web 技术, 还实现了 SPSS 等老牌统计软件难以实现的3D图表、可交互图标、动态演示等功能, 可以帮助初学者更好地理解统计学相关概念
 
 | ![](readme/data-4.png) | ![](readme/data-5.png) | ![](readme/var-5.png) |
 | :---: | :---: | :---: |
