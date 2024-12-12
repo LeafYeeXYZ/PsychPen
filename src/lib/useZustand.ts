@@ -136,7 +136,7 @@ export const useZustand = create<GlobalState>()((set) => ({
   _App_setMessageApi: (api) => set({ messageApi: api }),
   disabled: false,
   setDisabled: (disabled) => set({ disabled }),
-  isDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
+  isDarkMode: matchMedia('(prefers-color-scheme: dark)').matches,
   _App_setIsDarkMode: (isDarkMode) => set({ isDarkMode }),
 }))
 

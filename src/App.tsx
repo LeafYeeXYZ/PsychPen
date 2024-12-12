@@ -35,7 +35,7 @@ export function App() {
   // 检查浏览器版本
   useEffect(() => {
     _App_setMessageApi(messageApi)
-    const browser = Bowser.getParser(window.navigator.userAgent)
+    const browser = Bowser.getParser(navigator.userAgent)
     const valid = browser.satisfies({
       chrome: '>=110',
       firefox: '>=115',
@@ -46,10 +46,10 @@ export function App() {
   }, [messageApi, _App_setMessageApi])
   // 动态设置主题
   useEffect(() => {
-    const getIsDarkMode = () => window.matchMedia('(prefers-color-scheme: dark)').matches
+    const getIsDarkMode = () => matchMedia('(prefers-color-scheme: dark)').matches
     const subIsDarkMode = () => _App_setIsDarkMode(getIsDarkMode())
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', subIsDarkMode)
-    return () => window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', subIsDarkMode)
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', subIsDarkMode)
+    return () => matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', subIsDarkMode)
   }, [_App_setIsDarkMode])
 
   return (

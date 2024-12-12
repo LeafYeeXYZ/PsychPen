@@ -3,7 +3,8 @@
   "version": "1.7.0",
   "description": "Web statistic app for Psychology and Education",
   "engines": {
-    "bun": "^1.1.32"
+    "bun": "^1.1.32",
+    "deno": "^2.1.3"
   },
   "private": true,
   "type": "module",
