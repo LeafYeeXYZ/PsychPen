@@ -8,7 +8,6 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 import { importSheet, downloadSheet, type ImportTypes, type ExportTypes } from '@psych/sheet'
-import ImportDataWorker from '../lib/workers/importData?worker'
 
 /** 可导入的文件类型 */
 const ACCEPT_FILE_TYPES: ImportTypes[] = ['xls', 'xlsx', 'csv', 'txt', 'json', 'numbers', 'dta', 'sav', 'parquet']
@@ -177,9 +176,8 @@ export function DataView() {
                   duration: 0,
                 })
                 flushSync(() => setDisabled(true))
-                const isLargeData = file.size > LARGE_DATA_SIZE
                 // 如果文件比较大, 延迟等待通知加载
-                if (isLargeData) {
+                if (file.size > LARGE_DATA_SIZE) {
                   await new Promise((resolve) => setTimeout(resolve, 500))
                   _DataView_setIsLargeData(true)
                 }
@@ -193,20 +191,6 @@ export function DataView() {
                     } else if (ACCEPT_FILE_TYPES.indexOf(ext as ImportTypes) === -1) {
                       messageApi?.destroy('uploading')
                       messageApi?.error('文件读取失败, 不支持该文件格式')
-                    } else if (isLargeData) {
-                      const worker = new ImportDataWorker()
-                      worker.postMessage({ file: e.target.result, ext: ext as ImportTypes })
-                      const data = await new Promise((resolve, reject) => {
-                        worker.onmessage = (event) => {
-                          if (event.data.success) {
-                            resolve(event.data.data)
-                          } else {
-                            reject(event.data.error)
-                          }
-                        }
-                      })
-                      _DataView_setData(data as Record<string, unknown>[])
-                      worker.terminate()
                     } else {
                       const data = await importSheet(e.target.result as ArrayBuffer, ext as ImportTypes)
                       _DataView_setData(data)
