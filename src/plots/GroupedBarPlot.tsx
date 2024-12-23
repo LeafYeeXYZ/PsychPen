@@ -25,7 +25,7 @@ type Option = {
   /** 是否显示数据标签 */
   label: 'mean' | 'std' | 'both' | 'none'
   /** 误差棒数据 */
-  error: 0 | 1 | 2 | 3
+  error: 0 | 1 | 2 | 3 | 1.96 | 2.58
   /** 自定义 y 轴最大值 */
   maxY?: number
   /** 自定义 y 轴最小值 */
@@ -286,6 +286,8 @@ export function GroupedBarPlot() {
                   className='w-full'
                   placeholder='误差棒内容'
                   options={[
+                    { label: '上下1.96倍标准差', value: 1.96 },
+                    { label: '上下2.58倍标准差', value: 2.58 },
                     { label: '上下3倍标准差', value: 3 },
                     { label: '上下2倍标准差', value: 2 },
                     { label: '上下1倍标准差', value: 1 },
