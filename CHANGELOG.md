@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.8.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.7.0...v1.8.0) (2024-12-23)
+
+
+### Features
+
+* 使用 Web Worker 导入较大的数据文件 ([16c4889](https://github.com/LeafYeeXYZ/PsychPen/commit/16c4889cd72022decba99a943797a10b677d44d5))
+* 提高计算变量执行用户表达式的安全性 ([7e2a0a5](https://github.com/LeafYeeXYZ/PsychPen/commit/7e2a0a5addf71a2228bb393793e0596f37036c36))
+* 新增加载界面, 大幅减少白屏时间 ([8f732e0](https://github.com/LeafYeeXYZ/PsychPen/commit/8f732e0daa957f567668dfdf2559ddd52ed1c71f))
+* 支持计算变量 ([8a4a689](https://github.com/LeafYeeXYZ/PsychPen/commit/8a4a6894c833249b4199e73257e0a83e7e4faa9b))
+* 支持为所有变量统一定义缺失值 ([b56b8fe](https://github.com/LeafYeeXYZ/PsychPen/commit/b56b8fe30841d02ce95a5886c8b09494359d97a0))
+* 支持一键清除所有过滤规则 ([393883c](https://github.com/LeafYeeXYZ/PsychPen/commit/393883cb44cd93f2b3bd7e6af4ad6127a72fd17a))
+* 直方图的误差棒支持1.96和2.58倍标准差 ([1b07b8f](https://github.com/LeafYeeXYZ/PsychPen/commit/1b07b8fa4edf39c1182b89c44f214b2947b9578c))
+* **server:** 信度计算支持Omega系数 ([5d8c067](https://github.com/LeafYeeXYZ/PsychPen/commit/5d8c067e558899593306d6fe3b864f1e3518cc9a))
+* **server:** 支持通过环境变量设置密码 ([f54db6a](https://github.com/LeafYeeXYZ/PsychPen/commit/f54db6a1e757c601c7a1212e23d0e67eb539a00e))
+* **server:** introduce server ([f602932](https://github.com/LeafYeeXYZ/PsychPen/commit/f602932defa1bf9d6abaf1b0d184c68fd0e84f75))
+* **server:** omega系数支持手动指定因子数 ([df92c32](https://github.com/LeafYeeXYZ/PsychPen/commit/df92c32539de1955137ea75549544a5ca5274f6b))
+
+
+### Bug Fixes
+
+* 修复计算变量时缺失值未正常处理的问题 ([f4365e7](https://github.com/LeafYeeXYZ/PsychPen/commit/f4365e76e4f8d0798ed5082ac89aca8955f3690b))
+* wrong imports ([346310e](https://github.com/LeafYeeXYZ/PsychPen/commit/346310ef16d5aea447ed03e533ecb94813596e57))
+
+
+### Refactoring
+
+* 把远程R函数的逻辑独立 ([4b4b904](https://github.com/LeafYeeXYZ/PsychPen/commit/4b4b904046d30366a6ec099e6cbe6d20de4ec9ab))
+* 将信度处理逻辑抽象到 PsychLib ([6f39d04](https://github.com/LeafYeeXYZ/PsychPen/commit/6f39d04c7c3476c1be0839568e5432b330ec2c9b))
+
+
+### Improvements
+
+* 减少变量视图通知的显示时间 ([df0f849](https://github.com/LeafYeeXYZ/PsychPen/commit/df0f8497dc68dee846f0ea5212176d9b2fd7a515))
+* 提高描述统计计算速度 ([d264137](https://github.com/LeafYeeXYZ/PsychPen/commit/d264137ba441bf0b5c3d016c202fd1d5881b718c))
+* 提高描述统计运算速度 ([0c843ec](https://github.com/LeafYeeXYZ/PsychPen/commit/0c843ecd2302c5b07793d8c6d791da27776b247f))
+* 优化变量值排序的实现 ([0954394](https://github.com/LeafYeeXYZ/PsychPen/commit/09543942f8fb9e58b87f4f92d03c7077f35b3ac1))
+* 优化调用 R 时的错误报告 ([0f19cc3](https://github.com/LeafYeeXYZ/PsychPen/commit/0f19cc39a0dd1d58923b8984a611471c07eeb74a))
+
 ## [1.7.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.6.0...v1.7.0) (2024-11-25)
 
 
