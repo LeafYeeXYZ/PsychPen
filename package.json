@@ -30,7 +30,7 @@
     "@psych/lib": "npm:@jsr/psych__lib",
     "@psych/sheet": "npm:@jsr/psych__sheet",
     "ag-grid-react": "^32.3.3",
-    "antd": "^5.22.5",
+    "antd": "^5.22.7",
     "bowser": "^2.11.0",
     "echarts": "^5.5.1",
     "echarts-gl": "^2.0.9",
@@ -47,20 +47,20 @@
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/bun": "^1.1.14",
-    "@types/react": "^19.0.1",
+    "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "babel-plugin-react-compiler": "^19.0.0-beta-df7b47d-20241124",
     "commit-and-tag-version": "^12.5.0",
     "eslint": "^9.17.0",
-    "eslint-plugin-react": "^7.37.2",
-    "globals": "^15.13.0",
+    "eslint-plugin-react": "^7.37.3",
+    "globals": "^15.14.0",
     "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.16",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.18.1",
-    "vite": "^6.0.3"
+    "typescript-eslint": "^8.18.2",
+    "vite": "^6.0.6"
   },
   "commit-and-tag-version": {
     "types": [
