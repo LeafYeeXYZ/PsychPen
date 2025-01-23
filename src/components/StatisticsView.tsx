@@ -196,7 +196,7 @@ export function StatisticsView() {
             onChange={(value) => CASCADER_ONCHANGE(value, setPage)}
             expandTrigger='hover'
             allowClear={false}
-            className='w-max'
+            className='min-w-max'
           />
         </div>
         {/* 统计界面 */}

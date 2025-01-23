@@ -492,7 +492,7 @@ export function BasicBarPlot() {
                 noStyle
                 name='maxY'
               >
-                <InputNumber className='w-full' placeholder='默认为误差棒最高点' />
+                <InputNumber className='w-full' addonBefore='Y轴最大为' placeholder='默认自动' />
               </Form.Item>
             </Space.Compact>
           </Form.Item>

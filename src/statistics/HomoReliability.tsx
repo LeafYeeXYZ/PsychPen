@@ -135,6 +135,8 @@ export function HomoReliability() {
             name='manualNFactors'
           >
             <InputNumber
+              addonBefore='提取'
+              addonAfter='个因子'
               placeholder='留空则自动计算'
               className='w-full'
               min={1}

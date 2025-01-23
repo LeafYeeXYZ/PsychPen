@@ -158,6 +158,7 @@ export function PeerSampleTTest() {
                 rules={[{ required: true, message: '请输入显著性水平' }]}
               >
                 <InputNumber
+                  addonBefore='α ='
                   className='w-full'
                   placeholder='请输入显著性水平'
                   min={0}

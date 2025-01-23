@@ -329,7 +329,8 @@ export function GroupedBarPlot() {
               >
                 <InputNumber 
                   className='w-full' 
-                  placeholder='最大值' 
+                  addonBefore='最大值' 
+                  placeholder='默认自动设置'
                 />
               </Form.Item>
               <Form.Item
@@ -338,7 +339,8 @@ export function GroupedBarPlot() {
               >
                 <InputNumber 
                   className='w-full' 
-                  placeholder='最小值' 
+                  addonBefore='最小值'
+                  placeholder='默认自动设置'
                 />
               </Form.Item>
             </Space.Compact>

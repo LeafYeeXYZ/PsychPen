@@ -29,7 +29,7 @@ export function VariableTable() {
   }
 
   return (
-    <div className='w-full h-full grid grid-rows-[1fr,35%] gap-4'>
+    <div className='w-full h-full grid grid-rows-[1fr_35%] gap-4'>
       <AgGridReact
         className='ag-theme-quartz-auto-dark w-full h-full overflow-auto'
         rowData={dataCols

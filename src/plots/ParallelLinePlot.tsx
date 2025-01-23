@@ -125,7 +125,7 @@ export function ParallelLinePlot() {
                 name='lineWidth'
                 noStyle
               >
-                <InputNumber className='w-full' min={1} max={10} step={1} />
+                <InputNumber className='w-full' min={1} max={10} step={1} addonAfter='px' />
               </Form.Item>
               <Form.Item
                 name='lineColor'

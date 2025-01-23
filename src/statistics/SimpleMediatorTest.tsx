@@ -163,7 +163,7 @@ export function SimpleMediatorTest() {
             name='B'
             rules={[{ required: true, message: '请输入 Bootstrap 抽样次数' }]}
           >
-            <InputNumber className='w-full' min={100} max={100000} step={100} />
+            <InputNumber className='w-full' min={100} max={100000} step={100} addonBefore='重复抽样' addonAfter='次' placeholder='请输入' />
           </Form.Item>
           <Form.Item>
             <Button

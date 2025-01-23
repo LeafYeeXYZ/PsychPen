@@ -83,7 +83,7 @@ export function DataFilter() {
           name='value'
           rules={[{ required: true, message: '请输入参考值' }]}
         >
-          <InputNumber className='w-full' />
+          <InputNumber className='w-full' addonBefore={`只保留${method}`} addonAfter='的数据' />
         </Form.Item>
       )
     } else if (method === '区间') {
@@ -105,7 +105,7 @@ export function DataFilter() {
                 }),
               ]}
             >
-              <InputNumber placeholder='下限' className='w-full' />
+              <InputNumber placeholder='请输入' className='w-full' addonBefore='下限为' />
             </Form.Item>
             <Form.Item 
               noStyle
@@ -122,7 +122,7 @@ export function DataFilter() {
                 }),
               ]}
             >
-              <InputNumber placeholder='上限' className='w-full' />
+              <InputNumber placeholder='请输入' className='w-full' addonBefore='上限为' />
             </Form.Item>
           </Space.Compact>
         </Form.Item>

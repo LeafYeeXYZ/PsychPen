@@ -389,6 +389,7 @@ export function ThreeDBarPlot() {
                 rules={[{ required: true, message: '请选择柱状图透明度' }]}
               >
                 <InputNumber
+                  addonBefore='透明度'
                   className='w-full'
                   min={0}
                   max={1}

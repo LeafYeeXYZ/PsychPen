@@ -129,7 +129,9 @@ export function SubVariables() {
                 >
                   <InputNumber
                     className='w-full'
-                    placeholder='请输入离散化分组数'
+                    addonAfter='组'
+                    addonBefore='离散为'
+                    placeholder='请输入'
                     min={2}
                     step={1}
                   />

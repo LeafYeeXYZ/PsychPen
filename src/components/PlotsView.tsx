@@ -151,6 +151,7 @@ export function PlotsView() {
             onChange={(value) => CASCADER_ONCHANGE(value, setPage)}
             expandTrigger='hover'
             allowClear={false}
+            className='min-w-max'
           />
         </div>
         {/* 画图界面 */}
