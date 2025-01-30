@@ -14,6 +14,7 @@ import { KurtosisSkewness } from '../statistics/KurtosisSkewness'
 import { SimpleMediatorTest } from '../statistics/SimpleMediatorTest'
 import { WelchTTest } from '../statistics/WelchTTest'
 import { OneWayANOVA } from '../statistics/OneWayANOVA'
+import { PeerANOVA } from '../statistics/PeerANOVA'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -57,6 +58,10 @@ const CASCADER_OPTIONS: Option[] = [
       {
         value: 'OneWayANOVA',
         label: '单因素方差分析',
+      },
+      {
+        value: 'PeerANOVA',
+        label: '重复测量方差分析',
       },
     ],
   },
@@ -127,6 +132,9 @@ const CASCADER_OPTIONS: Option[] = [
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
+    case 'PeerANOVA':
+      set(<PeerANOVA />)
+      break
     case 'OneWayANOVA':
       set(<OneWayANOVA />)
       break

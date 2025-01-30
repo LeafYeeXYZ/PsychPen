@@ -3,14 +3,12 @@ import { Select, Button, Form } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { markP, markS } from '../lib/utils'
-import { OneWayAnova, std } from '@psych/lib'
+import { PeerAnova, std } from '@psych/lib'
 import type { ScheffeResult, BonferroniResult, TukeyResult } from '@psych/lib'
 
 type Option = {
-  /** 因变量 */
-  value: string
-  /** 分组变量 */
-  group: string
+  /** 变量 */
+  value: string[]
   /** 事后检验方法 */
   method: ('Scheffe' | 'Bonferroni' | 'Tukey')[]
 }
@@ -20,13 +18,13 @@ const METHODS = {
   Tukey: 'Tukey\'s HSD 事后检验',
 }
 type Result = {
-  m: OneWayAnova
+  m: PeerAnova
   scheffe?: ScheffeResult[]
   bonferroni?: BonferroniResult[]
   tukey?: TukeyResult[]
 } & Option
 
-export function OneWayANOVA() {
+export function PeerANOVA() {
 
   const { dataCols, dataRows, messageApi } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
@@ -35,16 +33,12 @@ export function OneWayANOVA() {
     try {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
-      const { value, group, method } = values
-      const filteredRows = dataRows.filter((row) => typeof row[value] !== 'undefined' && !isNaN(Number(row[value])) && typeof row[group] !== 'undefined')
-      const valueData = filteredRows.map((row) => Number(row[value]))
-      const groupData = filteredRows.map((row) => String(row[group]))
-      const m = new OneWayAnova(valueData, groupData)
+      const { value, method } = values
+      const filteredRows = dataRows.filter((row) => value.every((v) => typeof row[v] !== 'undefined' && !isNaN(Number(row[v]))))
+      const valueData = value.map((v) => filteredRows.map((row) => Number(row[v])))
+      const m = new PeerAnova(valueData, value)
       const scheffe = method && method.includes('Scheffe') ? m.scheffe() : undefined
       const bonferroni = method && method.includes('Bonferroni') ? m.bonferroni() : undefined
-      if (method && method.includes('Tukey') && m.groupsCount.some((count) => count !== m.groupsCount[0])) {
-        throw new Error('Tukey\'s HSD 要求每组样本量相等, 请移除此检验后重试')
-      }
       const tukey = method && method.includes('Tukey') ? m.tukey() : undefined
       setResult({ ...values, m, scheffe, bonferroni, tukey })
       messageApi?.destroy()
@@ -72,45 +66,18 @@ export function OneWayANOVA() {
           disabled={disabled}
         >
           <Form.Item
-            label='因变量'
+            label='配对变量'
             name='value'
             rules={[
-              { required: true, message: '请选择因变量' },
-              ({ getFieldValue }) => ({
-                validator: (_, value) => {
-                  if (value === getFieldValue('group')) {
-                    return Promise.reject('因变量和分组变量不能相同')
-                  }
-                  return Promise.resolve()
-                },
-              }),
+              { required: true, message: '请选择配对变量' },
+              { type: 'array', min: 2, message: '请选择至少两个配对变量' },
             ]}
           >
             <Select
               className='w-full'
               placeholder='请选择因变量'
+              mode='multiple'
               options={dataCols.filter((col) => col.type === '等距或等比数据').map((col) => ({ value: col.name, label: col.name }))}
-            />
-          </Form.Item>
-          <Form.Item
-            label='分组变量'
-            name='group'
-            rules={[
-              { required: true, message: '请选择分组变量' },
-              ({ getFieldValue }) => ({
-                validator: (_, value) => {
-                  if (value === getFieldValue('value')) {
-                    return Promise.reject('因变量和分组变量不能相同')
-                  }
-                  return Promise.resolve()
-                },
-              }),
-            ]}
-          >
-            <Select
-              className='w-full'
-              placeholder='请选择分组变量'
-              options={dataCols.map((col) => ({ value: col.name, label: `${col.name} (水平数: ${col.unique})` }))}
             />
           </Form.Item>
           <Form.Item
@@ -133,8 +100,13 @@ export function OneWayANOVA() {
               计算
             </Button>
           </Form.Item>
+          <p className='w-full text-center text-xs text-gray-400 mt-5'>
+            注: Cohen's d 和事后检验均使用 MS<sub>error</sub> 代替 MS<sub>within</sub>
+          </p>
+          <p className='w-full text-center text-xs text-gray-400 mt-1'>
+            对于重复测量方差分析, 事后检验推荐使用 Bonferroni 方法
+          </p>
         </Form>
-
       </div>
 
       <div className='component-result'>
@@ -142,17 +114,18 @@ export function OneWayANOVA() {
         {result ? (
           <div className='w-full h-full overflow-auto'>
 
-            <p className='text-lg mb-2 text-center w-full'>单因素方差分析</p>
+            <p className='text-lg mb-2 text-center w-full'>重复测量方差分析</p>
             <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 各组均值相等</p>
             <table className='three-line-table'>
               <thead>
                 <tr>
                   <td>样本量</td>
                   <td>水平数</td>
-                  <td>自由度 (组间/组内)</td>
+                  <td>自由度 (组间/误差)</td>
                   <td>F</td>
                   <td>p</td>
                   <td>η²</td>
+                  <td>η²<sub>p</sub></td>
                   <td>Conhen's f</td>
                 </tr>
               </thead>
@@ -160,15 +133,16 @@ export function OneWayANOVA() {
                 <tr>
                   <td>{result.m.dfT + 1}</td>
                   <td>{result.m.dfB + 1}</td>
-                  <td>{result.m.dfB} / {result.m.dfW}</td>
+                  <td>{result.m.dfB} / {result.m.dfError}</td>
                   <td>{markS(result.m.f, result.m.p)}</td>
                   <td>{markP(result.m.p)}</td>
                   <td>{result.m.r2.toFixed(3)}</td>
+                  <td>{result.m.r2adj.toFixed(3)}</td>
                   <td>{result.m.cohenF.toFixed(3)}</td>
                 </tr>
               </tbody>
             </table>
-            <p className='text-xs mt-3 text-center w-full'>因变量: {result.value} | 分组变量: {result.group}</p>
+            <p className='text-xs mt-3 text-center w-full'>配对变量: {result.m.groups.join(', ')}</p>
 
             <p className='text-lg mb-2 text-center w-full mt-8'>分析细节</p>
             <table className='three-line-table'>
@@ -199,6 +173,18 @@ export function OneWayANOVA() {
                   <td>{result.m.SSw.toFixed(3)}</td>
                   <td>{result.m.MSw.toFixed(3)}</td>
                 </tr>
+                <tr>
+                  <td>被试间 (Subj)</td>
+                  <td>{result.m.dfSubj}</td>
+                  <td>{result.m.SSsubj.toFixed(3)}</td>
+                  <td>{result.m.MSsubj.toFixed(3)}</td>
+                </tr>
+                <tr>
+                  <td>误差 (Error)</td>
+                  <td>{result.m.dfError}</td>
+                  <td>{result.m.SSerror.toFixed(3)}</td>
+                  <td>{result.m.MSerror.toFixed(3)}</td>
+                </tr>
               </tbody>
             </table>
             
@@ -217,7 +203,7 @@ export function OneWayANOVA() {
                 {result.m.groups.map((group, index) => (
                   <tr key={group}>
                     <td>{group}</td>
-                    <td>{result.m.groupsCount[index]}</td>
+                    <td>{result.m.n}</td>
                     <td>{result.m.groupsMean[index].toFixed(3)}</td>
                     <td>{std(result.m.values[index], true, result.m.groupsMean[index]).toFixed(3)}</td>
                     <td>{result.m.groupsSum[index].toFixed(3)}</td>
@@ -273,7 +259,7 @@ export function OneWayANOVA() {
                     ))}
                   </tbody>
                 </table>
-                <p className='text-xs mt-3 text-center w-full'>分组变量: {result.group}</p>
+                <p className='text-xs mt-3 text-center w-full'>配对变量: {result.m.groups.join(', ')}</p>
               </>
             )}
 
@@ -304,7 +290,8 @@ export function OneWayANOVA() {
                     ))}
                   </tbody>
                 </table>
-                <p className='text-xs mt-3 text-center w-full'>分组变量: {result.group} | 使用 MS<sub>within</sub> 代替 S<sub>p</sub><sup>2</sup> (检验更严格)</p>
+                <p className='text-xs mt-3 text-center w-full'>配对变量: {result.m.groups.join(', ')}</p>
+                <p className='text-xs mt-2 text-center w-full'>使用 MS<sub>error</sub> 代替 MS<sub>within</sub> 和 S<sub>p</sub><sup>2</sup> (检验更严格)</p>
                 <p className='text-xs mt-2 text-center w-full'>临界显著性水平应为: <span className='text-red-500'>{result.bonferroni[0].sig.toFixed(4)}</span> (即 0.05 除以成对比较次数)</p>
               </>
             )}
@@ -335,7 +322,7 @@ export function OneWayANOVA() {
                     ))}
                   </tbody>
                 </table>
-                <p className='text-xs mt-3 text-center w-full'>分组变量: {result.group}</p>
+                <p className='text-xs mt-3 text-center w-full'>配对变量: {result.m.groups.join(', ')}</p>
               </>
             )}
 
