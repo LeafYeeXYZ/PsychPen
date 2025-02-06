@@ -1,5 +1,6 @@
 // 注意: 本组件及其子组件不应当使用除 isDarkMode 之外的全局状态
 import { NormalDistribution } from '../tools/NormalDistribution'
+import { TDistribution } from '../tools/TDistribution'
 import { StatisticToPvalue } from '../tools/StatisticToPvalue'
 import { Cascader } from 'antd'
 import { useState } from 'react'
@@ -16,12 +17,19 @@ const CASCADER_OPTIONS: Option[] = [
     label: '正态分布动态演示',
   },
   {
+    value: 'TDistribution',
+    label: 'T分布动态演示',
+  },
+  {
     value: 'StatisticToPvalue',
     label: '统计量与P值相互转换',
   },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[0]) {
+    case 'TDistribution':
+      set(<TDistribution />)
+      break
     case 'NormalDistribution':
       set(<NormalDistribution />)
       break

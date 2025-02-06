@@ -1,5 +1,5 @@
 import { Button, InputNumber, Tag, Space } from 'antd'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { DeleteOutlined, PauseOutlined, PlaySquareOutlined } from '@ant-design/icons'
 import { mean as m, std as s, randomNormal } from '@psych/lib'
 import * as echarts from 'echarts'
@@ -7,6 +7,7 @@ import { useZustand } from '../lib/useZustand'
 
 const DEFAULT_MEAN = 0
 const DEFAULT_STD = 2
+const DEFAULT_DF = 30
 const ANIMATE_INTERVAL = 500
 
 function generateDate(
@@ -15,27 +16,39 @@ function generateDate(
   count: number[], 
   label: number[] 
 } {
+  const lag = 0.1
   const count: number[] = []
-  const label = [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  const label = new Array(21).fill(0).map((_, i) => (i - 10) * 2 * lag)
   label.map((value) => {
-    const min = value - 0.5
-    const max = value + 0.5
+    const min = value - lag
+    const max = value + lag
     count.push(data.filter((item) => item >= min && item < max).length)
   })
   return { count, label }
 }
 
-export function NormalDistribution() {
+export function TDistribution() {
 
   const { isDarkMode } = useZustand()
   // 基础数据
   const [mean, setMean] = useState<number>(DEFAULT_MEAN)
   const [std, setStd] = useState<number>(DEFAULT_STD)
-  const [data, setData] = useState<number[]>([])
+  const [df, setDf] = useState<number>(DEFAULT_DF)
+  const n = useMemo(() => df + 1, [df])
+
+  const [data, setData] = useState<{ mean: number, std: number, sem: number, t: number }[]>([])
   const generate = (times: number = 1) => {
-    const result: number[] = []
+    const result: { mean: number, std: number, sem: number, t: number }[] = []
     for (let i = 0; i < times; i++) {
-      result.push(randomNormal(mean, std))
+      const raw: number[] = []
+      for (let j = 0; j < n; j++) {
+        raw.push(randomNormal(mean, std))
+      }
+      const _mean = m(raw)
+      const _std = s(raw)
+      const _sem = std / Math.sqrt(n)
+      const _t = (_mean - mean) / _sem
+      result.push({ mean: _mean, std: _std, sem: _sem, t: _t })
     }
     setData(draft => [...draft, ...result])
   }
@@ -56,9 +69,9 @@ export function NormalDistribution() {
   useEffect(() => {
     const ele = document.getElementById('echart-sample-distribution')!
     const chart = echarts.init(ele)
-    const { count, label } = generateDate(data)
+    const { count, label } = generateDate(data.map((item) => item.mean))
     const option = {
-      xAxis: { type: 'category', data: label, axisTick: { alignWithLabel: true } },
+      xAxis: { type: 'category', data: label.map(v => v.toFixed(1)), axisTick: { alignWithLabel: true } },
       yAxis: { type: 'value' },
       series: [{ 
         data: count,
@@ -93,8 +106,8 @@ export function NormalDistribution() {
   return (
     <div className='w-full h-full flex flex-col justify-center items-center overflow-hidden p-4'>
       
-      <div className='w-full max-w-[70rem] h-[calc(100%-6rem)] flex justify-center items-center'>
-        <div className='w-52 h-full flex flex-col justify-center items-center'>
+      <div className='w-full max-w-[71rem] h-[calc(100%-6rem)] flex justify-center items-center'>
+        <div className='w-56 h-full flex flex-col justify-center items-center'>
           <table className='three-line-table'>
             <thead>
               <tr>
@@ -104,16 +117,28 @@ export function NormalDistribution() {
             </thead>
             <tbody>
               <tr>
-                <td>样本量</td>
-                <td>{data.length}</td>
+                <td><Tag color='pink'>样本均值</Tag>的均值</td>
+                <td>{data.length ? m(data.map(v => v.mean)).toFixed(3) : ''}</td>
               </tr>
               <tr>
-                <td><Tag color='pink'>样本</Tag>均值</td>
-                <td>{data.length ? m(data).toFixed(3) : ''}</td>
+                <td><Tag color='pink'>样本均值</Tag>标准差</td>
+                <td>{data.length ? s(data.map(v => v.mean)).toFixed(3) : ''}</td>
               </tr>
               <tr>
-                <td><Tag color='pink'>样本</Tag>标准差</td>
-                <td>{data.length ? s(data).toFixed(3) : ''}</td>
+                <td><Tag color='pink'>估计标准误</Tag>均值</td>
+                <td>{data.length ? m(data.map(v => v.sem)).toFixed(3) : ''}</td>
+              </tr>
+              <tr>
+                <td><Tag color='blue'>单个样本</Tag>样本量</td>
+                <td>{n}</td>
+              </tr>
+              <tr>
+                <td><Tag color='blue'>T分布</Tag>的自由度</td>
+                <td>{df}</td>
+              </tr>
+              <tr>
+                <td><Tag color='blue'>真实标准误</Tag></td>
+                <td>{(std / Math.sqrt(n)).toFixed(3)}</td>
               </tr>
               <tr>
                 <td><Tag color='blue'>总体</Tag>均值</td>
@@ -126,7 +151,7 @@ export function NormalDistribution() {
             </tbody>
           </table>
           <p className='text-sm mt-4 mb-1'>右图中 <Tag>X</Tag>轴刻度指区间</p>
-          <p className='text-sm'>如 <Tag>0</Tag>指 <Tag>[-0.5,0.5)</Tag></p>
+          <p className='text-sm'>如 <Tag>0</Tag>指均值在 <Tag>[-0.5,0.5)</Tag>之间</p>
         </div>
         <div className='w-[calc(100%-13rem)] h-full flex flex-col justify-center items-center gap-4 overflow-auto'>
           <div id='echart-sample-distribution' className='w-full h-full'></div>
@@ -160,6 +185,21 @@ export function NormalDistribution() {
           }}
           addonBefore={<span>总体标准差 <Tag color='blue' style={{ marginRight: '0' }}>σ</Tag></span>}
           className='w-52'
+        />
+        <InputNumber
+          defaultValue={DEFAULT_DF}
+          min={1}
+          step={1}
+          onChange={(value) => {
+            if (timer.current) {
+              clearInterval(timer.current)
+              timer.current = null
+            }
+            setDf(typeof value === 'number' ? value : 1)
+            setData([])
+          }}
+          addonBefore={<span>自由度 <Tag color='blue' style={{ marginRight: '0' }}>df</Tag></span>}
+          className='w-44'
         />
         <Button 
           onClick={() => {
