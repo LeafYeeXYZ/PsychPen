@@ -1,4 +1,4 @@
-import { Button, InputNumber, Tag, Space, Input } from 'antd'
+import { Button, InputNumber, Tag, Space } from 'antd'
 import { useState, useRef, useEffect } from 'react'
 import { DeleteOutlined, PauseOutlined, PlaySquareOutlined } from '@ant-design/icons'
 import { mean as m, std as s, randomNormal } from '@psych/lib'
@@ -176,7 +176,7 @@ export function NormalDistribution() {
       </div>
       <div className='w-full h-8 flex justify-center items-center gap-4 overflow-auto'>
         <Space.Compact>
-          <Input addonBefore='手动抽样' className='w-[4.7rem] overflow-hidden' />
+          <div className='w-[4.7rem] border rounded-l-md border-r-0 border-gray-300 flex items-center justify-center text-sm bg-gray-50 dark:bg-gray-900 dark:border-gray-700'>手动抽样</div>
           <Button onClick={() => generate(1)}><Tag className='mx-0' color='pink'>1</Tag> 次</Button>
           <Button onClick={() => generate(10)}><Tag className='mx-0' color='pink'>10</Tag> 次</Button>
           <Button onClick={() => generate(100)}><Tag className='mx-0' color='pink'>100</Tag> 次</Button>
