@@ -45,8 +45,8 @@ export function TDistribution() {
         raw.push(randomNormal(mean, std))
       }
       const _mean = m(raw)
-      const _std = s(raw)
-      const _sem = std / Math.sqrt(n)
+      const _std = s(raw, true, _mean)
+      const _sem = _std / Math.sqrt(n)
       const _t = (_mean - mean) / _sem
       result.push({ mean: _mean, std: _std, sem: _sem, t: _t })
     }
