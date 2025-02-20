@@ -22,8 +22,8 @@
     "build": "vite build",
     "lint": "eslint src/",
     "preview": "vite preview",
-    "release": "commit-and-tag-version",
-    "dep": "git push --follow-tags origin main"
+    "release:create": "commit-and-tag-version",
+    "release:push": "git push --follow-tags origin main"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.0",
