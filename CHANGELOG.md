@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.9.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.8.0...v1.9.0) (2025-02-20)
+
+
+### Features
+
+* 新增Q-Q图绘制功能 ([d2a1291](https://github.com/LeafYeeXYZ/PsychPen/commit/d2a12911878829a6e48c71f01648ec0d87ddc26a))
+* 新增T分布动态演示 ([9792be5](https://github.com/LeafYeeXYZ/PsychPen/commit/9792be551d50d643aef8e67df5c247fbc721f0b4))
+* 重复测量方差分析 ([8bef209](https://github.com/LeafYeeXYZ/PsychPen/commit/8bef209ea5aef817ea4ab18836e8752dedadb331))
+
+
+### Bug Fixes
+
+* 修复正态分布演示的样式错误 ([c2d296a](https://github.com/LeafYeeXYZ/PsychPen/commit/c2d296a9144c07a45bf45402c90cc9286a48a71f))
+
+
+### Improvements
+
+* 提高T分布演示抽样计算速度 ([a10582f](https://github.com/LeafYeeXYZ/PsychPen/commit/a10582f2c5544d24fffdbedbaa4357c693266a94))
+
 ## [1.8.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.7.0...v1.8.0) (2024-12-23)
 
 
