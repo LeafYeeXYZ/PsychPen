@@ -8,6 +8,7 @@ import { ParallelLinePlot } from '../plots/ParallelLinePlot'
 import { BasicPiePlot } from '../plots/BasicPiePlot'
 import { BasicBarPlot } from '../plots/BasicBarPlot'
 import { GroupedBarPlot } from '../plots/GroupedBarPlot'
+import { QQPlot } from '../plots/QQPlot'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
@@ -92,11 +93,18 @@ const CASCADER_OPTIONS: Option[] = [
         value: 'WordCloudPlot',
         label: '词云图',
       },
+      {
+        value: 'QQPlot',
+        label: 'Q-Q图',
+      },
     ],
   },
 ]
 const CASCADER_ONCHANGE = (value: string[], set: (page: React.ReactElement) => void) => {
   switch (value[1]) {
+    case 'QQPlot':
+      set(<QQPlot />)
+      break
     case 'GroupedBarPlot':
       set(<GroupedBarPlot />)
       break
