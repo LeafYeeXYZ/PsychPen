@@ -124,7 +124,7 @@ export function App() {
               工具
             </Button>
           </nav>
-          <p className='absolute left-4 text-sm'>
+          <p className='absolute left-4 text-sm text-rose-950 dark:text-white'>
             <a href='https://github.com/LeafYeeXYZ/PsychPen' target='_blank' rel='noreferrer' className='hover:underline'>
               <BarChartOutlined /> PsychPen v{version}
             </a>
@@ -147,6 +147,7 @@ export function App() {
         open={showAI}
         onClose={() => setShowAI(false)}
         closable={false}
+        width={480}
       >
         <AI />
       </Drawer>

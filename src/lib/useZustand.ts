@@ -3,7 +3,6 @@
  */
 
 import { create } from 'zustand'
-import { Variable } from './types'
 import type { MessageInstance } from 'antd/es/message/interface'
 import { Derive } from './calculates/derive'
 import { Missing } from './calculates/misssing'

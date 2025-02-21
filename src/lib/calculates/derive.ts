@@ -2,7 +2,6 @@
  * @file 处理派生变量, 包括标准化, 中心化, 离散化
  */
 
-import type { Variable, AllowedDiscreteMethods } from '../types'
 import { max, min } from '@psych/lib'
 import { kmeans } from 'ml-kmeans'
 

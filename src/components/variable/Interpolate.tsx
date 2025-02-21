@@ -1,7 +1,6 @@
 import { useZustand } from '../../lib/useZustand'
 import { Button, Select, Form } from 'antd'
 import { flushSync } from 'react-dom'
-import type { AllowedInterpolationMethods } from '../../lib/types'
 
 type Option = {
   /** 变量名 */

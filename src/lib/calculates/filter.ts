@@ -2,7 +2,6 @@
  * @file 处理数据过滤
  */
 
-import type { Variable } from '../types'
 import { mean, median } from '@psych/lib'
 
 /** 缺失值替换和插值 */

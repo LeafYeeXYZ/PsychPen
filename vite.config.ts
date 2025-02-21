@@ -18,7 +18,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'antd': ['antd'],
+          'antd': ['antd', '@ant-design/x'],
           'data': ['@psych/sheet'],
           'chart-a': ['echarts'],
           'chart-b': ['echarts-gl'],
@@ -27,7 +27,7 @@ export default defineConfig({
             'html2canvas', '@ant-design/icons', 'bowser',
             'echarts-wordcloud', 'echarts-stat',
             '@psych/lib', 'ml-kmeans', 'jieba-wasm',
-            'openai',
+            'openai', '@leaf/parse-think', 'markdown-it',
           ],
         }
       }

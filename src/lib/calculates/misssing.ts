@@ -2,7 +2,6 @@
  * @file 处理缺失值替换和插值
  */
 
-import type { Variable, AllowedInterpolationMethods } from '../types'
 import { mean, median } from '@psych/lib'
 
 /** 缺失值替换和插值 */

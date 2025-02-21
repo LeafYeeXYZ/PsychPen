@@ -3,7 +3,6 @@ import { Button, Select, Form, Input, InputNumber, Space, Popconfirm } from 'ant
 import type { FormInstance } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import type { AllowedFilterMethods } from '../../lib/types'
 
 type Option = {
   /** 变量名 */

@@ -1,11 +1,7 @@
-/**
- * @file 全局自定义类型定义
- */
-
-export type AllowedFilterMethods = '等于' | '不等于' | '大于' | '大于等于' | '小于' | '小于等于' | '区间' | '正则表达式' | '高于平均值' | '低于平均值' | '高于中位数' | '低于中位数'
-export type AllowedInterpolationMethods = '均值插值' | '中位数插值' | '最临近点插值法' | '拉格朗日插值法'
-export type AllowedDiscreteMethods = '等频' | '等宽' | '聚类分析'
-export type Variable = {
+declare type AllowedFilterMethods = '等于' | '不等于' | '大于' | '大于等于' | '小于' | '小于等于' | '区间' | '正则表达式' | '高于平均值' | '低于平均值' | '高于中位数' | '低于中位数'
+declare type AllowedInterpolationMethods = '均值插值' | '中位数插值' | '最临近点插值法' | '拉格朗日插值法'
+declare type AllowedDiscreteMethods = '等频' | '等宽' | '聚类分析'
+declare type Variable = {
   /** 变量名 */
   name: string
   /** 数据类型 */

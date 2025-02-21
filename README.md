@@ -125,7 +125,9 @@ PsychPen 是一个用于心理学/教育学专业的统计检验分析和图表�
 
 PsychPen 创新性地引入了 AI 辅助分析功能, 可以让 AI 助手基于你的数据和你的需求, 针对性地给出建议, 甚至直接替你操作 PsychPen 完成统计分析和图表绘制. PsychPen 支持所有实现了 [function calling](https://platform.openai.com/docs/guides/function-calling) 并兼容 OpenAI API 规范的大语言模型 (如 [DeepSeek](https://platform.deepseek.com/)), 你只需根据你所用的 AI 模型的使用文档, 在右上角的 `AI辅助分析设置` 中开启 `AI辅助分析` 功能, 并输入 `baseUrl`、`apiKey`、`modelId` 等参数, 即可点击页面右上角的 `Ask AI` 按钮, 与 AI 助手进行交互
 
-![](readme/data-7.png)
+| 设置 | 交互 |
+| :---: | :---: |
+| ![](readme/data-7.png) | ![](readme/data-8.png) |
 
 ## 3 变量视图
 
@@ -542,19 +544,20 @@ T分布是假设检验中最常见的分布之一. 在T分布可视化演示工�
 - `src/` 源码目录
   - `App.tsx` 根组件
   - `tailwind.css` 全局样式文件
+  - `types.d.ts` 类型定义
   - `lib/` 业务逻辑目录
-    - `calculates` 变量处理流程目录
-    - `types.ts` 类型定义
+    - `calculates/` 变量处理流程目录
+    - `assistant/` AI辅助分析相关目录
     - `utils.ts` 工具函数
     - `useZustand.ts` 全局状态管理
     - `useRemoteR.ts` R语言服务端接口
     - `useAssistant.ts` AI辅助分析接口
   - `components/` 组件目录
-    - `data` 数据视图组件
-    - `plots` 绘图视图组件
-    - `statistics` 统计视图组件
-    - `tools` 工具视图组件
-    - `variable` 变量视图组件
+    - `data/` 数据视图组件
+    - `plots/` 绘图视图组件
+    - `statistics/` 统计视图组件
+    - `tools/` 工具视图组件
+    - `variable/` 变量视图组件
 
 ## 2 开发说明
 

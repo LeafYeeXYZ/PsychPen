@@ -27,6 +27,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
+    "@ant-design/x": "^1.0.5",
+    "@leaf/parse-think": "npm:@jsr/leaf__parse-think",
     "@psych/lib": "npm:@jsr/psych__lib",
     "@psych/sheet": "npm:@jsr/psych__sheet",
     "@tailwindcss/vite": "^4.0.7",
@@ -40,6 +42,7 @@
     "eslint-plugin-react-compiler": "^19.0.0-beta-e552027-20250112",
     "html2canvas": "^1.4.1",
     "jieba-wasm": "^2.2.0",
+    "markdown-it": "^14.1.0",
     "ml-kmeans": "^6.0.0",
     "openai": "^4.85.3",
     "react": "^19.0.0",
