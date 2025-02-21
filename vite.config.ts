@@ -27,6 +27,7 @@ export default defineConfig({
             'html2canvas', '@ant-design/icons', 'bowser',
             'echarts-wordcloud', 'echarts-stat',
             '@psych/lib', 'ml-kmeans', 'jieba-wasm',
+            'openai',
           ],
         }
       }

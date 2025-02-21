@@ -1,13 +1,14 @@
 import { useZustand } from '../../lib/useZustand'
 import { useRemoteR } from '../../lib/useRemoteR'
-import { Button, Tag, Popconfirm, Modal, Input, Select, Popover, Segmented } from 'antd'
-import { DeleteOutlined, SaveOutlined, SettingOutlined } from '@ant-design/icons'
-import { flushSync } from 'react-dom'
+import { useAssistant } from '../../lib/useAssistant'
 import { useRef } from 'react'
+import { flushSync } from 'react-dom'
+import { downloadSheet, ExportTypes } from '@psych/sheet'
+import { Button, Tag, Popconfirm, Modal, Input, Select, Popover, Segmented } from 'antd'
+import { DeleteOutlined, SaveOutlined, CloudServerOutlined, CommentOutlined, LoadingOutlined } from '@ant-design/icons'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
-import { downloadSheet, ExportTypes } from '@psych/sheet'
 
 /** 可导出的文件类型 */
 const EXPORT_FILE_TYPES = Object.values(ExportTypes)
@@ -19,6 +20,8 @@ export function PreviewData() {
   // 导出数据相关
   const handleExport = (filename: string, type: string) => { downloadSheet(dataRows, type as ExportTypes, filename) }
   const handleExportParams = useRef<{ filename?: string; type?: string }>({})
+  // 标注AI状态
+  const { ai } = useAssistant()
 
   return (
     <div className='flex flex-col justify-start items-center w-full h-full p-4'>
@@ -80,17 +83,28 @@ export function PreviewData() {
         >
           导出数据
         </Button>
-        <Popover
-          title='高级设置'
-          trigger={['click', 'hover']}
-          content={<ConfigR />}
+        <div
+          className='absolute right-0 flex justify-end items-center gap-3'
         >
-          <div className='absolute right-0'>
-            <Button icon={<SettingOutlined />}>
-              高级设置
+          <Popover
+            title={<span>AI辅助分析设置 {'['}当前状态: {ai ? '可用' : '不可用'}<LoadingOutlined className='mx-[0.15rem] scale-75' />{']'}</span>}
+            trigger={['click', 'hover']}
+            content={<ConfigAI />}
+          >
+            <Button icon={<CommentOutlined />}>
+              AI辅助分析设置
             </Button>
-          </div>
-        </Popover>
+          </Popover>
+          <Popover
+            title='R语言服务器设置'
+            trigger={['click', 'hover']}
+            content={<ConfigR />}
+          >
+            <Button icon={<CloudServerOutlined />}>
+              R语言服务器设置
+            </Button>
+          </Popover>
+        </div>
       </div>
       {/* 数据表格 */}
       <AgGridReact
@@ -109,20 +123,69 @@ export function PreviewData() {
   )
 }
 
-function ConfigR() {
-  const { _DataView_setRurl, _DataView_setRpassword, _DataView_setRenable, Rurl, Rpassword, Renable } = useRemoteR()
+function ConfigAI() {
+  const { _DataView_setOpenaiEndpoint, _DataView_setOpenaiApiKey, _DataView_setModel, _DataView_setOpenaiEnable, openaiEndpoint, openaiApiKey, model, openaiEnable } = useAssistant()
+  const enum Open {
+    TRUE = '开启AI辅助分析',
+    FALSE = '关闭AI辅助分析',
+  }
   return (
-    <div className='flex flex-col'>
-      <p className='w-full text-sm font-bold text-center px-2 mb-4'>
-        R语言服务器设置
-      </p>
+    <div className='flex flex-col w-96'>
       <div className='mb-4'>
         <Segmented
           block
           className='border dark:border-[#424242]'
-          defaultValue={Renable ? '开启' : '关闭'}
-          options={['开启', '关闭']}
-          onChange={(value) => _DataView_setRenable(value === '开启')}
+          defaultValue={openaiEnable ? Open.TRUE : Open.FALSE}
+          options={[Open.TRUE, Open.FALSE]}
+          onChange={(value) => _DataView_setOpenaiEnable(value === Open.TRUE)}
+        />
+      </div>
+      <div className='mb-4'>
+        <Input
+          placeholder='请输入OpenAI兼容API端点 (baseUrl)'
+          defaultValue={openaiEndpoint}
+          disabled={!openaiEnable}
+          onChange={(e) => _DataView_setOpenaiEndpoint(e.target.value ?? '')}
+        />
+      </div>
+      <div className='mb-4'>
+        <Input.Password
+          placeholder='请输入OpenAI兼容API密钥 (apiKey)'
+          defaultValue={openaiApiKey}
+          disabled={!openaiEnable}
+          onChange={(e) => _DataView_setOpenaiApiKey(e.target.value ?? '')}
+        />
+      </div>
+      <div className='mb-4'>
+        <Input
+          placeholder='请输入AI模型名称 (modelId)'
+          defaultValue={model}
+          disabled={!openaiEnable}
+          onChange={(e) => _DataView_setModel(e.target.value ?? '')}
+        />
+      </div>
+      <p className='w-full text-xs text-center px-2 mb-1'>如果启用AI辅助分析功能, 则在与AI交互时</p>
+      <p className='w-full text-xs text-center px-2 mb-1'>部分数据信息将上传至上面指定的AI服务</p>
+      <p className='w-full text-xs text-center px-2 mb-1'>如果使用的不是自部署AI服务, 请注意数据安全</p>
+    </div>
+  )
+}
+
+function ConfigR() {
+  const { _DataView_setRurl, _DataView_setRpassword, _DataView_setRenable, Rurl, Rpassword, Renable } = useRemoteR()
+  const enum Open {
+    TRUE = '开启R语言服务器',
+    FALSE = '关闭R语言服务器',
+  }
+  return (
+    <div className='flex flex-col w-96'>
+      <div className='mb-4'>
+        <Segmented
+          block
+          className='border dark:border-[#424242]'
+          defaultValue={Renable ? Open.TRUE : Open.FALSE}
+          options={[Open.TRUE, Open.FALSE]}
+          onChange={(value) => _DataView_setRenable(value === Open.TRUE)}
         />
       </div>
       <div className='mb-4'>
@@ -142,7 +205,7 @@ function ConfigR() {
         />
       </div>
       <p className='w-full text-xs text-center px-2 mb-1'>如果启用R语言服务器功能, 则在执行部分统计功能时</p>
-      <p className='w-full text-xs text-center px-2 mb-1'>将数据上传至上面填写的R语言服务器进行处理</p>
+      <p className='w-full text-xs text-center px-2 mb-1'>数据将上传至上面填写的R语言服务器进行处理</p>
       <p className='w-full text-xs text-center px-2 mb-1'>如果使用的不是官方或自部署服务器, 请注意数据安全</p>
     </div>
   )

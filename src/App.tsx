@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Button, ConfigProvider, type ThemeConfig, message, theme } from 'antd'
-import { LinkOutlined, BarChartOutlined } from '@ant-design/icons'
+import { Button, ConfigProvider, type ThemeConfig, message, theme, Drawer } from 'antd'
+import { BarChartOutlined, CommentOutlined } from '@ant-design/icons'
 import { DataView } from './components/DataView'
 import { PlotsView } from './components/PlotsView'
 import { StatisticsView } from './components/StatisticsView'
@@ -8,6 +8,9 @@ import { VariableView } from './components/VariableView'
 import { ToolsView } from './components/ToolsView'
 import { useZustand } from './lib/useZustand'
 import Bowser from 'bowser'
+import { version } from '../package.json'
+import { useAssistant } from './lib/useAssistant'
+import { AI } from './components/AI'
 
 const ANTD_THEME_LIGHT: ThemeConfig = {
   token: {
@@ -51,6 +54,9 @@ export function App() {
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', subIsDarkMode)
     return () => matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', subIsDarkMode)
   }, [_App_setIsDarkMode])
+  // AI助手
+  const { ai } = useAssistant()
+  const [showAI, setShowAI] = useState<boolean>(false)
 
   return (
     <ConfigProvider theme={isDarkMode ? ANTD_THEME_DARK : ANTD_THEME_LIGHT}>
@@ -118,20 +124,32 @@ export function App() {
               工具
             </Button>
           </nav>
-          <a 
-            href='https://github.com/LeafYeeXYZ/PsychPen' 
-            target='_blank' 
-            rel='noreferrer'
-            className='absolute right-4 text-sm hover:underline'
-          >
-            <LinkOutlined /> GitHub
-          </a>
           <p className='absolute left-4 text-sm'>
-            <BarChartOutlined /> PsychPen
+            <a href='https://github.com/LeafYeeXYZ/PsychPen' target='_blank' rel='noreferrer' className='hover:underline'>
+              <BarChartOutlined /> PsychPen v{version}
+            </a>
+          </p>
+          <p className='absolute right-2 text-sm'>
+            <Button
+              type='text'
+              icon={<CommentOutlined />}
+              disabled={(data === null) || disabled || (ai === null)}
+              onClick={() => setShowAI(true)}
+            >
+              Ask AI
+            </Button>
           </p>
         </header>
         {page}
       </main>
+      <Drawer
+        placement='right'
+        open={showAI}
+        onClose={() => setShowAI(false)}
+        closable={false}
+      >
+        <AI />
+      </Drawer>
       {contextHolder}
     </ConfigProvider>
   )

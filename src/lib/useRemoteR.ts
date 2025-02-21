@@ -1,8 +1,21 @@
-/**
- * @file R 服务相关状态
- */
-
 import { create } from 'zustand'
+
+type RemoteRState = {
+  /** 执行 R 代码 */
+  executeRCode: (codeWithOutPackages: string, packages: string[]) => Promise<unknown>
+  /** R 服务地址 */
+  Rurl: string
+  /** R 服务密码 */
+  Rpassword: string
+  /** 是否启用 R 服务 */
+  Renable: boolean
+  /** 设置是否启用 R 服务 */
+  _DataView_setRenable: (enable: boolean) => void
+  /** 设置 R 服务地址 */
+  _DataView_setRurl: (url: string) => void
+  /** 设置 R 服务密码 */
+  _DataView_setRpassword: (password: string) => void
+}
 
 export const useRemoteR = create<RemoteRState>()((set, get) => ({
   Renable: localStorage.getItem('Renable') === 'true',
@@ -54,20 +67,3 @@ export const useRemoteR = create<RemoteRState>()((set, get) => ({
     }
   }
 }))
-
-type RemoteRState = {
-  /** 执行 R 代码 */
-  executeRCode: (codeWithOutPackages: string, packages: string[]) => Promise<unknown>
-  /** R 服务地址 */
-  Rurl: string
-  /** R 服务密码 */
-  Rpassword: string
-  /** 是否启用 R 服务 */
-  Renable: boolean
-  /** 设置是否启用 R 服务 */
-  _DataView_setRenable: (enable: boolean) => void
-  /** 设置 R 服务地址 */
-  _DataView_setRurl: (url: string) => void
-  /** 设置 R 服务密码 */
-  _DataView_setRpassword: (password: string) => void
-}
