@@ -18,7 +18,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'antd': ['antd', '@ant-design/x'],
+          'antd': ['antd'],
           'data': ['@psych/sheet'],
           'chart-a': ['echarts'],
           'chart-b': ['echarts-gl'],
