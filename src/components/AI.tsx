@@ -13,12 +13,13 @@ import {
   ChatCompletionUserMessageParam,
   ChatCompletionToolMessageParam,
 } from 'openai/resources/index.mjs'
+import readme from '../../README.md?raw'
 
 const md = markdownit({ html: true, breaks: true })
 type Message = ChatCompletionAssistantMessageParam | ChatCompletionUserMessageParam | ChatCompletionToolMessageParam
 
 // TODO: 暂未处理 Function Calling
-// TODO: 全部写好之后更新一下使用文档的 data-8.png
+// TODO: 全部写好之后更新一下使用文档的 2.5
 // TODO: 可以在第一条消息里说明可以使用的功能
 
 export function AI() {
@@ -38,37 +39,39 @@ export function AI() {
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
 
+  const onSubmit = async () => {
+    const snapshot = input
+    try {
+      const user: ChatCompletionUserMessageParam = { role: 'user', content: snapshot }
+      flushSync(() => {
+        setLoading(true)
+        setMessages((prev) => [...prev, user])
+        setInput('')
+      })
+      const res = await ai.chat.completions.create({
+        model: model,
+        messages: [
+          { role: 'system', content: `你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档; 你需要根据上下文信息, 为用户提供帮助.\n\n# 变量信息\n\n${dataCols.map((col) => `- ${col.name}: ${col.type}, 有 ${col.valid} 个有效值、${col.missing} 个缺失值、${col.unique} 个唯一值.${col.type === '等距或等比数据' ? ` 均值为 ${col.mean}, 标准差为 ${col.std}, 中位数为 ${col.q2}, 最小值为 ${col.min}, 最大值为 ${col.max}.` : ''}`).join('\n') }\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\`` },
+          ...messages,
+        ],
+        stream: false,
+      })
+      const { content } = parseThink(res.choices[0].message)
+      const assistant: ChatCompletionAssistantMessageParam = { role: 'assistant', content }
+      setMessages((prev) => [...prev, assistant])
+    } catch (e) {
+      messageApi!.error(e instanceof Error ? e.message : String(e))
+      setInput(snapshot)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className='w-full h-full flex flex-col justify-between items-center'>
       <Messages messages={messages} loading={loading} />
       <Sender
-        onSubmit={async () => {
-          const snapshot = input
-          try {
-            const user: ChatCompletionUserMessageParam = { role: 'user', content: snapshot }
-            flushSync(() => {
-              setLoading(true)
-              setMessages((prev) => [...prev, user])
-              setInput('')
-            })
-            const res = await ai.chat.completions.create({
-              model: model,
-              messages: [
-                { role: 'system', content: `你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问和当前用户导入到软件中的数据集中的变量的信息; 你需要根据当前上下文的信息, 为用户提供帮助.\n\n# 变量信息\n\n${dataCols.map((col) => `- ${col.name}: ${col.type}, 有 ${col.valid} 个有效值、${col.missing} 个缺失值、${col.unique} 个唯一值.${col.type === '等距或等比数据' ? ` 均值为 ${col.mean}, 标准差为 ${col.std}, 中位数为 ${col.q2}, 最小值为 ${col.min}, 最大值为 ${col.max}.` : ''}`).join('\n') }` },
-                ...messages,
-              ],
-              stream: false,
-            })
-            const { content } = parseThink(res.choices[0].message)
-            const assistant: ChatCompletionAssistantMessageParam = { role: 'assistant', content }
-            setMessages((prev) => [...prev, assistant])
-          } catch (e) {
-            messageApi!.error(e instanceof Error ? e.message : String(e))
-            setInput(snapshot)
-          } finally {
-            setLoading(false)
-          }
-        }}
+        onSubmit={onSubmit}
         disabled={disabled}
         loading={loading}
         value={input}

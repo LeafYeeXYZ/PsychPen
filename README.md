@@ -11,6 +11,7 @@
     - [2.2 数据预览/导出/删除](#22-数据预览导出删除)
     - [2.3 R语言服务器设置](#23-r语言服务器设置)
     - [2.4 AI辅助分析设置](#24-ai辅助分析设置)
+    - [2.5 AI助手](#25-ai助手)
   - [3 变量视图](#3-变量视图)
     - [3.1 变量预览](#31-变量预览)
     - [3.2 定义变量缺失值](#32-定义变量缺失值)
@@ -125,9 +126,14 @@ PsychPen 是一个用于心理学/教育学专业的统计检验分析和图表�
 
 PsychPen 创新性地引入了 AI 辅助分析功能, 可以让 AI 助手基于你的数据和你的需求, 针对性地给出建议, 甚至直接替你操作 PsychPen 完成统计分析和图表绘制. PsychPen 支持所有实现了 [function calling](https://platform.openai.com/docs/guides/function-calling) 并兼容 OpenAI API 规范的大语言模型 (如 [DeepSeek](https://platform.deepseek.com/)), 你只需根据你所用的 AI 模型的使用文档, 在右上角的 `AI辅助分析设置` 中开启 `AI辅助分析` 功能, 并输入 `baseUrl`、`apiKey`、`modelId` 等参数, 即可点击页面右上角的 `Ask AI` 按钮, 与 AI 助手进行交互
 
-| 设置 | 交互 |
+![](readme/data-7.png)
+
+### 2.5 AI助手
+
+在根据[2.4 AI辅助分析设置](#24-ai辅助分析设置) 设置好 AI 辅助分析后, 你可以点击右上角的 `Ask AI` 按钮, 与 AI 助手进行交互. 你可以询问它 PsychPen 的使用方法、对你的数据的见解、统计分析的建议等, 也可以直接指示它帮你操作 PsychPen 完成统计分析、图表绘制、数据导出等操作
+
+| ![](readme/data-8.png) | ![](readme/data-9.png) |
 | :---: | :---: |
-| ![](readme/data-7.png) | ![](readme/data-8.png) |
 
 ## 3 变量视图
 
