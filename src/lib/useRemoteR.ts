@@ -5,22 +5,31 @@
 import { create } from 'zustand'
 
 export const useRemoteR = create<RemoteRState>()((set, get) => ({
-  Renable: false,
-  Rurl: '',
-  Rpassword: '',
-  _DataView_setRenable: (enable) => set({ Renable: enable }),
-  _DataView_setRurl: (url) => set({ Rurl: url }),
-  _DataView_setRpassword: (password) => set({ Rpassword: password }),
+  Renable: localStorage.getItem('Renable') === 'true',
+  Rurl: localStorage.getItem('Rurl') ?? '',
+  Rpassword: localStorage.getItem('Rpassword') ?? '',
+  _DataView_setRenable: (enable) => {
+    localStorage.setItem('Renable', enable ? 'true' : 'false')
+    set({ Renable: enable })
+  },
+  _DataView_setRurl: (url) => {
+    localStorage.setItem('Rurl', url)
+    set({ Rurl: url })
+  },
+  _DataView_setRpassword: (password) => {
+    localStorage.setItem('Rpassword', password)
+    set({ Rpassword: password })
+  },
   executeRCode: async (codeWithOutPackages, packages) => {
     const { Rurl, Rpassword, Renable } = get()
     if (!Renable) {
-      throw new Error('未启用联网服务')
+      throw new Error('未启用R语言服务器')
     }
     if (!Rurl) {
-      throw new Error('未设置服务器地址')
+      throw new Error('未设置R语言服务器地址')
     }
     if (!Rpassword) {
-      throw new Error('未设置服务器密码')
+      throw new Error('未设置R语言服务器密码')
     }
     const code = `${packages.map((p) => `\nif (!requireNamespace("${p}", quietly = TRUE)) {\n  install.packages("${p}")\n}\nlibrary(${p})\n`).join('')}\n${codeWithOutPackages}`
     const res = await fetch(Rurl, { 

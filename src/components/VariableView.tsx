@@ -2,12 +2,12 @@ import { useZustand } from '../lib/useZustand'
 import { Button } from 'antd'
 import { useState } from 'react'
 import { CalculatorOutlined, ZoomOutOutlined, BoxPlotOutlined, TableOutlined, FilterOutlined, AppstoreAddOutlined } from '@ant-design/icons'
-import { VariableTable } from '../variable/VariableTable'
-import { Interpolate } from '../variable/Interpolate'
-import { MissingValue } from '../variable/MissingValue'
-import { SubVariables } from '../variable/SubVariables'
-import { DataFilter } from '../variable/DataFilter'
-import { ComputeVar } from '../variable/ComputeVar'
+import { VariableTable } from './variable/VariableTable'
+import { Interpolate } from './variable/Interpolate'
+import { MissingValue } from './variable/MissingValue'
+import { SubVariables } from './variable/SubVariables'
+import { DataFilter } from './variable/DataFilter'
+import { ComputeVar } from './variable/ComputeVar'
 
 export function VariableView() {
 

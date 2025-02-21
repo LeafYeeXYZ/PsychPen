@@ -1,7 +1,7 @@
 // 注意: 本组件及其子组件不应当使用除 isDarkMode 之外的全局状态
-import { NormalDistribution } from '../tools/NormalDistribution'
-import { TDistribution } from '../tools/TDistribution'
-import { StatisticToPvalue } from '../tools/StatisticToPvalue'
+import { NormalDistribution } from './tools/NormalDistribution'
+import { TDistribution } from './tools/TDistribution'
+import { StatisticToPvalue } from './tools/StatisticToPvalue'
 import { Cascader } from 'antd'
 import { useState } from 'react'
 
