@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.0.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.9.0...v2.0.0) (2025-02-22)
+
+
+### Features
+
+* 将使用文档加入到AI助手的上下文中 ([ad4b286](https://github.com/LeafYeeXYZ/PsychPen/commit/ad4b2865270fcde6962f6bde12a9f0d201207363))
+* 新增AI辅助分析功能 ([0772209](https://github.com/LeafYeeXYZ/PsychPen/commit/077220938fdefd7c2628c7faaf99279c0ba3e7c0))
+* AI助手的回复现在将流式传输 ([5cb6b86](https://github.com/LeafYeeXYZ/PsychPen/commit/5cb6b8693fee927c9d9473eb8ecdf8c4371e4ce4))
+* AI助手现在可以获取变量信息并提供建议 ([5b36e42](https://github.com/LeafYeeXYZ/PsychPen/commit/5b36e42de11e2b0f047206b959bea06caa32c1c2))
+* AI助手现在可以直接操作导出数据 ([1543282](https://github.com/LeafYeeXYZ/PsychPen/commit/1543282f82742a505e677fc7655be83cf9813941))
+* AI助手现在可以主动控制页面跳转 ([f5861a4](https://github.com/LeafYeeXYZ/PsychPen/commit/f5861a4f9b0807f3d3623a2ce3ae5d8f009e3c70))
+
+
+### Bug Fixes
+
+* 修复 Vite 生产和预览环境不一致带来的错误 ([b9a5821](https://github.com/LeafYeeXYZ/PsychPen/commit/b9a5821e11ff5bc5267afaf197a8800eed866010))
+
+
+### Refactoring
+
+* 优化组件结构, 准备加入AI辅助分析功能 ([8d59e2c](https://github.com/LeafYeeXYZ/PsychPen/commit/8d59e2cea8f56311e4e9fe795e081448383169e3))
+* 重构导航方式, 保留组件历史选择 ([944adde](https://github.com/LeafYeeXYZ/PsychPen/commit/944adde9722c07cb07c5dbe2083f64df66e8951e))
+
 ## [1.9.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.8.0...v1.9.0) (2025-02-20)
 
 
