@@ -147,7 +147,7 @@ export function App() {
         open={showAI}
         onClose={() => setShowAI(false)}
         closable={false}
-        width={480}
+        width={Math.min(window.innerWidth - 200, 720)}
       >
         <AI />
       </Drawer>

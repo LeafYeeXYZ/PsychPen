@@ -10,6 +10,7 @@ import { downloadSheet } from '@psych/sheet'
 import type { 
   ChatCompletionAssistantMessageParam,
   ChatCompletionUserMessageParam,
+  ChatCompletionMessageToolCall,
   ChatCompletionMessageParam,
 } from 'openai/resources/index.mjs'
 import readme from '../../README.md?raw'
@@ -21,7 +22,6 @@ const md = markdownit({ html: true, breaks: true })
 const funcs: AIFunction[] = [export_data]
 const GREETTING = '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据等. 请问有什么可以帮你的?'
 
-// TODO: 流式对话 (完成后更新 issue)
 // TODO: 全部写好之后更新一下使用文档的 2.5
 // TODO: 可以在第一条消息里说明可以使用的功能
 
@@ -40,78 +40,123 @@ export function AI() {
   const { messageApi, disabled, dataCols, dataRows } = useZustand()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showLoading, setShowLoading] = useState(false)
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
 
   const onSubmit = async () => {
+    const old = JSON.parse(JSON.stringify(messages))
     const snapshot = input
     try {
       const user: ChatCompletionUserMessageParam = { role: 'user', content: snapshot }
       flushSync(() => {
         setLoading(true)
-        setMessages((prev) => [...prev, user])
+        setShowLoading(true)
+        setMessages([...old, user])
         setInput('')
       })
 
       const system = 
-        '你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具信息; 你需要按照用户的要求, 为用户提供帮助.' + 
+        '你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具信息; 你的任务是按照用户的要求, 为用户提供帮助.' + 
         `\n\n# 变量信息\n\n${dataCols.map((col) => `- ${col.name}: ${col.type}, 有 ${col.valid} 个有效值、${col.missing} 个缺失值、${col.unique} 个唯一值.${col.type === '等距或等比数据' ? ` 均值为 ${col.mean}, 标准差为 ${col.std}, 中位数为 ${col.q2}, 最小值为 ${col.min}, 最大值为 ${col.max}.` : ''}`).join('\n')}` +
-        `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\`` 
+        `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\``
 
-      const res = await ai.chat.completions.create({
+      const stream = await ai.chat.completions.create({
         model: model,
         messages: [
           { role: 'system', content: system },
-          ...messages,
+          ...old,
+          user,
         ],
+        stream: true,
         tools: funcs.map((func) => func.tool),
-        stream: false,
+        tool_choice: 'auto',
       })
 
-      const tool_calls = res.choices[0].message.tool_calls
-      if (tool_calls?.length) {
-        const toolCall = tool_calls[0]
+      let rawResponse: string = ''
+      let toolCall: ChatCompletionMessageToolCall | null = null
+
+      for await (const chunk of stream) {
+        const delta = chunk.choices[0].delta
+        if (delta.tool_calls?.length) {
+          if (toolCall) {
+            toolCall.function.arguments += delta.tool_calls[0].function!.arguments || ''
+          } else {
+            toolCall = {
+              id: delta.tool_calls[0].id!,
+              type: 'function',
+              function: {
+                name: delta.tool_calls[0].function!.name!,
+                arguments: delta.tool_calls[0].function!.arguments || '',
+              },
+            }
+          }
+        } else if (!toolCall) {
+          rawResponse += delta.content || ''
+          flushSync(() => {
+            setShowLoading(false)
+            setMessages([...old, user, { role: 'assistant', content: rawResponse }])
+          })
+        }
+      }
+
+      if (toolCall) {
         const newMessages: ChatCompletionMessageParam[] = [
           { role: 'assistant', content: '', tool_calls: [toolCall] },
           { role: 'tool', content: 'done', tool_call_id: toolCall.id },
         ]
-        flushSync(() => {
-          setMessages((prev) => [...prev, ...newMessages])
-        })
+        flushSync(() => setMessages([...old, user, ...newMessages]))
+
         if (toolCall.function.name === 'export_data') {
           const { file_name, file_type } = JSON.parse(toolCall.function.arguments)
           downloadSheet(dataRows, file_type || 'xlsx', file_name || undefined)
         } else {
           throw new Error(`未知的AI函数调用: ${toolCall.function.name}`)
         }
+
         const newResponse = await ai.chat.completions.create({
           model: model,
           messages: [
             { role: 'system', content: system },
-            ...messages,
+            ...old,
+            user,
+            ...newMessages,
           ],
-          stream: false,
+          stream: true,
           tools: funcs.map((func) => func.tool),
           tool_choice: 'none',
         })
-        const { content } = parseThink(newResponse.choices[0].message)
-        const assistant: ChatCompletionAssistantMessageParam = { role: 'assistant', content }
-        setMessages((prev) => [...prev, assistant])
+
+        let rawNewResponse: string = ''
+        for await (const chunk of newResponse) {
+          const delta = chunk.choices[0].delta
+          rawNewResponse += delta.content || ''
+          flushSync(() => {
+            setShowLoading(false)
+            setMessages([...old, user, ...newMessages, { role: 'assistant', content: rawNewResponse }])
+          })
+        }
+        const { content } = parseThink(rawNewResponse)
+        setMessages([...old, user, ...newMessages, { role: 'assistant', content }])
       } else {
-        const { content } = parseThink(res.choices[0].message)
-        const assistant: ChatCompletionAssistantMessageParam = { role: 'assistant', content }
-        setMessages((prev) => [...prev, assistant])
+        const { content } = parseThink(rawResponse)
+        setMessages([...old, user, { role: 'assistant', content }])
       }
     } catch (e) {
-      messageApi!.error(e instanceof Error ? e.message : String(e))
+      messageApi?.error(e instanceof Error ? e.message : String(e))
+      setMessages(old)
       setInput(snapshot)
     } finally {
+      setShowLoading(false)
       setLoading(false)
     }
   }
 
   return (
     <div className='w-full h-full flex flex-col justify-between items-center'>
-      <Messages messages={messages} loading={loading} />
+      <Messages 
+        messages={messages} 
+        showLoading={showLoading} 
+      />
       <Sender
         onSubmit={onSubmit}
         disabled={disabled}
@@ -125,10 +170,11 @@ export function AI() {
           return (
             <Space size='small'>
               <ClearButton 
-                disabled={loading || disabled}
+                disabled={loading || disabled || !messages.length}
                 onClick={() => {
                   setInput('')
                   setMessages([])
+                  messageApi?.success('已清空历史对话')
                 }}
               />
               {loading ? <LoadingButton /> : <SendButton />}
@@ -140,7 +186,7 @@ export function AI() {
   )
 }
 
-function Messages({ messages, loading }: { messages: ChatCompletionMessageParam[], loading: boolean }) {
+function Messages({ messages, showLoading }: { messages: ChatCompletionMessageParam[], showLoading: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' })
@@ -153,7 +199,7 @@ function Messages({ messages, loading }: { messages: ChatCompletionMessageParam[
       {[
         { role: 'assistant', content: GREETTING },
         ...messages,
-        ...(loading ? [{ role: 'assistant', content: '__loading__' }] : [])
+        ...(showLoading ? [{ role: 'assistant', content: '__loading__' }] : [])
       ]
       .filter((message) => message.role === 'assistant' || message.role === 'user')
       .map((message, index) => {
