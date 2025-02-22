@@ -1,3 +1,7 @@
+declare type AIFunction = {
+  label: string
+  tool: import('openai/resources/index.mjs').ChatCompletionTool
+}
 declare type AllowedFilterMethods = '等于' | '不等于' | '大于' | '大于等于' | '小于' | '小于等于' | '区间' | '正则表达式' | '高于平均值' | '低于平均值' | '高于中位数' | '低于中位数'
 declare type AllowedInterpolationMethods = '均值插值' | '中位数插值' | '最临近点插值法' | '拉格朗日插值法'
 declare type AllowedDiscreteMethods = '等频' | '等宽' | '聚类分析'

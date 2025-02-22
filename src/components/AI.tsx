@@ -6,19 +6,22 @@ import { Space, Typography } from 'antd'
 import { Bubble, Sender } from '@ant-design/x'
 import { UserOutlined, BarChartOutlined } from '@ant-design/icons'
 import parseThink from '@leaf/parse-think'
-// @ts-expect-error markdown-it does not have types
-import markdownit from 'markdown-it'
-import { 
+import { downloadSheet } from '@psych/sheet'
+import type { 
   ChatCompletionAssistantMessageParam,
   ChatCompletionUserMessageParam,
-  ChatCompletionToolMessageParam,
+  ChatCompletionMessageParam,
 } from 'openai/resources/index.mjs'
 import readme from '../../README.md?raw'
+// @ts-expect-error markdown-it does not have types
+import markdownit from 'markdown-it'
+import { export_data } from '../lib/assistant/export_data'
 
 const md = markdownit({ html: true, breaks: true })
-type Message = ChatCompletionAssistantMessageParam | ChatCompletionUserMessageParam | ChatCompletionToolMessageParam
+const funcs: AIFunction[] = [export_data]
+const GREETTING = '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据等. 请问有什么可以帮你的?'
 
-// TODO: 暂未处理 Function Calling
+// TODO: 流式对话 (完成后更新 issue)
 // TODO: 全部写好之后更新一下使用文档的 2.5
 // TODO: 可以在第一条消息里说明可以使用的功能
 
@@ -34,10 +37,10 @@ export function AI() {
     )
   }
 
-  const { messageApi, disabled, dataCols } = useZustand()
+  const { messageApi, disabled, dataCols, dataRows } = useZustand()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
 
   const onSubmit = async () => {
     const snapshot = input
@@ -48,17 +51,56 @@ export function AI() {
         setMessages((prev) => [...prev, user])
         setInput('')
       })
+
+      const system = 
+        '你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具信息; 你需要按照用户的要求, 为用户提供帮助.' + 
+        `\n\n# 变量信息\n\n${dataCols.map((col) => `- ${col.name}: ${col.type}, 有 ${col.valid} 个有效值、${col.missing} 个缺失值、${col.unique} 个唯一值.${col.type === '等距或等比数据' ? ` 均值为 ${col.mean}, 标准差为 ${col.std}, 中位数为 ${col.q2}, 最小值为 ${col.min}, 最大值为 ${col.max}.` : ''}`).join('\n')}` +
+        `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\`` 
+
       const res = await ai.chat.completions.create({
         model: model,
         messages: [
-          { role: 'system', content: `你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档; 你需要根据上下文信息, 为用户提供帮助.\n\n# 变量信息\n\n${dataCols.map((col) => `- ${col.name}: ${col.type}, 有 ${col.valid} 个有效值、${col.missing} 个缺失值、${col.unique} 个唯一值.${col.type === '等距或等比数据' ? ` 均值为 ${col.mean}, 标准差为 ${col.std}, 中位数为 ${col.q2}, 最小值为 ${col.min}, 最大值为 ${col.max}.` : ''}`).join('\n') }\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\`` },
+          { role: 'system', content: system },
           ...messages,
         ],
+        tools: funcs.map((func) => func.tool),
         stream: false,
       })
-      const { content } = parseThink(res.choices[0].message)
-      const assistant: ChatCompletionAssistantMessageParam = { role: 'assistant', content }
-      setMessages((prev) => [...prev, assistant])
+
+      const tool_calls = res.choices[0].message.tool_calls
+      if (tool_calls?.length) {
+        const toolCall = tool_calls[0]
+        const newMessages: ChatCompletionMessageParam[] = [
+          { role: 'assistant', content: '', tool_calls: [toolCall] },
+          { role: 'tool', content: 'done', tool_call_id: toolCall.id },
+        ]
+        flushSync(() => {
+          setMessages((prev) => [...prev, ...newMessages])
+        })
+        if (toolCall.function.name === 'export_data') {
+          const { file_name, file_type } = JSON.parse(toolCall.function.arguments)
+          downloadSheet(dataRows, file_type || 'xlsx', file_name || undefined)
+        } else {
+          throw new Error(`未知的AI函数调用: ${toolCall.function.name}`)
+        }
+        const newResponse = await ai.chat.completions.create({
+          model: model,
+          messages: [
+            { role: 'system', content: system },
+            ...messages,
+          ],
+          stream: false,
+          tools: funcs.map((func) => func.tool),
+          tool_choice: 'none',
+        })
+        const { content } = parseThink(newResponse.choices[0].message)
+        const assistant: ChatCompletionAssistantMessageParam = { role: 'assistant', content }
+        setMessages((prev) => [...prev, assistant])
+      } else {
+        const { content } = parseThink(res.choices[0].message)
+        const assistant: ChatCompletionAssistantMessageParam = { role: 'assistant', content }
+        setMessages((prev) => [...prev, assistant])
+      }
     } catch (e) {
       messageApi!.error(e instanceof Error ? e.message : String(e))
       setInput(snapshot)
@@ -98,7 +140,7 @@ export function AI() {
   )
 }
 
-function Messages({ messages, loading }: { messages: Message[], loading: boolean }) {
+function Messages({ messages, loading }: { messages: ChatCompletionMessageParam[], loading: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' })
@@ -109,23 +151,28 @@ function Messages({ messages, loading }: { messages: Message[], loading: boolean
       ref={ref}
     >
       {[
-        { role: 'assistant', content: '你好, 有什么可以帮你的?' }, 
+        { role: 'assistant', content: GREETTING },
         ...messages,
         ...(loading ? [{ role: 'assistant', content: '__loading__' }] : [])
       ]
       .filter((message) => message.role === 'assistant' || message.role === 'user')
       .map((message, index) => {
+        const tool_calls = (message as ChatCompletionAssistantMessageParam).tool_calls
         return (
           <Bubble
             key={index}
             className='w-full'
             placement={message.role === 'user' ? 'end' : 'start'}
-            content={message.content}
+            content={tool_calls?.length ? 
+              <span className='text-gray-700 dark:text-gray-300'>
+                {funcs.find((func) => func.tool.function.name === tool_calls[0].function.name)!.label}
+              </span> : 
+              <Typography>
+                <div className='-mb-4' dangerouslySetInnerHTML={{ __html: md.render((message.content as string).trim()) }} />
+              </Typography>
+            }
             loading={message.content === '__loading__'}
             header={message.role === 'user' ? 'User' : 'PsychPen'}
-            messageRender={(content) => <Typography>
-              <div className='-mb-4' dangerouslySetInnerHTML={{ __html: md.render(content.trim()) }} />
-            </Typography>}
             avatar={{ 
               icon: message.role === 'user' ? <UserOutlined /> : <BarChartOutlined />,
               style: { 
