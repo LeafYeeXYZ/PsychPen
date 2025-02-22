@@ -1,6 +1,16 @@
+// 记得在 GREETTING 消息里说明可以使用的功能
+// TODO: 全部写好之后更新一下使用文档的 2.5
 import { useAssistant } from '../lib/useAssistant'
 import { useZustand } from '../lib/useZustand'
 import { useState, useRef, useEffect } from 'react'
+import { 
+  useNav,
+  MAIN_PAGES_LABELS,
+  VARIABLE_SUB_PAGES_LABELS,
+  PLOTS_SUB_PAGES_LABELS,
+  STATISTICS_SUB_PAGES_LABELS,
+  TOOLS_VIEW_SUB_PAGES_LABELS,
+} from '../lib/useNav'
 import { flushSync } from 'react-dom'
 import { Space, Typography } from 'antd'
 import { Bubble, Sender } from '@ant-design/x'
@@ -17,13 +27,23 @@ import readme from '../../README.md?raw'
 // @ts-expect-error markdown-it does not have types
 import markdownit from 'markdown-it'
 import { export_data } from '../lib/assistant/export_data'
+import { nav_to_data_view } from '../lib/assistant/nav_to_data_view'
+import { nav_to_variable_view } from '../lib/assistant/nav_to_variable_view'
+import { nav_to_plots_view } from '../lib/assistant/nav_to_plots_view'
+import { nav_to_statistics_view } from '../lib/assistant/nav_to_statistics_view'
+import { nav_to_tools_view } from '../lib/assistant/nav_to_tools_view'
 
 const md = markdownit({ html: true, breaks: true })
-const funcs: AIFunction[] = [export_data]
-const GREETTING = '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据等. 请问有什么可以帮你的?'
+const funcs: AIFunction[] = [
+  export_data,
+  nav_to_data_view,
+  nav_to_variable_view,
+  nav_to_plots_view,
+  nav_to_statistics_view,
+  nav_to_tools_view,
+]
+const GREETTING = '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面等. 请问有什么可以帮你的?'
 
-// TODO: 全部写好之后更新一下使用文档的 2.5
-// TODO: 可以在第一条消息里说明可以使用的功能
 
 export function AI() {
 
@@ -38,6 +58,7 @@ export function AI() {
   }
 
   const { messageApi, disabled, dataCols, dataRows } = useZustand()
+  const nav = useNav()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
@@ -106,11 +127,55 @@ export function AI() {
         ]
         flushSync(() => setMessages([...old, user, ...newMessages]))
 
-        if (toolCall.function.name === 'export_data') {
-          const { file_name, file_type } = JSON.parse(toolCall.function.arguments)
-          downloadSheet(dataRows, file_type || 'xlsx', file_name || undefined)
-        } else {
-          throw new Error(`未知的AI函数调用: ${toolCall.function.name}`)
+        switch (toolCall.function.name) {
+          case 'export_data': {
+            const { file_name, file_type } = JSON.parse(toolCall.function.arguments)
+            downloadSheet(dataRows, file_type || 'xlsx', file_name || undefined)
+            break
+          }
+          case 'nav_to_data_view': {
+            nav.setMainPage(MAIN_PAGES_LABELS.DATA)
+            break
+          }
+          case 'nav_to_variable_view': {
+            const { page } = JSON.parse(toolCall.function.arguments)
+            if (!page || !Object.values(VARIABLE_SUB_PAGES_LABELS).includes(page)) {
+              throw new Error(`AI函数调用参数错误 (nav_to_variable_view): 未知的子页面 ${page}`)
+            }
+            nav.setMainPage(MAIN_PAGES_LABELS.VARIABLE)
+            nav.setVariableViewSubPage(page)
+            break
+          }
+          case 'nav_to_plots_view': {
+            const { page } = JSON.parse(toolCall.function.arguments)
+            if (!page || !Object.values(PLOTS_SUB_PAGES_LABELS).includes(page)) {
+              throw new Error(`AI函数调用参数错误 (nav_to_plots_view): 未知的子页面 ${page}`)
+            }
+            nav.setMainPage(MAIN_PAGES_LABELS.PLOTS)
+            nav.setPlotsViewSubPage(page)
+            break
+          }
+          case 'nav_to_statistics_view': {
+            const { page } = JSON.parse(toolCall.function.arguments)
+            if (!page || !Object.values(STATISTICS_SUB_PAGES_LABELS).includes(page)) {
+              throw new Error(`AI函数调用参数错误 (nav_to_statistics_view): 未知的子页面 ${page}`)
+            }
+            nav.setMainPage(MAIN_PAGES_LABELS.STATISTICS)
+            nav.setStatisticsViewSubPage(page)
+            break
+          }
+          case 'nav_to_tools_view': {
+            const { page } = JSON.parse(toolCall.function.arguments)
+            if (!page || !Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).includes(page)) {
+              throw new Error(`AI函数调用参数错误 (nav_to_tools_view): 未知的子页面 ${page}`)
+            }
+            nav.setMainPage(MAIN_PAGES_LABELS.TOOLS)
+            nav.setToolsViewSubPage(page)
+            break
+          }
+          default: {
+            throw new Error(`未知的AI函数调用 (${toolCall.function.name})`)
+          }
         }
 
         const newResponse = await ai.chat.completions.create({
@@ -130,10 +195,12 @@ export function AI() {
         for await (const chunk of newResponse) {
           const delta = chunk.choices[0].delta
           rawNewResponse += delta.content || ''
-          flushSync(() => {
-            setShowLoading(false)
-            setMessages([...old, user, ...newMessages, { role: 'assistant', content: rawNewResponse }])
-          })
+          if (rawNewResponse) {
+            flushSync(() => {
+              setShowLoading(false)
+              setMessages([...old, user, ...newMessages, { role: 'assistant', content: rawNewResponse }])
+            })
+          }
         }
         const { content } = parseThink(rawNewResponse)
         setMessages([...old, user, ...newMessages, { role: 'assistant', content }])

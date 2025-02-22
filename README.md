@@ -5,7 +5,7 @@
 > `v1.2.0 引用信息`: `叶一杉. (2024). PsychPen: 在线统计分析和数据可视化工具 (v1.2.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v1.2.0`  
 > `v1.7.0 引用信息`: `叶一杉. (2024). PsychPen: 在线统计分析和数据可视化工具 (v1.7.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v1.7.0`  
 > `v2.0.0 引用信息`: `叶一杉. (2025). PsychPen: 在线统计分析和数据可视化工具 (v2.0.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v2.0.0`  
-V
+
 ## 目录
 
 - [PsychPen 使用文档](#psychpen-使用文档)
@@ -133,7 +133,7 @@ PsychPen 创新性地引入了 AI 辅助分析功能, 可以让 AI 助手基于�
 
 ### 2.5 AI助手
 
-在根据[2.4 AI辅助分析设置](#24-ai辅助分析设置) 设置好 AI 辅助分析后, 你可以点击右上角的 `Ask AI` 按钮, 与 AI 助手进行交互. 你可以询问它 PsychPen 的使用方法、对你的数据的见解、统计分析的建议等, 也可以直接指示它帮你操作 PsychPen 完成统计分析、图表绘制、数据导出等操作
+在根据[2.4 AI辅助分析设置](#24-ai辅助分析设置) 设置好 AI 辅助分析后, 你可以点击右上角的 `Ask AI` 按钮, 与 AI 助手进行交互. 你可以询问它 PsychPen 的使用方法、对你的数据的见解、统计分析的建议等, 也可以直接指示它帮你操作 PsychPen 完成统计分析、图表绘制、数据导出、页面跳转等操作
 
 | ![](readme/data-8.png) | ![](readme/data-9.png) |
 | :---: | :---: |
