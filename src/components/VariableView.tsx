@@ -1,19 +1,20 @@
 import { useZustand } from '../lib/useZustand'
 import { Button } from 'antd'
-import { useState } from 'react'
+import { useNav, VARIABLE_SUB_PAGES_LABELS } from '../lib/useNav'
 import { CalculatorOutlined, ZoomOutOutlined, BoxPlotOutlined, TableOutlined, FilterOutlined, AppstoreAddOutlined } from '@ant-design/icons'
-import { VariableTable } from './variable/VariableTable'
-import { Interpolate } from './variable/Interpolate'
-import { MissingValue } from './variable/MissingValue'
-import { SubVariables } from './variable/SubVariables'
-import { DataFilter } from './variable/DataFilter'
-import { ComputeVar } from './variable/ComputeVar'
+
+const ICONS: Record<VARIABLE_SUB_PAGES_LABELS, React.ReactElement> = {
+  '变量表格': <TableOutlined />,
+  '定义缺失值': <ZoomOutOutlined />,
+  '缺失值插值': <CalculatorOutlined />,
+  '中心化/标准化/离散化': <BoxPlotOutlined />,
+  '数据筛选': <FilterOutlined />,
+  '生成新变量': <AppstoreAddOutlined />,
+}
 
 export function VariableView() {
 
-  const [page, setPage] = useState<React.ReactElement>(<VariableTable />)
-  const [activePage, setActivePage] = useState<string>('VariableTable')
-
+  const { activeVariableViewSubPage, variableViewSubPage, setVariableViewSubPage } = useNav()
   const { disabled } = useZustand()
 
   return (
@@ -21,87 +22,24 @@ export function VariableView() {
       <div className='flex flex-col justify-start items-center w-full h-full p-4'>
         {/* 上方工具栏 */}
         <div className='w-full flex justify-start items-center gap-3 mb-4 flex-wrap'>
-          <Button
-            icon={<TableOutlined />}
-            disabled={disabled}
-            onClick={() => {
-              if (activePage === 'VariableTable') return
-              setPage(<VariableTable />)
-              setActivePage('VariableTable')
-            }}
-            type={activePage === 'VariableTable' ? 'primary' : 'default'}
-            autoInsertSpace={false}
-          >
-            变量表格
-          </Button>
-          <Button
-            icon={<ZoomOutOutlined />}
-            disabled={disabled}
-            onClick={() => {
-              if (activePage === 'MissingValue') return
-              setPage(<MissingValue />)
-              setActivePage('MissingValue')
-            }}
-            type={activePage === 'MissingValue' ? 'primary' : 'default'}
-            autoInsertSpace={false}
-          >
-            定义缺失值
-          </Button>
-          <Button
-            icon={<CalculatorOutlined />}
-            disabled={disabled}
-            onClick={() => {
-              if (activePage === 'Interpolate') return
-              setPage(<Interpolate />)
-              setActivePage('Interpolate')
-            }}
-            type={activePage === 'Interpolate' ? 'primary' : 'default'}
-            autoInsertSpace={false}
-          >
-            缺失值插值
-          </Button>
-          <Button
-            icon={<BoxPlotOutlined />}
-            disabled={disabled}
-            onClick={() => {
-              if (activePage === 'SubVariables') return
-              setPage(<SubVariables />)
-              setActivePage('SubVariables')
-            }}
-            type={activePage === 'SubVariables' ? 'primary' : 'default'}
-            autoInsertSpace={false}
-          >
-            中心化/标准化/离散化
-          </Button>
-          <Button
-            icon={<FilterOutlined />}
-            disabled={disabled}
-            onClick={() => {
-              if (activePage === 'DataFilter') return
-              setPage(<DataFilter />)
-              setActivePage('DataFilter')
-            }}
-            type={activePage === 'DataFilter' ? 'primary' : 'default'}
-            autoInsertSpace={false}
-          >
-            数据筛选
-          </Button>
-          <Button
-            icon={<AppstoreAddOutlined />}
-            disabled={disabled}
-            onClick={() => {
-              if (activePage === 'ComputeVar') return
-              setPage(<ComputeVar />)
-              setActivePage('ComputeVar')
-            }}
-            type={activePage === 'ComputeVar' ? 'primary' : 'default'}
-            autoInsertSpace={false}
-          >
-            生成新变量
-          </Button>
+          {Object.values(VARIABLE_SUB_PAGES_LABELS).map((label, index) => (
+            <Button
+              key={index}
+              icon={ICONS[label]}
+              disabled={disabled}
+              onClick={() => {
+                if (activeVariableViewSubPage === label) return
+                setVariableViewSubPage(label)
+              }}
+              type={activeVariableViewSubPage === label ? 'primary' : 'default'}
+              autoInsertSpace={false}
+            >
+              {label}
+            </Button>
+          ))}
         </div>
         {/* 页面内容 */}
-        {page}
+        {variableViewSubPage}
       </div>
     </div>
   )

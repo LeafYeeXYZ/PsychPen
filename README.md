@@ -1,10 +1,15 @@
 # PsychPen 使用文档
 
-**在线进行心理学/教育学统计分析和数据可视化**, **立即体验: <https://psychpen.leafyee.xyz>**
+**AI加持的在线心理学/教育学统计分析和数据可视化软件**, **立即体验: <https://psychpen.leafyee.xyz>**
 
-> PsychPen 基于 [PsychLib](https://github.com/LeafYeeXYZ/PsychLib) 进行统计分析, 基于 [PsychSheet](https://github.com/LeafYeeXYZ/PsychSheet) 进行数据导入导出, 欢迎也关注这两个项目
+> `v1.2.0 引用信息`: `叶一杉. (2024). PsychPen: 在线统计分析和数据可视化工具 (v1.2.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v1.2.0`
+> `v1.7.0 引用信息`: `叶一杉. (2024). PsychPen: 在线统计分析和数据可视化工具 (v1.7.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v1.7.0`
+> `v2.0.0 引用信息`: `叶一杉. (2025). PsychPen: 在线统计分析和数据可视化工具 (v2.0.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v2.0.0`
+V
+## 目录
 
 - [PsychPen 使用文档](#psychpen-使用文档)
+  - [目录](#目录)
   - [1 项目简介](#1-项目简介)
   - [2 数据视图](#2-数据视图)
     - [2.1 数据导入](#21-数据导入)
@@ -78,15 +83,13 @@
 
 ## 1 项目简介
 
-PsychPen 是一个用于心理学/教育学专业的统计检验分析和图表绘制的在线工具. 相比于传统的心理学统计软件, PsychPen 具有无需下载安装、跨平台 (你甚至可以在平板和手机上使用)、新手友好、开源免费等优势. 此外, PsychPen 依托于 Web 技术, 还实现了 SPSS 等老牌统计软件难以实现的3D图表、可交互图标、动态演示、AI辅助分析等功能, 可以帮助初学者更好地理解统计学相关概念
+PsychPen 是一个AI加持的心理学/教育学统计分析和数据可视化在线软件. 相比于传统的心理学统计软件, PsychPen 具有无需下载安装、跨平台 (你甚至可以在平板和手机上使用)、初学者友好 (具有内置的、深度集成的 AI 辅助功能)、开源免费等优势. 此外, PsychPen 依托于 Web 技术, 还实现了 SPSS 等老牌统计软件难以实现的3D图表、可交互图标、动态演示等功能, 可以帮助初学者更好地理解统计学相关概念
 
 | ![](readme/data-1.png) | ![](readme/data-2.png) | ![](readme/var-5.png) |
 | :---: | :---: | :---: |
 | ![](readme/intro-1.png) | ![](readme/intro-2.png) | ![](readme/intro-3.png) |
 
-本文档将按照 PsychPen 的功能模块, 分别介绍其使用方法
-
-> **引用信息**: `叶一杉. (2024). PsychPen: 在线统计分析和数据可视化工具. https://github.com/LeafYeeXYZ/PsychPen`
+PsychPen 有 `数据`、`变量`、`绘图`、`统计`、`工具` 五大功能模块, 本文档将分别介绍其使用方法
 
 ## 2 数据视图
 
@@ -558,6 +561,7 @@ T分布是假设检验中最常见的分布之一. 在T分布可视化演示工�
     - `useZustand.ts` 全局状态管理
     - `useRemoteR.ts` R语言服务端接口
     - `useAssistant.ts` AI辅助分析接口
+    - `useNav.tsx` 导航接口
   - `components/` 组件目录
     - `data/` 数据视图组件
     - `plots/` 绘图视图组件
@@ -584,6 +588,8 @@ T分布是假设检验中最常见的分布之一. 在T分布可视化演示工�
   ```bash
   bun run build
   ```
+
+> PsychPen 基于 [PsychLib](https://github.com/LeafYeeXYZ/PsychLib) 进行部分统计分析, 基于 [PsychSheet](https://github.com/LeafYeeXYZ/PsychSheet) 进行数据导入导出, 欢迎也关注这两个项目
 
 ## 3 R语言服务端部署说明
 

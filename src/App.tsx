@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useZustand } from './lib/useZustand'
+import { useNav, MAIN_PAGES_LABELS } from './lib/useNav'
 import { Button, ConfigProvider, type ThemeConfig, message, theme, Drawer } from 'antd'
 import { BarChartOutlined, CommentOutlined } from '@ant-design/icons'
-import { DataView } from './components/DataView'
-import { PlotsView } from './components/PlotsView'
-import { StatisticsView } from './components/StatisticsView'
-import { VariableView } from './components/VariableView'
-import { ToolsView } from './components/ToolsView'
-import { useZustand } from './lib/useZustand'
 import Bowser from 'bowser'
 import { version } from '../package.json'
 import { useAssistant } from './lib/useAssistant'
@@ -31,8 +27,7 @@ export function App() {
 
   const { data, _App_setMessageApi, disabled, isDarkMode, _App_setIsDarkMode } = useZustand()
   // 页面切换
-  const [page, setPage] = useState<React.ReactElement>(<DataView />)
-  const [activePage, setActivePage] = useState<string>('data')
+  const { activeMainPage, mainPage, setMainPage } = useNav()
   // 消息实例
   const [messageApi, contextHolder] = message.useMessage()
   // 检查浏览器版本
@@ -64,11 +59,10 @@ export function App() {
         <header className='flex justify-center items-center relative py-3 px-4 bg-gray-100 shadow-md dark:bg-gray-900'>
           <nav className='space-x-4'>
             <Button
-              type={activePage === 'data' ? 'primary' : 'text'}
+              type={activeMainPage === MAIN_PAGES_LABELS.DATA ? 'primary' : 'text'}
               onClick={() => {
-                if (activePage === 'data') return
-                setPage(<DataView />)
-                setActivePage('data')
+                if (activeMainPage === MAIN_PAGES_LABELS.DATA) return
+                setMainPage(MAIN_PAGES_LABELS.DATA)
               }}
               autoInsertSpace={false}
               disabled={disabled}
@@ -76,11 +70,10 @@ export function App() {
               数据
             </Button>
             <Button
-              type={activePage === 'variable' ? 'primary' : 'text'}
+              type={activeMainPage === MAIN_PAGES_LABELS.VARIABLE ? 'primary' : 'text'}
               onClick={() => {
-                if (activePage === 'variable') return
-                setPage(<VariableView />)
-                setActivePage('variable')
+                if (activeMainPage === MAIN_PAGES_LABELS.VARIABLE) return
+                setMainPage(MAIN_PAGES_LABELS.VARIABLE)
               }}
               autoInsertSpace={false}
               disabled={(data === null) || disabled}
@@ -88,11 +81,10 @@ export function App() {
               变量
             </Button>
             <Button
-              type={activePage === 'plots' ? 'primary' : 'text'}
+              type={activeMainPage === MAIN_PAGES_LABELS.PLOTS ? 'primary' : 'text'}
               onClick={() => {
-                if (activePage === 'plots') return
-                setPage(<PlotsView />)
-                setActivePage('plots')
+                if (activeMainPage === MAIN_PAGES_LABELS.PLOTS) return
+                setMainPage(MAIN_PAGES_LABELS.PLOTS)
               }}
               autoInsertSpace={false}
               disabled={(data === null) || disabled}
@@ -100,11 +92,10 @@ export function App() {
               绘图
             </Button>
             <Button
-              type={activePage === 'statistics' ? 'primary' : 'text'}
+              type={activeMainPage === MAIN_PAGES_LABELS.STATISTICS ? 'primary' : 'text'}
               onClick={() => {
-                if (activePage === 'statistics') return
-                setPage(<StatisticsView />)
-                setActivePage('statistics')
+                if (activeMainPage === MAIN_PAGES_LABELS.STATISTICS) return
+                setMainPage(MAIN_PAGES_LABELS.STATISTICS)
               }}
               autoInsertSpace={false}
               disabled={(data === null) || disabled}
@@ -112,11 +103,10 @@ export function App() {
               统计
             </Button>
             <Button
-              type={activePage === 'tools' ? 'primary' : 'text'}
+              type={activeMainPage === MAIN_PAGES_LABELS.TOOLS ? 'primary' : 'text'}
               onClick={() => {
-                if (activePage === 'tools') return
-                setPage(<ToolsView />)
-                setActivePage('tools')
+                if (activeMainPage === MAIN_PAGES_LABELS.TOOLS) return
+                setMainPage(MAIN_PAGES_LABELS.TOOLS)
               }}
               autoInsertSpace={false}
               disabled={disabled}
@@ -140,7 +130,7 @@ export function App() {
             </Button>
           </p>
         </header>
-        {page}
+        {mainPage}
       </main>
       <Drawer
         placement='right'
