@@ -6,7 +6,7 @@ export const export_data: AIFunction = {
     type: 'function',
     function: {
       name: 'export_data',
-      description: '你可以调用这个函数来帮助用户导出数据',
+      description: '你可以调用这个函数来帮助用户导出数据. 调用成功后, 浏览器会自动下载文件.',
       parameters: {
         type: 'object',
         properties: {

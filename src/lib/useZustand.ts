@@ -115,12 +115,21 @@ export const useZustand = create<GlobalState>()((set) => ({
         if (vars.some((v) => row[v.slice(3, -3)] === undefined)) {
           return { [name]: undefined, ...row }
         }
-        const expressionWithValues = expression.replace(/:::.+?:::/g, (v) => String(row[v.slice(3, -3)]))
+        const expressionWithValues = expression.replace(/:::.+?:::/g, (v) => {
+          const value = row[v.slice(3, -3)]
+          if (!value) {
+            return 'undefined'
+          } else if (!isNaN(Number(value))) {
+            return `${Number(value)}`
+          } else {
+            return `'${String(value)}'`
+          }
+        })
         try {
           const result = eval(expressionWithValues)
           return { [name]: result, ...row }
         } catch (error) {
-          throw new Error(`执行表达式失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+          throw new Error(`执行表达式失败: ${error instanceof Error ? error.message : String(error)}`)
         }
       })
       const describe = new Describe([{ name }], newRows)

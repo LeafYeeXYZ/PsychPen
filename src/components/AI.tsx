@@ -123,59 +123,90 @@ export function AI() {
       if (toolCall) {
         const newMessages: ChatCompletionMessageParam[] = [
           { role: 'assistant', content: '', tool_calls: [toolCall] },
-          { role: 'tool', content: 'done', tool_call_id: toolCall.id },
+          { role: 'tool', content: '', tool_call_id: toolCall.id },
         ]
-        flushSync(() => setMessages([...old, user, ...newMessages]))
 
-        switch (toolCall.function.name) {
-          case 'export_data': {
-            const { file_name, file_type } = JSON.parse(toolCall.function.arguments)
-            downloadSheet(dataRows, file_type || 'xlsx', file_name || undefined)
-            break
-          }
-          case 'nav_to_data_view': {
-            nav.setMainPage(MAIN_PAGES_LABELS.DATA)
-            break
-          }
-          case 'nav_to_variable_view': {
-            const { page } = JSON.parse(toolCall.function.arguments)
-            if (!page || !Object.values(VARIABLE_SUB_PAGES_LABELS).includes(page)) {
-              throw new Error(`AI函数调用参数错误 (nav_to_variable_view): 未知的子页面 ${page}`)
+        flushSync(() => {
+          setShowLoading(true)
+          setMessages([...old, user, ...newMessages])
+        })
+
+        try {
+          switch (toolCall.function.name) {
+            case 'export_data': {
+              const { file_name, file_type } = JSON.parse(toolCall.function.arguments)
+              downloadSheet(dataRows, file_type || 'xlsx', file_name || undefined)
+              const msg = '数据导出成功'
+              messageApi?.success(msg)
+              newMessages[1].content = msg
+              break
             }
-            nav.setMainPage(MAIN_PAGES_LABELS.VARIABLE)
-            nav.setVariableViewSubPage(page)
-            break
-          }
-          case 'nav_to_plots_view': {
-            const { page } = JSON.parse(toolCall.function.arguments)
-            if (!page || !Object.values(PLOTS_SUB_PAGES_LABELS).includes(page)) {
-              throw new Error(`AI函数调用参数错误 (nav_to_plots_view): 未知的子页面 ${page}`)
+            case 'nav_to_data_view': {
+              nav.setMainPage(MAIN_PAGES_LABELS.DATA)
+              const msg = '已跳转到数据视图'
+              messageApi?.success(msg)
+              newMessages[1].content = msg
+              break
             }
-            nav.setMainPage(MAIN_PAGES_LABELS.PLOTS)
-            nav.setPlotsViewSubPage(page)
-            break
-          }
-          case 'nav_to_statistics_view': {
-            const { page } = JSON.parse(toolCall.function.arguments)
-            if (!page || !Object.values(STATISTICS_SUB_PAGES_LABELS).includes(page)) {
-              throw new Error(`AI函数调用参数错误 (nav_to_statistics_view): 未知的子页面 ${page}`)
+            case 'nav_to_variable_view': {
+              const { page } = JSON.parse(toolCall.function.arguments)
+              if (!page || !Object.values(VARIABLE_SUB_PAGES_LABELS).includes(page)) {
+                throw new Error(`未知的子页面 ${page}`)
+              }
+              nav.setMainPage(MAIN_PAGES_LABELS.VARIABLE)
+              nav.setVariableViewSubPage(page)
+              const msg = `已跳转到变量视图的${page}页面`
+              messageApi?.success(msg)
+              newMessages[1].content = msg
+              break
             }
-            nav.setMainPage(MAIN_PAGES_LABELS.STATISTICS)
-            nav.setStatisticsViewSubPage(page)
-            break
-          }
-          case 'nav_to_tools_view': {
-            const { page } = JSON.parse(toolCall.function.arguments)
-            if (!page || !Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).includes(page)) {
-              throw new Error(`AI函数调用参数错误 (nav_to_tools_view): 未知的子页面 ${page}`)
+            case 'nav_to_plots_view': {
+              const { page } = JSON.parse(toolCall.function.arguments)
+              if (!page || !Object.values(PLOTS_SUB_PAGES_LABELS).includes(page)) {
+                throw new Error(`未知的子页面 ${page}`)
+              }
+              nav.setMainPage(MAIN_PAGES_LABELS.PLOTS)
+              nav.setPlotsViewSubPage(page)
+              const msg = `已跳转到绘图视图的${page}页面`
+              messageApi?.success(msg)
+              newMessages[1].content = msg
+              break
             }
-            nav.setMainPage(MAIN_PAGES_LABELS.TOOLS)
-            nav.setToolsViewSubPage(page)
-            break
+            case 'nav_to_statistics_view': {
+              const { page } = JSON.parse(toolCall.function.arguments)
+              if (!page || !Object.values(STATISTICS_SUB_PAGES_LABELS).includes(page)) {
+                throw new Error(`未知的子页面 ${page}`)
+              }
+              nav.setMainPage(MAIN_PAGES_LABELS.STATISTICS)
+              nav.setStatisticsViewSubPage(page)
+              const msg = `已跳转到统计视图的${page}页面`
+              messageApi?.success(msg)
+              newMessages[1].content = msg
+              break
+            }
+            case 'nav_to_tools_view': {
+              const { page } = JSON.parse(toolCall.function.arguments)
+              if (!page || !Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).includes(page)) {
+                throw new Error(`未知的子页面 ${page}`)
+              }
+              nav.setMainPage(MAIN_PAGES_LABELS.TOOLS)
+              nav.setToolsViewSubPage(page)
+              const msg = `已跳转到工具视图的${page}页面`
+              messageApi?.success(msg)
+              newMessages[1].content = msg
+              break
+            }
+            default: {
+              throw new Error(`未知函数`)
+            }
           }
-          default: {
-            throw new Error(`未知的AI函数调用 (${toolCall.function.name})`)
-          }
+          newMessages[1].content = newMessages[1].content || '执行成功'
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : String(error)
+          messageApi?.error(`执行AI命令 (${
+            funcs.find((func) => func.tool.function.name === toolCall.function.name)?.label || toolCall.function.name
+          }) 时出错: ${msg}`)
+          newMessages[1].content = `执行失败, 请提示用户手动操作. 错误信息: ${msg}`
         }
 
         const newResponse = await ai.chat.completions.create({
@@ -208,8 +239,8 @@ export function AI() {
         const { content } = parseThink(rawResponse)
         setMessages([...old, user, { role: 'assistant', content }])
       }
-    } catch (e) {
-      messageApi?.error(e instanceof Error ? e.message : String(e))
+    } catch (error) {
+      messageApi?.error(error instanceof Error ? error.message : String(error))
       setMessages(old)
       setInput(snapshot)
     } finally {

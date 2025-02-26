@@ -42,7 +42,7 @@ export function DataFilter() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`, 1)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
   const handleFinish = async (values: Option) => {
@@ -68,7 +68,7 @@ export function DataFilter() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`, 1)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
   const [step2Options, setStep2Options] = useState<{ label: string, value: string }[]>([])

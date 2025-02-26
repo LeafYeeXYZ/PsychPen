@@ -56,7 +56,7 @@ export function ImportData() {
                 messageApi?.success('数据导入完成', 0.5)
               } catch (error) {
                 messageApi?.destroy('uploading')
-                messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+                messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : String(error)}`)
               } finally {
                 setDisabled(false)
               }
@@ -64,7 +64,7 @@ export function ImportData() {
             reader.readAsArrayBuffer(file)
           } catch (error) {
             messageApi?.destroy()
-            messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : JSON.stringify(error)}`)
+            messageApi?.error(`文件读取失败: ${error instanceof Error ? error.message : String(error)}`)
             setDisabled(false)
           }
           return false
