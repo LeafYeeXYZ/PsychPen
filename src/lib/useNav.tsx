@@ -126,6 +126,7 @@ import { SimpleMediatorTest } from '../components/statistics/SimpleMediatorTest'
 import { WelchTTest } from '../components/statistics/WelchTTest'
 import { OneWayANOVA } from '../components/statistics/OneWayANOVA'
 import { PeerANOVA } from '../components/statistics/PeerANOVA'
+import { MultiLinearRegression } from '../components/statistics/MultiLinearRegression'
 
 export enum STATISTICS_SUB_PAGES_LABELS {
   DESCRIPTION = '描述统计',
@@ -141,6 +142,7 @@ export enum STATISTICS_SUB_PAGES_LABELS {
   PEARSON_CORRELATION_TEST = 'Pearson 相关检验',
   ONE_LINEAR_REGRESSION = '一元线性回归',
   TWO_LINEAR_REGRESSION = '二元线性回归',
+  MULTI_LINEAR_REGRESSION = '多元线性回归',
   CORR_RELIABILITY = '重测或复本信度',
   HALF_RELIABILITY = '分半信度',
   HOMO_RELIABILITY = '同质性信度',
@@ -160,6 +162,7 @@ export const STATISTICS_SUB_PAGES_ELEMENTS: Record<STATISTICS_SUB_PAGES_LABELS, 
   [STATISTICS_SUB_PAGES_LABELS.PEARSON_CORRELATION_TEST]: <PearsonCorrelationTest />,
   [STATISTICS_SUB_PAGES_LABELS.ONE_LINEAR_REGRESSION]: <OneLinearRegression />,
   [STATISTICS_SUB_PAGES_LABELS.TWO_LINEAR_REGRESSION]: <TwoLinearRegression />,
+  [STATISTICS_SUB_PAGES_LABELS.MULTI_LINEAR_REGRESSION]: <MultiLinearRegression />,
   [STATISTICS_SUB_PAGES_LABELS.CORR_RELIABILITY]: <CorrReliability />,
   [STATISTICS_SUB_PAGES_LABELS.HALF_RELIABILITY]: <HalfReliability />,
   [STATISTICS_SUB_PAGES_LABELS.HOMO_RELIABILITY]: <HomoReliability />,
@@ -188,6 +191,7 @@ export const STATISTICS_SUB_PAGES_MAP: Record<string, STATISTICS_SUB_PAGES_LABEL
     STATISTICS_SUB_PAGES_LABELS.PEARSON_CORRELATION_TEST,
     STATISTICS_SUB_PAGES_LABELS.ONE_LINEAR_REGRESSION,
     STATISTICS_SUB_PAGES_LABELS.TWO_LINEAR_REGRESSION,
+    STATISTICS_SUB_PAGES_LABELS.MULTI_LINEAR_REGRESSION,
   ],
   '信度分析': [
     STATISTICS_SUB_PAGES_LABELS.CORR_RELIABILITY,
