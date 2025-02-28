@@ -56,12 +56,19 @@ export function AI() {
     )
   }
 
-  const { messageApi, disabled, dataCols, dataRows } = useZustand()
+  const { messageApi, disabled, dataCols, dataRows, data } = useZustand()
   const nav = useNav()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
+  // 数据被清除时重置对话
+  useEffect(() => {
+    if (!data) {
+      setInput('')
+      setMessages([])
+    }
+  }, [data])
 
   const onSubmit = async () => {
     const old = JSON.parse(JSON.stringify(messages))
