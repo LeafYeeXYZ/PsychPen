@@ -33,34 +33,73 @@ type Option = {
 }
 
 export function GroupedBarPlot() {
-
-  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } = useZustand()
+  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } =
+    useZustand()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      const { group, xLabel, yLabel, gLabel, label, error, maxY, minY, iLabel } = values
+      const {
+        group,
+        xLabel,
+        yLabel,
+        gLabel,
+        label,
+        error,
+        maxY,
+        minY,
+        iLabel,
+      } = values
       let { variables } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const filteredRows = dataRows
         .filter((row) => row[group] !== undefined)
-        .filter((row) => variables.every((variable) => row[variable] !== undefined && !isNaN(Number(row[variable]))))
-        .map((row) => ({ [group]: String(row[group]), ...variables.reduce((acc, cur) => { acc[cur] = Number(row[cur]); return acc }, {} as Record<string, number>) }))
-      const cols = Array
-        .from(new Set(filteredRows.map((row) => row[group])).values())
-        .sort((a, b) => Number(a) - Number(b))
-      const mean: number[][] = Array.from({ length: variables.length }, () => [])
-      const std: [number, number, number, number][][] = Array.from({ length: variables.length }, () => [])
+        .filter((row) =>
+          variables.every(
+            (variable) =>
+              row[variable] !== undefined && !isNaN(Number(row[variable])),
+          ),
+        )
+        .map((row) => ({
+          [group]: String(row[group]),
+          ...variables.reduce(
+            (acc, cur) => {
+              acc[cur] = Number(row[cur])
+              return acc
+            },
+            {} as Record<string, number>,
+          ),
+        }))
+      const cols = Array.from(
+        new Set(filteredRows.map((row) => row[group])).values(),
+      ).sort((a, b) => Number(a) - Number(b))
+      const mean: number[][] = Array.from(
+        { length: variables.length },
+        () => [],
+      )
+      const std: [number, number, number, number][][] = Array.from(
+        { length: variables.length },
+        () => [],
+      )
       variables.forEach((variable, i) => {
-        const row = cols.map((col) => filteredRows.filter((row) => row[group] === col).map((row) => row[variable])) as number[][]
+        const row = cols.map((col) =>
+          filteredRows
+            .filter((row) => row[group] === col)
+            .map((row) => row[variable]),
+        ) as number[][]
         const _mean = row.map((r) => +mn(r).toFixed(4))
         const _std = row.map((r) => +sd(r).toFixed(4))
         mean[i] = _mean
-        std[i] = _mean.map((m, j) => [j, m - error * _std[j], m + error * _std[j], _std[j]])
+        std[i] = _mean.map((m, j) => [
+          j,
+          m - error * _std[j],
+          m + error * _std[j],
+          _std[j],
+        ])
       })
       if (iLabel) {
         variables = variables.map((variable, i) => iLabel?.[i] ?? variable)
@@ -98,8 +137,10 @@ export function GroupedBarPlot() {
               // @ts-expect-error 套了一层数组后, 类型推断出错
               formatter: (params) => {
                 if (label === 'mean') return `均值: ${params.value}`
-                if (label === 'std') return `标准差: ${std[i][params.dataIndex][3]}`
-                if (label === 'both') return `均值: ${params.value}\n标准差: ${std[i][params.dataIndex][3]}`
+                if (label === 'std')
+                  return `标准差: ${std[i][params.dataIndex][3]}`
+                if (label === 'both')
+                  return `均值: ${params.value}\n标准差: ${std[i][params.dataIndex][3]}`
                 return ''
               },
               rotate: 90,
@@ -114,70 +155,78 @@ export function GroupedBarPlot() {
               },
             },
           })),
-          ...(error !== 0 ? std.map((s) => ({
-            type: 'custom',
-            data: s,
-            zlevel: 2,
-            // @ts-expect-error 套了一层数组后, 类型推断出错
-            renderItem(params, api) {
-              const xValue = api.value(0)
-              const currentSeriesIndices = api.currentSeriesIndices()
-              // 获取柱状图布局信息
-              const barLayout = api.barLayout({
-                count: variables.length
-              })
-              // 获取当前系列在所有柱状图系列中的索引
-              const barIndex = currentSeriesIndices.indexOf(params.seriesIndex) - variables.length
-              const lowPoint = api.coord([xValue, api.value(1)])
-              const highPoint = api.coord([xValue, api.value(2)])
-              // 使用布局信息调整 x 坐标
-              const offset = barLayout[barIndex].offsetCenter
-              lowPoint[0] += offset 
-              highPoint[0] += offset
-              const halfWidth = Math.min(15, barLayout[barIndex].width / 4)
-              return {
-                type: 'group',
-                children: [{
-                  // 顶部横线
-                  type: 'line',
-                  shape: {
-                    x1: lowPoint[0] - halfWidth,
-                    y1: highPoint[1],
-                    x2: lowPoint[0] + halfWidth,
-                    y2: highPoint[1],
-                  },
-                  style: {
-                    stroke: isDarkMode ? '#fff' : '#000',
-                  },
-                }, {
-                  // 底部横线
-                  type: 'line',
-                  shape: {
-                    x1: lowPoint[0] - halfWidth,
-                    y1: lowPoint[1],
-                    x2: lowPoint[0] + halfWidth,
-                    y2: lowPoint[1],
-                  },
-                  style: {
-                    stroke: isDarkMode ? '#fff' : '#000',
-                  },
-                }, {
-                  // 竖线
-                  type: 'line',
-                  shape: {
-                    x1: lowPoint[0],
-                    y1: lowPoint[1],
-                    x2: lowPoint[0],
-                    y2: highPoint[1],
-                  },
-                  style: {
-                    stroke: isDarkMode ? '#fff' : '#000',
-                  },
-                }],
-              }
-            }
-          })) : []),
-        ]
+          ...(error !== 0
+            ? std.map((s) => ({
+                type: 'custom',
+                data: s,
+                zlevel: 2,
+                // @ts-expect-error 套了一层数组后, 类型推断出错
+                renderItem(params, api) {
+                  const xValue = api.value(0)
+                  const currentSeriesIndices = api.currentSeriesIndices()
+                  // 获取柱状图布局信息
+                  const barLayout = api.barLayout({
+                    count: variables.length,
+                  })
+                  // 获取当前系列在所有柱状图系列中的索引
+                  const barIndex =
+                    currentSeriesIndices.indexOf(params.seriesIndex) -
+                    variables.length
+                  const lowPoint = api.coord([xValue, api.value(1)])
+                  const highPoint = api.coord([xValue, api.value(2)])
+                  // 使用布局信息调整 x 坐标
+                  const offset = barLayout[barIndex].offsetCenter
+                  lowPoint[0] += offset
+                  highPoint[0] += offset
+                  const halfWidth = Math.min(15, barLayout[barIndex].width / 4)
+                  return {
+                    type: 'group',
+                    children: [
+                      {
+                        // 顶部横线
+                        type: 'line',
+                        shape: {
+                          x1: lowPoint[0] - halfWidth,
+                          y1: highPoint[1],
+                          x2: lowPoint[0] + halfWidth,
+                          y2: highPoint[1],
+                        },
+                        style: {
+                          stroke: isDarkMode ? '#fff' : '#000',
+                        },
+                      },
+                      {
+                        // 底部横线
+                        type: 'line',
+                        shape: {
+                          x1: lowPoint[0] - halfWidth,
+                          y1: lowPoint[1],
+                          x2: lowPoint[0] + halfWidth,
+                          y2: lowPoint[1],
+                        },
+                        style: {
+                          stroke: isDarkMode ? '#fff' : '#000',
+                        },
+                      },
+                      {
+                        // 竖线
+                        type: 'line',
+                        shape: {
+                          x1: lowPoint[0],
+                          y1: lowPoint[1],
+                          x2: lowPoint[0],
+                          y2: highPoint[1],
+                        },
+                        style: {
+                          stroke: isDarkMode ? '#fff' : '#000',
+                        },
+                      },
+                    ],
+                  }
+                },
+              }))
+            : []),
+        ],
       }
       chart.setOption(option, true)
       setRendered(true)
@@ -185,15 +234,15 @@ export function GroupedBarPlot() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -214,22 +263,18 @@ export function GroupedBarPlot() {
               <Form.Item
                 noStyle
                 name='group'
-                rules={[ 
-                  { required: true, message: '请选择分组变量' } 
-                ]}
+                rules={[{ required: true, message: '请选择分组变量' }]}
               >
                 <Select
                   className='w-full'
                   placeholder='请选择分组变量'
-                  options={dataCols.map((col) => (
-                    { label: `${col.name} (水平数: ${col.unique})`, value: col.name }
-                  ))}
+                  options={dataCols.map((col) => ({
+                    label: `${col.name} (水平数: ${col.unique})`,
+                    value: col.name,
+                  }))}
                 />
               </Form.Item>
-              <Form.Item
-                noStyle
-                name='xLabel'
-              >
+              <Form.Item noStyle name='xLabel'>
                 <Input className='w-full' placeholder='默认为分组变量名' />
               </Form.Item>
             </Space.Compact>
@@ -239,9 +284,7 @@ export function GroupedBarPlot() {
               <Form.Item
                 noStyle
                 name='variables'
-                rules={[
-                  { required: true, message: '请选择数据变量' },
-                ]}
+                rules={[{ required: true, message: '请选择数据变量' }]}
               >
                 <Select
                   className='w-full'
@@ -249,24 +292,17 @@ export function GroupedBarPlot() {
                   mode='multiple'
                   options={dataCols
                     .filter((col) => col.type === '等距或等比数据')
-                    .map((col) => ({ label: col.name, value: col.name })
-                  )}
+                    .map((col) => ({ label: col.name, value: col.name }))}
                 />
               </Form.Item>
-              <Form.Item
-                noStyle
-                name='yLabel'
-              >
+              <Form.Item noStyle name='yLabel'>
                 <Input className='w-full' placeholder='默认为Y' />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
           <Form.Item label='数据标签和误差棒内容'>
             <Space.Compact className='w-full'>
-              <Form.Item
-                noStyle
-                name='label'
-              >
+              <Form.Item noStyle name='label'>
                 <Select
                   className='w-full'
                   placeholder='数据标签内容'
@@ -278,10 +314,7 @@ export function GroupedBarPlot() {
                   ]}
                 />
               </Form.Item>
-              <Form.Item
-                noStyle
-                name='error'
-              >
+              <Form.Item noStyle name='error'>
                 <Select
                   className='w-full'
                   placeholder='误差棒内容'
@@ -299,20 +332,14 @@ export function GroupedBarPlot() {
           </Form.Item>
           <Form.Item label='自定义不同组的标签和组内不同变量的标签'>
             <Space.Compact block>
-              <Form.Item
-                noStyle
-                name='gLabel'
-              >
+              <Form.Item noStyle name='gLabel'>
                 <Select
                   className='w-full'
                   placeholder='默认为分组变量值'
                   mode='tags'
                 />
               </Form.Item>
-              <Form.Item
-                noStyle
-                name='iLabel'
-              >
+              <Form.Item noStyle name='iLabel'>
                 <Select
                   className='w-full'
                   placeholder='默认为数据变量名'
@@ -323,31 +350,23 @@ export function GroupedBarPlot() {
           </Form.Item>
           <Form.Item label='自定义Y轴最大值和最小值'>
             <Space.Compact className='w-full'>
-              <Form.Item
-                noStyle
-                name='maxY'
-              >
-                <InputNumber 
-                  className='w-full' 
-                  addonBefore='最大值' 
+              <Form.Item noStyle name='maxY'>
+                <InputNumber
+                  className='w-full'
+                  addonBefore='最大值'
                   placeholder='默认自动设置'
                 />
               </Form.Item>
-              <Form.Item
-                noStyle
-                name='minY'
-              >
-                <InputNumber 
-                  className='w-full' 
+              <Form.Item noStyle name='minY'>
+                <InputNumber
+                  className='w-full'
                   addonBefore='最小值'
                   placeholder='默认自动设置'
                 />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <div
-            className='flex flex-row flex-nowrap justify-center items-center gap-4'
-          >
+          <div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
             <Button
               className='w-full mt-4'
               type='default'
@@ -367,16 +386,18 @@ export function GroupedBarPlot() {
             </Button>
           </div>
         </Form>
-
       </div>
 
       <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>
-        {!rendered && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>请选择参数并点击生成</div>}
+        {!rendered && (
+          <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+            请选择参数并点击生成
+          </div>
+        )}
       </div>
-
     </div>
   )
 }

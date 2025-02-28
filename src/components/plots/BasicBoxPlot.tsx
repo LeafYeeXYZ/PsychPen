@@ -7,7 +7,6 @@ import type { EChartsOption } from 'echarts'
 import { downloadImage } from '../../lib/utils'
 
 type Option = {
-
   /** 数据分类 */
   type: 'peer' | 'independent'
 
@@ -34,7 +33,6 @@ type Option = {
 }
 
 export function BasicBoxPlot() {
-
   const { dataCols, dataRows, messageApi, isLargeData } = useZustand()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -42,125 +40,32 @@ export function BasicBoxPlot() {
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      const { dataVar, groupVar, xLabel, yLabel, title, type, variables, peerLabel, dataLabel } = values
+      const {
+        dataVar,
+        groupVar,
+        xLabel,
+        yLabel,
+        title,
+        type,
+        variables,
+        peerLabel,
+        dataLabel,
+      } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       if (type === 'independent') {
         // 被试间数据处理
-        const cols = Array
-          .from(new Set(dataRows.map((row) => row[groupVar!])).values())
+        const cols = Array.from(
+          new Set(dataRows.map((row) => row[groupVar!])).values(),
+        )
           .filter((value) => typeof value !== 'undefined')
           .sort((a, b) => Number(a) - Number(b))
-        const rows = cols.map((col) => dataRows.filter((row) => row[groupVar!] === col).map((row) => row[dataVar!]).filter((value) => typeof value === 'number'))
-        const option: EChartsOption = {
-          title: [
-            {
-              text: title,
-              left: 'center',
-            },
-            {
-              text: '上离群值: Q3 + 1.5 * IQR\n下离群值: Q1 - 1.5 * IQR',
-              borderColor: '#a0a0a0',
-              borderWidth: 1,
-              textStyle: {
-                fontWeight: 'normal',
-                fontSize: 10,
-                lineHeight: 15,
-                color: '#a0a0a0'
-              },
-              left: '10%',
-              top: '90%'
-            },
-          ],
-          grid: {
-            left: '10%',
-            right: '10%',
-            bottom: '15%',
-          },
-          xAxis: {
-            name: xLabel || groupVar,
-            nameLocation: 'middle',
-            type: 'category',
-            boundaryGap: true,
-            nameGap: 30,
-            splitArea: {
-              show: false
-            },
-            splitLine: {
-              show: false
-            }
-          },
-          yAxis: {
-            type: 'value',
-            name: yLabel || dataVar,
-            nameLocation: 'middle',
-            nameGap: 35,
-            splitArea: {
-              show: true
-            },
-          },
-          series: [
-            {
-              name: 'boxplot',
-              type: 'boxplot',
-              datasetIndex: 1,
-            },
-            {
-              name: 'outlier',
-              type: 'scatter',
-              datasetIndex: 2,
-            }
-          ],
-          dataset: [
-            {
-              source: rows,
-            },
-            {
-              transform: {
-                type: 'boxplot',
-                config: { itemNameFormatter: (value: { value: number }) => cols[value.value] }
-              }
-            },
-            {
-              fromDatasetIndex: 1,
-              fromTransformResult: 1
-            }
-          ],
-          tooltip: {
-            trigger: 'item',
-            axisPointer: {
-              type: 'shadow'
-            },
-            formatter: (params) => {
-              // @ts-expect-error 无法正确推断类型
-              if (params.componentSubType === 'boxplot') {
-                return [
-                  // @ts-expect-error 无法正确推断类型
-                  `最大值: ${params.value[5]}`,
-                  // @ts-expect-error 无法正确推断类型
-                  `Q3: ${params.value[4]}`,
-                  // @ts-expect-error 无法正确推断类型
-                  `Q2: ${params.value[3]}`,
-                  // @ts-expect-error 无法正确推断类型
-                  `Q1: ${params.value[2]}`,
-                  // @ts-expect-error 无法正确推断类型
-                  `最小值: ${params.value[1]}`,
-                ].join('<br>')
-              }
-              // @ts-expect-error 无法正确推断类型
-              return `${params.value[1]}`
-            }
-          },
-        }
-        chart.setOption(option, true)
-      } else {
-        // 被试内数据处理
-        const cols = variables!
-        const rows = variables!.map((variable) => dataRows
-          .map((row) => row[variable])
-          .filter((value) => typeof value !== 'undefined' && !isNaN(Number(value)))
-          .map((value) => Number(value))
+        const rows = cols.map((col) =>
+          dataRows
+            .filter((row) => row[groupVar!] === col)
+            .map((row) => row[dataVar!])
+            .filter((value) => typeof value === 'number'),
         )
         const option: EChartsOption = {
           title: [
@@ -176,10 +81,10 @@ export function BasicBoxPlot() {
                 fontWeight: 'normal',
                 fontSize: 10,
                 lineHeight: 15,
-                color: '#a0a0a0'
+                color: '#a0a0a0',
               },
               left: '10%',
-              top: '90%'
+              top: '90%',
             },
           ],
           grid: {
@@ -188,25 +93,25 @@ export function BasicBoxPlot() {
             bottom: '15%',
           },
           xAxis: {
-            name: peerLabel || 'X',
+            name: xLabel || groupVar,
             nameLocation: 'middle',
             type: 'category',
             boundaryGap: true,
             nameGap: 30,
             splitArea: {
-              show: false
+              show: false,
             },
             splitLine: {
-              show: false
-            }
+              show: false,
+            },
           },
           yAxis: {
             type: 'value',
-            name: dataLabel || 'Y',
+            name: yLabel || dataVar,
             nameLocation: 'middle',
             nameGap: 35,
             splitArea: {
-              show: true
+              show: true,
             },
           },
           series: [
@@ -219,7 +124,7 @@ export function BasicBoxPlot() {
               name: 'outlier',
               type: 'scatter',
               datasetIndex: 2,
-            }
+            },
           ],
           dataset: [
             {
@@ -228,18 +133,21 @@ export function BasicBoxPlot() {
             {
               transform: {
                 type: 'boxplot',
-                config: { itemNameFormatter: (value: { value: number }) => cols[value.value] }
-              }
+                config: {
+                  itemNameFormatter: (value: { value: number }) =>
+                    cols[value.value],
+                },
+              },
             },
             {
               fromDatasetIndex: 1,
-              fromTransformResult: 1
-            }
+              fromTransformResult: 1,
+            },
           ],
           tooltip: {
             trigger: 'item',
             axisPointer: {
-              type: 'shadow'
+              type: 'shadow',
             },
             formatter: (params) => {
               // @ts-expect-error 无法正确推断类型
@@ -259,7 +167,122 @@ export function BasicBoxPlot() {
               }
               // @ts-expect-error 无法正确推断类型
               return `${params.value[1]}`
-            }
+            },
+          },
+        }
+        chart.setOption(option, true)
+      } else {
+        // 被试内数据处理
+        const cols = variables!
+        const rows = variables!.map((variable) =>
+          dataRows
+            .map((row) => row[variable])
+            .filter(
+              (value) => typeof value !== 'undefined' && !isNaN(Number(value)),
+            )
+            .map((value) => Number(value)),
+        )
+        const option: EChartsOption = {
+          title: [
+            {
+              text: title,
+              left: 'center',
+            },
+            {
+              text: '上离群值: Q3 + 1.5 * IQR\n下离群值: Q1 - 1.5 * IQR',
+              borderColor: '#a0a0a0',
+              borderWidth: 1,
+              textStyle: {
+                fontWeight: 'normal',
+                fontSize: 10,
+                lineHeight: 15,
+                color: '#a0a0a0',
+              },
+              left: '10%',
+              top: '90%',
+            },
+          ],
+          grid: {
+            left: '10%',
+            right: '10%',
+            bottom: '15%',
+          },
+          xAxis: {
+            name: peerLabel || 'X',
+            nameLocation: 'middle',
+            type: 'category',
+            boundaryGap: true,
+            nameGap: 30,
+            splitArea: {
+              show: false,
+            },
+            splitLine: {
+              show: false,
+            },
+          },
+          yAxis: {
+            type: 'value',
+            name: dataLabel || 'Y',
+            nameLocation: 'middle',
+            nameGap: 35,
+            splitArea: {
+              show: true,
+            },
+          },
+          series: [
+            {
+              name: 'boxplot',
+              type: 'boxplot',
+              datasetIndex: 1,
+            },
+            {
+              name: 'outlier',
+              type: 'scatter',
+              datasetIndex: 2,
+            },
+          ],
+          dataset: [
+            {
+              source: rows,
+            },
+            {
+              transform: {
+                type: 'boxplot',
+                config: {
+                  itemNameFormatter: (value: { value: number }) =>
+                    cols[value.value],
+                },
+              },
+            },
+            {
+              fromDatasetIndex: 1,
+              fromTransformResult: 1,
+            },
+          ],
+          tooltip: {
+            trigger: 'item',
+            axisPointer: {
+              type: 'shadow',
+            },
+            formatter: (params) => {
+              // @ts-expect-error 无法正确推断类型
+              if (params.componentSubType === 'boxplot') {
+                return [
+                  // @ts-expect-error 无法正确推断类型
+                  `最大值: ${params.value[5]}`,
+                  // @ts-expect-error 无法正确推断类型
+                  `Q3: ${params.value[4]}`,
+                  // @ts-expect-error 无法正确推断类型
+                  `Q2: ${params.value[3]}`,
+                  // @ts-expect-error 无法正确推断类型
+                  `Q1: ${params.value[2]}`,
+                  // @ts-expect-error 无法正确推断类型
+                  `最小值: ${params.value[1]}`,
+                ].join('<br>')
+              }
+              // @ts-expect-error 无法正确推断类型
+              return `${params.value[1]}`
+            },
           },
         }
         chart.setOption(option, true)
@@ -269,17 +292,19 @@ export function BasicBoxPlot() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
   // 被试内和被试间
-  const [formType, setFormType] = useState<'peer' | 'independent'>('independent')
+  const [formType, setFormType] = useState<'peer' | 'independent'>(
+    'independent',
+  )
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -329,10 +354,7 @@ export function BasicBoxPlot() {
                       }),
                     ]}
                   >
-                    <Select
-                      className='w-full'
-                      placeholder='请选择分组变量'
-                    >
+                    <Select className='w-full' placeholder='请选择分组变量'>
                       {dataCols.map((col) => (
                         <Select.Option key={col.name} value={col.name}>
                           {col.name} (水平数: {col.unique})
@@ -340,10 +362,7 @@ export function BasicBoxPlot() {
                       ))}
                     </Select>
                   </Form.Item>
-                  <Form.Item
-                    name='xLabel'
-                    noStyle
-                  >
+                  <Form.Item name='xLabel' noStyle>
                     <Input className='w-max' placeholder='标签默认为变量名' />
                   </Form.Item>
                 </Space.Compact>
@@ -365,21 +384,18 @@ export function BasicBoxPlot() {
                       }),
                     ]}
                   >
-                    <Select
-                      className='w-full'
-                      placeholder='请选择数据变量'
-                    >
-                      {dataCols.map((col) => col.type === '等距或等比数据' && (
-                        <Select.Option key={col.name} value={col.name}>
-                          {col.name}
-                        </Select.Option>
-                      ))}
+                    <Select className='w-full' placeholder='请选择数据变量'>
+                      {dataCols.map(
+                        (col) =>
+                          col.type === '等距或等比数据' && (
+                            <Select.Option key={col.name} value={col.name}>
+                              {col.name}
+                            </Select.Option>
+                          ),
+                      )}
                     </Select>
                   </Form.Item>
-                  <Form.Item
-                    name='xLabel'
-                    noStyle
-                  >
+                  <Form.Item name='xLabel' noStyle>
                     <Input className='w-max' placeholder='标签默认为变量名' />
                   </Form.Item>
                 </Space.Compact>
@@ -401,37 +417,25 @@ export function BasicBoxPlot() {
                   mode='multiple'
                   options={dataCols
                     .filter((col) => col.type === '等距或等比数据')
-                    .map((col) => ({ label: col.name, value: col.name })
-                  )}
+                    .map((col) => ({ label: col.name, value: col.name }))}
                 />
               </Form.Item>
               <Form.Item label='自定义X轴和Y轴标签'>
                 <Space.Compact>
-                  <Form.Item
-                    noStyle
-                    name='peerLabel'
-                  >
+                  <Form.Item noStyle name='peerLabel'>
                     <Input className='w-full' placeholder='X轴标签默认为X' />
                   </Form.Item>
-                  <Form.Item
-                    noStyle
-                    name='dataLabel'
-                  >
+                  <Form.Item noStyle name='dataLabel'>
                     <Input className='w-full' placeholder='Y轴标签默认为Y' />
                   </Form.Item>
                 </Space.Compact>
               </Form.Item>
             </>
           )}
-          <Form.Item
-            label='自定义标题'
-            name='title'
-          >
+          <Form.Item label='自定义标题' name='title'>
             <Input className='w-full' placeholder='默认无标题' />
           </Form.Item>
-          <div
-            className='flex flex-row flex-nowrap justify-center items-center gap-4'
-          >
+          <div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
             <Button
               className='w-full mt-4'
               type='default'
@@ -451,16 +455,18 @@ export function BasicBoxPlot() {
             </Button>
           </div>
         </Form>
-
       </div>
 
       <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>
-        {!rendered && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>请选择参数并点击生成</div>}
+        {!rendered && (
+          <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+            请选择参数并点击生成
+          </div>
+        )}
       </div>
-
     </div>
   )
 }

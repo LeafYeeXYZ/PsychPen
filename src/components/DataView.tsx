@@ -3,7 +3,6 @@ import { ImportData } from './data/ImportData'
 import { PreviewData } from './data/PreviewData'
 
 export function DataView() {
-
   const { data } = useZustand()
 
   return (

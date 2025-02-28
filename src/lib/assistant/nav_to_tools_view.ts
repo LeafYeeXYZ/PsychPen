@@ -10,9 +10,11 @@ export const nav_to_tools_view: AIFunction = {
       parameters: {
         type: 'object',
         properties: {
-          'page': {
+          page: {
             type: 'string',
-            description: `页面 (${Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).map((label) => `"${label}"`).join(' / ')})`,
+            description: `页面 (${Object.values(TOOLS_VIEW_SUB_PAGES_LABELS)
+              .map((label) => `"${label}"`)
+              .join(' / ')})`,
           },
         },
         required: ['page'],

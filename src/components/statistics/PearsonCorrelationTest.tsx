@@ -24,7 +24,6 @@ type Result = {
 } & Option
 
 export function PearsonCorrelationTest() {
-
   const { dataCols, dataRows, messageApi } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -33,11 +32,19 @@ export function PearsonCorrelationTest() {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
       const { variable, alpha } = values
-      const filteredRows = dataRows.filter((row) => variable.every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
+      const filteredRows = dataRows.filter((row) =>
+        variable.every(
+          (variable) =>
+            typeof row[variable] !== 'undefined' &&
+            !isNaN(Number(row[variable])),
+        ),
+      )
       const results: Result['data'] = []
       for (let i = 0; i < variable.length - 1; i++) {
         for (let j = i + 1; j < variable.length; j++) {
-          const data = [variable[i], variable[j]].map((variable) => filteredRows.map((row) => Number(row[variable])))
+          const data = [variable[i], variable[j]].map((variable) =>
+            filteredRows.map((row) => Number(row[variable])),
+          )
           const result = new PearsonCorrTest(data[0], data[1], alpha)
           results.push({
             peer: [values.variable[i], values.variable[j]],
@@ -58,15 +65,15 @@ export function PearsonCorrelationTest() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -89,16 +96,15 @@ export function PearsonCorrelationTest() {
               { type: 'array', min: 2, message: '至少选择两个变量' },
             ]}
           >
-            <Select
-              className='w-full'
-              placeholder='请选择变量'
-              mode='multiple'
-            >
-              {dataCols.map((col) => col.type === '等距或等比数据' && (
-                <Select.Option key={col.name} value={col.name}>
-                  {col.name}
-                </Select.Option>
-              ))}
+            <Select className='w-full' placeholder='请选择变量' mode='multiple'>
+              {dataCols.map(
+                (col) =>
+                  col.type === '等距或等比数据' && (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name}
+                    </Select.Option>
+                  ),
+              )}
             </Select>
           </Form.Item>
           <Form.Item
@@ -116,25 +122,23 @@ export function PearsonCorrelationTest() {
             />
           </Form.Item>
           <Form.Item>
-            <Button
-              className='w-full mt-4'
-              type='default'
-              htmlType='submit'
-            >
+            <Button className='w-full mt-4' type='default' htmlType='submit'>
               计算
             </Button>
           </Form.Item>
         </Form>
-
       </div>
 
       <div className='component-result'>
-
         {result ? (
           <div className='w-full h-full overflow-auto'>
-
-            <p className='text-lg mb-2 text-center w-full'>Pearson 相关系数检验</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 两个变量的相关系数等于零 | 显著性水平(α): {result.alpha}</p>
+            <p className='text-lg mb-2 text-center w-full'>
+              Pearson 相关系数检验
+            </p>
+            <p className='text-xs mb-3 text-center w-full'>
+              H<sub>0</sub>: 两个变量的相关系数等于零 | 显著性水平(α):{' '}
+              {result.alpha}
+            </p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -179,22 +183,27 @@ export function PearsonCorrelationTest() {
                   <tr key={variableA}>
                     <td>{variableA}</td>
                     {result.variable.map((variableB, indexB) => (
-                      <td key={variableB}>{indexA === indexB ? '-' : result.data.find((row) => row.peer.includes(variableA) && row.peer.includes(variableB))?.r}</td>
+                      <td key={variableB}>
+                        {indexA === indexB
+                          ? '-'
+                          : result.data.find(
+                              (row) =>
+                                row.peer.includes(variableA) &&
+                                row.peer.includes(variableB),
+                            )?.r}
+                      </td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
-
           </div>
         ) : (
           <div className='w-full h-full flex justify-center items-center'>
             <span>请填写参数并点击计算</span>
           </div>
         )}
-        
       </div>
-
     </div>
   )
 }

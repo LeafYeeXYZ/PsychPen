@@ -32,24 +32,32 @@ type Option = {
 }
 
 export function ThreeDBarPlot() {
-
-  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } = useZustand()
+  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } =
+    useZustand()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      const { xVar, yVar, zVar ,xLabel, yLabel, zLabel, title, statistic, opacity } = values
+      const {
+        xVar,
+        yVar,
+        zVar,
+        xLabel,
+        yLabel,
+        zLabel,
+        title,
+        statistic,
+        opacity,
+      } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
-      const x: string[] = Array
-        .from(new Set(dataRows.map((row) => row[xVar])))
+      const x: string[] = Array.from(new Set(dataRows.map((row) => row[xVar])))
         .sort((a, b) => Number(a) - Number(b))
         .map(String)
-      const y: string[] = Array
-        .from(new Set(dataRows.map((row) => row[yVar])))
+      const y: string[] = Array.from(new Set(dataRows.map((row) => row[yVar])))
         .sort((a, b) => Number(a) - Number(b))
         .map(String)
       const z: number[][] = []
@@ -170,12 +178,12 @@ export function ThreeDBarPlot() {
           boxDepth: 80,
           light: {
             main: {
-              intensity: 1.2
+              intensity: 1.2,
             },
             ambient: {
-              intensity: 0.3
-            }
-          }
+              intensity: 0.3,
+            },
+          },
         },
         visualMap: {
           max: max(z.map((item) => item[2])),
@@ -192,40 +200,42 @@ export function ThreeDBarPlot() {
               '#fdae61',
               '#f46d43',
               '#d73027',
-              '#a50026'
-            ]
-          }
+              '#a50026',
+            ],
+          },
         },
         tooltip: {
           show: true,
           formatter: (params) => {
             // @ts-expect-error 没问题
             return `${xLabel || xVar}: ${x[params.value[0]]}<br />${yLabel || yVar}: ${y[params.value[1]]}<br />${zLabel || zVar}: ${params.value[2]}`
-          }
+          },
         },
         // @ts-expect-error echarts-gl 没有提供类型定义
-        series: [{
-          type: 'bar3D',
-          data: z,
-          shading: 'color',
-          label: {
-            show: false,
-            fontSize: 16,
-            borderWidth: 1
-          },
-          itemStyle: {
-            opacity: opacity,
-          },
-          emphasis: {
+        series: [
+          {
+            type: 'bar3D',
+            data: z,
+            shading: 'color',
             label: {
-              fontSize: 20,
-              color: '#900'
+              show: false,
+              fontSize: 16,
+              borderWidth: 1,
             },
             itemStyle: {
-              color: '#900'
-            }
-          }
-        }],
+              opacity: opacity,
+            },
+            emphasis: {
+              label: {
+                fontSize: 20,
+                color: '#900',
+              },
+              itemStyle: {
+                color: '#900',
+              },
+            },
+          },
+        ],
       }
       chart.setOption(option, true)
       setRendered(true)
@@ -233,15 +243,15 @@ export function ThreeDBarPlot() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -266,7 +276,10 @@ export function ThreeDBarPlot() {
                   { required: true, message: '请选择X轴变量' },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
-                      if (value === getFieldValue('yVar') || value === getFieldValue('zVar')) {
+                      if (
+                        value === getFieldValue('yVar') ||
+                        value === getFieldValue('zVar')
+                      ) {
                         return Promise.reject('请选择不同的变量')
                       }
                       return Promise.resolve()
@@ -274,10 +287,7 @@ export function ThreeDBarPlot() {
                   }),
                 ]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='请选择X轴变量'
-                >
+                <Select className='w-full' placeholder='请选择X轴变量'>
                   {dataCols.map((col) => (
                     <Select.Option key={col.name} value={col.name}>
                       {col.name} (水平数: {col.unique})
@@ -285,10 +295,7 @@ export function ThreeDBarPlot() {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item
-                name='xLabel'
-                noStyle
-              >
+              <Form.Item name='xLabel' noStyle>
                 <Input className='w-max' placeholder='标签默认为变量名' />
               </Form.Item>
             </Space.Compact>
@@ -302,7 +309,10 @@ export function ThreeDBarPlot() {
                   { required: true, message: '请选择Y轴变量' },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
-                      if (value === getFieldValue('xVar') || value === getFieldValue('zVar')) {
+                      if (
+                        value === getFieldValue('xVar') ||
+                        value === getFieldValue('zVar')
+                      ) {
                         return Promise.reject('请选择不同的变量')
                       }
                       return Promise.resolve()
@@ -310,10 +320,7 @@ export function ThreeDBarPlot() {
                   }),
                 ]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='请选择Y轴变量'
-                >
+                <Select className='w-full' placeholder='请选择Y轴变量'>
                   {dataCols.map((col) => (
                     <Select.Option key={col.name} value={col.name}>
                       {col.name} (水平数: {col.unique})
@@ -321,10 +328,7 @@ export function ThreeDBarPlot() {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item
-                name='yLabel'
-                noStyle
-              >
+              <Form.Item name='yLabel' noStyle>
                 <Input className='w-max' placeholder='标签默认为变量名' />
               </Form.Item>
             </Space.Compact>
@@ -338,7 +342,10 @@ export function ThreeDBarPlot() {
                   { required: true, message: '请选择Z轴变量' },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
-                      if (value === getFieldValue('xVar') || value === getFieldValue('yVar')) {
+                      if (
+                        value === getFieldValue('xVar') ||
+                        value === getFieldValue('yVar')
+                      ) {
                         return Promise.reject('请选择不同的变量')
                       }
                       return Promise.resolve()
@@ -346,28 +353,23 @@ export function ThreeDBarPlot() {
                   }),
                 ]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='请选择Z轴变量'
-                >
-                  {dataCols.map((col) => col.type === '等距或等比数据' && (
-                    <Select.Option key={col.name} value={col.name}>
-                      {col.name}
-                    </Select.Option>
-                  ))}
+                <Select className='w-full' placeholder='请选择Z轴变量'>
+                  {dataCols.map(
+                    (col) =>
+                      col.type === '等距或等比数据' && (
+                        <Select.Option key={col.name} value={col.name}>
+                          {col.name}
+                        </Select.Option>
+                      ),
+                  )}
                 </Select>
               </Form.Item>
-              <Form.Item
-                name='zLabel'
-                noStyle
-              >
+              <Form.Item name='zLabel' noStyle>
                 <Input className='w-max' placeholder='标签默认为变量名' />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item
-            label='柱状图统计量和透明度'
-          >
+          <Form.Item label='柱状图统计量和透明度'>
             <Space.Compact block>
               <Form.Item
                 noStyle
@@ -399,15 +401,10 @@ export function ThreeDBarPlot() {
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item
-            label='自定义标题'
-            name='title'
-          >
+          <Form.Item label='自定义标题' name='title'>
             <Input className='w-full' placeholder='默认无标题' />
           </Form.Item>
-          <div
-            className='flex flex-row flex-nowrap justify-center items-center gap-4'
-          >
+          <div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
             <Button
               className='w-full mt-4'
               type='default'
@@ -427,16 +424,18 @@ export function ThreeDBarPlot() {
             </Button>
           </div>
         </Form>
-
       </div>
 
       <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>
-        {!rendered && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>请选择参数并点击生成</div>}
+        {!rendered && (
+          <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+            请选择参数并点击生成
+          </div>
+        )}
       </div>
-
     </div>
   )
 }

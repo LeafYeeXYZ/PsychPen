@@ -27,7 +27,7 @@ function validateExpression(expression: string): void {
     // 阻止外部代码执行
     expression.includes('import') ||
     expression.includes('eval') ||
-    expression.includes('Function') || 
+    expression.includes('Function') ||
     expression.includes('setTimeout') ||
     expression.includes('setInterval') ||
     expression.includes('setImmediate') ||
@@ -45,18 +45,19 @@ function validateExpression(expression: string): void {
  * @param dataRows 原始数据, 不要传入已经处理过的数据
  * @returns 处理后的数据变量列表和数据行
  */
-const calculator = ( 
-  dataCols: Variable[], 
-  dataRows: { [key: string]: unknown }[] 
-) : { 
-  calculatedCols: Variable[], 
-  calculatedRows: { [key: string]: unknown }[] 
+const calculator = (
+  dataCols: Variable[],
+  dataRows: { [key: string]: unknown }[],
+): {
+  calculatedCols: Variable[]
+  calculatedRows: { [key: string]: unknown }[]
 } => {
-  const TASKS = [ // Order matters
-    Missing, 
-    Derive, 
-    Filter, 
-    Describe
+  const TASKS = [
+    // Order matters
+    Missing,
+    Derive,
+    Filter,
+    Describe,
   ]
   let calculatedCols = dataCols
   let calculatedRows = dataRows
@@ -78,7 +79,7 @@ export const useZustand = create<GlobalState>()((set) => ({
     if (rows) {
       const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
       const { calculatedCols, calculatedRows } = calculator(cols, rows)
-      set({ 
+      set({
         data: rows,
         dataRows: calculatedRows,
         dataCols: calculatedCols,
@@ -99,13 +100,15 @@ export const useZustand = create<GlobalState>()((set) => ({
     set((state) => {
       const cols = state.dataCols
       const rows = state.dataRows
-      if (cols.find((col) => col.name == name)) { // 故意使用 == 而不是 ===
+      if (cols.find((col) => col.name == name)) {
+        // 故意使用 == 而不是 ===
         throw new Error(`变量名 ${name} 已存在`)
       }
       const vars = expression.match(/:::.+?:::/g) ?? []
       if (vars.length > 0) {
         vars.forEach((v) => {
-          if (!cols.find(({ name }) => name == v.slice(3, -3))) { // 故意使用 == 而不是 ===
+          if (!cols.find(({ name }) => name == v.slice(3, -3))) {
+            // 故意使用 == 而不是 ===
             throw new Error(`变量 ${v} 不存在`)
           }
         })
@@ -129,14 +132,19 @@ export const useZustand = create<GlobalState>()((set) => ({
           const result = eval(expressionWithValues)
           return { [name]: result, ...row }
         } catch (error) {
-          throw new Error(`执行表达式失败: ${error instanceof Error ? error.message : String(error)}`)
+          throw new Error(
+            `执行表达式失败: ${error instanceof Error ? error.message : String(error)}`,
+          )
         }
       })
       const describe = new Describe([{ name }], newRows)
-      return { 
-        dataCols: [...describe.updatedCols, ...cols], 
+      return {
+        dataCols: [...describe.updatedCols, ...cols],
         dataRows: newRows,
-        data: state.data!.map((row, i) => ({ [name]: newRows[i][name], ...row }))
+        data: state.data!.map((row, i) => ({
+          [name]: newRows[i][name],
+          ...row,
+        })),
       }
     })
   },

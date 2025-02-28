@@ -1,9 +1,16 @@
-import { useNav, STATISTICS_SUB_PAGES_MAP, type STATISTICS_SUB_PAGES_LABELS } from '../lib/useNav'
+import {
+  useNav,
+  STATISTICS_SUB_PAGES_MAP,
+  type STATISTICS_SUB_PAGES_LABELS,
+} from '../lib/useNav'
 import { Cascader } from 'antd'
 
 export function StatisticsView() {
-  
-  const { activeStatisticsViewSubPage, setStatisticsViewSubPage, statisticsViewSubPage } = useNav()
+  const {
+    activeStatisticsViewSubPage,
+    setStatisticsViewSubPage,
+    statisticsViewSubPage,
+  } = useNav()
 
   return (
     <div className='w-full h-full overflow-hidden'>
@@ -13,17 +20,21 @@ export function StatisticsView() {
           <Cascader
             placeholder='请选择统计方法'
             defaultValue={[
-              Object.entries(STATISTICS_SUB_PAGES_MAP).find(([, value]) => value.includes(activeStatisticsViewSubPage))![0],
-              activeStatisticsViewSubPage
+              Object.entries(STATISTICS_SUB_PAGES_MAP).find(([, value]) =>
+                value.includes(activeStatisticsViewSubPage),
+              )![0],
+              activeStatisticsViewSubPage,
             ]}
-            options={Object.entries(STATISTICS_SUB_PAGES_MAP).map(([key, value]) => ({
-              value: key,
-              label: key,
-              children: value.map((subPage) => ({
-                value: subPage,
-                label: subPage,
-              })),
-            }))}
+            options={Object.entries(STATISTICS_SUB_PAGES_MAP).map(
+              ([key, value]) => ({
+                value: key,
+                label: key,
+                children: value.map((subPage) => ({
+                  value: subPage,
+                  label: subPage,
+                })),
+              }),
+            )}
             onChange={(value) => {
               if (activeStatisticsViewSubPage === value[1]) return
               setStatisticsViewSubPage(value[1] as STATISTICS_SUB_PAGES_LABELS)

@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useZustand } from './lib/useZustand'
 import { useNav, MAIN_PAGES_LABELS } from './lib/useNav'
-import { Button, ConfigProvider, type ThemeConfig, message, theme, Drawer } from 'antd'
+import {
+  Button,
+  ConfigProvider,
+  type ThemeConfig,
+  message,
+  theme,
+  Drawer,
+} from 'antd'
 import { BarChartOutlined, CommentOutlined } from '@ant-design/icons'
 import Bowser from 'bowser'
 import { version } from '../package.json'
@@ -24,8 +31,8 @@ const ANTD_THEME_DARK: ThemeConfig = {
 }
 
 export function App() {
-
-  const { data, _App_setMessageApi, disabled, isDarkMode, _App_setIsDarkMode } = useZustand()
+  const { data, _App_setMessageApi, disabled, isDarkMode, _App_setIsDarkMode } =
+    useZustand()
   // 页面切换
   const { activeMainPage, mainPage, setMainPage } = useNav()
   // 消息实例
@@ -40,14 +47,26 @@ export function App() {
       safari: '>=16',
       edge: '>=110',
     })
-    valid || messageApi.warning('当前浏览器版本较低, 可能会导致部分功能无法正常使用, 请使用最新版本的 Chrome, Firefox, Safari 或 Edge 浏览器', 8)
+    valid ||
+      messageApi.warning(
+        '当前浏览器版本较低, 可能会导致部分功能无法正常使用, 请使用最新版本的 Chrome, Firefox, Safari 或 Edge 浏览器',
+        8,
+      )
   }, [messageApi, _App_setMessageApi])
   // 动态设置主题
   useEffect(() => {
-    const getIsDarkMode = () => matchMedia('(prefers-color-scheme: dark)').matches
+    const getIsDarkMode = () =>
+      matchMedia('(prefers-color-scheme: dark)').matches
     const subIsDarkMode = () => _App_setIsDarkMode(getIsDarkMode())
-    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', subIsDarkMode)
-    return () => matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', subIsDarkMode)
+    matchMedia('(prefers-color-scheme: dark)').addEventListener(
+      'change',
+      subIsDarkMode,
+    )
+    return () =>
+      matchMedia('(prefers-color-scheme: dark)').removeEventListener(
+        'change',
+        subIsDarkMode,
+      )
   }, [_App_setIsDarkMode])
   // AI助手
   const { ai } = useAssistant()
@@ -59,7 +78,9 @@ export function App() {
         <header className='flex justify-center items-center relative py-3 px-4 bg-gray-100 shadow-md dark:bg-gray-900'>
           <nav className='space-x-4'>
             <Button
-              type={activeMainPage === MAIN_PAGES_LABELS.DATA ? 'primary' : 'text'}
+              type={
+                activeMainPage === MAIN_PAGES_LABELS.DATA ? 'primary' : 'text'
+              }
               onClick={() => {
                 if (activeMainPage === MAIN_PAGES_LABELS.DATA) return
                 setMainPage(MAIN_PAGES_LABELS.DATA)
@@ -70,40 +91,52 @@ export function App() {
               数据
             </Button>
             <Button
-              type={activeMainPage === MAIN_PAGES_LABELS.VARIABLE ? 'primary' : 'text'}
+              type={
+                activeMainPage === MAIN_PAGES_LABELS.VARIABLE
+                  ? 'primary'
+                  : 'text'
+              }
               onClick={() => {
                 if (activeMainPage === MAIN_PAGES_LABELS.VARIABLE) return
                 setMainPage(MAIN_PAGES_LABELS.VARIABLE)
               }}
               autoInsertSpace={false}
-              disabled={(data === null) || disabled}
+              disabled={data === null || disabled}
             >
               变量
             </Button>
             <Button
-              type={activeMainPage === MAIN_PAGES_LABELS.PLOTS ? 'primary' : 'text'}
+              type={
+                activeMainPage === MAIN_PAGES_LABELS.PLOTS ? 'primary' : 'text'
+              }
               onClick={() => {
                 if (activeMainPage === MAIN_PAGES_LABELS.PLOTS) return
                 setMainPage(MAIN_PAGES_LABELS.PLOTS)
               }}
               autoInsertSpace={false}
-              disabled={(data === null) || disabled}
+              disabled={data === null || disabled}
             >
               绘图
             </Button>
             <Button
-              type={activeMainPage === MAIN_PAGES_LABELS.STATISTICS ? 'primary' : 'text'}
+              type={
+                activeMainPage === MAIN_PAGES_LABELS.STATISTICS
+                  ? 'primary'
+                  : 'text'
+              }
               onClick={() => {
                 if (activeMainPage === MAIN_PAGES_LABELS.STATISTICS) return
                 setMainPage(MAIN_PAGES_LABELS.STATISTICS)
               }}
               autoInsertSpace={false}
-              disabled={(data === null) || disabled}
+              disabled={data === null || disabled}
             >
               统计
             </Button>
             <Button
-              type={activeMainPage === MAIN_PAGES_LABELS.TOOLS ? 'primary' : 'text'}
+              type={
+                activeMainPage === MAIN_PAGES_LABELS.TOOLS ? 'primary' : 'text'
+              }
               onClick={() => {
                 if (activeMainPage === MAIN_PAGES_LABELS.TOOLS) return
                 setMainPage(MAIN_PAGES_LABELS.TOOLS)
@@ -115,7 +148,12 @@ export function App() {
             </Button>
           </nav>
           <p className='absolute left-4 text-sm text-rose-950 dark:text-white'>
-            <a href='https://github.com/LeafYeeXYZ/PsychPen' target='_blank' rel='noreferrer' className='hover:underline'>
+            <a
+              href='https://github.com/LeafYeeXYZ/PsychPen'
+              target='_blank'
+              rel='noreferrer'
+              className='hover:underline'
+            >
               <BarChartOutlined /> PsychPen v{version}
             </a>
           </p>
@@ -123,7 +161,7 @@ export function App() {
             <Button
               type='text'
               icon={<CommentOutlined />}
-              disabled={(data === null) || disabled || (ai === null)}
+              disabled={data === null || disabled || ai === null}
               onClick={() => setShowAI(true)}
             >
               Ask AI

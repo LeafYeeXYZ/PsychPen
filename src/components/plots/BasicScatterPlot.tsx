@@ -35,8 +35,8 @@ type Option = {
 }
 
 export function BasicScatterPlot() {
-
-  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } = useZustand()
+  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } =
+    useZustand()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
@@ -44,7 +44,7 @@ export function BasicScatterPlot() {
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
       const { xVar, yVar, xLabel, yLabel, title, regression, formula } = values
       // @ts-expect-error echarts-stat 没有提供正确的类型定义
@@ -68,11 +68,12 @@ export function BasicScatterPlot() {
         dataset: [
           {
             source: dataRows
-              .filter((row) => 
-                typeof row[xVar] !== 'undefined'
-                && typeof row[yVar] !== 'undefined'
+              .filter(
+                (row) =>
+                  typeof row[xVar] !== 'undefined' &&
+                  typeof row[yVar] !== 'undefined',
               )
-              .map((row) => { 
+              .map((row) => {
                 return [Number(row[xVar]), Number(row[yVar])]
               }),
           },
@@ -81,9 +82,9 @@ export function BasicScatterPlot() {
               type: 'ecStat:regression',
               config: {
                 method: regression === 'none' ? 'linear' : regression,
-              }
-            }
-          }
+              },
+            },
+          },
         ],
         series: [
           {
@@ -98,8 +99,8 @@ export function BasicScatterPlot() {
             smooth: true,
             symbolSize: 0.1,
             symbol: 'circle',
-            label: { 
-              show: true, 
+            label: {
+              show: true,
               fontSize: 16,
               color: isDarkMode ? '#ffffff' : '#1010a0',
               opacity: 0.8,
@@ -110,7 +111,7 @@ export function BasicScatterPlot() {
             // 如果 regression 为 none 则不显示回归线
             showSymbol: regression !== 'none' && formula,
             lineStyle: regression === 'none' ? { opacity: 0 } : {},
-          }
+          },
         ],
       }
       chart.setOption(option, true)
@@ -119,15 +120,15 @@ export function BasicScatterPlot() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -161,21 +162,18 @@ export function BasicScatterPlot() {
                   }),
                 ]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='请选择X轴变量'
-                >
-                  {dataCols.map((col) => col.type === '等距或等比数据' && (
-                    <Select.Option key={col.name} value={col.name}>
-                      {col.name}
-                    </Select.Option>
-                  ))}
+                <Select className='w-full' placeholder='请选择X轴变量'>
+                  {dataCols.map(
+                    (col) =>
+                      col.type === '等距或等比数据' && (
+                        <Select.Option key={col.name} value={col.name}>
+                          {col.name}
+                        </Select.Option>
+                      ),
+                  )}
                 </Select>
               </Form.Item>
-              <Form.Item
-                name='xLabel'
-                noStyle
-              >
+              <Form.Item name='xLabel' noStyle>
                 <Input className='w-max' placeholder='标签默认为变量名' />
               </Form.Item>
             </Space.Compact>
@@ -197,47 +195,47 @@ export function BasicScatterPlot() {
                   }),
                 ]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='请选择Y轴变量'
-                >
-                  {dataCols.map((col) => col.type === '等距或等比数据' && (
-                    <Select.Option key={col.name} value={col.name}>
-                      {col.name}
-                    </Select.Option>
-                  ))}
+                <Select className='w-full' placeholder='请选择Y轴变量'>
+                  {dataCols.map(
+                    (col) =>
+                      col.type === '等距或等比数据' && (
+                        <Select.Option key={col.name} value={col.name}>
+                          {col.name}
+                        </Select.Option>
+                      ),
+                  )}
                 </Select>
               </Form.Item>
-              <Form.Item
-                name='yLabel'
-                noStyle
-              >
+              <Form.Item name='yLabel' noStyle>
                 <Input className='w-max' placeholder='标签默认为变量名' />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item
-            label='自定义标题和点大小'
-          >
+          <Form.Item label='自定义标题和点大小'>
             <Space.Compact block>
-              <Form.Item
-                name='title'
-                noStyle
-              >
-                <Input addonBefore='标题' className='w-full' placeholder='默认无标题' />
+              <Form.Item name='title' noStyle>
+                <Input
+                  addonBefore='标题'
+                  className='w-full'
+                  placeholder='默认无标题'
+                />
               </Form.Item>
               <Form.Item
                 name='dotSize'
                 noStyle
                 rules={[{ required: true, message: '请输入点大小' }]}
               >
-                <InputNumber addonBefore='点大小' className='w-52' placeholder='默认10' min={1} step={1} />
+                <InputNumber
+                  addonBefore='点大小'
+                  className='w-52'
+                  placeholder='默认10'
+                  min={1}
+                  step={1}
+                />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item
-            label='回归线类型与通项公式'
-          >
+          <Form.Item label='回归线类型与通项公式'>
             <Space.Compact block>
               <Form.Item
                 name='regression'
@@ -260,7 +258,9 @@ export function BasicScatterPlot() {
                   ({ getFieldValue }) => ({
                     validator(_, value) {
                       if (getFieldValue('regression') === 'none' && value) {
-                        return Promise.reject('如果要显示公式, 请选择回归线类型')
+                        return Promise.reject(
+                          '如果要显示公式, 请选择回归线类型',
+                        )
                       }
                       return Promise.resolve()
                     },
@@ -274,9 +274,7 @@ export function BasicScatterPlot() {
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <div
-            className='flex flex-row flex-nowrap justify-center items-center gap-4'
-          >
+          <div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
             <Button
               className='w-full mt-4'
               type='default'
@@ -296,16 +294,18 @@ export function BasicScatterPlot() {
             </Button>
           </div>
         </Form>
-
       </div>
 
       <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>
-        {!rendered && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>请选择参数并点击生成</div>}
+        {!rendered && (
+          <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+            请选择参数并点击生成
+          </div>
+        )}
       </div>
-
     </div>
   )
 }

@@ -10,7 +10,6 @@ import { downloadImage } from '../../lib/utils'
 type Statistic = 'mean' | 'median' | 'max' | 'min' | 'sum' | 'count'
 
 type Option = {
-
   /** 数据分类 */
   type: 'peer' | 'independent'
 
@@ -43,7 +42,6 @@ type Option = {
 }
 
 export function BasicLinePlot() {
-
   const { dataCols, dataRows, messageApi, isLargeData } = useZustand()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -51,24 +49,40 @@ export function BasicLinePlot() {
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      const { dataVar, groupVar, xLabel, yLabel, title, variables, peerLabel, dataLabel, type, statistic, smooth, label } = values
+      const {
+        dataVar,
+        groupVar,
+        xLabel,
+        yLabel,
+        title,
+        variables,
+        peerLabel,
+        dataLabel,
+        type,
+        statistic,
+        smooth,
+        label,
+      } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       if (type === 'independent') {
         // 被试间数据处理
-        const cols = Array
-          .from(new Set(dataRows.map((row) => row[groupVar!])).values())
+        const cols = Array.from(
+          new Set(dataRows.map((row) => row[groupVar!])).values(),
+        )
           .filter((value) => typeof value !== 'undefined')
           .sort((a, b) => Number(a) - Number(b))
         const data: number[] = []
-        const rows: number[][] = cols
-          .map((col) => dataRows
+        const rows: number[][] = cols.map((col) =>
+          dataRows
             .filter((row) => row[groupVar!] === col)
             .map((row) => row[dataVar!])
-            .filter((value) => typeof value !== 'undefined' && !isNaN(Number(value)))
-            .map((value) => Number(value))
-          )
+            .filter(
+              (value) => typeof value !== 'undefined' && !isNaN(Number(value)),
+            )
+            .map((value) => Number(value)),
+        )
         rows.map((row) => {
           switch (statistic) {
             case 'mean':
@@ -111,19 +125,21 @@ export function BasicLinePlot() {
             nameLocation: 'middle',
             nameGap: 35,
           },
-          series: [{
-            type: 'line',
-            data: data,
-            smooth: smooth,
-            label: {
-              show: label,
-            },
-            emphasis: {
+          series: [
+            {
+              type: 'line',
+              data: data,
+              smooth: smooth,
               label: {
-                show: true,
+                show: label,
+              },
+              emphasis: {
+                label: {
+                  show: true,
+                },
               },
             },
-          }],
+          ],
           legend: {
             show: false,
           },
@@ -151,39 +167,43 @@ export function BasicLinePlot() {
             nameLocation: 'middle',
             nameGap: 35,
           },
-          series: [{
-            type: 'line',
-            data: variables!.map((variable) => {
-              const row = dataRows
-                .map((row) => row[variable])
-                .filter((value) => typeof value !== 'undefined' && !isNaN(Number(value)))
-                .map((value) => Number(value))
-              switch (statistic) {
-                case 'mean':
-                  return +mean(row).toFixed(4)
-                case 'median':
-                  return +median(row).toFixed(4)
-                case 'max':
-                  return +max(row).toFixed(4)
-                case 'min':
-                  return +min(row).toFixed(4)
-                case 'sum':
-                  return +sum(row).toFixed(4)
-                case 'count':
-                  return row.length
-              }
-            }),
-            smooth: smooth,
-            label: {
-              show: label,
-              
-            },
-            emphasis: {
+          series: [
+            {
+              type: 'line',
+              data: variables!.map((variable) => {
+                const row = dataRows
+                  .map((row) => row[variable])
+                  .filter(
+                    (value) =>
+                      typeof value !== 'undefined' && !isNaN(Number(value)),
+                  )
+                  .map((value) => Number(value))
+                switch (statistic) {
+                  case 'mean':
+                    return +mean(row).toFixed(4)
+                  case 'median':
+                    return +median(row).toFixed(4)
+                  case 'max':
+                    return +max(row).toFixed(4)
+                  case 'min':
+                    return +min(row).toFixed(4)
+                  case 'sum':
+                    return +sum(row).toFixed(4)
+                  case 'count':
+                    return row.length
+                }
+              }),
+              smooth: smooth,
               label: {
-                show: true,
+                show: label,
+              },
+              emphasis: {
+                label: {
+                  show: true,
+                },
               },
             },
-          }],
+          ],
           legend: {
             show: false,
           },
@@ -195,17 +215,19 @@ export function BasicLinePlot() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
   // 被试内和被试间
-  const [formType, setFormType] = useState<'peer' | 'independent'>('independent')
+  const [formType, setFormType] = useState<'peer' | 'independent'>(
+    'independent',
+  )
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -260,15 +282,13 @@ export function BasicLinePlot() {
                     <Select
                       className='w-full'
                       placeholder='请选择分组变量'
-                      options={dataCols.map((col) => (
-                        { label: `${col.name} (水平数: ${col.unique})`, value: col.name }
-                      ))}
+                      options={dataCols.map((col) => ({
+                        label: `${col.name} (水平数: ${col.unique})`,
+                        value: col.name,
+                      }))}
                     />
                   </Form.Item>
-                  <Form.Item
-                    name='xLabel'
-                    noStyle
-                  >
+                  <Form.Item name='xLabel' noStyle>
                     <Input className='w-max' placeholder='标签默认为变量名' />
                   </Form.Item>
                 </Space.Compact>
@@ -295,19 +315,15 @@ export function BasicLinePlot() {
                       placeholder='请选择数据变量'
                       options={dataCols
                         .filter((col) => col.type === '等距或等比数据')
-                        .map((col) => ({ label: col.name, value: col.name })
-                      )}
+                        .map((col) => ({ label: col.name, value: col.name }))}
                     />
                   </Form.Item>
-                  <Form.Item
-                    name='yLabel'
-                    noStyle
-                  >
+                  <Form.Item name='yLabel' noStyle>
                     <Input className='w-max' placeholder='标签默认为变量名' />
                   </Form.Item>
                 </Space.Compact>
               </Form.Item>
-            </>  
+            </>
           ) : (
             <>
               <Form.Item
@@ -324,22 +340,15 @@ export function BasicLinePlot() {
                   mode='multiple'
                   options={dataCols
                     .filter((col) => col.type === '等距或等比数据')
-                    .map((col) => ({ label: col.name, value: col.name })
-                  )}
+                    .map((col) => ({ label: col.name, value: col.name }))}
                 />
               </Form.Item>
               <Form.Item label='自定义X轴和Y轴标签'>
                 <Space.Compact>
-                  <Form.Item
-                    noStyle
-                    name='peerLabel'
-                  >
+                  <Form.Item noStyle name='peerLabel'>
                     <Input className='w-full' placeholder='X轴标签默认为X' />
                   </Form.Item>
-                  <Form.Item
-                    noStyle
-                    name='dataLabel'
-                  >
+                  <Form.Item noStyle name='dataLabel'>
                     <Input className='w-full' placeholder='Y轴标签默认为Y' />
                   </Form.Item>
                 </Space.Compact>
@@ -348,10 +357,7 @@ export function BasicLinePlot() {
           )}
           <Form.Item label='折线统计量和图形设置'>
             <Space.Compact className='w-full'>
-              <Form.Item
-                noStyle
-                name='statistic'
-              >
+              <Form.Item noStyle name='statistic'>
                 <Select className='w-full'>
                   <Select.Option value='mean'>均值</Select.Option>
                   <Select.Option value='count'>计数</Select.Option>
@@ -361,41 +367,24 @@ export function BasicLinePlot() {
                   <Select.Option value='sum'>总和</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item
-                noStyle
-                name='smooth'
-              >
-                <Select
-                  className='w-full'
-                  placeholder='曲线平滑'
-                >
+              <Form.Item noStyle name='smooth'>
+                <Select className='w-full' placeholder='曲线平滑'>
                   <Select.Option value={true}>启用曲线平滑</Select.Option>
                   <Select.Option value={false}>关闭曲线平滑</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item
-                noStyle
-                name='label'
-              >
-                <Select
-                  className='w-full'
-                  placeholder='数据标签'
-                >
+              <Form.Item noStyle name='label'>
+                <Select className='w-full' placeholder='数据标签'>
                   <Select.Option value={true}>显示数据标签</Select.Option>
                   <Select.Option value={false}>隐藏数据标签</Select.Option>
                 </Select>
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item
-            label='自定义标题'
-            name='title'
-          >
+          <Form.Item label='自定义标题' name='title'>
             <Input className='w-full' placeholder='默认无标题' />
           </Form.Item>
-          <div
-            className='flex flex-row flex-nowrap justify-center items-center gap-4'
-          >
+          <div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
             <Button
               className='w-full mt-4'
               type='default'
@@ -415,16 +404,18 @@ export function BasicLinePlot() {
             </Button>
           </div>
         </Form>
-
       </div>
 
       <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>
-        {!rendered && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>请选择参数并点击生成</div>}
+        {!rendered && (
+          <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+            请选择参数并点击生成
+          </div>
+        )}
       </div>
-
     </div>
   )
 }

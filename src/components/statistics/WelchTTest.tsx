@@ -23,7 +23,6 @@ type Result = {
 } & Option
 
 export function WelchTTest() {
-
   const { dataCols, dataRows, messageApi } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -34,19 +33,21 @@ export function WelchTTest() {
       const { dataVar, groupVar, expect, twoside, alpha } = values
       const data1: number[] = []
       const data2: number[] = []
-      const groups = Array.from((new Set(dataRows.map((value) => value[groupVar]))).values())
+      const groups = Array.from(
+        new Set(dataRows.map((value) => value[groupVar])).values(),
+      )
       for (const row of dataRows) {
         if (
-          typeof row[dataVar] !== 'undefined' 
-          && !isNaN(Number(row[dataVar]))
-          && typeof row[groupVar] !== 'undefined'
+          typeof row[dataVar] !== 'undefined' &&
+          !isNaN(Number(row[dataVar])) &&
+          typeof row[groupVar] !== 'undefined'
         ) {
           row[groupVar] == groups[0] && data1.push(Number(row[dataVar]))
           row[groupVar] == groups[1] && data2.push(Number(row[dataVar]))
         }
       }
-      setResult({ 
-        ...values, 
+      setResult({
+        ...values,
         groups: groups.map(String),
         m: new T(data1, data2, twoside, expect, alpha),
       })
@@ -54,15 +55,15 @@ export function WelchTTest() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -94,15 +95,15 @@ export function WelchTTest() {
               }),
             ]}
           >
-            <Select
-              className='w-full'
-              placeholder='请选择数据变量'
-            >
-              {dataCols.map((col) => col.type === '等距或等比数据' && (
-                <Select.Option key={col.name} value={col.name}>
-                  {col.name}
-                </Select.Option>
-              ))}
+            <Select className='w-full' placeholder='请选择数据变量'>
+              {dataCols.map(
+                (col) =>
+                  col.type === '等距或等比数据' && (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name}
+                    </Select.Option>
+                  ),
+              )}
             </Select>
           </Form.Item>
           <Form.Item
@@ -120,15 +121,15 @@ export function WelchTTest() {
               }),
             ]}
           >
-            <Select
-              className='w-full'
-              placeholder='请选择分组变量'
-            >
-              {dataCols.map((col) => col.unique === 2 && (
-                <Select.Option key={col.name} value={col.name}>
-                  {col.name} (水平数: 2)
-                </Select.Option>
-              ))}
+            <Select className='w-full' placeholder='请选择分组变量'>
+              {dataCols.map(
+                (col) =>
+                  col.unique === 2 && (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name} (水平数: 2)
+                    </Select.Option>
+                  ),
+              )}
             </Select>
           </Form.Item>
           <Form.Item
@@ -149,10 +150,7 @@ export function WelchTTest() {
                 name='twoside'
                 rules={[{ required: true, message: '请选择单双尾检验' }]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='请选择单双尾检验'
-                >
+                <Select className='w-full' placeholder='请选择单双尾检验'>
                   <Select.Option value={true}>双尾检验</Select.Option>
                   <Select.Option value={false}>单尾检验</Select.Option>
                 </Select>
@@ -174,11 +172,7 @@ export function WelchTTest() {
             </Space.Compact>
           </Form.Item>
           <Form.Item>
-            <Button
-              className='w-full mt-4'
-              type='default'
-              htmlType='submit'
-            >
+            <Button className='w-full mt-4' type='default' htmlType='submit'>
               计算
             </Button>
           </Form.Item>
@@ -189,16 +183,18 @@ export function WelchTTest() {
             且相比 Student's T 更加稳健
           </p>
         </Form>
-
       </div>
 
       <div className='component-result'>
-
         {result ? (
           <div className='w-full h-full overflow-auto'>
-           
-            <p className='text-lg mb-2 text-center w-full'>Welch's T Test ({result.twoside ? '双尾' : '单尾'})</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 均值差异={result.expect} | 显著性水平(α): {result.alpha}</p>
+            <p className='text-lg mb-2 text-center w-full'>
+              Welch's T Test ({result.twoside ? '双尾' : '单尾'})
+            </p>
+            <p className='text-xs mb-3 text-center w-full'>
+              H<sub>0</sub>: 均值差异={result.expect} | 显著性水平(α):{' '}
+              {result.alpha}
+            </p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -208,7 +204,9 @@ export function WelchTTest() {
                   <td>p</td>
                   <td>{(100 - result.alpha * 100).toFixed(3)}%置信区间</td>
                   <td>效应量 (Cohen's d)</td>
-                  <td>测定系数 (R<sup>2</sup>)</td>
+                  <td>
+                    测定系数 (R<sup>2</sup>)
+                  </td>
                 </tr>
               </thead>
               <tbody>
@@ -225,7 +223,9 @@ export function WelchTTest() {
             </table>
 
             <p className='text-lg mb-2 text-center w-full mt-8'>描述统计</p>
-            <p className='text-xs mb-3 text-center w-full'>分组变量: {result.groupVar}</p>
+            <p className='text-xs mb-3 text-center w-full'>
+              分组变量: {result.groupVar}
+            </p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -253,16 +253,13 @@ export function WelchTTest() {
                 </tr>
               </tbody>
             </table>
-
           </div>
         ) : (
           <div className='w-full h-full flex justify-center items-center'>
             <span>请填写参数并点击计算</span>
           </div>
         )}
-        
       </div>
-
     </div>
   )
 }

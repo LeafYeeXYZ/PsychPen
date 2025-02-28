@@ -22,7 +22,6 @@ type Result = {
 } & Option
 
 export function LeveneTest() {
-
   const { dataCols, dataRows, messageApi } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -35,14 +34,22 @@ export function LeveneTest() {
       let value: number[]
       // 处理被试间变量
       if (type === 'independent') {
-        const filteredRows = dataRows.filter((row) => row[variable!] !== undefined && !isNaN(Number(row[variable!])) && row[groups!] !== undefined)
+        const filteredRows = dataRows.filter(
+          (row) =>
+            row[variable!] !== undefined &&
+            !isNaN(Number(row[variable!])) &&
+            row[groups!] !== undefined,
+        )
         group = filteredRows.map((row) => String(row[groups!]))
         value = filteredRows.map((row) => Number(row[variable!]))
       } else {
         group = []
         value = []
         for (const variable of variables!) {
-          const filteredRows = dataRows.filter((row) => row[variable] !== undefined && !isNaN(Number(row[variable])))
+          const filteredRows = dataRows.filter(
+            (row) =>
+              row[variable] !== undefined && !isNaN(Number(row[variable])),
+          )
           filteredRows.forEach((row) => {
             group.push(String(variable))
             value.push(Number(row[variable]))
@@ -58,16 +65,16 @@ export function LeveneTest() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
   const [formType, setFormType] = useState<'peer' | 'independent'>('peer')
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -113,11 +120,14 @@ export function LeveneTest() {
                 placeholder='请选择变量'
                 mode='multiple'
               >
-                {dataCols.map((col) => col.type === '等距或等比数据' && (
-                  <Select.Option key={col.name} value={col.name}>
-                    {col.name}
-                  </Select.Option>
-                ))}
+                {dataCols.map(
+                  (col) =>
+                    col.type === '等距或等比数据' && (
+                      <Select.Option key={col.name} value={col.name}>
+                        {col.name}
+                      </Select.Option>
+                    ),
+                )}
               </Select>
             </Form.Item>
           ) : (
@@ -130,15 +140,15 @@ export function LeveneTest() {
                   { type: 'string', message: '只能选择一个数据变量' },
                 ]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='请选择数据变量'
-                >
-                  {dataCols.map((col) => col.type === '等距或等比数据' && (
-                    <Select.Option key={col.name} value={col.name}>
-                      {col.name}
-                    </Select.Option>
-                  ))}
+                <Select className='w-full' placeholder='请选择数据变量'>
+                  {dataCols.map(
+                    (col) =>
+                      col.type === '等距或等比数据' && (
+                        <Select.Option key={col.name} value={col.name}>
+                          {col.name}
+                        </Select.Option>
+                      ),
+                  )}
                 </Select>
               </Form.Item>
               <Form.Item
@@ -146,10 +156,7 @@ export function LeveneTest() {
                 name='group'
                 rules={[{ required: true, message: '请选择分组变量' }]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='请选择分组变量'
-                >
+                <Select className='w-full' placeholder='请选择分组变量'>
                   {dataCols.map((col) => (
                     <Select.Option key={col.name} value={col.name}>
                       {col.name} (水平数: {col.unique})
@@ -175,25 +182,20 @@ export function LeveneTest() {
             </Radio.Group>
           </Form.Item>
           <Form.Item>
-            <Button
-              className='w-full mt-4'
-              type='default'
-              htmlType='submit'
-            >
+            <Button className='w-full mt-4' type='default' htmlType='submit'>
               计算
             </Button>
           </Form.Item>
         </Form>
-
       </div>
 
       <div className='component-result'>
-
         {result ? (
           <div className='w-full h-full overflow-auto'>
-
             <p className='text-lg mb-2 text-center w-full'>Levene 检验</p>
-            <p className='text-xs mb-3 text-center w-full'>H<sub>0</sub>: 各变量/组满足方差齐性</p>
+            <p className='text-xs mb-3 text-center w-full'>
+              H<sub>0</sub>: 各变量/组满足方差齐性
+            </p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -204,7 +206,9 @@ export function LeveneTest() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{result.m.dfB}, {result.m.dfW}</td>
+                  <td>
+                    {result.m.dfB}, {result.m.dfW}
+                  </td>
                   <td>{markS(result.m.w, result.m.p)}</td>
                   <td>{markP(result.m.p)}</td>
                 </tr>
@@ -212,7 +216,9 @@ export function LeveneTest() {
             </table>
 
             <p className='text-lg mb-2 mt-8 text-center w-full'>描述统计</p>
-            <p className='text-xs mb-3 text-center w-full'>中心化方法: {result.center === 'mean' ? '均值' : '中位数'}</p>
+            <p className='text-xs mb-3 text-center w-full'>
+              中心化方法: {result.center === 'mean' ? '均值' : '中位数'}
+            </p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -237,17 +243,16 @@ export function LeveneTest() {
                 ))}
               </tbody>
             </table>
-            <p className='text-xs mt-3 text-center w-full'>注: 此处中心化指离中心的"距离" (即差异的绝对值)</p>
-
+            <p className='text-xs mt-3 text-center w-full'>
+              注: 此处中心化指离中心的"距离" (即差异的绝对值)
+            </p>
           </div>
         ) : (
           <div className='w-full h-full flex justify-center items-center'>
             <span>请填写参数并点击计算</span>
           </div>
         )}
-        
       </div>
-
     </div>
   )
 }

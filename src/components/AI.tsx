@@ -3,7 +3,7 @@
 import { useAssistant } from '../lib/useAssistant'
 import { useZustand } from '../lib/useZustand'
 import { useState, useRef, useEffect } from 'react'
-import { 
+import {
   useNav,
   MAIN_PAGES_LABELS,
   VARIABLE_SUB_PAGES_LABELS,
@@ -17,7 +17,7 @@ import { Bubble, Sender } from '@ant-design/x'
 import { UserOutlined, BarChartOutlined } from '@ant-design/icons'
 import parseThink from '@leaf/parse-think'
 import { downloadSheet } from '@psych/sheet'
-import type { 
+import type {
   ChatCompletionAssistantMessageParam,
   ChatCompletionUserMessageParam,
   ChatCompletionMessageToolCall,
@@ -42,11 +42,10 @@ const funcs: AIFunction[] = [
   nav_to_statistics_view,
   nav_to_tools_view,
 ]
-const GREETTING = '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面等. 请问有什么可以帮你的?'
-
+const GREETTING =
+  '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面等. 请问有什么可以帮你的?'
 
 export function AI() {
-
   const { ai, model } = useAssistant()
 
   if (ai === null) {
@@ -68,7 +67,10 @@ export function AI() {
     const old = JSON.parse(JSON.stringify(messages))
     const snapshot = input
     try {
-      const user: ChatCompletionUserMessageParam = { role: 'user', content: snapshot }
+      const user: ChatCompletionUserMessageParam = {
+        role: 'user',
+        content: snapshot,
+      }
       flushSync(() => {
         setLoading(true)
         setShowLoading(true)
@@ -76,18 +78,14 @@ export function AI() {
         setInput('')
       })
 
-      const system = 
-        '你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具信息; 你的任务是按照用户的要求, 为用户提供帮助.' + 
+      const system =
+        '你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具信息; 你的任务是按照用户的要求, 为用户提供帮助.' +
         `\n\n# 变量信息\n\n${dataCols.map((col) => `- ${col.name}: ${col.type}, 有 ${col.valid} 个有效值、${col.missing} 个缺失值、${col.unique} 个唯一值.${col.type === '等距或等比数据' ? ` 均值为 ${col.mean}, 标准差为 ${col.std}, 中位数为 ${col.q2}, 最小值为 ${col.min}, 最大值为 ${col.max}.` : ''}`).join('\n')}` +
         `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\``
 
       const stream = await ai.chat.completions.create({
         model: model,
-        messages: [
-          { role: 'system', content: system },
-          ...old,
-          user,
-        ],
+        messages: [{ role: 'system', content: system }, ...old, user],
         stream: true,
         tools: funcs.map((func) => func.tool),
         tool_choice: 'auto',
@@ -100,7 +98,8 @@ export function AI() {
         const delta = chunk.choices[0].delta
         if (delta.tool_calls?.length) {
           if (toolCall) {
-            toolCall.function.arguments += delta.tool_calls[0].function!.arguments || ''
+            toolCall.function.arguments +=
+              delta.tool_calls[0].function!.arguments || ''
           } else {
             toolCall = {
               id: delta.tool_calls[0].id!,
@@ -115,7 +114,11 @@ export function AI() {
           rawResponse += delta.content || ''
           flushSync(() => {
             setShowLoading(false)
-            setMessages([...old, user, { role: 'assistant', content: rawResponse }])
+            setMessages([
+              ...old,
+              user,
+              { role: 'assistant', content: rawResponse },
+            ])
           })
         }
       }
@@ -134,8 +137,14 @@ export function AI() {
         try {
           switch (toolCall.function.name) {
             case 'export_data': {
-              const { file_name, file_type } = JSON.parse(toolCall.function.arguments)
-              downloadSheet(dataRows, file_type || 'xlsx', file_name || undefined)
+              const { file_name, file_type } = JSON.parse(
+                toolCall.function.arguments,
+              )
+              downloadSheet(
+                dataRows,
+                file_type || 'xlsx',
+                file_name || undefined,
+              )
               const msg = '数据导出成功'
               messageApi?.success(msg)
               newMessages[1].content = msg
@@ -150,7 +159,10 @@ export function AI() {
             }
             case 'nav_to_variable_view': {
               const { page } = JSON.parse(toolCall.function.arguments)
-              if (!page || !Object.values(VARIABLE_SUB_PAGES_LABELS).includes(page)) {
+              if (
+                !page ||
+                !Object.values(VARIABLE_SUB_PAGES_LABELS).includes(page)
+              ) {
                 throw new Error(`未知的子页面 ${page}`)
               }
               nav.setMainPage(MAIN_PAGES_LABELS.VARIABLE)
@@ -162,7 +174,10 @@ export function AI() {
             }
             case 'nav_to_plots_view': {
               const { page } = JSON.parse(toolCall.function.arguments)
-              if (!page || !Object.values(PLOTS_SUB_PAGES_LABELS).includes(page)) {
+              if (
+                !page ||
+                !Object.values(PLOTS_SUB_PAGES_LABELS).includes(page)
+              ) {
                 throw new Error(`未知的子页面 ${page}`)
               }
               nav.setMainPage(MAIN_PAGES_LABELS.PLOTS)
@@ -174,7 +189,10 @@ export function AI() {
             }
             case 'nav_to_statistics_view': {
               const { page } = JSON.parse(toolCall.function.arguments)
-              if (!page || !Object.values(STATISTICS_SUB_PAGES_LABELS).includes(page)) {
+              if (
+                !page ||
+                !Object.values(STATISTICS_SUB_PAGES_LABELS).includes(page)
+              ) {
                 throw new Error(`未知的子页面 ${page}`)
               }
               nav.setMainPage(MAIN_PAGES_LABELS.STATISTICS)
@@ -186,7 +204,10 @@ export function AI() {
             }
             case 'nav_to_tools_view': {
               const { page } = JSON.parse(toolCall.function.arguments)
-              if (!page || !Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).includes(page)) {
+              if (
+                !page ||
+                !Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).includes(page)
+              ) {
                 throw new Error(`未知的子页面 ${page}`)
               }
               nav.setMainPage(MAIN_PAGES_LABELS.TOOLS)
@@ -203,9 +224,13 @@ export function AI() {
           newMessages[1].content = newMessages[1].content || '执行成功'
         } catch (error) {
           const msg = error instanceof Error ? error.message : String(error)
-          messageApi?.error(`执行AI命令 (${
-            funcs.find((func) => func.tool.function.name === toolCall.function.name)?.label || toolCall.function.name
-          }) 时出错: ${msg}`)
+          messageApi?.error(
+            `执行AI命令 (${
+              funcs.find(
+                (func) => func.tool.function.name === toolCall.function.name,
+              )?.label || toolCall.function.name
+            }) 时出错: ${msg}`,
+          )
           newMessages[1].content = `执行失败, 请提示用户手动操作. 错误信息: ${msg}`
         }
 
@@ -229,12 +254,22 @@ export function AI() {
           if (rawNewResponse) {
             flushSync(() => {
               setShowLoading(false)
-              setMessages([...old, user, ...newMessages, { role: 'assistant', content: rawNewResponse }])
+              setMessages([
+                ...old,
+                user,
+                ...newMessages,
+                { role: 'assistant', content: rawNewResponse },
+              ])
             })
           }
         }
         const { content } = parseThink(rawNewResponse)
-        setMessages([...old, user, ...newMessages, { role: 'assistant', content }])
+        setMessages([
+          ...old,
+          user,
+          ...newMessages,
+          { role: 'assistant', content },
+        ])
       } else {
         const { content } = parseThink(rawResponse)
         setMessages([...old, user, { role: 'assistant', content }])
@@ -251,10 +286,7 @@ export function AI() {
 
   return (
     <div className='w-full h-full flex flex-col justify-between items-center'>
-      <Messages 
-        messages={messages} 
-        showLoading={showLoading} 
-      />
+      <Messages messages={messages} showLoading={showLoading} />
       <Sender
         onSubmit={onSubmit}
         disabled={disabled}
@@ -267,7 +299,7 @@ export function AI() {
           const { SendButton, LoadingButton, ClearButton } = info.components
           return (
             <Space size='small'>
-              <ClearButton 
+              <ClearButton
                 disabled={loading || disabled || !messages.length}
                 onClick={() => {
                   setInput('')
@@ -284,49 +316,78 @@ export function AI() {
   )
 }
 
-function Messages({ messages, showLoading }: { messages: ChatCompletionMessageParam[], showLoading: boolean }) {
+function Messages({
+  messages,
+  showLoading,
+}: {
+  messages: ChatCompletionMessageParam[]
+  showLoading: boolean
+}) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
   return (
-    <div 
+    <div
       className='w-full h-full flex flex-col items-center justify-start gap-4 overflow-auto pt-4 pb-8 no-scrollbar'
       ref={ref}
     >
       {[
         { role: 'assistant', content: GREETTING },
         ...messages,
-        ...(showLoading ? [{ role: 'assistant', content: '__loading__' }] : [])
+        ...(showLoading ? [{ role: 'assistant', content: '__loading__' }] : []),
       ]
-      .filter((message) => message.role === 'assistant' || message.role === 'user')
-      .map((message, index) => {
-        const tool_calls = (message as ChatCompletionAssistantMessageParam).tool_calls
-        return (
-          <Bubble
-            key={index}
-            className='w-full'
-            placement={message.role === 'user' ? 'end' : 'start'}
-            content={tool_calls?.length ? 
-              <span className='text-gray-700 dark:text-gray-300'>
-                {funcs.find((func) => func.tool.function.name === tool_calls[0].function.name)!.label}
-              </span> : 
-              <Typography>
-                <div className='-mb-4' dangerouslySetInnerHTML={{ __html: md.render((message.content as string).trim()) }} />
-              </Typography>
-            }
-            loading={message.content === '__loading__'}
-            header={message.role === 'user' ? 'User' : 'PsychPen'}
-            avatar={{ 
-              icon: message.role === 'user' ? <UserOutlined /> : <BarChartOutlined />,
-              style: { 
-                backgroundColor: message.role === 'user' ? '#f0f0ff' : '#fff0f0',
-                color: message.role === 'user' ? '#597ef7' : '#f75959',
-              }
-            }}
-          />
+        .filter(
+          (message) => message.role === 'assistant' || message.role === 'user',
         )
-      })}
+        .map((message, index) => {
+          const tool_calls = (message as ChatCompletionAssistantMessageParam)
+            .tool_calls
+          return (
+            <Bubble
+              key={index}
+              className='w-full'
+              placement={message.role === 'user' ? 'end' : 'start'}
+              content={
+                tool_calls?.length ? (
+                  <span className='text-gray-700 dark:text-gray-300'>
+                    {
+                      funcs.find(
+                        (func) =>
+                          func.tool.function.name ===
+                          tool_calls[0].function.name,
+                      )!.label
+                    }
+                  </span>
+                ) : (
+                  <Typography>
+                    <div
+                      className='-mb-4'
+                      dangerouslySetInnerHTML={{
+                        __html: md.render((message.content as string).trim()),
+                      }}
+                    />
+                  </Typography>
+                )
+              }
+              loading={message.content === '__loading__'}
+              header={message.role === 'user' ? 'User' : 'PsychPen'}
+              avatar={{
+                icon:
+                  message.role === 'user' ? (
+                    <UserOutlined />
+                  ) : (
+                    <BarChartOutlined />
+                  ),
+                style: {
+                  backgroundColor:
+                    message.role === 'user' ? '#f0f0ff' : '#fff0f0',
+                  color: message.role === 'user' ? '#597ef7' : '#f75959',
+                },
+              }}
+            />
+          )
+        })}
     </div>
   )
 }

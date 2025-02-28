@@ -21,7 +21,6 @@ type Result = {
 } & Option
 
 export function TwoLinearRegression() {
-
   const { dataCols, dataRows, messageApi } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -30,7 +29,13 @@ export function TwoLinearRegression() {
       messageApi?.loading('正在处理数据...')
       const timestamp = Date.now()
       const { x1, x2, y, method } = values
-      const filteredRows = dataRows.filter((row) => [x1, x2, y].every((variable) => typeof row[variable] !== 'undefined' && !isNaN(Number(row[variable]))))
+      const filteredRows = dataRows.filter((row) =>
+        [x1, x2, y].every(
+          (variable) =>
+            typeof row[variable] !== 'undefined' &&
+            !isNaN(Number(row[variable])),
+        ),
+      )
       const x1Data = filteredRows.map((row) => Number(row[x1]))
       const x2Data = filteredRows.map((row) => Number(row[x2]))
       const yData = filteredRows.map((row) => Number(row[y]))
@@ -40,15 +45,15 @@ export function TwoLinearRegression() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -60,11 +65,18 @@ export function TwoLinearRegression() {
           autoComplete='off'
           disabled={disabled}
           initialValues={{
-            method: 'standard'
+            method: 'standard',
           }}
         >
           <Form.Item
-            label={<span>第一个自变量 <Tag color='blue'>X<sub>1</sub></Tag></span>}
+            label={
+              <span>
+                第一个自变量{' '}
+                <Tag color='blue'>
+                  X<sub>1</sub>
+                </Tag>
+              </span>
+            }
             name='x1'
             rules={[
               { required: true, message: '请选择第一个自变量' },
@@ -77,18 +89,27 @@ export function TwoLinearRegression() {
                   } else {
                     return Promise.resolve()
                   }
-                }
-              })
+                },
+              }),
             ]}
           >
             <Select
               className='w-full'
               placeholder='请选择第一个自变量'
-              options={dataCols.filter((col) => col.type === '等距或等比数据').map((col) => ({ label: col.name, value: col.name }))}
+              options={dataCols
+                .filter((col) => col.type === '等距或等比数据')
+                .map((col) => ({ label: col.name, value: col.name }))}
             />
           </Form.Item>
           <Form.Item
-            label={<span>第二个自变量 <Tag color='blue'>X<sub>2</sub></Tag></span>}
+            label={
+              <span>
+                第二个自变量{' '}
+                <Tag color='blue'>
+                  X<sub>2</sub>
+                </Tag>
+              </span>
+            }
             name='x2'
             rules={[
               { required: true, message: '请选择第二个自变量' },
@@ -101,36 +122,47 @@ export function TwoLinearRegression() {
                   } else {
                     return Promise.resolve()
                   }
-                }
-              })
+                },
+              }),
             ]}
           >
             <Select
               className='w-full'
               placeholder='请选择第二个自变量'
-              options={dataCols.filter((col) => col.type === '等距或等比数据').map((col) => ({ label: col.name, value: col.name }))}
+              options={dataCols
+                .filter((col) => col.type === '等距或等比数据')
+                .map((col) => ({ label: col.name, value: col.name }))}
             />
           </Form.Item>
           <Form.Item
-            label={<span>因变量 <Tag color='pink'>Y</Tag></span>}
+            label={
+              <span>
+                因变量 <Tag color='pink'>Y</Tag>
+              </span>
+            }
             name='y'
             rules={[
               { required: true, message: '请选择因变量' },
               ({ getFieldValue }) => ({
                 validator: (_, value) => {
-                  if (value === getFieldValue('x1') || value === getFieldValue('x2')) {
+                  if (
+                    value === getFieldValue('x1') ||
+                    value === getFieldValue('x2')
+                  ) {
                     return Promise.reject('自变量和因变量不能相同')
                   } else {
                     return Promise.resolve()
                   }
-                }
-              })
+                },
+              }),
             ]}
           >
             <Select
               className='w-full'
               placeholder='请选择因变量'
-              options={dataCols.filter((col) => col.type === '等距或等比数据').map((col) => ({ label: col.name, value: col.name }))}
+              options={dataCols
+                .filter((col) => col.type === '等距或等比数据')
+                .map((col) => ({ label: col.name, value: col.name }))}
             />
           </Form.Item>
           <Form.Item
@@ -148,32 +180,36 @@ export function TwoLinearRegression() {
             />
           </Form.Item>
           <Form.Item>
-            <Button
-              className='w-full mt-4'
-              type='default'
-              htmlType='submit'
-            >
+            <Button className='w-full mt-4' type='default' htmlType='submit'>
               计算
             </Button>
           </Form.Item>
         </Form>
-
       </div>
 
       <div className='component-result'>
-
         {result ? (
           <div className='w-full h-full overflow-auto'>
-
-            <p className='text-lg mb-2 text-center w-full'>{result.method === 'standard' ? '标准' : '序列'}二元线性回归</p>
-            <p className='text-xs mb-2 text-center w-full'>模型: y = {result.m.b0.toFixed(4)} + {result.m.b1.toFixed(4)} * x<sub>1</sub> + {result.m.b2.toFixed(4)} * x<sub>2</sub></p>
-            <p className='text-xs mb-3 text-center w-full'>测定系数 (R<sup>2</sup>): {result.m.r2.toFixed(4)} | 调整后测定系数 (R<sup>2</sup><sub>adj</sub>): {result.m.r2adj.toFixed(4)}</p>
+            <p className='text-lg mb-2 text-center w-full'>
+              {result.method === 'standard' ? '标准' : '序列'}二元线性回归
+            </p>
+            <p className='text-xs mb-2 text-center w-full'>
+              模型: y = {result.m.b0.toFixed(4)} + {result.m.b1.toFixed(4)} * x
+              <sub>1</sub> + {result.m.b2.toFixed(4)} * x<sub>2</sub>
+            </p>
+            <p className='text-xs mb-3 text-center w-full'>
+              测定系数 (R<sup>2</sup>): {result.m.r2.toFixed(4)} |
+              调整后测定系数 (R<sup>2</sup>
+              <sub>adj</sub>): {result.m.r2adj.toFixed(4)}
+            </p>
             <table className='three-line-table'>
               <thead>
                 <tr>
                   <td>参数</td>
                   <td>值</td>
-                  <td>H<sub>0</sub></td>
+                  <td>
+                    H<sub>0</sub>
+                  </td>
                   <td>统计量</td>
                   <td>显著性</td>
                 </tr>
@@ -181,44 +217,64 @@ export function TwoLinearRegression() {
               <tbody>
                 <tr>
                   <td>模型</td>
-                  <td>b0: {result.m.b0.toFixed(4)} | b1: {result.m.b1.toFixed(4)} | b2: {result.m.b2.toFixed(4)}</td>
+                  <td>
+                    b0: {result.m.b0.toFixed(4)} | b1: {result.m.b1.toFixed(4)}{' '}
+                    | b2: {result.m.b2.toFixed(4)}
+                  </td>
                   <td>b1 = b2 = 0</td>
                   <td>F = {markS(result.m.F, result.m.p)}</td>
                   <td>{markP(result.m.p)}</td>
                 </tr>
                 <tr>
                   <td>b1</td>
-                  <td>{result.m.b1.toFixed(4)}{result.method === 'standard' ? ' (偏回归系数)' : ' (含两自变量的共同效应)'}</td>
+                  <td>
+                    {result.m.b1.toFixed(4)}
+                    {result.method === 'standard'
+                      ? ' (偏回归系数)'
+                      : ' (含两自变量的共同效应)'}
+                  </td>
                   <td>b1 = 0</td>
-                  <td>{result.method === 'standard' ? (
-                    `t = ${markS(result.m.b1t!, result.m.b1p)}`
-                  ) : (
-                    `F = ${markS(result.m.b1F!, result.m.b1p)}`
-                  )}</td>
-                  <td>{result.method === 'standard' ? (
-                    markP(result.m.b1p)
-                  ) : (
-                    markP(result.m.b1p)
-                  )}</td>
+                  <td>
+                    {result.method === 'standard'
+                      ? `t = ${markS(result.m.b1t!, result.m.b1p)}`
+                      : `F = ${markS(result.m.b1F!, result.m.b1p)}`}
+                  </td>
+                  <td>
+                    {result.method === 'standard'
+                      ? markP(result.m.b1p)
+                      : markP(result.m.b1p)}
+                  </td>
                 </tr>
                 <tr>
                   <td>b2</td>
-                  <td>{result.m.b2.toFixed(4)}{result.method === 'standard' ? ' (偏回归系数)' : ' (不含两自变量的共同效应)'}</td>
-                  {result.method === 'standard' ? (<td>b2 = 0</td>) : (<td>加入 x2 后 r2 变化量为 0</td>)}
-                  <td>{result.method === 'standard' ? (
-                    `t = ${markS(result.m.b2t!, result.m.b2p)}`
+                  <td>
+                    {result.m.b2.toFixed(4)}
+                    {result.method === 'standard'
+                      ? ' (偏回归系数)'
+                      : ' (不含两自变量的共同效应)'}
+                  </td>
+                  {result.method === 'standard' ? (
+                    <td>b2 = 0</td>
                   ) : (
-                    `F = ${markS(result.m.b2F!, result.m.b2p)}`
-                  )}</td>
-                  <td>{result.method === 'standard' ? (
-                    markP(result.m.b2p)
-                  ) : (
-                    markP(result.m.b2p)
-                  )}</td>
+                    <td>加入 x2 后 r2 变化量为 0</td>
+                  )}
+                  <td>
+                    {result.method === 'standard'
+                      ? `t = ${markS(result.m.b2t!, result.m.b2p)}`
+                      : `F = ${markS(result.m.b2F!, result.m.b2p)}`}
+                  </td>
+                  <td>
+                    {result.method === 'standard'
+                      ? markP(result.m.b2p)
+                      : markP(result.m.b2p)}
+                  </td>
                 </tr>
               </tbody>
             </table>
-            <p className='text-xs mt-3 text-center w-full'>x<sub>1</sub>: {result.x1} | x<sub>2</sub>: {result.x2} | y: {result.y}</p>
+            <p className='text-xs mt-3 text-center w-full'>
+              x<sub>1</sub>: {result.x1} | x<sub>2</sub>: {result.x2} | y:{' '}
+              {result.y}
+            </p>
 
             <p className='text-lg mb-2 text-center w-full mt-8'>模型细节</p>
             <table className='three-line-table'>
@@ -287,16 +343,13 @@ export function TwoLinearRegression() {
                 </tr>
               </tbody>
             </table>
-
           </div>
         ) : (
           <div className='w-full h-full flex justify-center items-center'>
             <span>请填写参数并点击计算</span>
           </div>
         )}
-        
       </div>
-
     </div>
   )
 }

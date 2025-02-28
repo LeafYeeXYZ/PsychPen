@@ -21,7 +21,12 @@ const openaiApiKey = localStorage.getItem('openaiApiKey') ?? ''
 const openaiModelName = localStorage.getItem('openaiModelName') ?? ''
 const openaiEnable = localStorage.getItem('openaiEnable') === 'true'
 
-async function getAI(enable: boolean, endpoint: string, apiKey: string, model: string): Promise<OpenAI | null> {
+async function getAI(
+  enable: boolean,
+  endpoint: string,
+  apiKey: string,
+  model: string,
+): Promise<OpenAI | null> {
   try {
     if (!enable || !endpoint || !apiKey || !model) {
       return null
@@ -42,9 +47,11 @@ async function getAI(enable: boolean, endpoint: string, apiKey: string, model: s
 }
 
 export const useAssistant = create<AssistantState>()((set, get) => {
-  getAI(openaiEnable, openaiEndpoint, openaiApiKey, openaiModelName).then((ai) => {
-    set({ ai })
-  }).catch(() => {})
+  getAI(openaiEnable, openaiEndpoint, openaiApiKey, openaiModelName)
+    .then((ai) => {
+      set({ ai })
+    })
+    .catch(() => {})
   return {
     openaiEndpoint,
     openaiApiKey,
@@ -95,7 +102,12 @@ export const useAssistant = create<AssistantState>()((set, get) => {
       }
       const { openaiEnable, openaiEndpoint, openaiApiKey } = get()
       timer = setTimeout(async () => {
-        const ai = await getAI(openaiEnable, openaiEndpoint, openaiApiKey, modelName)
+        const ai = await getAI(
+          openaiEnable,
+          openaiEndpoint,
+          openaiApiKey,
+          modelName,
+        )
         set({ ai })
       }, delay)
     },

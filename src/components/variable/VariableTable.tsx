@@ -4,7 +4,6 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 
 export function VariableTable() {
-
   const { dataCols } = useZustand()
   const getFilterDescription = (
     method: AllowedFilterMethods | undefined,
@@ -43,7 +42,12 @@ export function VariableTable() {
             missingValues: col.missingValues?.join(', '),
             missingMethod: col.missingMethod ?? '删除法',
             missingRefer: col.missingRefer,
-            filter: getFilterDescription(col.filterMethod, col.filterValue, col.filterRange, col.filterRegex),
+            filter: getFilterDescription(
+              col.filterMethod,
+              col.filterValue,
+              col.filterRange,
+              col.filterRegex,
+            ),
             min: col.min?.toFixed(4),
             max: col.max?.toFixed(4),
             mean: col.mean?.toFixed(4),
@@ -52,8 +56,7 @@ export function VariableTable() {
             q3: col.q3?.toFixed(4),
             std: col.std?.toFixed(4),
             mode: col.mode?.toFixed(4),
-          }))
-        }
+          }))}
         columnDefs={[
           { headerName: '变量名', field: 'name', pinned: 'left', width: 150 },
           { headerName: '数据类型', field: 'type', width: 130 },
@@ -91,8 +94,7 @@ export function VariableTable() {
             q3: col.q3?.toFixed(4),
             std: col.std?.toFixed(4),
             mode: col.mode?.toFixed(4),
-          }))
-        }
+          }))}
         columnDefs={[
           { headerName: '子变量', field: 'name', pinned: 'left', width: 200 },
           { headerName: '唯一值数', field: 'unique', width: 100 },

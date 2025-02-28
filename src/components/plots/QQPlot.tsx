@@ -31,7 +31,6 @@ const DEFAULT_DOT_COUNT = 50
 const DEFAULT_DOT_SIZE = 10
 
 export function QQPlot() {
-
   const { dataCols, dataRows, messageApi, isLargeData } = useZustand()
   const [form] = Form.useForm<Option>()
   // 图形设置相关
@@ -41,16 +40,40 @@ export function QQPlot() {
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      const { xVar, yVar, xLabel, yLabel, title, standardize: std, dotCount } = values
+      const {
+        xVar,
+        yVar,
+        xLabel,
+        yLabel,
+        title,
+        standardize: std,
+        dotCount,
+      } = values
       const filteredData = dataRows.filter((row) => {
-        if (xVar !== '__stdnorm__' && typeof row[xVar] === 'undefined') return false
-        if (yVar !== '__stdnorm__' && typeof row[yVar] === 'undefined') return false
+        if (xVar !== '__stdnorm__' && typeof row[xVar] === 'undefined')
+          return false
+        if (yVar !== '__stdnorm__' && typeof row[yVar] === 'undefined')
+          return false
         return true
       })
-      const xData = xVar === '__stdnorm__' ? null : sort(std ? standardize(filteredData.map((row) => Number(row[xVar]))) : filteredData.map((row) => Number(row[xVar])))
-      const yData = yVar === '__stdnorm__' ? null : sort(std ? standardize(filteredData.map((row) => Number(row[yVar]))) : filteredData.map((row) => Number(row[yVar])))
+      const xData =
+        xVar === '__stdnorm__'
+          ? null
+          : sort(
+              std
+                ? standardize(filteredData.map((row) => Number(row[xVar])))
+                : filteredData.map((row) => Number(row[xVar])),
+            )
+      const yData =
+        yVar === '__stdnorm__'
+          ? null
+          : sort(
+              std
+                ? standardize(filteredData.map((row) => Number(row[yVar])))
+                : filteredData.map((row) => Number(row[yVar])),
+            )
       const data = new Array(dotCount).fill(0).map((_, i) => {
         const q = (i + 1) * (1 / (dotCount + 1))
         return [
@@ -59,10 +82,18 @@ export function QQPlot() {
         ]
       })
       const chart = echarts.init(document.getElementById('echarts-container')!)
-      const xMin = +((xData && !std) ? quantile(xData, z2p(-3), true) : -3).toFixed(2)
-      const xMax = +((xData && !std) ? quantile(xData, z2p(3), true) : 3).toFixed(2)
-      const yMin = +((yData && !std) ? quantile(yData, z2p(-3), true) : -3).toFixed(2)
-      const yMax = +((yData && !std) ? quantile(yData, z2p(3), true) : 3).toFixed(2)
+      const xMin = +(
+        xData && !std ? quantile(xData, z2p(-3), true) : -3
+      ).toFixed(2)
+      const xMax = +(xData && !std ? quantile(xData, z2p(3), true) : 3).toFixed(
+        2,
+      )
+      const yMin = +(
+        yData && !std ? quantile(yData, z2p(-3), true) : -3
+      ).toFixed(2)
+      const yMax = +(yData && !std ? quantile(yData, z2p(3), true) : 3).toFixed(
+        2,
+      )
       const option: EChartsOption = {
         title: {
           text: title,
@@ -87,7 +118,10 @@ export function QQPlot() {
             source: data,
           },
           {
-            source: [[xMin, yMin], [xMax, yMax]],
+            source: [
+              [xMin, yMin],
+              [xMax, yMax],
+            ],
           },
         ],
         series: [
@@ -108,15 +142,15 @@ export function QQPlot() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form
           form={form}
           className='w-full py-4 overflow-auto'
@@ -158,7 +192,15 @@ export function QQPlot() {
                     if (value !== '__stdnorm__') {
                       const col = dataCols.find((col) => col.name === value)
                       if (col) {
-                        form.setFieldsValue({ dotCount: Math.max(4, Math.min(MAX_DOT_COUNT, col.valid ?? DEFAULT_DOT_COUNT)) })
+                        form.setFieldsValue({
+                          dotCount: Math.max(
+                            4,
+                            Math.min(
+                              MAX_DOT_COUNT,
+                              col.valid ?? DEFAULT_DOT_COUNT,
+                            ),
+                          ),
+                        })
                       }
                     }
                   }}
@@ -166,14 +208,11 @@ export function QQPlot() {
                     { label: '标准正态分布', value: '__stdnorm__' },
                     ...dataCols
                       .filter((col) => col.type === '等距或等比数据')
-                      .map((col) => ({ label: col.name, value: col.name }))
+                      .map((col) => ({ label: col.name, value: col.name })),
                   ]}
                 />
               </Form.Item>
-              <Form.Item
-                name='xLabel'
-                noStyle
-              >
+              <Form.Item name='xLabel' noStyle>
                 <Input className='w-max' placeholder='标签默认为变量名' />
               </Form.Item>
             </Space.Compact>
@@ -202,7 +241,15 @@ export function QQPlot() {
                     if (value !== '__stdnorm__') {
                       const col = dataCols.find((col) => col.name === value)
                       if (col) {
-                        form.setFieldsValue({ dotCount: Math.max(4, Math.min(MAX_DOT_COUNT, col.valid ?? DEFAULT_DOT_COUNT)) })
+                        form.setFieldsValue({
+                          dotCount: Math.max(
+                            4,
+                            Math.min(
+                              MAX_DOT_COUNT,
+                              col.valid ?? DEFAULT_DOT_COUNT,
+                            ),
+                          ),
+                        })
                       }
                     }
                   }}
@@ -210,26 +257,18 @@ export function QQPlot() {
                     { label: '标准正态分布', value: '__stdnorm__' },
                     ...dataCols
                       .filter((col) => col.type === '等距或等比数据')
-                      .map((col) => ({ label: col.name, value: col.name }))
+                      .map((col) => ({ label: col.name, value: col.name })),
                   ]}
                 />
               </Form.Item>
-              <Form.Item
-                name='yLabel'
-                noStyle
-              >
+              <Form.Item name='yLabel' noStyle>
                 <Input className='w-max' placeholder='标签默认为变量名' />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item
-            label='数据标准化和取点数'
-          >
+          <Form.Item label='数据标准化和取点数'>
             <Space.Compact block>
-              <Form.Item
-                name='standardize'
-                noStyle
-              >
+              <Form.Item name='standardize' noStyle>
                 <Select
                   className='w-full'
                   placeholder='标准化'
@@ -244,32 +283,42 @@ export function QQPlot() {
                 noStyle
                 rules={[{ required: true, message: '请输入取点数' }]}
               >
-                <InputNumber addonBefore='取' addonAfter='个点' className='w-full' min={4} step={1} max={MAX_DOT_COUNT} />
+                <InputNumber
+                  addonBefore='取'
+                  addonAfter='个点'
+                  className='w-full'
+                  min={4}
+                  step={1}
+                  max={MAX_DOT_COUNT}
+                />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <Form.Item
-            label='自定义标题和点大小'
-          >
+          <Form.Item label='自定义标题和点大小'>
             <Space.Compact block>
-              <Form.Item
-                name='title'
-                noStyle
-              >
-                <Input addonBefore='标题' className='w-full' placeholder='默认无标题' />
+              <Form.Item name='title' noStyle>
+                <Input
+                  addonBefore='标题'
+                  className='w-full'
+                  placeholder='默认无标题'
+                />
               </Form.Item>
               <Form.Item
                 name='dotSize'
                 noStyle
                 rules={[{ required: true, message: '请输入点大小' }]}
               >
-                <InputNumber addonBefore='点大小' className='w-52' placeholder='默认10' min={1} step={1} />
+                <InputNumber
+                  addonBefore='点大小'
+                  className='w-52'
+                  placeholder='默认10'
+                  min={1}
+                  step={1}
+                />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <div
-            className='flex flex-row flex-nowrap justify-center items-center gap-4'
-          >
+          <div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
             <Button
               className='w-full mt-4'
               type='default'
@@ -295,16 +344,18 @@ export function QQPlot() {
             取点数默认为变量的有效值个数, 最大取点数为1000
           </p>
         </Form>
-
       </div>
 
       <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>
-        {!rendered && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>请选择参数并点击生成</div>}
+        {!rendered && (
+          <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+            请选择参数并点击生成
+          </div>
+        )}
       </div>
-
     </div>
   )
 }

@@ -49,10 +49,10 @@ table.three-line-table {
     @apply py-1 px-4 text-sm;
   }
   & > tbody > tr:first-of-type > td {
-    @apply pt-2
+    @apply pt-2;
   }
   & > tbody > tr:last-of-type > td {
-    @apply pb-2
+    @apply pb-2;
   }
 }
 

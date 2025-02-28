@@ -13,11 +13,10 @@ const DEFAULT_VALUES = {
   fP: 0.05,
   chi: 1,
   chiDf: 5,
-  chiP: 0.05
+  chiP: 0.05,
 }
 
 export function StatisticToPvalue() {
-
   // z -> p
   const [zS, setZS] = useState<number>(DEFAULT_VALUES.zS)
   // p -> z
@@ -56,16 +55,24 @@ export function StatisticToPvalue() {
     <div className='w-full h-full flex flex-col sm:flex-row justify-center items-center gap-4 p-4 text-rose-950 dark:text-white'>
       <div className='w-full sm:w-1/2 h-full flex flex-col justify-start items-center gap-4 p-4 border rounded-md bg-gray-50 relative overflow-auto dark:bg-gray-800 dark:border-black'>
         <p className='text-base pb-2 pt-4'>统计量转P值</p>
-        <Form 
-          layout='vertical'
-          className='w-full max-w-96'
-        >
-          <Form.Item label={<span>
-            标准正态分布 <Tag color='pink'>p = {z2p(zS).toFixed(6)}</Tag>
-          </span>}>
+        <Form layout='vertical' className='w-full max-w-96'>
+          <Form.Item
+            label={
+              <span>
+                标准正态分布 <Tag color='pink'>p = {z2p(zS).toFixed(6)}</Tag>
+              </span>
+            }
+          >
             <InputNumber
               className='w-full'
-              addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>Z</Tag></span>}
+              addonBefore={
+                <span>
+                  统计量{' '}
+                  <Tag className='mr-0' color='blue'>
+                    Z
+                  </Tag>
+                </span>
+              }
               step={0.01}
               min={-5}
               max={5}
@@ -75,12 +82,24 @@ export function StatisticToPvalue() {
               }}
             />
           </Form.Item>
-          <Form.Item label={<span>
-            T分布(单尾) <Tag color='pink'>p = {t2p(tS1, tDf1a, false).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                T分布(单尾){' '}
+                <Tag color='pink'>p = {t2p(tS1, tDf1a, false).toFixed(6)}</Tag>
+              </span>
+            }
+          >
             <Space.Compact block>
               <InputNumber
-                addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>T</Tag></span>}
+                addonBefore={
+                  <span>
+                    统计量{' '}
+                    <Tag className='mr-0' color='blue'>
+                      T
+                    </Tag>
+                  </span>
+                }
                 step={0.01}
                 min={-5}
                 max={5}
@@ -90,7 +109,14 @@ export function StatisticToPvalue() {
                 }}
               />
               <InputNumber
-                addonBefore={<span>自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+                addonBefore={
+                  <span>
+                    自由度{' '}
+                    <Tag className='mr-0' color='blue'>
+                      df
+                    </Tag>
+                  </span>
+                }
                 step={1}
                 min={1}
                 defaultValue={DEFAULT_VALUES.tDf}
@@ -100,12 +126,24 @@ export function StatisticToPvalue() {
               />
             </Space.Compact>
           </Form.Item>
-          <Form.Item label={<span>
-            T分布(双尾) <Tag color='pink'>p = {t2p(tS2, tDf2a).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                T分布(双尾){' '}
+                <Tag color='pink'>p = {t2p(tS2, tDf2a).toFixed(6)}</Tag>
+              </span>
+            }
+          >
             <Space.Compact block>
               <InputNumber
-                addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>T</Tag></span>}
+                addonBefore={
+                  <span>
+                    统计量{' '}
+                    <Tag className='mr-0' color='blue'>
+                      T
+                    </Tag>
+                  </span>
+                }
                 step={0.01}
                 min={-5}
                 max={5}
@@ -115,7 +153,14 @@ export function StatisticToPvalue() {
                 }}
               />
               <InputNumber
-                addonBefore={<span>自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+                addonBefore={
+                  <span>
+                    自由度{' '}
+                    <Tag className='mr-0' color='blue'>
+                      df
+                    </Tag>
+                  </span>
+                }
                 step={1}
                 min={1}
                 defaultValue={DEFAULT_VALUES.tDf}
@@ -125,12 +170,26 @@ export function StatisticToPvalue() {
               />
             </Space.Compact>
           </Form.Item>
-          <Form.Item label={<span>
-            F分布(单尾) <Tag color='pink'>p = {f2p(fS1, fDf1a[0], fDf1a[1], false).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                F分布(单尾){' '}
+                <Tag color='pink'>
+                  p = {f2p(fS1, fDf1a[0], fDf1a[1], false).toFixed(6)}
+                </Tag>
+              </span>
+            }
+          >
             <InputNumber
               className='w-full mb-2'
-              addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>F</Tag></span>}
+              addonBefore={
+                <span>
+                  统计量{' '}
+                  <Tag className='mr-0' color='blue'>
+                    F
+                  </Tag>
+                </span>
+              }
               step={0.01}
               min={0.0001}
               defaultValue={DEFAULT_VALUES.fS}
@@ -140,7 +199,14 @@ export function StatisticToPvalue() {
             />
             <InputNumber
               className='w-full mb-2'
-              addonBefore={<span>分子(因素)自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+              addonBefore={
+                <span>
+                  分子(因素)自由度{' '}
+                  <Tag className='mr-0' color='blue'>
+                    df
+                  </Tag>
+                </span>
+              }
               step={1}
               min={1}
               defaultValue={DEFAULT_VALUES.fDf[0]}
@@ -150,7 +216,14 @@ export function StatisticToPvalue() {
             />
             <InputNumber
               className='w-full'
-              addonBefore={<span>分母(样本)自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+              addonBefore={
+                <span>
+                  分母(样本)自由度{' '}
+                  <Tag className='mr-0' color='blue'>
+                    df
+                  </Tag>
+                </span>
+              }
               step={1}
               min={1}
               defaultValue={DEFAULT_VALUES.fDf[1]}
@@ -159,12 +232,26 @@ export function StatisticToPvalue() {
               }}
             />
           </Form.Item>
-          <Form.Item label={<span>
-            F分布(双尾) <Tag color='pink'>p = {f2p(fS2, fDf2a[0], fDf2a[1], true).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                F分布(双尾){' '}
+                <Tag color='pink'>
+                  p = {f2p(fS2, fDf2a[0], fDf2a[1], true).toFixed(6)}
+                </Tag>
+              </span>
+            }
+          >
             <InputNumber
               className='w-full mb-2'
-              addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>F</Tag></span>}
+              addonBefore={
+                <span>
+                  统计量{' '}
+                  <Tag className='mr-0' color='blue'>
+                    F
+                  </Tag>
+                </span>
+              }
               step={0.01}
               min={0.0001}
               defaultValue={DEFAULT_VALUES.fS}
@@ -174,7 +261,14 @@ export function StatisticToPvalue() {
             />
             <InputNumber
               className='w-full mb-2'
-              addonBefore={<span>分子(因素)自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+              addonBefore={
+                <span>
+                  分子(因素)自由度{' '}
+                  <Tag className='mr-0' color='blue'>
+                    df
+                  </Tag>
+                </span>
+              }
               step={1}
               min={1}
               defaultValue={DEFAULT_VALUES.fDf[0]}
@@ -184,7 +278,14 @@ export function StatisticToPvalue() {
             />
             <InputNumber
               className='w-full'
-              addonBefore={<span>分母(样本)自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+              addonBefore={
+                <span>
+                  分母(样本)自由度{' '}
+                  <Tag className='mr-0' color='blue'>
+                    df
+                  </Tag>
+                </span>
+              }
               step={1}
               min={1}
               defaultValue={DEFAULT_VALUES.fDf[1]}
@@ -193,12 +294,24 @@ export function StatisticToPvalue() {
               }}
             />
           </Form.Item>
-          <Form.Item label={<span>
-            卡方分布 <Tag color='pink'>p = {c2p(chi, chiDf).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                卡方分布{' '}
+                <Tag color='pink'>p = {c2p(chi, chiDf).toFixed(6)}</Tag>
+              </span>
+            }
+          >
             <Space.Compact block>
               <InputNumber
-                addonBefore={<span>统计量 <Tag className='mr-0' color='blue'>χ²</Tag></span>}
+                addonBefore={
+                  <span>
+                    统计量{' '}
+                    <Tag className='mr-0' color='blue'>
+                      χ²
+                    </Tag>
+                  </span>
+                }
                 step={0.01}
                 min={0}
                 defaultValue={DEFAULT_VALUES.chi}
@@ -207,7 +320,14 @@ export function StatisticToPvalue() {
                 }}
               />
               <InputNumber
-                addonBefore={<span>自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+                addonBefore={
+                  <span>
+                    自由度{' '}
+                    <Tag className='mr-0' color='blue'>
+                      df
+                    </Tag>
+                  </span>
+                }
                 step={1}
                 min={1}
                 defaultValue={DEFAULT_VALUES.chiDf}
@@ -221,16 +341,27 @@ export function StatisticToPvalue() {
       </div>
       <div className='w-full sm:w-1/2 h-full flex flex-col justify-start items-center gap-4 p-4 border rounded-md bg-gray-50 relative overflow-auto dark:bg-gray-800 dark:border-black'>
         <p className='text-base pb-2 pt-4'>P值转统计量</p>
-        <Form 
-          layout='vertical'
-          className='w-full max-w-96'
-        >
-          <Form.Item label={<span>
-            标准正态分布 <Tag color='pink'>Z = {zP === 1 ? '+∞' : zP === 0 ? '-∞' : p2z(zP).toFixed(6)}</Tag>
-          </span>}>
+        <Form layout='vertical' className='w-full max-w-96'>
+          <Form.Item
+            label={
+              <span>
+                标准正态分布{' '}
+                <Tag color='pink'>
+                  Z = {zP === 1 ? '+∞' : zP === 0 ? '-∞' : p2z(zP).toFixed(6)}
+                </Tag>
+              </span>
+            }
+          >
             <InputNumber
               className='w-full'
-              addonBefore={<span>累积概率 <Tag className='mr-0' color='blue'>p</Tag></span>}
+              addonBefore={
+                <span>
+                  累积概率{' '}
+                  <Tag className='mr-0' color='blue'>
+                    p
+                  </Tag>
+                </span>
+              }
               step={0.01}
               min={0}
               max={1}
@@ -240,12 +371,31 @@ export function StatisticToPvalue() {
               }}
             />
           </Form.Item>
-          <Form.Item label={<span>
-            T分布(单尾) <Tag color='pink'>T = {tP1 === 1 ? '-∞' : tP1 === 0 ? '+∞' : p2t(tP1, tDf1b, false).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                T分布(单尾){' '}
+                <Tag color='pink'>
+                  T ={' '}
+                  {tP1 === 1
+                    ? '-∞'
+                    : tP1 === 0
+                      ? '+∞'
+                      : p2t(tP1, tDf1b, false).toFixed(6)}
+                </Tag>
+              </span>
+            }
+          >
             <Space.Compact block>
               <InputNumber
-                addonBefore={<span>显著性 <Tag className='mr-0' color='blue'>p</Tag></span>}
+                addonBefore={
+                  <span>
+                    显著性{' '}
+                    <Tag className='mr-0' color='blue'>
+                      p
+                    </Tag>
+                  </span>
+                }
                 step={0.01}
                 min={0}
                 max={1}
@@ -255,7 +405,14 @@ export function StatisticToPvalue() {
                 }}
               />
               <InputNumber
-                addonBefore={<span>自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+                addonBefore={
+                  <span>
+                    自由度{' '}
+                    <Tag className='mr-0' color='blue'>
+                      df
+                    </Tag>
+                  </span>
+                }
                 step={1}
                 min={1}
                 defaultValue={DEFAULT_VALUES.tDf}
@@ -265,12 +422,31 @@ export function StatisticToPvalue() {
               />
             </Space.Compact>
           </Form.Item>
-          <Form.Item label={<span>
-            T分布(双尾) <Tag color='pink'>T = {tP2 === 1 ? '-∞' : tP2 === 0 ? '+∞' : p2t(tP2, tDf2b).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                T分布(双尾){' '}
+                <Tag color='pink'>
+                  T ={' '}
+                  {tP2 === 1
+                    ? '-∞'
+                    : tP2 === 0
+                      ? '+∞'
+                      : p2t(tP2, tDf2b).toFixed(6)}
+                </Tag>
+              </span>
+            }
+          >
             <Space.Compact block>
               <InputNumber
-                addonBefore={<span>显著性 <Tag className='mr-0' color='blue'>p</Tag></span>}
+                addonBefore={
+                  <span>
+                    显著性{' '}
+                    <Tag className='mr-0' color='blue'>
+                      p
+                    </Tag>
+                  </span>
+                }
                 step={0.01}
                 min={0}
                 max={1}
@@ -280,7 +456,14 @@ export function StatisticToPvalue() {
                 }}
               />
               <InputNumber
-                addonBefore={<span>自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+                addonBefore={
+                  <span>
+                    自由度{' '}
+                    <Tag className='mr-0' color='blue'>
+                      df
+                    </Tag>
+                  </span>
+                }
                 step={1}
                 min={1}
                 defaultValue={DEFAULT_VALUES.tDf}
@@ -290,12 +473,31 @@ export function StatisticToPvalue() {
               />
             </Space.Compact>
           </Form.Item>
-          <Form.Item label={<span>
-            F分布(单尾) <Tag color='pink'>F = {fP1 === 1 ? '0' : fP1 === 0 ? '+∞' : p2f(fP1, fDf1b[0], fDf1b[1], false).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                F分布(单尾){' '}
+                <Tag color='pink'>
+                  F ={' '}
+                  {fP1 === 1
+                    ? '0'
+                    : fP1 === 0
+                      ? '+∞'
+                      : p2f(fP1, fDf1b[0], fDf1b[1], false).toFixed(6)}
+                </Tag>
+              </span>
+            }
+          >
             <InputNumber
               className='w-full mb-2'
-              addonBefore={<span>显著性 <Tag className='mr-0' color='blue'>p</Tag></span>}
+              addonBefore={
+                <span>
+                  显著性{' '}
+                  <Tag className='mr-0' color='blue'>
+                    p
+                  </Tag>
+                </span>
+              }
               step={0.01}
               min={0}
               max={1}
@@ -306,7 +508,14 @@ export function StatisticToPvalue() {
             />
             <InputNumber
               className='w-full mb-2'
-              addonBefore={<span>分子(因素)自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+              addonBefore={
+                <span>
+                  分子(因素)自由度{' '}
+                  <Tag className='mr-0' color='blue'>
+                    df
+                  </Tag>
+                </span>
+              }
               step={1}
               min={1}
               defaultValue={DEFAULT_VALUES.fDf[0]}
@@ -316,7 +525,14 @@ export function StatisticToPvalue() {
             />
             <InputNumber
               className='w-full'
-              addonBefore={<span>分母(样本)自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+              addonBefore={
+                <span>
+                  分母(样本)自由度{' '}
+                  <Tag className='mr-0' color='blue'>
+                    df
+                  </Tag>
+                </span>
+              }
               step={1}
               min={1}
               defaultValue={DEFAULT_VALUES.fDf[1]}
@@ -325,12 +541,31 @@ export function StatisticToPvalue() {
               }}
             />
           </Form.Item>
-          <Form.Item label={<span>
-            F分布(双尾) <Tag color='pink'>F = {fP2 === 1 ? '0' : fP2 === 0 ? '+∞' : p2f(fP2, fDf2b[0], fDf2b[1], true).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                F分布(双尾){' '}
+                <Tag color='pink'>
+                  F ={' '}
+                  {fP2 === 1
+                    ? '0'
+                    : fP2 === 0
+                      ? '+∞'
+                      : p2f(fP2, fDf2b[0], fDf2b[1], true).toFixed(6)}
+                </Tag>
+              </span>
+            }
+          >
             <InputNumber
               className='w-full mb-2'
-              addonBefore={<span>显著性 <Tag className='mr-0' color='blue'>p</Tag></span>}
+              addonBefore={
+                <span>
+                  显著性{' '}
+                  <Tag className='mr-0' color='blue'>
+                    p
+                  </Tag>
+                </span>
+              }
               step={0.01}
               min={0}
               max={1}
@@ -341,7 +576,14 @@ export function StatisticToPvalue() {
             />
             <InputNumber
               className='w-full mb-2'
-              addonBefore={<span>分子(因素)自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+              addonBefore={
+                <span>
+                  分子(因素)自由度{' '}
+                  <Tag className='mr-0' color='blue'>
+                    df
+                  </Tag>
+                </span>
+              }
               step={1}
               min={1}
               defaultValue={DEFAULT_VALUES.fDf[0]}
@@ -351,7 +593,14 @@ export function StatisticToPvalue() {
             />
             <InputNumber
               className='w-full'
-              addonBefore={<span>分母(样本)自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+              addonBefore={
+                <span>
+                  分母(样本)自由度{' '}
+                  <Tag className='mr-0' color='blue'>
+                    df
+                  </Tag>
+                </span>
+              }
               step={1}
               min={1}
               defaultValue={DEFAULT_VALUES.fDf[1]}
@@ -360,12 +609,31 @@ export function StatisticToPvalue() {
               }}
             />
           </Form.Item>
-          <Form.Item label={<span>
-            卡方分布 <Tag color='pink'>χ² = {chiP === 1 ? '0' : chiP === 0 ? '+∞' : p2c(chiP, chiDf).toFixed(6)}</Tag>
-          </span>}>
+          <Form.Item
+            label={
+              <span>
+                卡方分布{' '}
+                <Tag color='pink'>
+                  χ² ={' '}
+                  {chiP === 1
+                    ? '0'
+                    : chiP === 0
+                      ? '+∞'
+                      : p2c(chiP, chiDf).toFixed(6)}
+                </Tag>
+              </span>
+            }
+          >
             <Space.Compact block>
               <InputNumber
-                addonBefore={<span>显著性 <Tag className='mr-0' color='blue'>p</Tag></span>}
+                addonBefore={
+                  <span>
+                    显著性{' '}
+                    <Tag className='mr-0' color='blue'>
+                      p
+                    </Tag>
+                  </span>
+                }
                 step={0.01}
                 min={0}
                 max={1}
@@ -375,7 +643,14 @@ export function StatisticToPvalue() {
                 }}
               />
               <InputNumber
-                addonBefore={<span>自由度 <Tag className='mr-0' color='blue'>df</Tag></span>}
+                addonBefore={
+                  <span>
+                    自由度{' '}
+                    <Tag className='mr-0' color='blue'>
+                      df
+                    </Tag>
+                  </span>
+                }
                 step={1}
                 min={1}
                 defaultValue={DEFAULT_VALUES.chiDf}

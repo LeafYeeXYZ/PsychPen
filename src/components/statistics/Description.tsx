@@ -2,11 +2,34 @@ import { useZustand } from '../../lib/useZustand'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { min, max, mean, quantile, std, mode, median, range, vari as _vari } from '@psych/lib'
+import {
+  min,
+  max,
+  mean,
+  quantile,
+  std,
+  mode,
+  median,
+  range,
+  vari as _vari,
+} from '@psych/lib'
 
-type AvialableStat = 'min' | 'max' | 'mean' | 'mode' | 'q1' | 'q2' | 'q3' | 'std' | 'count' | 'unique' | 'median' | 'range' | 'variance'
+type AvialableStat =
+  | 'min'
+  | 'max'
+  | 'mean'
+  | 'mode'
+  | 'q1'
+  | 'q2'
+  | 'q3'
+  | 'std'
+  | 'count'
+  | 'unique'
+  | 'median'
+  | 'range'
+  | 'variance'
 
-const STAT_OPTIONS: { value: AvialableStat, label: string }[] = [
+const STAT_OPTIONS: { value: AvialableStat; label: string }[] = [
   { value: 'count', label: '有效值数' },
   { value: 'unique', label: '唯一值数' },
   { value: 'mean', label: '均值' },
@@ -42,16 +65,15 @@ type Result = {
   /** 分组变量 */
   group?: string
   /** 描述性数据 */
-  data: { 
+  data: {
     /** 变量名/组名 */
-    var: string, 
+    var: string
     /** 统计量 */
-    data: { value: string | number, label: string }[] 
+    data: { value: string | number; label: string }[]
   }[]
 }
 
 export function Description() {
-
   const { dataCols, dataRows, messageApi } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -68,19 +90,41 @@ export function Description() {
             .map((v) => Number(v))
           const data = statistic.map((stat) => {
             switch (stat) {
-              case 'min': return { value: +min(rows).toFixed(4), label: '最小值' }
-              case 'max': return { value: +max(rows).toFixed(4), label: '最大值' }
-              case 'mean': return { value: +mean(rows).toFixed(4), label: '均值' }
-              case 'mode': return { value: +mode(rows).toFixed(4), label: '众数' }
-              case 'q1': return { value: +quantile(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
-              case 'q2': return { value: +quantile(rows, 0.5).toFixed(4), label: 'Q2(50%分位数)' }
-              case 'q3': return { value: +quantile(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
-              case 'std': return { value: +std(rows).toFixed(4), label: '标准差' }
-              case 'count': return { value: rows.length, label: '有效值数' }
-              case 'unique': return { value: new Set(rows).size, label: '唯一值数' }
-              case 'median': return { value: +median(rows).toFixed(4), label: '中位数' }
-              case 'range': return { value: +range(rows).toFixed(4), label: '极差' }
-              case 'variance': return { value: +_vari(rows).toFixed(4), label: '方差' }
+              case 'min':
+                return { value: +min(rows).toFixed(4), label: '最小值' }
+              case 'max':
+                return { value: +max(rows).toFixed(4), label: '最大值' }
+              case 'mean':
+                return { value: +mean(rows).toFixed(4), label: '均值' }
+              case 'mode':
+                return { value: +mode(rows).toFixed(4), label: '众数' }
+              case 'q1':
+                return {
+                  value: +quantile(rows, 0.25).toFixed(4),
+                  label: 'Q1(25%分位数)',
+                }
+              case 'q2':
+                return {
+                  value: +quantile(rows, 0.5).toFixed(4),
+                  label: 'Q2(50%分位数)',
+                }
+              case 'q3':
+                return {
+                  value: +quantile(rows, 0.75).toFixed(4),
+                  label: 'Q3(75%分位数)',
+                }
+              case 'std':
+                return { value: +std(rows).toFixed(4), label: '标准差' }
+              case 'count':
+                return { value: rows.length, label: '有效值数' }
+              case 'unique':
+                return { value: new Set(rows).size, label: '唯一值数' }
+              case 'median':
+                return { value: +median(rows).toFixed(4), label: '中位数' }
+              case 'range':
+                return { value: +range(rows).toFixed(4), label: '极差' }
+              case 'variance':
+                return { value: +_vari(rows).toFixed(4), label: '方差' }
             }
           })
           return { var: vari, data }
@@ -96,39 +140,66 @@ export function Description() {
             .map((v) => Number(v))
           const data = statistic.map((stat) => {
             switch (stat) {
-              case 'min': return { value: +min(rows).toFixed(4), label: '最小值' }
-              case 'max': return { value: +max(rows).toFixed(4), label: '最大值' }
-              case 'mean': return { value: +mean(rows).toFixed(4), label: '均值' }
-              case 'mode': return { value: +mode(rows).toFixed(4), label: '众数' }
-              case 'q1': return { value: +quantile(rows, 0.25).toFixed(4), label: 'Q1(25%分位数)' }
-              case 'q2': return { value: +quantile(rows, 0.5).toFixed(4), label: 'Q2(50%分位数)' }
-              case 'q3': return { value: +quantile(rows, 0.75).toFixed(4), label: 'Q3(75%分位数)' }
-              case 'std': return { value: +std(rows).toFixed(4), label: '标准差' }
-              case 'count': return { value: rows.length, label: '有效值数' }
-              case 'unique': return { value: new Set(rows).size, label: '唯一值数' }
-              case 'median': return { value: +median(rows).toFixed(4), label: '中位数' }
-              case 'range': return { value: +range(rows).toFixed(4), label: '极差' }
-              case 'variance': return { value: +_vari(rows).toFixed(4), label: '方差' }
+              case 'min':
+                return { value: +min(rows).toFixed(4), label: '最小值' }
+              case 'max':
+                return { value: +max(rows).toFixed(4), label: '最大值' }
+              case 'mean':
+                return { value: +mean(rows).toFixed(4), label: '均值' }
+              case 'mode':
+                return { value: +mode(rows).toFixed(4), label: '众数' }
+              case 'q1':
+                return {
+                  value: +quantile(rows, 0.25).toFixed(4),
+                  label: 'Q1(25%分位数)',
+                }
+              case 'q2':
+                return {
+                  value: +quantile(rows, 0.5).toFixed(4),
+                  label: 'Q2(50%分位数)',
+                }
+              case 'q3':
+                return {
+                  value: +quantile(rows, 0.75).toFixed(4),
+                  label: 'Q3(75%分位数)',
+                }
+              case 'std':
+                return { value: +std(rows).toFixed(4), label: '标准差' }
+              case 'count':
+                return { value: rows.length, label: '有效值数' }
+              case 'unique':
+                return { value: new Set(rows).size, label: '唯一值数' }
+              case 'median':
+                return { value: +median(rows).toFixed(4), label: '中位数' }
+              case 'range':
+                return { value: +range(rows).toFixed(4), label: '极差' }
+              case 'variance':
+                return { value: +_vari(rows).toFixed(4), label: '方差' }
             }
           })
           return { var: String(g), data }
         })
-        setResult({ type, variable, group, data: data.sort((a, b) => Number(a.var) - Number(b.var))})
+        setResult({
+          type,
+          variable,
+          group,
+          data: data.sort((a, b) => Number(a.var) - Number(b.var)),
+        })
       }
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
   const [formType, setFormType] = useState<'peer' | 'independent'>('peer')
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -163,9 +234,7 @@ export function Description() {
             <Form.Item
               label='选择变量(可多选)'
               name='variables'
-              rules={[
-                { required: true, message: '请选择变量' },
-              ]}
+              rules={[{ required: true, message: '请选择变量' }]}
             >
               <Select
                 className='w-full'
@@ -173,8 +242,7 @@ export function Description() {
                 mode='multiple'
                 options={dataCols
                   .filter((col) => col.type === '等距或等比数据')
-                  .map((col) => ({ value: col.name, label: col.name }))
-                }
+                  .map((col) => ({ value: col.name, label: col.name }))}
               />
             </Form.Item>
           ) : (
@@ -182,17 +250,14 @@ export function Description() {
               <Form.Item
                 label='选择数据变量'
                 name='variable'
-                rules={[
-                  { required: true, message: '请选择数据变量' },
-                ]}
+                rules={[{ required: true, message: '请选择数据变量' }]}
               >
                 <Select
                   className='w-full'
                   placeholder='请选择数据变量'
                   options={dataCols
                     .filter((col) => col.type === '等距或等比数据')
-                    .map((col) => ({ value: col.name, label: col.name }))
-                  }
+                    .map((col) => ({ value: col.name, label: col.name }))}
                 />
               </Form.Item>
               <Form.Item
@@ -203,9 +268,10 @@ export function Description() {
                 <Select
                   className='w-full'
                   placeholder='请选择分组变量'
-                  options={dataCols
-                    .map((col) => ({ value: col.name, label: `${col.name} (水平数: ${col.unique})` }))
-                  }
+                  options={dataCols.map((col) => ({
+                    value: col.name,
+                    label: `${col.name} (水平数: ${col.unique})`,
+                  }))}
                 />
               </Form.Item>
             </>
@@ -223,29 +289,22 @@ export function Description() {
             />
           </Form.Item>
           <Form.Item>
-            <Button
-              className='w-full mt-4'
-              type='default'
-              htmlType='submit'
-            >
+            <Button className='w-full mt-4' type='default' htmlType='submit'>
               计算
             </Button>
           </Form.Item>
         </Form>
-
       </div>
 
       <div className='component-result'>
-
         {result ? (
           <div className='w-full h-full overflow-auto'>
-
             <p className='text-lg mb-2 text-center w-full'>描述统计</p>
-            <p className='text-xs mb-3 text-center w-full'>{
-              result.type === 'peer' ? 
-                `被试内变量: ${result.data.map((d) => d.var).join(', ')}`
-              : `被试间变量: ${result.variable} | 分组变量: ${result.group} (${result.data.map((d) => d.var).join(', ')})`
-            }</p>
+            <p className='text-xs mb-3 text-center w-full'>
+              {result.type === 'peer'
+                ? `被试内变量: ${result.data.map((d) => d.var).join(', ')}`
+                : `被试间变量: ${result.variable} | 分组变量: ${result.group} (${result.data.map((d) => d.var).join(', ')})`}
+            </p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -253,37 +312,28 @@ export function Description() {
                     {result.type === 'peer' ? '变量' : '组别'}
                   </td>
                   {result.data[0].data.map((d) => (
-                    <td key={Math.random()}>
-                      {d.label}
-                    </td>
+                    <td key={Math.random()}>{d.label}</td>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {result.data.map((d) => (
                   <tr key={Math.random()}>
-                    <td key={Math.random()}>
-                      {d.var}
-                    </td>
+                    <td key={Math.random()}>{d.var}</td>
                     {d.data.map((v) => (
-                      <td key={Math.random()}>
-                        {v.value}
-                      </td>
+                      <td key={Math.random()}>{v.value}</td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
-
           </div>
         ) : (
           <div className='w-full h-full flex justify-center items-center'>
             <span>请填写参数并点击计算</span>
           </div>
         )}
-        
       </div>
-
     </div>
   )
 }

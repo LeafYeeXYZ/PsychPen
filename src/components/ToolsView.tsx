@@ -2,9 +2,9 @@ import { useNav, TOOLS_VIEW_SUB_PAGES_LABELS } from '../lib/useNav'
 import { Cascader } from 'antd'
 
 export function ToolsView() {
+  const { setToolsViewSubPage, toolsViewSubPage, activeToolsViewSubPage } =
+    useNav()
 
-  const { setToolsViewSubPage, toolsViewSubPage, activeToolsViewSubPage } = useNav()
-  
   return (
     <div className='w-full h-full overflow-hidden'>
       <div className='flex flex-col justify-start items-center w-full h-full p-4'>
@@ -13,7 +13,9 @@ export function ToolsView() {
           <Cascader
             placeholder='请选择工具'
             defaultValue={[activeToolsViewSubPage]}
-            options={Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).map((label) => ({ label, value: label }))}
+            options={Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).map(
+              (label) => ({ label, value: label }),
+            )}
             onChange={(value) => {
               if (value[0] === activeToolsViewSubPage) return
               setToolsViewSubPage(value[0])

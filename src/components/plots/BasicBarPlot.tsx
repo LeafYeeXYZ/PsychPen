@@ -8,7 +8,6 @@ import { mean, std as sd } from '@psych/lib'
 import { downloadImage } from '../../lib/utils'
 
 type Option = {
-
   /** 数据分类 */
   type: 'peer' | 'independent'
 
@@ -41,31 +40,49 @@ type Option = {
 }
 
 export function BasicBarPlot() {
-
-  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } = useZustand()
+  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } =
+    useZustand()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      const { dataVar, groupVar, xLabel, yLabel, title, variables, peerLabel, dataLabel, type, label, error, maxY } = values
+      const {
+        dataVar,
+        groupVar,
+        xLabel,
+        yLabel,
+        title,
+        variables,
+        peerLabel,
+        dataLabel,
+        type,
+        label,
+        error,
+        maxY,
+      } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const data: number[] = []
       const std: [number, number, number, number][] = []
       if (type === 'independent') {
-        const filteredRows = dataRows.filter((row) => row[dataVar!] !== undefined && row[groupVar!] !== undefined && !isNaN(Number(row[dataVar!])))
+        const filteredRows = dataRows.filter(
+          (row) =>
+            row[dataVar!] !== undefined &&
+            row[groupVar!] !== undefined &&
+            !isNaN(Number(row[dataVar!])),
+        )
         // 被试间数据处理
-        const cols = Array
-          .from(new Set(filteredRows.map((row) => row[groupVar!])).values())
-          .sort((a, b) => Number(a) - Number(b))
-        const rows: number[][] = cols
-          .map((col) => filteredRows
+        const cols = Array.from(
+          new Set(filteredRows.map((row) => row[groupVar!])).values(),
+        ).sort((a, b) => Number(a) - Number(b))
+        const rows: number[][] = cols.map((col) =>
+          filteredRows
             .filter((row) => row[groupVar!] === col)
-            .map((row) => Number(row[dataVar!]))
-          )
+            .map((row) => Number(row[dataVar!])),
+        )
         rows.map((row, i) => {
           const _mean = +mean(row).toFixed(4)
           const _std = +sd(row).toFixed(4)
@@ -108,7 +125,7 @@ export function BasicBarPlot() {
                   } else {
                     return `均值: ${params.value}\n标准差: ${std[params.dataIndex][3]}`
                   }
-                }
+                },
               },
               emphasis: {
                 label: {
@@ -116,58 +133,67 @@ export function BasicBarPlot() {
                 },
               },
             },
-            error !== 0 ? {
-              type: 'custom',
-              data: std,
-              zlevel: 2,
-              renderItem(_, api) {
-                const xValue = api.value(0)
-                const lowPoint = api.coord([xValue, api.value(1)])
-                const highPoint = api.coord([xValue, api.value(2)])
-                // @ts-expect-error 没问题
-                const halfWidth = Math.min(15, Number(api.size([1, 0])[0] / 8))
-                return {
-                  type: 'group',
-                  children: [{
-                    // 顶部横线
-                    type: 'line',
-                    shape: {
-                      x1: lowPoint[0] - halfWidth,
-                      y1: highPoint[1],
-                      x2: lowPoint[0] + halfWidth,
-                      y2: highPoint[1],
-                    },
-                    style: {
-                      stroke: isDarkMode ? '#fff' : '#000',
-                    },
-                  }, {
-                    // 底部横线
-                    type: 'line',
-                    shape: {
-                      x1: lowPoint[0] - halfWidth,
-                      y1: lowPoint[1],
-                      x2: lowPoint[0] + halfWidth,
-                      y2: lowPoint[1],
-                    },
-                    style: {
-                      stroke: isDarkMode ? '#fff' : '#000',
-                    },
-                  }, {
-                    // 竖线
-                    type: 'line',
-                    shape: {
-                      x1: lowPoint[0],
-                      y1: lowPoint[1],
-                      x2: lowPoint[0],
-                      y2: highPoint[1],
-                    },
-                    style: {
-                      stroke: isDarkMode ? '#fff' : '#000',
-                    },
-                  }],
+            error !== 0
+              ? {
+                  type: 'custom',
+                  data: std,
+                  zlevel: 2,
+                  renderItem(_, api) {
+                    const xValue = api.value(0)
+                    const lowPoint = api.coord([xValue, api.value(1)])
+                    const highPoint = api.coord([xValue, api.value(2)])
+                    // @ts-expect-error 没问题
+                    const halfWidth = Math.min(
+                      15,
+                      Number(api.size([1, 0])[0] / 8),
+                    )
+                    return {
+                      type: 'group',
+                      children: [
+                        {
+                          // 顶部横线
+                          type: 'line',
+                          shape: {
+                            x1: lowPoint[0] - halfWidth,
+                            y1: highPoint[1],
+                            x2: lowPoint[0] + halfWidth,
+                            y2: highPoint[1],
+                          },
+                          style: {
+                            stroke: isDarkMode ? '#fff' : '#000',
+                          },
+                        },
+                        {
+                          // 底部横线
+                          type: 'line',
+                          shape: {
+                            x1: lowPoint[0] - halfWidth,
+                            y1: lowPoint[1],
+                            x2: lowPoint[0] + halfWidth,
+                            y2: lowPoint[1],
+                          },
+                          style: {
+                            stroke: isDarkMode ? '#fff' : '#000',
+                          },
+                        },
+                        {
+                          // 竖线
+                          type: 'line',
+                          shape: {
+                            x1: lowPoint[0],
+                            y1: lowPoint[1],
+                            x2: lowPoint[0],
+                            y2: highPoint[1],
+                          },
+                          style: {
+                            stroke: isDarkMode ? '#fff' : '#000',
+                          },
+                        },
+                      ],
+                    }
+                  },
                 }
-              }
-            } : {},
+              : {},
           ],
           legend: {
             show: false,
@@ -175,7 +201,12 @@ export function BasicBarPlot() {
         }
         chart.setOption(option, true)
       } else {
-        const filteredRows = dataRows.filter((row) => variables!.every((variable) => row[variable] !== undefined && !isNaN(Number(row[variable]))))
+        const filteredRows = dataRows.filter((row) =>
+          variables!.every(
+            (variable) =>
+              row[variable] !== undefined && !isNaN(Number(row[variable])),
+          ),
+        )
         // 被试内数据处理
         variables!.map((variable, i) => {
           const row = filteredRows
@@ -222,7 +253,7 @@ export function BasicBarPlot() {
                   } else {
                     return `均值: ${params.value}\n标准差: ${std[params.dataIndex][3]}`
                   }
-                }
+                },
               },
               emphasis: {
                 label: {
@@ -230,58 +261,67 @@ export function BasicBarPlot() {
                 },
               },
             },
-            error !== 0 ? {
-              type: 'custom',
-              data: std,
-              zlevel: 2,
-              renderItem(_, api) {
-                const xValue = api.value(0)
-                const lowPoint = api.coord([xValue, api.value(1)])
-                const highPoint = api.coord([xValue, api.value(2)])
-                // @ts-expect-error 没问题
-                const halfWidth = Math.min(15, Number(api.size([1, 0])[0] / 8))
-                return {
-                  type: 'group',
-                  children: [{
-                    // 顶部横线
-                    type: 'line',
-                    shape: {
-                      x1: lowPoint[0] - halfWidth,
-                      y1: highPoint[1],
-                      x2: lowPoint[0] + halfWidth,
-                      y2: highPoint[1],
-                    },
-                    style: {
-                      stroke: isDarkMode ? '#fff' : '#000',
-                    },
-                  }, {
-                    // 底部横线
-                    type: 'line',
-                    shape: {
-                      x1: lowPoint[0] - halfWidth,
-                      y1: lowPoint[1],
-                      x2: lowPoint[0] + halfWidth,
-                      y2: lowPoint[1],
-                    },
-                    style: {
-                      stroke: isDarkMode ? '#fff' : '#000',
-                    },
-                  }, {
-                    // 竖线
-                    type: 'line',
-                    shape: {
-                      x1: lowPoint[0],
-                      y1: lowPoint[1],
-                      x2: lowPoint[0],
-                      y2: highPoint[1],
-                    },
-                    style: {
-                      stroke: isDarkMode ? '#fff' : '#000',
-                    },
-                  }],
+            error !== 0
+              ? {
+                  type: 'custom',
+                  data: std,
+                  zlevel: 2,
+                  renderItem(_, api) {
+                    const xValue = api.value(0)
+                    const lowPoint = api.coord([xValue, api.value(1)])
+                    const highPoint = api.coord([xValue, api.value(2)])
+                    // @ts-expect-error 没问题
+                    const halfWidth = Math.min(
+                      15,
+                      Number(api.size([1, 0])[0] / 8),
+                    )
+                    return {
+                      type: 'group',
+                      children: [
+                        {
+                          // 顶部横线
+                          type: 'line',
+                          shape: {
+                            x1: lowPoint[0] - halfWidth,
+                            y1: highPoint[1],
+                            x2: lowPoint[0] + halfWidth,
+                            y2: highPoint[1],
+                          },
+                          style: {
+                            stroke: isDarkMode ? '#fff' : '#000',
+                          },
+                        },
+                        {
+                          // 底部横线
+                          type: 'line',
+                          shape: {
+                            x1: lowPoint[0] - halfWidth,
+                            y1: lowPoint[1],
+                            x2: lowPoint[0] + halfWidth,
+                            y2: lowPoint[1],
+                          },
+                          style: {
+                            stroke: isDarkMode ? '#fff' : '#000',
+                          },
+                        },
+                        {
+                          // 竖线
+                          type: 'line',
+                          shape: {
+                            x1: lowPoint[0],
+                            y1: lowPoint[1],
+                            x2: lowPoint[0],
+                            y2: highPoint[1],
+                          },
+                          style: {
+                            stroke: isDarkMode ? '#fff' : '#000',
+                          },
+                        },
+                      ],
+                    }
+                  },
                 }
-              },
-            } : {},
+              : {},
           ],
           legend: {
             show: false,
@@ -294,17 +334,19 @@ export function BasicBarPlot() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
   // 被试内和被试间
-  const [formType, setFormType] = useState<'peer' | 'independent'>('independent')
+  const [formType, setFormType] = useState<'peer' | 'independent'>(
+    'independent',
+  )
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -358,15 +400,13 @@ export function BasicBarPlot() {
                     <Select
                       className='w-full'
                       placeholder='请选择分组变量'
-                      options={dataCols.map((col) => (
-                        { label: `${col.name} (水平数: ${col.unique})`, value: col.name }
-                      ))}
+                      options={dataCols.map((col) => ({
+                        label: `${col.name} (水平数: ${col.unique})`,
+                        value: col.name,
+                      }))}
                     />
                   </Form.Item>
-                  <Form.Item
-                    name='xLabel'
-                    noStyle
-                  >
+                  <Form.Item name='xLabel' noStyle>
                     <Input className='w-max' placeholder='标签默认为变量名' />
                   </Form.Item>
                 </Space.Compact>
@@ -393,19 +433,15 @@ export function BasicBarPlot() {
                       placeholder='请选择数据变量'
                       options={dataCols
                         .filter((col) => col.type === '等距或等比数据')
-                        .map((col) => ({ label: col.name, value: col.name })
-                      )}
+                        .map((col) => ({ label: col.name, value: col.name }))}
                     />
                   </Form.Item>
-                  <Form.Item
-                    name='yLabel'
-                    noStyle
-                  >
+                  <Form.Item name='yLabel' noStyle>
                     <Input className='w-max' placeholder='标签默认为变量名' />
                   </Form.Item>
                 </Space.Compact>
               </Form.Item>
-            </>  
+            </>
           ) : (
             <>
               <Form.Item
@@ -422,22 +458,15 @@ export function BasicBarPlot() {
                   mode='multiple'
                   options={dataCols
                     .filter((col) => col.type === '等距或等比数据')
-                    .map((col) => ({ label: col.name, value: col.name })
-                  )}
+                    .map((col) => ({ label: col.name, value: col.name }))}
                 />
               </Form.Item>
               <Form.Item label='自定义X轴和Y轴标签'>
                 <Space.Compact>
-                  <Form.Item
-                    noStyle
-                    name='peerLabel'
-                  >
+                  <Form.Item noStyle name='peerLabel'>
                     <Input className='w-full' placeholder='X轴标签默认为X' />
                   </Form.Item>
-                  <Form.Item
-                    noStyle
-                    name='dataLabel'
-                  >
+                  <Form.Item noStyle name='dataLabel'>
                     <Input className='w-full' placeholder='Y轴标签默认为Y' />
                   </Form.Item>
                 </Space.Compact>
@@ -446,10 +475,7 @@ export function BasicBarPlot() {
           )}
           <Form.Item label='数据标签内容和标题设置'>
             <Space.Compact className='w-full'>
-              <Form.Item
-                noStyle
-                name='label'
-              >
+              <Form.Item noStyle name='label'>
                 <Select
                   className='w-full'
                   placeholder='数据标签内容'
@@ -461,20 +487,14 @@ export function BasicBarPlot() {
                   ]}
                 />
               </Form.Item>
-              <Form.Item
-                noStyle
-                name='title'
-              >
+              <Form.Item noStyle name='title'>
                 <Input className='w-full' placeholder='默认无标题' />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
           <Form.Item label='误差棒内容和Y轴最大值'>
             <Space.Compact className='w-full'>
-              <Form.Item
-                noStyle
-                name='error'
-              >
+              <Form.Item noStyle name='error'>
                 <Select
                   className='w-full'
                   placeholder='误差棒内容'
@@ -488,17 +508,16 @@ export function BasicBarPlot() {
                   ]}
                 />
               </Form.Item>
-              <Form.Item
-                noStyle
-                name='maxY'
-              >
-                <InputNumber className='w-full' addonBefore='Y轴最大为' placeholder='默认自动' />
+              <Form.Item noStyle name='maxY'>
+                <InputNumber
+                  className='w-full'
+                  addonBefore='Y轴最大为'
+                  placeholder='默认自动'
+                />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
-          <div
-            className='flex flex-row flex-nowrap justify-center items-center gap-4'
-          >
+          <div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
             <Button
               className='w-full mt-4'
               type='default'
@@ -518,16 +537,18 @@ export function BasicBarPlot() {
             </Button>
           </div>
         </Form>
-
       </div>
 
       <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>
-        {!rendered && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>请选择参数并点击生成</div>}
+        {!rendered && (
+          <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+            请选择参数并点击生成
+          </div>
+        )}
       </div>
-
     </div>
   )
 }

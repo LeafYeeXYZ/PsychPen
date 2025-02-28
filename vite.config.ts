@@ -4,11 +4,14 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react({
-    babel: {
-      plugins: ['babel-plugin-react-compiler', {}],
-    },
-  }), tailwindcss()],
+  plugins: [
+    react({
+      babel: {
+        plugins: ['babel-plugin-react-compiler', {}],
+      },
+    }),
+    tailwindcss(),
+  ],
   optimizeDeps: {
     exclude: ['jieba-wasm'],
   },
@@ -18,19 +21,26 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'antd': ['antd'],
-          'data': ['@psych/sheet'],
+          antd: ['antd'],
+          data: ['@psych/sheet'],
           'chart-a': ['echarts'],
           'chart-b': ['echarts-gl'],
-          'table': ['ag-grid-react'],
-          'utils': [
-            'html2canvas', '@ant-design/icons', 'bowser',
-            'echarts-wordcloud', 'echarts-stat',
-            '@psych/lib', 'ml-kmeans', 'jieba-wasm',
-            'openai', '@leaf/parse-think', 'markdown-it',
+          table: ['ag-grid-react'],
+          utils: [
+            'html2canvas',
+            '@ant-design/icons',
+            'bowser',
+            'echarts-wordcloud',
+            'echarts-stat',
+            '@psych/lib',
+            'ml-kmeans',
+            'jieba-wasm',
+            'openai',
+            '@leaf/parse-think',
+            'markdown-it',
           ],
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 })

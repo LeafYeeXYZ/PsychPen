@@ -22,7 +22,6 @@ type Result = {
 } & Option
 
 export function PeerSampleTTest() {
-
   const { dataCols, dataRows, messageApi } = useZustand()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -35,10 +34,10 @@ export function PeerSampleTTest() {
       const data2: number[] = []
       for (const row of dataRows) {
         if (
-          typeof row[variable1] !== 'undefined' 
-          && !isNaN(Number(row[variable1]))
-          && typeof row[variable2] !== 'undefined'
-          && !isNaN(Number(row[variable2]))
+          typeof row[variable1] !== 'undefined' &&
+          !isNaN(Number(row[variable1])) &&
+          typeof row[variable2] !== 'undefined' &&
+          !isNaN(Number(row[variable2]))
         ) {
           data1.push(Number(row[variable1]))
           data2.push(Number(row[variable2]))
@@ -49,15 +48,15 @@ export function PeerSampleTTest() {
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -89,15 +88,15 @@ export function PeerSampleTTest() {
               }),
             ]}
           >
-            <Select
-              className='w-full'
-              placeholder='请选择配对变量'
-            >
-              {dataCols.map((col) => col.type === '等距或等比数据' && (
-                <Select.Option key={col.name} value={col.name}>
-                  {col.name}
-                </Select.Option>
-              ))}
+            <Select className='w-full' placeholder='请选择配对变量'>
+              {dataCols.map(
+                (col) =>
+                  col.type === '等距或等比数据' && (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name}
+                    </Select.Option>
+                  ),
+              )}
             </Select>
           </Form.Item>
           <Form.Item
@@ -115,15 +114,15 @@ export function PeerSampleTTest() {
               }),
             ]}
           >
-            <Select
-              className='w-full'
-              placeholder='请选择配对变量'
-            >
-              {dataCols.map((col) => col.type === '等距或等比数据' && (
-                <Select.Option key={col.name} value={col.name}>
-                  {col.name}
-                </Select.Option>
-              ))}
+            <Select className='w-full' placeholder='请选择配对变量'>
+              {dataCols.map(
+                (col) =>
+                  col.type === '等距或等比数据' && (
+                    <Select.Option key={col.name} value={col.name}>
+                      {col.name}
+                    </Select.Option>
+                  ),
+              )}
             </Select>
           </Form.Item>
           <Form.Item
@@ -144,10 +143,7 @@ export function PeerSampleTTest() {
                 name='twoside'
                 rules={[{ required: true, message: '请选择单双尾检验' }]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='请选择单双尾检验'
-                >
+                <Select className='w-full' placeholder='请选择单双尾检验'>
                   <Select.Option value={true}>双尾检验</Select.Option>
                   <Select.Option value={false}>单尾检验</Select.Option>
                 </Select>
@@ -169,25 +165,23 @@ export function PeerSampleTTest() {
             </Space.Compact>
           </Form.Item>
           <Form.Item>
-            <Button
-              className='w-full mt-4'
-              type='default'
-              htmlType='submit'
-            >
+            <Button className='w-full mt-4' type='default' htmlType='submit'>
               计算
             </Button>
           </Form.Item>
         </Form>
-
       </div>
 
       <div className='component-result'>
-
         {result ? (
           <div className='w-full h-full overflow-auto'>
-
-            <p className='text-lg mb-2 text-center w-full'>配对样本T检验 ({result.twoside ? '双尾' : '单尾'})</p>
-            <p className='text-xs mb-3 text-center w-full'>方法: Student's T Test | H<sub>0</sub>: 均值差异={result.expect} | 显著性水平(α): {result.alpha}</p>
+            <p className='text-lg mb-2 text-center w-full'>
+              配对样本T检验 ({result.twoside ? '双尾' : '单尾'})
+            </p>
+            <p className='text-xs mb-3 text-center w-full'>
+              方法: Student's T Test | H<sub>0</sub>: 均值差异={result.expect} |
+              显著性水平(α): {result.alpha}
+            </p>
             <table className='three-line-table'>
               <thead>
                 <tr>
@@ -197,7 +191,9 @@ export function PeerSampleTTest() {
                   <td>p</td>
                   <td>{(100 - result.alpha * 100).toFixed(3)}%置信区间</td>
                   <td>效应量 (Cohen's d)</td>
-                  <td>测定系数 (R<sup>2</sup>)</td>
+                  <td>
+                    测定系数 (R<sup>2</sup>)
+                  </td>
                 </tr>
               </thead>
               <tbody>
@@ -248,16 +244,13 @@ export function PeerSampleTTest() {
                 </tr>
               </tbody>
             </table>
-
           </div>
         ) : (
           <div className='w-full h-full flex justify-center items-center'>
             <span>请填写参数并点击计算</span>
           </div>
         )}
-        
       </div>
-
     </div>
   )
 }

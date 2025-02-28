@@ -6,14 +6,16 @@ import html2canvas from 'html2canvas'
  * @returns R 的数据框
  */
 export function jsObjectToRDataFrame(obj: Record<string, number[]>): string {
-  return `data.frame(\n${Object.entries(obj).map(([key, value]) => `${key} = c(${value.join(', ')})`).join(',\n')}\n)`
+  return `data.frame(\n${Object.entries(obj)
+    .map(([key, value]) => `${key} = c(${value.join(', ')})`)
+    .join(',\n')}\n)`
 }
 
 /**
  * 把二维数组转换为 R 的矩阵
  * @param arr 二维数组
  * @param transpose 是否转置 (默认不转置)
- * @returns R 的矩阵 
+ * @returns R 的矩阵
  */
 export function jsArrayToRMatrix(arr: number[][], transpose = false): string {
   const matrix = `matrix(c(${arr.flat().join(', ')}), nrow = ${arr.length})`
@@ -90,7 +92,9 @@ export function markP(p: number, hideZero = false): string {
  * 把当前 echarts 图表保存为图片
  */
 export function downloadImage(): void {
-  html2canvas(document.getElementById('echarts-container')!.firstChild as HTMLElement).then((canvas) => {
+  html2canvas(
+    document.getElementById('echarts-container')!.firstChild as HTMLElement,
+  ).then((canvas) => {
     const url = canvas.toDataURL('image/png')
     const a = document.createElement('a')
     a.href = url

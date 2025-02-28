@@ -7,24 +7,20 @@ import { kmeans } from 'ml-kmeans'
 
 /** 生成子变量 */
 export class Derive {
-
   /**
    * 生成子变量
    * @param dataCols 数据列
    * @param dataRows 数据行
    */
-  constructor(
-    dataCols: Variable[], 
-    dataRows: { [key: string]: unknown }[]
-  ) {
+  constructor(dataCols: Variable[], dataRows: { [key: string]: unknown }[]) {
     const derivedCols: Variable[] = []
     dataCols.forEach((col) => {
       if (col.derived) {
         return
       }
       if (col.subVars?.standard) {
-        derivedCols.push({ 
-          name: `${col.name}_标准化`, 
+        derivedCols.push({
+          name: `${col.name}_标准化`,
           derived: true,
           count: col.count,
           missing: col.missing,
@@ -33,12 +29,13 @@ export class Derive {
           type: col.type,
         })
         dataRows.forEach((row) => {
-          row[`${col.name}_标准化`] = (Number(row[col.name]) - col.mean!) / col.std!
+          row[`${col.name}_标准化`] =
+            (Number(row[col.name]) - col.mean!) / col.std!
         })
       }
       if (col.subVars?.center) {
-        derivedCols.push({ 
-          name: `${col.name}_中心化`, 
+        derivedCols.push({
+          name: `${col.name}_中心化`,
           derived: true,
           count: col.count,
           missing: col.missing,
@@ -54,13 +51,21 @@ export class Derive {
         const groups = col.subVars.discrete.groups
         const method = col.subVars.discrete.method
         const discrete = new Discrete(
-          dataRows.filter((row) => typeof row[col.name] !== 'undefined').map((row) => Number(row[col.name])),
+          dataRows
+            .filter((row) => typeof row[col.name] !== 'undefined')
+            .map((row) => Number(row[col.name])),
           groups,
-          method
+          method,
         )
-        const predictedData = dataRows.map((row) => discrete.predictor(typeof row[col.name] !== 'undefined' ? Number(row[col.name]) : undefined))
-        derivedCols.push({ 
-          name: `${col.name}_${method}离散`, 
+        const predictedData = dataRows.map((row) =>
+          discrete.predictor(
+            typeof row[col.name] !== 'undefined'
+              ? Number(row[col.name])
+              : undefined,
+          ),
+        )
+        derivedCols.push({
+          name: `${col.name}_${method}离散`,
           derived: true,
           count: col.count,
           missing: col.missing,
@@ -81,12 +86,10 @@ export class Derive {
   updatedCols: Variable[]
   /** 更新后的数据行 */
   updatedRows: { [key: string]: unknown }[]
-
 }
 
 /** 变量离散化 */
 class Discrete {
-  
   /**
    * 变量离散化
    * @param data 原始数据
@@ -94,7 +97,6 @@ class Discrete {
    * @param methed 离散化方法
    */
   constructor(data: number[], groups: number, methed: AllowedDiscreteMethods) {
-
     this.method = methed
     this.groups = groups
     this.#data = data.toSorted((a, b) => a - b)
@@ -111,12 +113,19 @@ class Discrete {
       case '等频': {
         this.predictor = (data: number | undefined) => {
           if (typeof data === 'undefined') return undefined
-          return Math.floor(this.#data.findIndex((v) => v >= data) / (this.#count / this.groups))
+          return Math.floor(
+            this.#data.findIndex((v) => v >= data) /
+              (this.#count / this.groups),
+          )
         }
         break
       }
       case '聚类分析': {
-        const { clusters } = kmeans(data.map((v) => [v]), groups, {})
+        const { clusters } = kmeans(
+          data.map((v) => [v]),
+          groups,
+          {},
+        )
         this.#kmeans = new Map(clusters.map((v, i) => [data[i], v]))
         this.predictor = (index: number | undefined) => {
           if (typeof index === 'undefined') return undefined
@@ -125,7 +134,6 @@ class Discrete {
         break
       }
     }
-
   }
 
   /** 分组器 */
@@ -141,10 +149,13 @@ class Discrete {
   /** 数据最大值 */
   #max: number
   /** 数据全距 */
-  get #range() { return this.#max - this.#min }
+  get #range() {
+    return this.#max - this.#min
+  }
   /** 数据量 */
-  get #count() { return this.#data.length }
+  get #count() {
+    return this.#data.length
+  }
   /** 聚类分析的分析结果 (原始数据 => 分组) */
   #kmeans?: Map<number, number>
-
 }

@@ -18,11 +18,25 @@ const SPAPE_OPTIONS = [
 ]
 const ROTATION_OPTIONS = [
   { value: 'x', label: '水平', rotationRange: [0, 0], rotationStep: 90 },
-  { value: 'y', label: '水平/垂直', rotationRange: [-90, 90], rotationStep: 90 },
-  { value: 'z', label: '水平/垂直/倾斜', rotationRange: [-90, 90], rotationStep: 45 },
+  {
+    value: 'y',
+    label: '水平/垂直',
+    rotationRange: [-90, 90],
+    rotationStep: 90,
+  },
+  {
+    value: 'z',
+    label: '水平/垂直/倾斜',
+    rotationRange: [-90, 90],
+    rotationStep: 45,
+  },
 ]
 const FILTER_OPTIONS = [
-  { value: '__punctuation', label: '标点符号', reg: /[\p{P}\p{S}\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F]/u },
+  {
+    value: '__punctuation',
+    label: '标点符号',
+    reg: /[\p{P}\p{S}\u2000-\u206F\u2E00-\u2E7F\u3000-\u303F]/u,
+  },
   { value: '__number', label: '数字', reg: /\d/ },
   { value: '__english', label: '英文', reg: /[a-zA-Z]/ },
   { value: '__single', label: '单个字', reg: /^.$/ },
@@ -35,7 +49,7 @@ type Option = {
   /** 词云形状 */
   shape: string
   /** 词云颜色 */
-  color: { metaColor: { r: number, g: number, b: number, a: number } } | string
+  color: { metaColor: { r: number; g: number; b: number; a: number } } | string
   /** 单词最小尺寸 */
   min: number // 默认 12, 单位 px
   /** 单词最大尺寸 */
@@ -49,17 +63,18 @@ type Option = {
 }
 
 export function WordCloudPlot() {
-
-  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } = useZustand()
+  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } =
+    useZustand()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      const { variable, shape, min, max, rotation, filter, color, split } = values
+      const { variable, shape, min, max, rotation, filter, color, split } =
+        values
       const chart = echarts.init(document.getElementById('echarts-container')!)
       const raw = dataRows.map((row) => String(row[variable]))
       let data: string[] = []
@@ -71,44 +86,64 @@ export function WordCloudPlot() {
       }
       if (filter) {
         for (const f of filter) {
-          const reg = FILTER_OPTIONS.find((filter) => filter.value === f)?.reg ?? new RegExp(f)
+          const reg =
+            FILTER_OPTIONS.find((filter) => filter.value === f)?.reg ??
+            new RegExp(f)
           data = data.filter((word) => !reg.test(word))
         }
       }
-      const counts = data.reduce((acc, cur) => {
-        acc[cur] = (acc[cur] || 0) + 1
-        return acc
-      }, {} as { [key: string]: number })
-      const wordCloudData = Object.entries(counts).map(([name, value]) => ({ name, value }))
-      chart.setOption({
-        series: [{
-          type: 'wordCloud',
-          shape: shape,
-          left: 'center',
-          top: 'center',
-          width: '80%',
-          height: '80%',
-          textStyle: { color: typeof color === 'string' ? color : `rgba(${color.metaColor.r}, ${color.metaColor.g}, ${color.metaColor.b}, ${color.metaColor.a})` },
-          sizeRange: [min, max],
-          rotationRange: ROTATION_OPTIONS.find((r) => r.value === rotation)?.rotationRange,
-          rotationStep: ROTATION_OPTIONS.find((r) => r.value === rotation)?.rotationStep,
-          data: wordCloudData,
-        }],
-      }, true)
+      const counts = data.reduce(
+        (acc, cur) => {
+          acc[cur] = (acc[cur] || 0) + 1
+          return acc
+        },
+        {} as { [key: string]: number },
+      )
+      const wordCloudData = Object.entries(counts).map(([name, value]) => ({
+        name,
+        value,
+      }))
+      chart.setOption(
+        {
+          series: [
+            {
+              type: 'wordCloud',
+              shape: shape,
+              left: 'center',
+              top: 'center',
+              width: '80%',
+              height: '80%',
+              textStyle: {
+                color:
+                  typeof color === 'string'
+                    ? color
+                    : `rgba(${color.metaColor.r}, ${color.metaColor.g}, ${color.metaColor.b}, ${color.metaColor.a})`,
+              },
+              sizeRange: [min, max],
+              rotationRange: ROTATION_OPTIONS.find((r) => r.value === rotation)
+                ?.rotationRange,
+              rotationStep: ROTATION_OPTIONS.find((r) => r.value === rotation)
+                ?.rotationStep,
+              data: wordCloudData,
+            },
+          ],
+        },
+        true,
+      )
       setRendered(true)
       messageApi?.destroy()
       messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   return (
     <div className='component-main'>
-
       <div className='component-form'>
-
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
@@ -132,15 +167,13 @@ export function WordCloudPlot() {
           <Form.Item
             label='变量'
             name='variable'
-            rules={[ { required: true, message: '请选择变量' } ]}
+            rules={[{ required: true, message: '请选择变量' }]}
           >
-            <Select
-              className='w-full'
-              placeholder='请选择变量'
-            >
+            <Select className='w-full' placeholder='请选择变量'>
               {dataCols.map((col) => (
                 <Select.Option key={col.name} value={col.name}>
-                  {col.name} (重复值占比: {(100 - (col.unique! / col.count!) * 100).toFixed(2)})
+                  {col.name} (重复值占比:{' '}
+                  {(100 - (col.unique! / col.count!) * 100).toFixed(2)})
                 </Select.Option>
               ))}
             </Select>
@@ -150,24 +183,23 @@ export function WordCloudPlot() {
               <Form.Item
                 noStyle
                 name='shape'
-                rules={[ { required: true, message: '请选择词云形状' } ]}
+                rules={[{ required: true, message: '请选择词云形状' }]}
               >
                 <Select
                   className='w-full'
                   placeholder='词云形状'
-                  options={SPAPE_OPTIONS.map((shape) => ({ label: shape.label, value: shape.value }))}
+                  options={SPAPE_OPTIONS.map((shape) => ({
+                    label: shape.label,
+                    value: shape.value,
+                  }))}
                 />
               </Form.Item>
               <Form.Item
                 noStyle
                 name='color'
-                rules={[ { required: true, message: '请选择词云颜色' } ]}
+                rules={[{ required: true, message: '请选择词云颜色' }]}
               >
-                <ColorPicker 
-                  className='w-full' 
-                  showText 
-                  format='hex'
-                />
+                <ColorPicker className='w-full' showText format='hex' />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
@@ -176,7 +208,7 @@ export function WordCloudPlot() {
               <Form.Item
                 noStyle
                 name='min'
-                rules={[ 
+                rules={[
                   { required: true, message: '请输入最小尺寸' },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
@@ -200,7 +232,7 @@ export function WordCloudPlot() {
               <Form.Item
                 noStyle
                 name='max'
-                rules={[ 
+                rules={[
                   { required: true, message: '请输入最大尺寸' },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
@@ -224,12 +256,9 @@ export function WordCloudPlot() {
               <Form.Item
                 noStyle
                 name='rotation'
-                rules={[ { required: true, message: '请选择单词方向' } ]}
+                rules={[{ required: true, message: '请选择单词方向' }]}
               >
-                <Select
-                  className='w-full'
-                  placeholder='单词方向'
-                >
+                <Select className='w-full' placeholder='单词方向'>
                   {ROTATION_OPTIONS.map((rotation) => (
                     <Select.Option key={rotation.value} value={rotation.value}>
                       {rotation.label}
@@ -242,11 +271,13 @@ export function WordCloudPlot() {
           <Form.Item
             label='内容过滤设置(可输入正则表达式)'
             name='filter'
-            rules={[ 
+            rules={[
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!getFieldValue('split') && value) {
-                    return Promise.reject('如果需要进行内容过滤, 请启用词语切分')
+                    return Promise.reject(
+                      '如果需要进行内容过滤, 请启用词语切分',
+                    )
                   }
                   return Promise.resolve()
                 },
@@ -257,13 +288,13 @@ export function WordCloudPlot() {
               className='w-full'
               placeholder='留空则不过滤'
               mode='tags'
-              options={FILTER_OPTIONS.map((filter) => ({ label: filter.label, value: filter.value }))}
+              options={FILTER_OPTIONS.map((filter) => ({
+                label: filter.label,
+                value: filter.value,
+              }))}
             />
           </Form.Item>
-          <Form.Item
-            label='词语切分'
-            name='split'
-          >
+          <Form.Item label='词语切分' name='split'>
             <Select
               className='w-full'
               placeholder='请选择是否启用词语切分'
@@ -273,9 +304,7 @@ export function WordCloudPlot() {
               ]}
             />
           </Form.Item>
-          <div
-            className='flex flex-row flex-nowrap justify-center items-center gap-4'
-          >
+          <div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
             <Button
               className='w-full mt-4'
               type='default'
@@ -301,16 +330,18 @@ export function WordCloudPlot() {
             如果形状不明显, 请调小最小单词尺寸
           </p>
         </Form>
-
       </div>
 
       <div className='component-result'>
         <div className='w-full h-full overflow-auto'>
           <div className='w-full h-full' id='echarts-container' />
         </div>
-        {!rendered && <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>请选择参数并点击生成</div>}
+        {!rendered && (
+          <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
+            请选择参数并点击生成
+          </div>
+        )}
       </div>
-
     </div>
   )
 }

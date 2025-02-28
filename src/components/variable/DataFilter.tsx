@@ -1,5 +1,13 @@
 import { useZustand } from '../../lib/useZustand'
-import { Button, Select, Form, Input, InputNumber, Space, Popconfirm } from 'antd'
+import {
+  Button,
+  Select,
+  Form,
+  Input,
+  InputNumber,
+  Space,
+  Popconfirm,
+} from 'antd'
 import type { FormInstance } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -18,45 +26,78 @@ type Option = {
   regex?: string
 }
 
-const FILTER_METHODS: AllowedFilterMethods[] = ['等于', '不等于', '大于', '大于等于', '小于', '小于等于', '区间', '正则表达式', '高于平均值', '低于平均值', '高于中位数', '低于中位数']
+const FILTER_METHODS: AllowedFilterMethods[] = [
+  '等于',
+  '不等于',
+  '大于',
+  '大于等于',
+  '小于',
+  '小于等于',
+  '区间',
+  '正则表达式',
+  '高于平均值',
+  '低于平均值',
+  '高于中位数',
+  '低于中位数',
+]
 
 export function DataFilter() {
-
-  const { dataCols, dataRows, messageApi, isLargeData, disabled, setDisabled, _VariableView_updateData } = useZustand()
+  const {
+    dataCols,
+    dataRows,
+    messageApi,
+    isLargeData,
+    disabled,
+    setDisabled,
+    _VariableView_updateData,
+  } = useZustand()
   const [form] = Form.useForm()
   const handleClear = async () => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
       _VariableView_updateData(
-        dataCols.map((col) => ({ 
-          ...col, 
-          filterMethod: undefined, 
-          filterValue: undefined, 
-          filterRange: undefined, 
-          filterRegex: undefined 
-        }))
+        dataCols.map((col) => ({
+          ...col,
+          filterMethod: undefined,
+          filterValue: undefined,
+          filterRange: undefined,
+          filterRegex: undefined,
+        })),
       )
       messageApi?.destroy()
-      messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`, 1)
+      messageApi?.success(
+        `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+        1,
+      )
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
   const handleFinish = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...')
-      isLargeData && await new Promise((resolve) => setTimeout(resolve, 500))
+      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
       const cols = dataCols.map((col) => {
         if (values.variable === col.name) {
-          return { 
-            ...col, 
+          return {
+            ...col,
             filterMethod: values.method,
-            filterValue: values.value === undefined ? undefined : Array.isArray(values.value) ? values.value : [values.value],
-            filterRange: (values.rangeMin !== undefined && values.rangeMax !== undefined) ? [values.rangeMin, values.rangeMax] as [number, number] : undefined,
+            filterValue:
+              values.value === undefined
+                ? undefined
+                : Array.isArray(values.value)
+                  ? values.value
+                  : [values.value],
+            filterRange:
+              values.rangeMin !== undefined && values.rangeMax !== undefined
+                ? ([values.rangeMin, values.rangeMax] as [number, number])
+                : undefined,
             filterRegex: values.regex,
           }
         } else {
@@ -65,38 +106,63 @@ export function DataFilter() {
       })
       _VariableView_updateData(cols)
       messageApi?.destroy()
-      messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`, 1)
+      messageApi?.success(
+        `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+        1,
+      )
     } catch (error) {
       messageApi?.destroy()
-      messageApi?.error(`数据处理失败: ${error instanceof Error ? error.message : String(error)}`)
+      messageApi?.error(
+        `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
-  const [step2Options, setStep2Options] = useState<{ label: string, value: string }[]>([])
+  const [step2Options, setStep2Options] = useState<
+    { label: string; value: string }[]
+  >([])
   const [step2Key, setStep2Key] = useState<string>('default')
-  const [step3Element, setStep3Element] = useState<React.ReactElement | null>(null)
-  const getStep3Element = (method: AllowedFilterMethods, form: FormInstance<Option>): React.ReactElement | null => {
-    if (method === '大于' || method === '大于等于' || method === '小于' || method === '小于等于') {
+  const [step3Element, setStep3Element] = useState<React.ReactElement | null>(
+    null,
+  )
+  const getStep3Element = (
+    method: AllowedFilterMethods,
+    form: FormInstance<Option>,
+  ): React.ReactElement | null => {
+    if (
+      method === '大于' ||
+      method === '大于等于' ||
+      method === '小于' ||
+      method === '小于等于'
+    ) {
       return (
-        <Form.Item 
+        <Form.Item
           label='过滤参考值'
           name='value'
           rules={[{ required: true, message: '请输入参考值' }]}
         >
-          <InputNumber className='w-full' addonBefore={`只保留${method}`} addonAfter='的数据' />
+          <InputNumber
+            className='w-full'
+            addonBefore={`只保留${method}`}
+            addonAfter='的数据'
+          />
         </Form.Item>
       )
     } else if (method === '区间') {
       return (
         <Form.Item label='过滤参考区间'>
           <Space.Compact block>
-            <Form.Item 
+            <Form.Item
               noStyle
               name='rangeMin'
               rules={[
                 { required: true, message: '请输入区间下限' },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
-                    if (value === undefined || getFieldValue('rangeMax') === undefined || value < getFieldValue('rangeMax')) {
+                    if (
+                      value === undefined ||
+                      getFieldValue('rangeMax') === undefined ||
+                      value < getFieldValue('rangeMax')
+                    ) {
                       return Promise.resolve()
                     }
                     return Promise.reject(new Error('区间下限必须小于上限'))
@@ -104,16 +170,24 @@ export function DataFilter() {
                 }),
               ]}
             >
-              <InputNumber placeholder='请输入' className='w-full' addonBefore='下限为' />
+              <InputNumber
+                placeholder='请输入'
+                className='w-full'
+                addonBefore='下限为'
+              />
             </Form.Item>
-            <Form.Item 
+            <Form.Item
               noStyle
               name='rangeMax'
               rules={[
                 { required: true, message: '请输入区间上限' },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
-                    if (value === undefined || getFieldValue('rangeMin') === undefined || value > getFieldValue('rangeMin')) {
+                    if (
+                      value === undefined ||
+                      getFieldValue('rangeMin') === undefined ||
+                      value > getFieldValue('rangeMin')
+                    ) {
                       return Promise.resolve()
                     }
                     return Promise.reject(new Error('区间上限必须大于下限'))
@@ -121,14 +195,18 @@ export function DataFilter() {
                 }),
               ]}
             >
-              <InputNumber placeholder='请输入' className='w-full' addonBefore='上限为' />
+              <InputNumber
+                placeholder='请输入'
+                className='w-full'
+                addonBefore='上限为'
+              />
             </Form.Item>
           </Space.Compact>
         </Form.Item>
       )
     } else if (method === '正则表达式') {
       return (
-        <Form.Item 
+        <Form.Item
           label='过滤正则表达式'
           name='regex'
           rules={[{ required: true, message: '请输入正则表达式' }]}
@@ -136,16 +214,20 @@ export function DataFilter() {
           <Input className='w-full' />
         </Form.Item>
       )
-    } else if (method === '高于平均值' || method === '低于平均值' || method === '高于中位数' || method === '低于中位数') {
+    } else if (
+      method === '高于平均值' ||
+      method === '低于平均值' ||
+      method === '高于中位数' ||
+      method === '低于中位数'
+    ) {
       return null
     } else if (method === '等于' || method === '不等于') {
       const variable = form.getFieldValue('variable')
-      const options = Array
-        .from(new Set(dataRows.map((row) => row[variable])))
+      const options = Array.from(new Set(dataRows.map((row) => row[variable])))
         .sort((a, b) => Number(a) - Number(b))
         .map((value) => ({ label: String(value), value }))
       return (
-        <Form.Item 
+        <Form.Item
           label='过滤参考值(可多选)'
           name='value'
           rules={[{ required: true, message: '请输入参考值' }]}
@@ -164,7 +246,6 @@ export function DataFilter() {
 
   return (
     <div className='component-main variable-view'>
-
       <div className='component-form'>
         <Form<Option>
           form={form}
@@ -178,7 +259,7 @@ export function DataFilter() {
           autoComplete='off'
           disabled={disabled}
         >
-          <Form.Item 
+          <Form.Item
             label='变量名'
             name='variable'
             rules={[{ required: true, message: '请选择变量' }]}
@@ -189,27 +270,36 @@ export function DataFilter() {
               allowClear
               options={dataCols
                 .filter((col) => col.derived !== true)
-                .map((col) => ({ label: col.name, value: col.name }))
-              }
+                .map((col) => ({ label: col.name, value: col.name }))}
               onChange={(value) => {
                 if (!dataCols.some((col) => col.name === value)) {
                   setStep2Options([])
                   setStep2Key('default')
                   return
-                } else if (dataCols.find((col) => col.name === value)!.type === '等距或等比数据') {
-                  setStep2Options(FILTER_METHODS.map((method) => ({ label: method, value: method })))
+                } else if (
+                  dataCols.find((col) => col.name === value)!.type ===
+                  '等距或等比数据'
+                ) {
+                  setStep2Options(
+                    FILTER_METHODS.map((method) => ({
+                      label: method,
+                      value: method,
+                    })),
+                  )
                   setStep2Key(value)
                 } else {
-                  setStep2Options(['等于', '不等于', '正则表达式'].map((method) => ({ label: method, value: method })))
+                  setStep2Options(
+                    ['等于', '不等于', '正则表达式'].map((method) => ({
+                      label: method,
+                      value: method,
+                    })),
+                  )
                   setStep2Key(value)
                 }
               }}
             />
           </Form.Item>
-          <Form.Item 
-            label='过滤方法(留空则不过滤)'
-            name='method'
-          >
+          <Form.Item label='过滤方法(留空则不过滤)' name='method'>
             <Select
               key={step2Key}
               className='w-full'
@@ -217,7 +307,11 @@ export function DataFilter() {
               allowClear
               disabled={step2Options.length === 0}
               options={step2Options}
-              onChange={(value) => setStep3Element(getStep3Element(value as AllowedFilterMethods, form))}
+              onChange={(value) =>
+                setStep3Element(
+                  getStep3Element(value as AllowedFilterMethods, form),
+                )
+              }
             />
           </Form.Item>
           {step3Element ?? (
@@ -225,9 +319,7 @@ export function DataFilter() {
               <Select disabled />
             </Form.Item>
           )}
-          <div
-            className='flex flex-row flex-nowrap justify-center items-center gap-4'
-          >
+          <div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
             <Button
               className='mt-4 w-full'
               htmlType='submit'
@@ -260,10 +352,11 @@ export function DataFilter() {
 
       <div className='component-result variable-view'>
         <p className='intro-text'>数据过滤可以让你根据自己的需求</p>
-        <p className='intro-text'>选择性地<b>保留</b>满足过滤规则的数据</p>
+        <p className='intro-text'>
+          选择性地<b>保留</b>满足过滤规则的数据
+        </p>
         <p className='intro-text'>过滤基于原数据, 过滤后会生成新描述统计数据</p>
       </div>
-
     </div>
   )
 }

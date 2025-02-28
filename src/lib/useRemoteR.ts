@@ -2,7 +2,10 @@ import { create } from 'zustand'
 
 type RemoteRState = {
   /** 执行 R 代码 */
-  executeRCode: (codeWithOutPackages: string, packages: string[]) => Promise<unknown>
+  executeRCode: (
+    codeWithOutPackages: string,
+    packages: string[],
+  ) => Promise<unknown>
   /** R 服务地址 */
   Rurl: string
   /** R 服务密码 */
@@ -45,10 +48,10 @@ export const useRemoteR = create<RemoteRState>()((set, get) => ({
       throw new Error('未设置R语言服务器密码')
     }
     const code = `${packages.map((p) => `\nif (!requireNamespace("${p}", quietly = TRUE)) {\n  install.packages("${p}")\n}\nlibrary(${p})\n`).join('')}\n${codeWithOutPackages}`
-    const res = await fetch(Rurl, { 
-      method: 'POST', 
-      headers: { 'Content-Type': 'application/json' }, 
-      body: JSON.stringify({ password: Rpassword, code }) 
+    const res = await fetch(Rurl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: Rpassword, code }),
     })
     const text = await res.text()
     try {
@@ -65,5 +68,5 @@ export const useRemoteR = create<RemoteRState>()((set, get) => ({
     } catch (e) {
       throw e instanceof Error ? e : new Error(text)
     }
-  }
+  },
 }))

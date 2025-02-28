@@ -1,20 +1,30 @@
 import { useZustand } from '../lib/useZustand'
 import { Button } from 'antd'
 import { useNav, VARIABLE_SUB_PAGES_LABELS } from '../lib/useNav'
-import { CalculatorOutlined, ZoomOutOutlined, BoxPlotOutlined, TableOutlined, FilterOutlined, AppstoreAddOutlined } from '@ant-design/icons'
+import {
+  CalculatorOutlined,
+  ZoomOutOutlined,
+  BoxPlotOutlined,
+  TableOutlined,
+  FilterOutlined,
+  AppstoreAddOutlined,
+} from '@ant-design/icons'
 
 const ICONS: Record<VARIABLE_SUB_PAGES_LABELS, React.ReactElement> = {
-  '变量表格': <TableOutlined />,
-  '定义缺失值': <ZoomOutOutlined />,
-  '缺失值插值': <CalculatorOutlined />,
+  变量表格: <TableOutlined />,
+  定义缺失值: <ZoomOutOutlined />,
+  缺失值插值: <CalculatorOutlined />,
   '中心化/标准化/离散化': <BoxPlotOutlined />,
-  '数据筛选': <FilterOutlined />,
-  '生成新变量': <AppstoreAddOutlined />,
+  数据筛选: <FilterOutlined />,
+  生成新变量: <AppstoreAddOutlined />,
 }
 
 export function VariableView() {
-
-  const { activeVariableViewSubPage, variableViewSubPage, setVariableViewSubPage } = useNav()
+  const {
+    activeVariableViewSubPage,
+    variableViewSubPage,
+    setVariableViewSubPage,
+  } = useNav()
   const { disabled } = useZustand()
 
   return (
