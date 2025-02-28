@@ -57,7 +57,7 @@ export function DataFilter() {
       messageApi?.loading('正在处理数据...')
       isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      _VariableView_updateData(
+      await _VariableView_updateData(
         dataCols.map((col) => ({
           ...col,
           filterMethod: undefined,
@@ -104,7 +104,7 @@ export function DataFilter() {
           return col
         }
       })
-      _VariableView_updateData(cols)
+      await _VariableView_updateData(cols)
       messageApi?.destroy()
       messageApi?.success(
         `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,

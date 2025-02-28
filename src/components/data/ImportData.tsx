@@ -45,7 +45,9 @@ export function ImportData() {
             // 如果文件比较大, 延迟等待通知加载
             if (file.size > LARGE_DATA_SIZE) {
               await new Promise((resolve) => setTimeout(resolve, 500))
-              _DataView_setIsLargeData(true)
+              await _DataView_setIsLargeData(true)
+            } else {
+              await _DataView_setIsLargeData(false)
             }
             const reader = new FileReader()
             const ext = file.name.split('.').pop()?.toLowerCase()
@@ -64,7 +66,7 @@ export function ImportData() {
                     e.target.result as ArrayBuffer,
                     ext as ImportTypes,
                   )
-                  _DataView_setData(data)
+                  await _DataView_setData(data)
                 }
                 messageApi?.destroy('uploading')
                 messageApi?.success('数据导入完成', 0.5)

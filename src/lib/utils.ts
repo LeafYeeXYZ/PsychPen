@@ -1,6 +1,36 @@
 import html2canvas from 'html2canvas'
 
 /**
+ * 检查计算变量的表达式的安全性
+ * @param expression 计算变量的表达式
+ * @throws 如果表达式不安全, 则抛出异常
+ */
+export function validateExpression(expression: string): void {
+  // 先排除变量名
+  expression = expression.replace(/:::.+?:::/g, '')
+  if (
+    // 阻止数据泄露
+    expression.includes('http://') ||
+    expression.includes('https://') ||
+    expression.includes('//') ||
+    expression.includes('fetch') ||
+    expression.includes('XMLHttpRequest') ||
+    // 阻止外部代码执行
+    expression.includes('import') ||
+    expression.includes('eval') ||
+    expression.includes('Function') ||
+    expression.includes('setTimeout') ||
+    expression.includes('setInterval') ||
+    expression.includes('setImmediate') ||
+    // 阻止本地存储
+    expression.includes('localStorage') ||
+    expression.includes('sessionStorage')
+  ) {
+    throw new Error('表达式不安全, 拒绝执行')
+  }
+}
+
+/**
  * 把数组对象转换为 R 的数据框
  * @param obj 数组对象
  * @returns R 的数据框

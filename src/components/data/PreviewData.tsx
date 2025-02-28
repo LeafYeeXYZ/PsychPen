@@ -52,7 +52,7 @@ export function PreviewData() {
               本地数据不受影响
             </span>
           }
-          onConfirm={() => _DataView_setData(null)}
+          onConfirm={async () => await _DataView_setData(null)}
           okText='确定'
           cancelText='取消'
         >

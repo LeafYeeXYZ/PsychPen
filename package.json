@@ -42,6 +42,7 @@
     "echarts-wordcloud": "^2.1.0",
     "eslint-plugin-react-compiler": "^19.0.0-beta-e552027-20250112",
     "html2canvas": "^1.4.1",
+    "idb-keyval": "^6.2.1",
     "jieba-wasm": "^2.2.0",
     "markdown-it": "^14.1.0",
     "ml-kmeans": "^6.0.0",

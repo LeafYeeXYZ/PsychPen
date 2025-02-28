@@ -45,7 +45,7 @@ export function Interpolate() {
           return col
         }
       })
-      _VariableView_updateData(cols)
+      await _VariableView_updateData(cols)
       messageApi?.destroy()
       messageApi?.success(
         `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,

@@ -62,6 +62,7 @@ export function AI() {
   const [loading, setLoading] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
+  
   // 数据被清除时重置对话
   useEffect(() => {
     if (!data) {

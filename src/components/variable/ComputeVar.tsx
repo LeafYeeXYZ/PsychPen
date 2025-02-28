@@ -30,7 +30,7 @@ export function ComputeVar() {
       messageApi?.loading('正在处理数据...')
       isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      _VariableView_addNewVar(values.variable, values.expression)
+      await _VariableView_addNewVar(values.variable, values.expression)
       messageApi?.destroy()
       messageApi?.success(
         `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,

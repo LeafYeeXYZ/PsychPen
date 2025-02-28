@@ -4,39 +4,81 @@
 
 import { create } from 'zustand'
 import type { MessageInstance } from 'antd/es/message/interface'
+import { validateExpression } from './utils'
 import { Derive } from './calculates/derive'
 import { Missing } from './calculates/misssing'
 import { Describe } from './calculates/describe'
 import { Filter } from './calculates/filter'
+import { get, set, del } from 'idb-keyval'
 
-/**
- * 检查计算变量的表达式的安全性
- * @param expression 计算变量的表达式
- * @throws 如果表达式不安全, 则抛出异常
- */
-function validateExpression(expression: string): void {
-  // 先排除变量名
-  expression = expression.replace(/:::.+?:::/g, '')
-  if (
-    // 阻止数据泄露
-    expression.includes('http://') ||
-    expression.includes('https://') ||
-    expression.includes('//') ||
-    expression.includes('fetch') ||
-    expression.includes('XMLHttpRequest') ||
-    // 阻止外部代码执行
-    expression.includes('import') ||
-    expression.includes('eval') ||
-    expression.includes('Function') ||
-    expression.includes('setTimeout') ||
-    expression.includes('setInterval') ||
-    expression.includes('setImmediate') ||
-    // 阻止本地存储
-    expression.includes('localStorage') ||
-    expression.includes('sessionStorage')
-  ) {
-    throw new Error('表达式不安全, 拒绝执行')
-  }
+type GlobalState = {
+  /**
+   * 原始数据
+   */
+  data: Record<string, unknown>[] | null
+  /**
+   * 设置原始数据
+   * @param data 原始数据 (WorkBook 类型)
+   * @important 仅在 DataView.tsx 中使用
+   */
+  _DataView_setData: (data: Record<string, unknown>[] | null) => Promise<void>
+  /**
+   * 更新数据
+   * @param cols 变量列表
+   * @important 仅在 VariableView.tsx 中使用
+   */
+  _VariableView_updateData: (cols: Variable[]) => Promise<void>
+  /**
+   * 添加新变量
+   * @param name 新变量名
+   * @param expression 计算表达式
+   * @important 仅在 VariableView.tsx 中使用
+   */
+  _VariableView_addNewVar: (name: string, expression: string) => Promise<void>
+  /**
+   * 数据列表
+   */
+  dataRows: { [key: string]: unknown }[]
+  /**
+   * 变量列表
+   */
+  dataCols: Variable[]
+  /**
+   * 是否数据量较大 (超过 LARGE_DATA_SIZE)
+   */
+  isLargeData: boolean
+  /**
+   * 设置数据量是否较大
+   * @param isLargeData 是否数据量较大
+   */
+  _DataView_setIsLargeData: (isLargeData: boolean) => Promise<void>
+  /**
+   * 消息提示 API
+   */
+  messageApi: MessageInstance | null
+  /**
+   * 设置消息提示 API
+   * @param api 消息提示 API
+   */
+  _App_setMessageApi: (api: MessageInstance) => void
+  /**
+   * 是否是黑暗模式
+   */
+  isDarkMode: boolean
+  /**
+   * 设置是否是黑暗模式
+   * @param isDarkMode 是否是黑暗模式
+   */
+  _App_setIsDarkMode: (isDarkMode: boolean) => void
+  /**
+   * 是否禁用各种按钮等
+   */
+  disabled: boolean
+  /**
+   * 设置是否禁用各种按钮等
+   * @param disabled 是否禁用
+   */
+  setDisabled: (disabled: boolean) => void
 }
 
 /**
@@ -69,51 +111,75 @@ const calculator = (
   return { calculatedCols, calculatedRows }
 }
 
-export const useZustand = create<GlobalState>()((set) => ({
-  data: null,
-  dataRows: [],
-  dataCols: [],
-  isLargeData: false,
-  _DataView_setIsLargeData: (isLargeData) => set({ isLargeData }),
-  _DataView_setData: (rows) => {
-    if (rows) {
-      const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
-      const { calculatedCols, calculatedRows } = calculator(cols, rows)
-      set({
-        data: rows,
+const enum STORE_KEYS {
+  DATA = 'data',
+  DATA_COLS = 'data_cols',
+  DATA_ROWS = 'data_rows',
+  IS_LARGE_DATA = 'is_large_data',
+}
+
+const localData = await get<Record<string, unknown>[]>(STORE_KEYS.DATA) || null
+const localDataCols = await get<Variable[]>(STORE_KEYS.DATA_COLS) || []
+const localDataRows = await get<Record<string, unknown>[]>(STORE_KEYS.DATA_ROWS) || []
+const localIsLargeData = await get<boolean>(STORE_KEYS.IS_LARGE_DATA) || false
+
+export const useZustand = create<GlobalState>()((setState, getState) => {
+  return {
+    data: localData,
+    dataRows: localDataRows,
+    dataCols: localDataCols,
+    isLargeData: localIsLargeData,
+    _DataView_setIsLargeData: async (isLargeData) => {
+      await set(STORE_KEYS.IS_LARGE_DATA, isLargeData)
+      setState({ isLargeData })
+    },
+    _DataView_setData: async (rows) => {
+      if (rows) {
+        const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
+        const { calculatedCols, calculatedRows } = calculator(cols, rows)
+        await set(STORE_KEYS.DATA, rows)
+        await set(STORE_KEYS.DATA_COLS, calculatedCols)
+        await set(STORE_KEYS.DATA_ROWS, calculatedRows)
+        setState({
+          data: rows,
+          dataRows: calculatedRows,
+          dataCols: calculatedCols,
+        })
+      } else {
+        await del(STORE_KEYS.DATA)
+        await del(STORE_KEYS.DATA_COLS)
+        await del(STORE_KEYS.DATA_ROWS)
+        await del(STORE_KEYS.IS_LARGE_DATA)
+        setState({ data: rows, dataRows: [], dataCols: [] })
+      }
+    },
+    _VariableView_updateData: async (cols) => {
+      const { data } = getState()
+      const { calculatedCols, calculatedRows } = calculator(cols, data!)
+      await set(STORE_KEYS.DATA_COLS, calculatedCols)
+      await set(STORE_KEYS.DATA_ROWS, calculatedRows)
+      setState({
         dataRows: calculatedRows,
         dataCols: calculatedCols,
       })
-    } else {
-      set({ data: rows, dataRows: [], dataCols: [] })
-    }
-  },
-  _VariableView_updateData: (cols) => {
-    set((state) => {
-      const rows = state.data!
-      const { calculatedCols, calculatedRows } = calculator(cols, rows)
-      return { dataCols: calculatedCols, dataRows: calculatedRows }
-    })
-  },
-  _VariableView_addNewVar: (name, expression) => {
-    validateExpression(expression) // 检查表达式的安全性
-    set((state) => {
-      const cols = state.dataCols
-      const rows = state.dataRows
-      if (cols.find((col) => col.name == name)) {
+    },
+    _VariableView_addNewVar: async (name, expression) => {
+      validateExpression(expression) // 检查表达式的安全性
+      const { dataCols, dataRows, data } = getState()
+      if (dataCols.find((col) => col.name == name)) {
         // 故意使用 == 而不是 ===
         throw new Error(`变量名 ${name} 已存在`)
       }
       const vars = expression.match(/:::.+?:::/g) ?? []
       if (vars.length > 0) {
         vars.forEach((v) => {
-          if (!cols.find(({ name }) => name == v.slice(3, -3))) {
+          if (!dataCols.find(({ name }) => name == v.slice(3, -3))) {
             // 故意使用 == 而不是 ===
             throw new Error(`变量 ${v} 不存在`)
           }
         })
       }
-      const newRows = rows.map((row) => {
+      const newRows = dataRows.map((row) => {
         // 如果参考的变量值不存在, 或已被按照缺失值定义删除, 则新变量值也是缺失值
         if (vars.some((v) => row[v.slice(3, -3)] === undefined)) {
           return { [name]: undefined, ...row }
@@ -122,11 +188,11 @@ export const useZustand = create<GlobalState>()((set) => ({
           const value = row[v.slice(3, -3)]
           if (!value) {
             return 'undefined'
-          } else if (!isNaN(Number(value))) {
-            return `${Number(value)}`
-          } else {
-            return `'${String(value)}'`
           }
+          if (!isNaN(Number(value))) {
+            return `${Number(value)}`
+          }
+          return `'${String(value)}'`
         })
         try {
           const result = eval(expressionWithValues)
@@ -138,90 +204,25 @@ export const useZustand = create<GlobalState>()((set) => ({
         }
       })
       const describe = new Describe([{ name }], newRows)
-      return {
-        dataCols: [...describe.updatedCols, ...cols],
+      const newCols = [...describe.updatedCols, ...dataCols]
+      const newData = data!.map((row, i) => ({
+        [name]: newRows[i][name],
+        ...row,
+      }))
+      await set(STORE_KEYS.DATA, newData)
+      await set(STORE_KEYS.DATA_COLS, newCols)
+      await set(STORE_KEYS.DATA_ROWS, newRows)
+      setState({
+        dataCols: newCols,
         dataRows: newRows,
-        data: state.data!.map((row, i) => ({
-          [name]: newRows[i][name],
-          ...row,
-        })),
-      }
-    })
-  },
-  messageApi: null,
-  _App_setMessageApi: (api) => set({ messageApi: api }),
-  disabled: false,
-  setDisabled: (disabled) => set({ disabled }),
-  isDarkMode: matchMedia('(prefers-color-scheme: dark)').matches,
-  _App_setIsDarkMode: (isDarkMode) => set({ isDarkMode }),
-}))
-
-type GlobalState = {
-  /**
-   * 原始数据
-   */
-  data: Record<string, unknown>[] | null
-  /**
-   * 设置原始数据
-   * @param data 原始数据 (WorkBook 类型)
-   * @important 仅在 DataView.tsx 中使用
-   */
-  _DataView_setData: (data: Record<string, unknown>[] | null) => void
-  /**
-   * 更新数据
-   * @param cols 变量列表
-   * @important 仅在 VariableView.tsx 中使用
-   */
-  _VariableView_updateData: (cols: Variable[]) => void
-  /**
-   * 添加新变量
-   * @param name 新变量名
-   * @param expression 计算表达式
-   * @important 仅在 VariableView.tsx 中使用
-   */
-  _VariableView_addNewVar: (name: string, expression: string) => void
-  /**
-   * 数据列表
-   */
-  dataRows: { [key: string]: unknown }[]
-  /**
-   * 变量列表
-   */
-  dataCols: Variable[]
-  /**
-   * 是否数据量较大 (超过 LARGE_DATA_SIZE)
-   */
-  isLargeData: boolean
-  /**
-   * 设置数据量是否较大
-   * @param isLargeData 是否数据量较大
-   */
-  _DataView_setIsLargeData: (isLargeData: boolean) => void
-  /**
-   * 消息提示 API
-   */
-  messageApi: MessageInstance | null
-  /**
-   * 设置消息提示 API
-   * @param api 消息提示 API
-   */
-  _App_setMessageApi: (api: MessageInstance) => void
-  /**
-   * 是否是黑暗模式
-   */
-  isDarkMode: boolean
-  /**
-   * 设置是否是黑暗模式
-   * @param isDarkMode 是否是黑暗模式
-   */
-  _App_setIsDarkMode: (isDarkMode: boolean) => void
-  /**
-   * 是否禁用各种按钮等
-   */
-  disabled: boolean
-  /**
-   * 设置是否禁用各种按钮等
-   * @param disabled 是否禁用
-   */
-  setDisabled: (disabled: boolean) => void
-}
+        data: newData,
+      })
+    },
+    messageApi: null,
+    _App_setMessageApi: (api) => setState({ messageApi: api }),
+    disabled: false,
+    setDisabled: (disabled) => setState({ disabled }),
+    isDarkMode: matchMedia('(prefers-color-scheme: dark)').matches,
+    _App_setIsDarkMode: (isDarkMode) => setState({ isDarkMode }),
+  }
+})
