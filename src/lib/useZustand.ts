@@ -118,10 +118,12 @@ const enum STORE_KEYS {
   IS_LARGE_DATA = 'is_large_data',
 }
 
-const localData = await get<Record<string, unknown>[]>(STORE_KEYS.DATA) || null
-const localDataCols = await get<Variable[]>(STORE_KEYS.DATA_COLS) || []
-const localDataRows = await get<Record<string, unknown>[]>(STORE_KEYS.DATA_ROWS) || []
-const localIsLargeData = await get<boolean>(STORE_KEYS.IS_LARGE_DATA) || false
+const localData =
+  (await get<Record<string, unknown>[]>(STORE_KEYS.DATA)) || null
+const localDataCols = (await get<Variable[]>(STORE_KEYS.DATA_COLS)) || []
+const localDataRows =
+  (await get<Record<string, unknown>[]>(STORE_KEYS.DATA_ROWS)) || []
+const localIsLargeData = (await get<boolean>(STORE_KEYS.IS_LARGE_DATA)) || false
 
 export const useZustand = create<GlobalState>()((setState, getState) => {
   return {

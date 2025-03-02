@@ -12,7 +12,7 @@ import {
   TOOLS_VIEW_SUB_PAGES_LABELS,
 } from '../lib/useNav'
 import { flushSync } from 'react-dom'
-import { Space, Typography } from 'antd'
+import { Space, Typography, Tag } from 'antd'
 import { Bubble, Sender } from '@ant-design/x'
 import { UserOutlined, BarChartOutlined } from '@ant-design/icons'
 import parseThink from '@leaf/parse-think'
@@ -32,6 +32,7 @@ import { nav_to_variable_view } from '../lib/assistant/nav_to_variable_view'
 import { nav_to_plots_view } from '../lib/assistant/nav_to_plots_view'
 import { nav_to_statistics_view } from '../lib/assistant/nav_to_statistics_view'
 import { nav_to_tools_view } from '../lib/assistant/nav_to_tools_view'
+import { create_new_var } from '../lib/assistant/create_new_var'
 
 const md = markdownit({ html: true, breaks: true })
 const funcs: AIFunction[] = [
@@ -41,9 +42,10 @@ const funcs: AIFunction[] = [
   nav_to_plots_view,
   nav_to_statistics_view,
   nav_to_tools_view,
+  create_new_var,
 ]
 const GREETTING =
-  '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面等. 请问有什么可以帮你的?'
+  '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、生成新变量等. 请问有什么可以帮你的?'
 
 export function AI() {
   const { ai, model } = useAssistant()
@@ -56,13 +58,20 @@ export function AI() {
     )
   }
 
-  const { messageApi, disabled, dataCols, dataRows, data } = useZustand()
+  const {
+    messageApi,
+    disabled,
+    dataCols,
+    dataRows,
+    data,
+    _VariableView_addNewVar,
+  } = useZustand()
   const nav = useNav()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [showLoading, setShowLoading] = useState(false)
   const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
-  
+
   // 数据被清除时重置对话
   useEffect(() => {
     if (!data) {
@@ -139,11 +148,19 @@ export function AI() {
 
         flushSync(() => {
           setShowLoading(true)
-          setMessages([...old, user, ...newMessages])
+          setMessages([...old, user, newMessages[0]])
         })
 
         try {
           switch (toolCall.function.name) {
+            case 'create_new_var': {
+              const { variable_name, calc_expression } = JSON.parse(
+                toolCall.function.arguments,
+              )
+              await _VariableView_addNewVar(variable_name, calc_expression)
+              newMessages[1].content = `已成功生成新变量"${variable_name}", 计算表达式如下:\n\n\`\`\`markdown\n${calc_expression}\n\`\`\``
+              break
+            }
             case 'export_data': {
               const { file_name, file_type } = JSON.parse(
                 toolCall.function.arguments,
@@ -153,16 +170,12 @@ export function AI() {
                 file_type || 'xlsx',
                 file_name || undefined,
               )
-              const msg = '数据导出成功'
-              messageApi?.success(msg)
-              newMessages[1].content = msg
+              newMessages[1].content = `已成功导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}"`
               break
             }
             case 'nav_to_data_view': {
               nav.setMainPage(MAIN_PAGES_LABELS.DATA)
-              const msg = '已跳转到数据视图'
-              messageApi?.success(msg)
-              newMessages[1].content = msg
+              newMessages[1].content = '已成功跳转到数据视图'
               break
             }
             case 'nav_to_variable_view': {
@@ -171,13 +184,11 @@ export function AI() {
                 !page ||
                 !Object.values(VARIABLE_SUB_PAGES_LABELS).includes(page)
               ) {
-                throw new Error(`未知的子页面 ${page}`)
+                throw new Error(`未知的子页面 (${page})`)
               }
               nav.setMainPage(MAIN_PAGES_LABELS.VARIABLE)
               nav.setVariableViewSubPage(page)
-              const msg = `已跳转到变量视图的${page}页面`
-              messageApi?.success(msg)
-              newMessages[1].content = msg
+              newMessages[1].content = `已成功跳转到变量视图的${page}页面`
               break
             }
             case 'nav_to_plots_view': {
@@ -186,13 +197,11 @@ export function AI() {
                 !page ||
                 !Object.values(PLOTS_SUB_PAGES_LABELS).includes(page)
               ) {
-                throw new Error(`未知的子页面 ${page}`)
+                throw new Error(`未知的子页面 (${page})`)
               }
               nav.setMainPage(MAIN_PAGES_LABELS.PLOTS)
               nav.setPlotsViewSubPage(page)
-              const msg = `已跳转到绘图视图的${page}页面`
-              messageApi?.success(msg)
-              newMessages[1].content = msg
+              newMessages[1].content = `已成功跳转到绘图视图的${page}页面`
               break
             }
             case 'nav_to_statistics_view': {
@@ -201,13 +210,11 @@ export function AI() {
                 !page ||
                 !Object.values(STATISTICS_SUB_PAGES_LABELS).includes(page)
               ) {
-                throw new Error(`未知的子页面 ${page}`)
+                throw new Error(`未知的子页面 (${page})`)
               }
               nav.setMainPage(MAIN_PAGES_LABELS.STATISTICS)
               nav.setStatisticsViewSubPage(page)
-              const msg = `已跳转到统计视图的${page}页面`
-              messageApi?.success(msg)
-              newMessages[1].content = msg
+              newMessages[1].content = `已成功跳转到统计视图的${page}页面`
               break
             }
             case 'nav_to_tools_view': {
@@ -216,31 +223,34 @@ export function AI() {
                 !page ||
                 !Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).includes(page)
               ) {
-                throw new Error(`未知的子页面 ${page}`)
+                throw new Error(`未知的子页面 (${page})`)
               }
               nav.setMainPage(MAIN_PAGES_LABELS.TOOLS)
               nav.setToolsViewSubPage(page)
-              const msg = `已跳转到工具视图的${page}页面`
-              messageApi?.success(msg)
-              newMessages[1].content = msg
+              newMessages[1].content = `已成功跳转到工具视图的${page}页面`
               break
             }
             default: {
-              throw new Error(`未知函数`)
+              throw new Error(`未知函数 (${toolCall.function.name})`)
             }
           }
           newMessages[1].content = newMessages[1].content || '执行成功'
         } catch (error) {
           const msg = error instanceof Error ? error.message : String(error)
           messageApi?.error(
-            `执行AI命令 (${
+            `执行AI命令"${
               funcs.find(
                 (func) => func.tool.function.name === toolCall.function.name,
-              )?.label || toolCall.function.name
-            }) 时出错: ${msg}`,
+              )?.label || `未知函数 (${toolCall.function.name})`
+            }"时出错: ${msg}`,
           )
-          newMessages[1].content = `执行失败, 请提示用户手动操作. 错误信息: ${msg}`
+          newMessages[1].content = `执行函数失败, 请用户手动操作. 错误信息: ${msg}`
         }
+
+        flushSync(() => {
+          setShowLoading(true)
+          setMessages([...old, user, ...newMessages])
+        })
 
         const newResponse = await ai.chat.completions.create({
           model: model,
@@ -344,58 +354,60 @@ function Messages({
         { role: 'assistant', content: GREETTING },
         ...messages,
         ...(showLoading ? [{ role: 'assistant', content: '__loading__' }] : []),
-      ]
-        .filter(
-          (message) => message.role === 'assistant' || message.role === 'user',
-        )
-        .map((message, index) => {
-          const tool_calls = (message as ChatCompletionAssistantMessageParam)
-            .tool_calls
-          return (
-            <Bubble
-              key={index}
-              className='w-full'
-              placement={message.role === 'user' ? 'end' : 'start'}
-              content={
-                tool_calls?.length ? (
-                  <span className='text-gray-700 dark:text-gray-300'>
-                    {
-                      funcs.find(
-                        (func) =>
-                          func.tool.function.name ===
-                          tool_calls[0].function.name,
-                      )!.label
-                    }
-                  </span>
+      ].map((message, index) => {
+        const tool_calls = (message as ChatCompletionAssistantMessageParam)
+          .tool_calls
+        return (
+          <Bubble
+            key={index}
+            className='w-full'
+            placement={message.role === 'user' ? 'end' : 'start'}
+            content={
+              tool_calls?.length ? (
+                <span>
+                  执行函数{' '}
+                  <Tag color='blue' style={{ margin: 0 }}>
+                    {funcs.find(
+                      (func) =>
+                        func.tool.function.name === tool_calls[0].function.name,
+                    )?.label || `未知函数 (${tool_calls[0].function.name})`}
+                  </Tag>
+                </span>
+              ) : (
+                <Typography>
+                  <div
+                    className='-mb-[0.8rem]'
+                    dangerouslySetInnerHTML={{
+                      __html: md.render((message.content as string).trim()),
+                    }}
+                  />
+                </Typography>
+              )
+            }
+            loading={message.content === '__loading__'}
+            header={
+              message.role === 'user'
+                ? 'User'
+                : message.role === 'assistant'
+                  ? 'PsychPen'
+                  : 'PsychPen [系统]'
+            }
+            avatar={{
+              icon:
+                message.role === 'user' ? (
+                  <UserOutlined />
                 ) : (
-                  <Typography>
-                    <div
-                      className='-mb-4'
-                      dangerouslySetInnerHTML={{
-                        __html: md.render((message.content as string).trim()),
-                      }}
-                    />
-                  </Typography>
-                )
-              }
-              loading={message.content === '__loading__'}
-              header={message.role === 'user' ? 'User' : 'PsychPen'}
-              avatar={{
-                icon:
-                  message.role === 'user' ? (
-                    <UserOutlined />
-                  ) : (
-                    <BarChartOutlined />
-                  ),
-                style: {
-                  backgroundColor:
-                    message.role === 'user' ? '#f0f0ff' : '#fff0f0',
-                  color: message.role === 'user' ? '#597ef7' : '#f75959',
-                },
-              }}
-            />
-          )
-        })}
+                  <BarChartOutlined />
+                ),
+              style: {
+                backgroundColor:
+                  message.role === 'user' ? '#f0f0ff' : '#fff0f0',
+                color: message.role === 'user' ? '#597ef7' : '#f75959',
+              },
+            }}
+          />
+        )
+      })}
     </div>
   )
 }
