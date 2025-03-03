@@ -58,12 +58,7 @@ export function AI() {
     )
   }
 
-  const {
-    messageApi,
-    disabled,
-    dataCols,
-    data,
-  } = useZustand()
+  const { messageApi, disabled, dataCols, data } = useZustand()
   const nav = useNav()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -428,16 +423,18 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
             , 计算表达式为如下:
           </div>
           <div className='bg-white dark:bg-gray-800 rounded-md p-3 border'>
-            {(calc_expression as string).split(/(:::.+?:::)/g).map((part, index) => {
-              if (part.match(/:::.+?:::/)) {
-                return (
-                  <Tag key={index} style={{ margin: 0 }}>
-                    {part.slice(3, -3)}
-                  </Tag>
-                )
-              }
-              return <span key={index}>{part}</span>
-            })}
+            {(calc_expression as string)
+              .split(/(:::.+?:::)/g)
+              .map((part, index) => {
+                if (part.match(/:::.+?:::/)) {
+                  return (
+                    <Tag key={index} style={{ margin: 0 }}>
+                      {part.slice(3, -3)}
+                    </Tag>
+                  )
+                }
+                return <span key={index}>{part}</span>
+              })}
           </div>
           <div>
             <Button
@@ -481,10 +478,16 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
               block
               disabled={done}
               onClick={() => {
-                downloadSheet(dataRows, file_type || 'xlsx', file_name || undefined)
+                downloadSheet(
+                  dataRows,
+                  file_type || 'xlsx',
+                  file_name || undefined,
+                )
                 setDone(true)
                 sessionStorage.setItem(id, 'done')
-                messageApi?.success(`已成功导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}"`)
+                messageApi?.success(
+                  `已成功导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}"`,
+                )
               }}
             >
               {done ? '已导出数据' : '确认导出数据'}
@@ -512,9 +515,5 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
       setDone(true)
     }
   }, [])
-  return (
-    <div className='flex flex-col gap-3'>
-      {element}
-    </div>
-  )
+  return <div className='flex flex-col gap-3'>{element}</div>
 }
