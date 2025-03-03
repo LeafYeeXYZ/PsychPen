@@ -189,7 +189,7 @@ function Expression({ value }: { value: string }) {
       {value.split(/(:::.+?:::)/g).map((part, index) => {
         if (part.match(/:::.+?:::/)) {
           return (
-            <Tag key={index} color='green' className='m-0'>
+            <Tag key={index} color='green' style={{ margin: 0 }}>
               {part.slice(3, -3)}
             </Tag>
           )

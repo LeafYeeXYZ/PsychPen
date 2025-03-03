@@ -12,7 +12,7 @@ import {
   TOOLS_VIEW_SUB_PAGES_LABELS,
 } from '../lib/useNav'
 import { flushSync } from 'react-dom'
-import { Space, Typography, Tag } from 'antd'
+import { Space, Typography, Tag, Button } from 'antd'
 import { Bubble, Sender } from '@ant-design/x'
 import { UserOutlined, BarChartOutlined } from '@ant-design/icons'
 import parseThink from '@leaf/parse-think'
@@ -62,9 +62,7 @@ export function AI() {
     messageApi,
     disabled,
     dataCols,
-    dataRows,
     data,
-    _VariableView_addNewVar,
   } = useZustand()
   const nav = useNav()
   const [input, setInput] = useState('')
@@ -154,23 +152,18 @@ export function AI() {
         try {
           switch (toolCall.function.name) {
             case 'create_new_var': {
-              const { variable_name, calc_expression } = JSON.parse(
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { variable_name, calc_expression: _ } = JSON.parse(
                 toolCall.function.arguments,
-              )
-              await _VariableView_addNewVar(variable_name, calc_expression)
-              newMessages[1].content = `已成功生成新变量"${variable_name}", 计算表达式如下:\n\n\`\`\`markdown\n${calc_expression}\n\`\`\``
+              ) // 尝试解析参数, 但暂不执行逻辑
+              newMessages[1].content = `已请求生成新变量"${variable_name}", 等待用户手动确认`
               break
             }
             case 'export_data': {
               const { file_name, file_type } = JSON.parse(
                 toolCall.function.arguments,
-              )
-              downloadSheet(
-                dataRows,
-                file_type || 'xlsx',
-                file_name || undefined,
-              )
-              newMessages[1].content = `已成功导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}"`
+              ) // 尝试解析参数, 但暂不执行逻辑
+              newMessages[1].content = `已请求导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}", 等待用户手动确认`
               break
             }
             case 'nav_to_data_view': {
@@ -364,15 +357,7 @@ function Messages({
             placement={message.role === 'user' ? 'end' : 'start'}
             content={
               tool_calls?.length ? (
-                <span>
-                  执行函数{' '}
-                  <Tag color='blue' style={{ margin: 0 }}>
-                    {funcs.find(
-                      (func) =>
-                        func.tool.function.name === tool_calls[0].function.name,
-                    )?.label || `未知函数 (${tool_calls[0].function.name})`}
-                  </Tag>
-                </span>
+                <ToolCall toolCall={tool_calls[0]} />
               ) : (
                 <Typography>
                   <div
@@ -408,6 +393,128 @@ function Messages({
           />
         )
       })}
+    </div>
+  )
+}
+
+function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
+  const id = toolCall.id
+  const name = toolCall.function.name
+  const args = toolCall.function.arguments
+  const { dataRows, _VariableView_addNewVar, messageApi } = useZustand()
+  const [done, setDone] = useState(false)
+  const formerDone = sessionStorage.getItem(id) === 'done'
+  let element: React.ReactElement | null = null
+  let initDone = true
+  switch (name) {
+    case 'create_new_var': {
+      const { variable_name, calc_expression } = JSON.parse(args)
+      if (!formerDone) {
+        initDone = false
+      }
+      element = (
+        <>
+          <div>
+            执行函数{' '}
+            <Tag color='blue' style={{ margin: 0 }}>
+              {funcs.find(
+                (func) => func.tool.function.name === toolCall.function.name,
+              )?.label || `未知函数 (${toolCall.function.name})`}
+            </Tag>
+            {done ? ', 已' : ', 是否确认'}生成新变量{' '}
+            <Tag style={{ margin: 0 }} color='blue'>
+              {variable_name}
+            </Tag>
+            , 计算表达式为如下:
+          </div>
+          <div className='bg-white dark:bg-gray-800 rounded-md p-3 border'>
+            {(calc_expression as string).split(/(:::.+?:::)/g).map((part, index) => {
+              if (part.match(/:::.+?:::/)) {
+                return (
+                  <Tag key={index} style={{ margin: 0 }}>
+                    {part.slice(3, -3)}
+                  </Tag>
+                )
+              }
+              return <span key={index}>{part}</span>
+            })}
+          </div>
+          <div>
+            <Button
+              block
+              disabled={done}
+              onClick={() => {
+                _VariableView_addNewVar(variable_name, calc_expression)
+                setDone(true)
+                sessionStorage.setItem(id, 'done')
+                messageApi?.success(`已成功生成新变量"${variable_name}"`)
+              }}
+            >
+              {done ? '已生成新变量' : '确认生成新变量'}
+            </Button>
+          </div>
+        </>
+      )
+      break
+    }
+    case 'export_data': {
+      const { file_name, file_type } = JSON.parse(args)
+      if (!formerDone) {
+        initDone = false
+      }
+      element = (
+        <>
+          <div>
+            执行函数{' '}
+            <Tag color='blue' style={{ margin: 0 }}>
+              {funcs.find(
+                (func) => func.tool.function.name === toolCall.function.name,
+              )?.label || `未知函数 (${toolCall.function.name})`}
+            </Tag>
+            {done ? ', 已' : ', 是否确认'}导出数据到文件{' '}
+            <Tag style={{ margin: 0 }} color='blue'>
+              {file_name || 'data'}.{file_type || 'xlsx'}
+            </Tag>
+          </div>
+          <div>
+            <Button
+              block
+              disabled={done}
+              onClick={() => {
+                downloadSheet(dataRows, file_type || 'xlsx', file_name || undefined)
+                setDone(true)
+                sessionStorage.setItem(id, 'done')
+                messageApi?.success(`已成功导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}"`)
+              }}
+            >
+              {done ? '已导出数据' : '确认导出数据'}
+            </Button>
+          </div>
+        </>
+      )
+      break
+    }
+    default: {
+      element = (
+        <div>
+          执行函数{' '}
+          <Tag color='blue' style={{ margin: 0 }}>
+            {funcs.find(
+              (func) => func.tool.function.name === toolCall.function.name,
+            )?.label || `未知函数 (${toolCall.function.name})`}
+          </Tag>
+        </div>
+      )
+    }
+  }
+  useEffect(() => {
+    if (initDone) {
+      setDone(true)
+    }
+  }, [])
+  return (
+    <div className='flex flex-col gap-3'>
+      {element}
     </div>
   )
 }
