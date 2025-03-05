@@ -1,6 +1,6 @@
 // 记得在 GREETTING 消息里说明可以使用的功能
 // TODO: 写好之后更新一下使用文档的 2.5
-import { type AIFunction, ALLOWED_DISCRETE_METHODS } from '../types'
+import { type AIFunction, ALLOWED_DISCRETE_METHODS, type Variable } from '../types'
 import { useAssistant } from '../lib/useAssistant'
 import { useZustand } from '../lib/useZustand'
 import { useState, useRef, useEffect } from 'react'
@@ -48,8 +48,39 @@ const funcs: AIFunction[] = [
   create_sub_var,
   clear_sub_var,
 ]
+
 const GREETTING =
   '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、生成/清除子变量 (标准化/中心化/离散化)、生成新变量等. 请问有什么可以帮你的?'
+const INSTRUCTION =
+  '你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具信息; 你的任务是按照用户的要求, 为用户提供帮助.'
+function GET_PROMPT(vars: Variable[]): string {
+  const varsInfo = vars.map((col) => {
+    if (col.type === '称名或等级数据') {
+      return `- ${col.name}: ${col.type}, 有 ${col.valid} 个有效值、${col.missing} 个缺失值、${col.unique} 个唯一值.`
+    } else {
+      const baseInfo = `- ${col.name}: ${col.type}, 有 ${col.valid} 个有效值、${col.missing} 个缺失值、${col.unique} 个唯一值.`
+      const statInfo = ` 均值为 ${col.mean?.toFixed(4)}, 标准差为 ${col.std?.toFixed(4)}, 中位数为 ${col.q2?.toFixed(4)}, 最小值为 ${col.min?.toFixed(4)}, 最大值为 ${col.max?.toFixed(4)}.`
+      const subVarInfo =
+        col.subVars &&
+        (col.subVars.standard || col.subVars.center || col.subVars.discrete)
+          ? ` 已定义${[
+              col.subVars.standard ? '标准化' : '',
+              col.subVars.center ? '中心化' : '',
+              col.subVars.discrete
+                ? `离散化 (${col.subVars.discrete.method}, ${col.subVars.discrete.groups} 组) `
+                : '',
+            ]
+              .filter((part) => part)
+              .join('、')}子变量.`
+          : ''
+      return baseInfo + statInfo + subVarInfo
+    }
+  })
+  const varsText = `\n\n# 变量信息\n\n${varsInfo.join('\n')}`
+  const docsText = `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\``
+  return INSTRUCTION + varsText + docsText
+}
+
 
 export function AI() {
   const { ai, model } = useAssistant()
@@ -91,12 +122,8 @@ export function AI() {
         setMessages([...old, user])
         setInput('')
       })
-
-      const system =
-        '你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具信息; 你的任务是按照用户的要求, 为用户提供帮助.' +
-        `\n\n# 变量信息\n\n${dataCols.map((col) => `- ${col.name}: ${col.type}, 有 ${col.valid} 个有效值、${col.missing} 个缺失值、${col.unique} 个唯一值.${col.type === '等距或等比数据' ? ` 均值为 ${col.mean}, 标准差为 ${col.std}, 中位数为 ${col.q2}, 最小值为 ${col.min}, 最大值为 ${col.max}.` : ''}`).join('\n')}` +
-        `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\``
-
+      const system = GET_PROMPT(dataCols)
+      
       const stream = await ai.chat.completions.create({
         model: model,
         messages: [{ role: 'system', content: system }, ...old, user],
@@ -154,7 +181,11 @@ export function AI() {
               const { variable_names } = JSON.parse(toolCall.function.arguments)
               if (
                 !Array.isArray(variable_names) ||
-                !variable_names.every((name) =>  (typeof name === 'string') && dataCols.some((col) => col.name === name))
+                !variable_names.every(
+                  (name) =>
+                    typeof name === 'string' &&
+                    dataCols.some((col) => col.name === name),
+                )
               ) {
                 throw new Error('变量名参数错误')
               }
@@ -166,7 +197,11 @@ export function AI() {
                 JSON.parse(toolCall.function.arguments)
               if (
                 !Array.isArray(variable_names) ||
-                !variable_names.every((name) =>  (typeof name === 'string') && dataCols.some((col) => col.name === name))
+                !variable_names.every(
+                  (name) =>
+                    typeof name === 'string' &&
+                    dataCols.some((col) => col.name === name),
+                )
               ) {
                 throw new Error('变量名参数错误')
               }
@@ -429,14 +464,22 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
   const id = toolCall.id
   const name = toolCall.function.name
   const args = toolCall.function.arguments
-  const { dataRows, _VariableView_addNewVar, messageApi, dataCols, _VariableView_updateData } = useZustand()
+  const {
+    dataRows,
+    _VariableView_addNewVar,
+    messageApi,
+    dataCols,
+    _VariableView_updateData,
+  } = useZustand()
   const [done, setDone] = useState(false)
   const formerDone = sessionStorage.getItem(id) === 'done'
   let element: React.ReactElement | null = null
   let initDone = true
   switch (name) {
     case 'clear_sub_var': {
-      const { variable_names } = JSON.parse(args) as { variable_names: string[] }
+      const { variable_names } = JSON.parse(args) as {
+        variable_names: string[]
+      }
       if (!formerDone) {
         initDone = false
       }
@@ -451,7 +494,11 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
             </Tag>
             {done ? ', 已' : ', 是否确认'}清除变量
             {variable_names.map((name) => (
-              <Tag key={name} style={{ margin: 0, marginLeft: '0.3rem' }} color='blue'>
+              <Tag
+                key={name}
+                style={{ margin: 0, marginLeft: '0.3rem' }}
+                color='blue'
+              >
                 {name}
               </Tag>
             ))}{' '}
@@ -463,19 +510,23 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
               disabled={done}
               onClick={() => {
                 _VariableView_updateData(
-                  dataCols.map((col) => {
-                    if (variable_names.includes(col.name)) {
-                      return {
-                        ...col,
-                        subVars: undefined,
+                  dataCols
+                    .map((col) => {
+                      if (variable_names.includes(col.name)) {
+                        return {
+                          ...col,
+                          subVars: undefined,
+                        }
                       }
-                    }
-                    return col
-                  }).filter((col) => col.derived !== true),
+                      return col
+                    })
+                    .filter((col) => col.derived !== true),
                 )
                 setDone(true)
                 sessionStorage.setItem(id, 'done')
-                messageApi?.success(`已成功清除变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的所有子变量`)
+                messageApi?.success(
+                  `已成功清除变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的所有子变量`,
+                )
               }}
             >
               {done ? '已清除子变量' : '确认清除子变量'}
@@ -486,24 +537,27 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
       break
     }
     case 'create_sub_var': {
-      const { variable_names, standardize, centralize, discretize } = JSON.parse(args) as {
-        variable_names: string[]
-        standardize: boolean | undefined
-        centralize: boolean | undefined
-        discretize: {
-          method: ALLOWED_DISCRETE_METHODS
-          groups: number
-        } | undefined
-      }
+      const { variable_names, standardize, centralize, discretize } =
+        JSON.parse(args) as {
+          variable_names: string[]
+          standardize: boolean | undefined
+          centralize: boolean | undefined
+          discretize:
+            | {
+                method: ALLOWED_DISCRETE_METHODS
+                groups: number
+              }
+            | undefined
+        }
       if (!formerDone) {
         initDone = false
       }
       const ALLOWED_METHOD = Object.values(ALLOWED_DISCRETE_METHODS)
       const shouldDiscritize = Boolean(
-        typeof discretize === 'object' && 
-        discretize.method && 
-        discretize.groups && 
-        ALLOWED_METHOD.includes(discretize.method)
+        typeof discretize === 'object' &&
+          discretize.method &&
+          discretize.groups &&
+          ALLOWED_METHOD.includes(discretize.method),
       )
       element = (
         <>
@@ -516,7 +570,11 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
             </Tag>
             {done ? ', 已' : ', 是否确认'}生成变量
             {variable_names.map((name) => (
-              <Tag key={name} style={{ margin: 0, marginLeft: '0.3rem' }} color='blue'>
+              <Tag
+                key={name}
+                style={{ margin: 0, marginLeft: '0.3rem' }}
+                color='blue'
+              >
                 {name}
               </Tag>
             ))}{' '}
@@ -524,7 +582,9 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
             {[
               standardize ? '标准化' : '',
               centralize ? '中心化' : '',
-              shouldDiscritize ? `离散化 (${discretize!.method}, ${discretize!.groups} 组) ` : '',
+              shouldDiscritize
+                ? `离散化 (${discretize!.method}, ${discretize!.groups} 组) `
+                : '',
             ]
               .filter((part) => part)
               .join('、')}
@@ -536,34 +596,39 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
               disabled={done}
               onClick={() => {
                 _VariableView_updateData(
-                  dataCols.map((col) => {
-                    if (variable_names.includes(col.name)) {
-                      return {
-                        ...col,
-                        subVars: {
-                          standard: Boolean(standardize) || col.subVars?.standard,
-                          center: Boolean(centralize) || col.subVars?.center,
-                          discrete: shouldDiscritize
-                            ? {
-                                method: discretize!.method,
-                                groups: discretize!.groups,
-                              }
-                            : col.subVars?.discrete,
-                        },
+                  dataCols
+                    .map((col) => {
+                      if (variable_names.includes(col.name)) {
+                        return {
+                          ...col,
+                          subVars: {
+                            standard:
+                              Boolean(standardize) || col.subVars?.standard,
+                            center: Boolean(centralize) || col.subVars?.center,
+                            discrete: shouldDiscritize
+                              ? {
+                                  method: discretize!.method,
+                                  groups: discretize!.groups,
+                                }
+                              : col.subVars?.discrete,
+                          },
+                        }
                       }
-                    }
-                    return col
-                  }).filter((col) => col.derived !== true),
+                      return col
+                    })
+                    .filter((col) => col.derived !== true),
                 )
                 setDone(true)
                 sessionStorage.setItem(id, 'done')
-                messageApi?.success(`已成功生成变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的${[
-                  standardize ? '标准化' : '',
-                  centralize ? '中心化' : '',
-                  shouldDiscritize ? '离散化' : '',
-                ]
-                  .filter((part) => part)
-                  .join('、')}子变量`)
+                messageApi?.success(
+                  `已成功生成变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的${[
+                    standardize ? '标准化' : '',
+                    centralize ? '中心化' : '',
+                    shouldDiscritize ? '离散化' : '',
+                  ]
+                    .filter((part) => part)
+                    .join('、')}子变量`,
+                )
               }}
             >
               {done ? '已生成子变量' : '确认生成子变量'}
