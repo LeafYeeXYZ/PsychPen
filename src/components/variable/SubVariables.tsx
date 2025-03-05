@@ -41,27 +41,32 @@ export function SubVariables() {
       messageApi?.loading('正在处理数据...')
       isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      const cols = dataCols.map((col) => {
-        if (values.variables.includes(col.name)) {
-          return {
-            ...col,
-            subVars: values.subVars
-              ? {
-                  standard: values.subVars.includes('standard'),
-                  center: values.subVars.includes('center'),
-                  discrete: values.subVars.includes('discretize')
-                    ? {
-                        method: values.discretizeMethod!,
-                        groups: values.discretizeGroups!,
-                      }
-                    : undefined,
-                }
-              : undefined,
+      const cols = dataCols
+        .map((col) => {
+          if (values.variables.includes(col.name)) {
+            return {
+              ...col,
+              subVars: values.subVars?.length
+                ? {
+                    standard:
+                      values.subVars.includes('standard') ||
+                      col.subVars?.standard,
+                    center:
+                      values.subVars.includes('center') || col.subVars?.center,
+                    discrete: values.subVars.includes('discretize')
+                      ? {
+                          method: values.discretizeMethod!,
+                          groups: values.discretizeGroups!,
+                        }
+                      : col.subVars?.discrete,
+                  }
+                : undefined,
+            }
+          } else {
+            return col
           }
-        } else {
-          return col
-        }
-      })
+        })
+        .filter((col) => col.derived !== true)
       await _VariableView_updateData(cols)
       messageApi?.destroy()
       messageApi?.success(
