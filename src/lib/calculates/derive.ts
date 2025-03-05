@@ -97,7 +97,11 @@ class Discrete {
    * @param groups 分组数
    * @param methed 离散化方法
    */
-  constructor(data: number[], groups: number, methed: ALLOWED_DISCRETE_METHODS) {
+  constructor(
+    data: number[],
+    groups: number,
+    methed: ALLOWED_DISCRETE_METHODS,
+  ) {
     this.method = methed
     this.groups = groups
     this.#data = data.toSorted((a, b) => a - b)

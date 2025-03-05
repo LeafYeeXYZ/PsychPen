@@ -16,10 +16,12 @@ type Option = {
   discretizeGroups?: number
 }
 
-const DISCRETE_METHODS = Object.values(ALLOWED_DISCRETE_METHODS).map((method) => ({
-  label: method,
-  value: method,
-}))
+const DISCRETE_METHODS = Object.values(ALLOWED_DISCRETE_METHODS).map(
+  (method) => ({
+    label: method,
+    value: method,
+  }),
+)
 const ALLOW_SUBVARS: {
   en: string
   cn: string

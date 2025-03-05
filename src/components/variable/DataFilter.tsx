@@ -209,7 +209,10 @@ export function DataFilter() {
       method === ALLOWED_FILTER_METHODS.BELOW_MEDIAN
     ) {
       return null
-    } else if (method === ALLOWED_FILTER_METHODS.EQUAL || method === ALLOWED_FILTER_METHODS.NOT_EQUAL) {
+    } else if (
+      method === ALLOWED_FILTER_METHODS.EQUAL ||
+      method === ALLOWED_FILTER_METHODS.NOT_EQUAL
+    ) {
       const variable = form.getFieldValue('variable')
       const options = Array.from(new Set(dataRows.map((row) => row[variable])))
         .sort((a, b) => Number(a) - Number(b))
