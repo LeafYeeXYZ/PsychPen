@@ -3,6 +3,7 @@
  */
 
 import { min, max, mean, quantile, std, mode, sort } from '@psych/lib'
+import type { Variable } from '../../types'
 
 /** 生成描述统计量 */
 export class Describe {

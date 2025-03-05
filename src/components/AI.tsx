@@ -1,5 +1,6 @@
 // 记得在 GREETTING 消息里说明可以使用的功能
-// TODO: 全部写好之后更新一下使用文档的 2.5
+// TODO: 写好之后更新一下使用文档的 2.5
+import type { AIFunction } from '../types'
 import { useAssistant } from '../lib/useAssistant'
 import { useZustand } from '../lib/useZustand'
 import { useState, useRef, useEffect } from 'react'

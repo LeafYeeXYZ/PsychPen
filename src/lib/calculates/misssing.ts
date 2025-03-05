@@ -3,6 +3,7 @@
  */
 
 import { mean, median } from '@psych/lib'
+import { Variable, ALLOWED_INTERPOLATION_METHODS } from '../../types'
 
 /** 缺失值替换和插值 */
 export class Missing {
@@ -70,20 +71,20 @@ class Interpolate {
    */
   constructor(
     data: (number | undefined)[],
-    method: AllowedInterpolationMethods,
+    method: ALLOWED_INTERPOLATION_METHODS,
     peer?: (number | undefined)[],
   ) {
     switch (method) {
-      case '均值插值':
+      case ALLOWED_INTERPOLATION_METHODS.MEAN:
         this.interpolatedData = this.#mean(data)
         break
-      case '中位数插值':
+      case ALLOWED_INTERPOLATION_METHODS.MEDIAN:
         this.interpolatedData = this.#median(data)
         break
-      case '最临近点插值法':
+      case ALLOWED_INTERPOLATION_METHODS.NEAREST:
         this.interpolatedData = this.#nearest(data, peer!)
         break
-      case '拉格朗日插值法':
+      case ALLOWED_INTERPOLATION_METHODS.LAGRANGE:
         this.interpolatedData = this.#lagrange(data, peer!)
         break
     }

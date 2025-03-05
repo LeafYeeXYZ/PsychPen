@@ -1,27 +1,39 @@
-declare type AIFunction = {
+import type { ChatCompletionTool } from 'openai/resources/index.mjs'
+
+export type AIFunction = {
   label: string
-  tool: import('openai/resources/index.mjs').ChatCompletionTool
+  tool: ChatCompletionTool
 }
-declare type AllowedFilterMethods =
-  | '等于'
-  | '不等于'
-  | '大于'
-  | '大于等于'
-  | '小于'
-  | '小于等于'
-  | '区间'
-  | '正则表达式'
-  | '高于平均值'
-  | '低于平均值'
-  | '高于中位数'
-  | '低于中位数'
-declare type AllowedInterpolationMethods =
-  | '均值插值'
-  | '中位数插值'
-  | '最临近点插值法'
-  | '拉格朗日插值法'
-declare type AllowedDiscreteMethods = '等频' | '等宽' | '聚类分析'
-declare type Variable = {
+
+export enum ALLOWED_FILTER_METHODS {
+  EQUAL = '等于',
+  NOT_EQUAL = '不等于',
+  GREATER_THAN = '大于',
+  GREATER_THAN_OR_EQUAL = '大于等于',
+  LESS_THAN = '小于',
+  LESS_THAN_OR_EQUAL = '小于等于',
+  RANGE = '区间',
+  REGEX = '正则表达式',
+  ABOVE_MEAN = '高于平均值',
+  BELOW_MEAN = '低于平均值',
+  ABOVE_MEDIAN = '高于中位数',
+  BELOW_MEDIAN = '低于中位数',
+}
+
+export enum ALLOWED_INTERPOLATION_METHODS {
+  MEAN = '均值插值',
+  MEDIAN = '中位数插值',
+  NEAREST = '最临近点插值法',
+  LAGRANGE = '拉格朗日插值法',
+}
+
+export enum ALLOWED_DISCRETE_METHODS {
+  EQUAL_WIDTH = '等宽',
+  EQUAL_FREQUENCY = '等频',
+  CLUSTER = '聚类分析',
+}
+
+export type Variable = {
   /** 变量名 */
   name: string
   /** 数据类型 */
@@ -54,7 +66,7 @@ declare type Variable = {
    * 自定义的过滤方法
    * 默认为空, 即不过滤
    */
-  filterMethod?: AllowedFilterMethods
+  filterMethod?: ALLOWED_FILTER_METHODS
   filterValue?: (number | string)[]
   filterRange?: [number, number]
   filterRegex?: string
@@ -69,7 +81,7 @@ declare type Variable = {
    * 默认为空, 即不插值, 直接删除缺失值
    * 先进行缺失值处理, 再进行插值处理
    */
-  missingMethod?: AllowedInterpolationMethods
+  missingMethod?: ALLOWED_INTERPOLATION_METHODS
   /**
    * 用于插值的配对变量名
    * 即另一个变量的 name 字段, 用于计算插值
@@ -92,7 +104,7 @@ declare type Variable = {
     /** 离散化 */
     discrete?: {
       /** 方法 */
-      method: AllowedDiscreteMethods
+      method: ALLOWED_DISCRETE_METHODS
       /** 分组数 */
       groups: number
     }

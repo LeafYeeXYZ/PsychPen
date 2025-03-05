@@ -1,22 +1,18 @@
 import { useZustand } from '../../lib/useZustand'
 import { Button, Select, Form } from 'antd'
 import { flushSync } from 'react-dom'
+import { ALLOWED_INTERPOLATION_METHODS } from '../../types'
 
 type Option = {
   /** 变量名 */
   variables: string[]
   /** 插值方法 */
-  method?: AllowedInterpolationMethods
+  method?: ALLOWED_INTERPOLATION_METHODS
   /** 插值参考变量 */
   peer?: string
 }
 
-const INTERPOLATE_METHODS: AllowedInterpolationMethods[] = [
-  '均值插值',
-  '中位数插值',
-  '最临近点插值法',
-  '拉格朗日插值法',
-]
+const INTERPOLATE_METHODS = Object.values(ALLOWED_INTERPOLATION_METHODS)
 
 export function Interpolate() {
   const {

@@ -4,6 +4,7 @@
 
 import { max, min } from '@psych/lib'
 import { kmeans } from 'ml-kmeans'
+import { Variable, ALLOWED_DISCRETE_METHODS } from '../../types'
 
 /** 生成子变量 */
 export class Derive {
@@ -96,21 +97,21 @@ class Discrete {
    * @param groups 分组数
    * @param methed 离散化方法
    */
-  constructor(data: number[], groups: number, methed: AllowedDiscreteMethods) {
+  constructor(data: number[], groups: number, methed: ALLOWED_DISCRETE_METHODS) {
     this.method = methed
     this.groups = groups
     this.#data = data.toSorted((a, b) => a - b)
     this.#min = min(data)
     this.#max = max(data)
     switch (methed) {
-      case '等宽': {
+      case ALLOWED_DISCRETE_METHODS.EQUAL_WIDTH: {
         this.predictor = (data: number | undefined) => {
           if (typeof data === 'undefined') return undefined
           return Math.floor((data - this.#min) / (this.#range / this.groups))
         }
         break
       }
-      case '等频': {
+      case ALLOWED_DISCRETE_METHODS.EQUAL_FREQUENCY: {
         this.predictor = (data: number | undefined) => {
           if (typeof data === 'undefined') return undefined
           return Math.floor(
@@ -120,7 +121,7 @@ class Discrete {
         }
         break
       }
-      case '聚类分析': {
+      case ALLOWED_DISCRETE_METHODS.CLUSTER: {
         const { clusters } = kmeans(
           data.map((v) => [v]),
           groups,
@@ -139,7 +140,7 @@ class Discrete {
   /** 分组器 */
   predictor: (data: number | undefined) => number | undefined
   /** 分组方法 */
-  method: AllowedDiscreteMethods
+  method: ALLOWED_DISCRETE_METHODS
   /** 分组数 */
   groups: number
   /** 排序后数据 */

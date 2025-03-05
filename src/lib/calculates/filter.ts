@@ -3,6 +3,7 @@
  */
 
 import { mean, median } from '@psych/lib'
+import type { Variable } from '../../types'
 
 /** 缺失值替换和插值 */
 export class Filter {

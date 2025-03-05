@@ -1,4 +1,5 @@
 import { PLOTS_SUB_PAGES_LABELS } from '../useNav'
+import type { AIFunction } from '../../types'
 
 export const nav_to_plots_view: AIFunction = {
   label: '将页面导航到绘图视图的指定页面',

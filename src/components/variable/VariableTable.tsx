@@ -2,11 +2,12 @@ import { useZustand } from '../../lib/useZustand'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
+import type { ALLOWED_FILTER_METHODS } from '../../types'
 
 export function VariableTable() {
   const { dataCols } = useZustand()
   const getFilterDescription = (
-    method: AllowedFilterMethods | undefined,
+    method: ALLOWED_FILTER_METHODS | undefined,
     value: (number | string)[] | undefined,
     range: [number, number] | undefined,
     regex: string | undefined,

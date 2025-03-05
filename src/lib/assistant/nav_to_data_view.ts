@@ -1,3 +1,5 @@
+import type { AIFunction } from '../../types'
+
 export const nav_to_data_view: AIFunction = {
   label: '将页面导航到数据视图',
   tool: {

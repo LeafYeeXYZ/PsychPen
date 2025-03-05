@@ -2,6 +2,7 @@ import { useZustand } from '../../lib/useZustand'
 import { Button, Select, Form, Tag, InputNumber, Space } from 'antd'
 import { flushSync } from 'react-dom'
 import { useState } from 'react'
+import { ALLOWED_DISCRETE_METHODS } from '../../types'
 
 type Option = {
   /** 变量名 */
@@ -10,11 +11,15 @@ type Option = {
   subVars?: string[]
 
   /** 离散化算法 */
-  discretizeMethod?: '等宽' | '等频' | '聚类分析'
+  discretizeMethod?: ALLOWED_DISCRETE_METHODS
   /** 离散化分组数 */
   discretizeGroups?: number
 }
 
+const DISCRETE_METHODS = Object.values(ALLOWED_DISCRETE_METHODS).map((method) => ({
+  label: method,
+  value: method,
+}))
 const ALLOW_SUBVARS: {
   en: string
   cn: string
@@ -114,7 +119,7 @@ export function SubVariables() {
             <Select
               mode='multiple'
               className='w-full'
-              placeholder='请选择子变量'
+              placeholder='留空则会清除所有现有子变量'
               options={ALLOW_SUBVARS.map((subVar) => ({
                 label: subVar.cn,
                 value: subVar.en,
@@ -135,11 +140,7 @@ export function SubVariables() {
                   <Select
                     className='w-full'
                     placeholder='请选择离散化方法'
-                    options={[
-                      { label: '等宽', value: '等宽' },
-                      { label: '等频', value: '等频' },
-                      { label: '聚类分析', value: '聚类分析' },
-                    ]}
+                    options={DISCRETE_METHODS}
                   />
                 </Form.Item>
                 <Form.Item

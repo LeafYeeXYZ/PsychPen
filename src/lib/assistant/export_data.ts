@@ -1,4 +1,5 @@
 import { ExportTypes } from '@psych/sheet'
+import type { AIFunction } from '../../types'
 
 export const export_data: AIFunction = {
   label: '导出数据',

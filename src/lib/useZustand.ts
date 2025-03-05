@@ -1,7 +1,4 @@
-/**
- * @file 全局状态管理
- */
-
+import type { Variable } from '../types'
 import { create } from 'zustand'
 import type { MessageInstance } from 'antd/es/message/interface'
 import { validateExpression } from './utils'

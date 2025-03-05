@@ -11,12 +11,13 @@ import {
 import type { FormInstance } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
+import { ALLOWED_FILTER_METHODS } from '../../types'
 
 type Option = {
   /** 变量名 */
   variable: string
   /** 过滤方法 */
-  method?: AllowedFilterMethods
+  method?: ALLOWED_FILTER_METHODS
   /** 过滤参考值 */
   value?: (number | string)[] | (string | number)
   /** 过滤区间 */
@@ -26,20 +27,7 @@ type Option = {
   regex?: string
 }
 
-const FILTER_METHODS: AllowedFilterMethods[] = [
-  '等于',
-  '不等于',
-  '大于',
-  '大于等于',
-  '小于',
-  '小于等于',
-  '区间',
-  '正则表达式',
-  '高于平均值',
-  '低于平均值',
-  '高于中位数',
-  '低于中位数',
-]
+const FILTER_METHODS = Object.values(ALLOWED_FILTER_METHODS)
 
 export function DataFilter() {
   const {
@@ -125,14 +113,14 @@ export function DataFilter() {
     null,
   )
   const getStep3Element = (
-    method: AllowedFilterMethods,
+    method: ALLOWED_FILTER_METHODS,
     form: FormInstance<Option>,
   ): React.ReactElement | null => {
     if (
-      method === '大于' ||
-      method === '大于等于' ||
-      method === '小于' ||
-      method === '小于等于'
+      method === ALLOWED_FILTER_METHODS.GREATER_THAN ||
+      method === ALLOWED_FILTER_METHODS.GREATER_THAN_OR_EQUAL ||
+      method === ALLOWED_FILTER_METHODS.LESS_THAN ||
+      method === ALLOWED_FILTER_METHODS.LESS_THAN_OR_EQUAL
     ) {
       return (
         <Form.Item
@@ -147,7 +135,7 @@ export function DataFilter() {
           />
         </Form.Item>
       )
-    } else if (method === '区间') {
+    } else if (method === ALLOWED_FILTER_METHODS.RANGE) {
       return (
         <Form.Item label='过滤参考区间'>
           <Space.Compact block>
@@ -204,7 +192,7 @@ export function DataFilter() {
           </Space.Compact>
         </Form.Item>
       )
-    } else if (method === '正则表达式') {
+    } else if (method === ALLOWED_FILTER_METHODS.REGEX) {
       return (
         <Form.Item
           label='过滤正则表达式'
@@ -215,13 +203,13 @@ export function DataFilter() {
         </Form.Item>
       )
     } else if (
-      method === '高于平均值' ||
-      method === '低于平均值' ||
-      method === '高于中位数' ||
-      method === '低于中位数'
+      method === ALLOWED_FILTER_METHODS.ABOVE_MEAN ||
+      method === ALLOWED_FILTER_METHODS.BELOW_MEAN ||
+      method === ALLOWED_FILTER_METHODS.ABOVE_MEDIAN ||
+      method === ALLOWED_FILTER_METHODS.BELOW_MEDIAN
     ) {
       return null
-    } else if (method === '等于' || method === '不等于') {
+    } else if (method === ALLOWED_FILTER_METHODS.EQUAL || method === ALLOWED_FILTER_METHODS.NOT_EQUAL) {
       const variable = form.getFieldValue('variable')
       const options = Array.from(new Set(dataRows.map((row) => row[variable])))
         .sort((a, b) => Number(a) - Number(b))
@@ -309,7 +297,7 @@ export function DataFilter() {
               options={step2Options}
               onChange={(value) =>
                 setStep3Element(
-                  getStep3Element(value as AllowedFilterMethods, form),
+                  getStep3Element(value as ALLOWED_FILTER_METHODS, form),
                 )
               }
             />
