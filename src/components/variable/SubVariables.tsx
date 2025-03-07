@@ -1,4 +1,5 @@
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
 import { Button, Select, Form, Tag, InputNumber, Space } from 'antd'
 import { flushSync } from 'react-dom'
 import { useState } from 'react'
@@ -32,14 +33,8 @@ const ALLOW_SUBVARS: {
 ]
 
 export function SubVariables() {
-  const {
-    dataCols,
-    messageApi,
-    isLargeData,
-    disabled,
-    setDisabled,
-    _VariableView_updateData,
-  } = useZustand()
+  const { dataCols, updateData, isLargeData } = useData()
+  const { messageApi, disabled, setDisabled } = useStates()
 
   // 定义子变量
   const [showDiscretize, setShowDiscretize] = useState(false)
@@ -74,7 +69,7 @@ export function SubVariables() {
           }
         })
         .filter((col) => col.derived !== true)
-      await _VariableView_updateData(cols)
+      await updateData(cols)
       messageApi?.destroy()
       messageApi?.success(
         `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,

@@ -1,4 +1,4 @@
-import { VARIABLE_SUB_PAGES_LABELS } from '../useNav'
+import { VARIABLE_SUB_PAGES_LABELS } from '../hooks/useNav'
 import type { AIFunction } from '../../types'
 
 export const nav_to_variable_view: AIFunction = {

@@ -1,6 +1,6 @@
-import { useZustand } from '../lib/useZustand'
+import { useStates } from '../lib/hooks/useStates'
 import { Button } from 'antd'
-import { useNav, VARIABLE_SUB_PAGES_LABELS } from '../lib/useNav'
+import { useNav, VARIABLE_SUB_PAGES_LABELS } from '../lib/hooks/useNav'
 import {
   CalculatorOutlined,
   ZoomOutOutlined,
@@ -25,7 +25,7 @@ export function VariableView() {
     variableViewSubPage,
     setVariableViewSubPage,
   } = useNav()
-  const { disabled } = useZustand()
+  const { disabled } = useStates()
 
   return (
     <div className='w-full h-full overflow-hidden'>

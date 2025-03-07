@@ -1,11 +1,11 @@
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import type { ALLOWED_FILTER_METHODS } from '../../types'
 
 export function VariableTable() {
-  const { dataCols } = useZustand()
+  const { dataCols } = useData()
   const getFilterDescription = (
     method: ALLOWED_FILTER_METHODS | undefined,
     value: (number | string)[] | undefined,

@@ -1,9 +1,9 @@
-import { useZustand } from '../lib/useZustand'
+import { useData } from '../lib/hooks/useData'
 import { ImportData } from './data/ImportData'
 import { PreviewData } from './data/PreviewData'
 
 export function DataView() {
-  const { data } = useZustand()
+  const { data } = useData()
 
   return (
     <div className='w-full h-full overflow-hidden'>

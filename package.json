@@ -20,7 +20,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint src/",
+    "lint": "eslint ./src",
     "preview": "vite preview",
     "release:create": "commit-and-tag-version",
     "release:push": "git push --follow-tags origin main",
@@ -61,6 +61,7 @@
     "commit-and-tag-version": "^12.5.0",
     "eslint": "^9.21.0",
     "eslint-config-prettier": "^10.0.2",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.4",
     "globals": "^15.15.0",
     "prettier": "3.5.2",

@@ -1,6 +1,7 @@
 import * as echarts from 'echarts'
 import { Select, Button, Form, Input } from 'antd'
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
@@ -33,8 +34,8 @@ const LABEL_OPTIONS = {
 }
 
 export function BasicPiePlot() {
-  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } =
-    useZustand()
+  const { dataCols, dataRows, isLargeData } = useData()
+  const { isDarkMode, messageApi } = useStates()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)

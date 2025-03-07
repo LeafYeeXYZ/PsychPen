@@ -1,4 +1,5 @@
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
 import { Button, Select, Form } from 'antd'
 import { flushSync } from 'react-dom'
 import { ALLOWED_INTERPOLATION_METHODS } from '../../types'
@@ -15,14 +16,8 @@ type Option = {
 const INTERPOLATE_METHODS = Object.values(ALLOWED_INTERPOLATION_METHODS)
 
 export function Interpolate() {
-  const {
-    dataCols,
-    messageApi,
-    isLargeData,
-    disabled,
-    setDisabled,
-    _VariableView_updateData,
-  } = useZustand()
+  const { dataCols, isLargeData, updateData } = useData()
+  const { messageApi, disabled, setDisabled } = useStates()
 
   // 处理插值
   const handleFinish = async (values: Option) => {
@@ -41,7 +36,7 @@ export function Interpolate() {
           return col
         }
       })
-      await _VariableView_updateData(cols)
+      await updateData(cols)
       messageApi?.destroy()
       messageApi?.success(
         `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,

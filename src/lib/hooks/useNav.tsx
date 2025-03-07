@@ -1,10 +1,10 @@
 import { create } from 'zustand'
 
-import { DataView } from '../components/DataView'
-import { VariableView } from '../components/VariableView'
-import { PlotsView } from '../components/PlotsView'
-import { StatisticsView } from '../components/StatisticsView'
-import { ToolsView } from '../components/ToolsView'
+import { DataView } from '../../components/DataView'
+import { VariableView } from '../../components/VariableView'
+import { PlotsView } from '../../components/PlotsView'
+import { StatisticsView } from '../../components/StatisticsView'
+import { ToolsView } from '../../components/ToolsView'
 
 export enum MAIN_PAGES_LABELS {
   DATA = '数据',
@@ -24,12 +24,12 @@ export const MAIN_PAGES_ELEMENTS: Record<
   [MAIN_PAGES_LABELS.TOOLS]: <ToolsView />,
 }
 
-import { VariableTable } from '../components/variable/VariableTable'
-import { Interpolate } from '../components/variable/Interpolate'
-import { MissingValue } from '../components/variable/MissingValue'
-import { SubVariables } from '../components/variable/SubVariables'
-import { DataFilter } from '../components/variable/DataFilter'
-import { ComputeVar } from '../components/variable/ComputeVar'
+import { VariableTable } from '../../components/variable/VariableTable'
+import { Interpolate } from '../../components/variable/Interpolate'
+import { MissingValue } from '../../components/variable/MissingValue'
+import { SubVariables } from '../../components/variable/SubVariables'
+import { DataFilter } from '../../components/variable/DataFilter'
+import { ComputeVar } from '../../components/variable/ComputeVar'
 
 export enum VARIABLE_SUB_PAGES_LABELS {
   VARIABLE_TABLE = '变量表格',
@@ -51,17 +51,17 @@ export const VARIABLE_SUB_PAGES_ELEMENTS: Record<
   [VARIABLE_SUB_PAGES_LABELS.COMPUTE_VAR]: <ComputeVar />,
 }
 
-import { BasicBoxPlot } from '../components/plots/BasicBoxPlot'
-import { BasicScatterPlot } from '../components/plots/BasicScatterPlot'
-import { ThreeDScatterPlot } from '../components/plots/ThreeDScatterPlot'
-import { BasicLinePlot } from '../components/plots/BasicLinePlot'
-import { WordCloudPlot } from '../components/plots/WordCloudPlot'
-import { ThreeDBarPlot } from '../components/plots/ThreeDBarPlot'
-import { ParallelLinePlot } from '../components/plots/ParallelLinePlot'
-import { BasicPiePlot } from '../components/plots/BasicPiePlot'
-import { BasicBarPlot } from '../components/plots/BasicBarPlot'
-import { GroupedBarPlot } from '../components/plots/GroupedBarPlot'
-import { QQPlot } from '../components/plots/QQPlot'
+import { BasicBoxPlot } from '../../components/plots/BasicBoxPlot'
+import { BasicScatterPlot } from '../../components/plots/BasicScatterPlot'
+import { ThreeDScatterPlot } from '../../components/plots/ThreeDScatterPlot'
+import { BasicLinePlot } from '../../components/plots/BasicLinePlot'
+import { WordCloudPlot } from '../../components/plots/WordCloudPlot'
+import { ThreeDBarPlot } from '../../components/plots/ThreeDBarPlot'
+import { ParallelLinePlot } from '../../components/plots/ParallelLinePlot'
+import { BasicPiePlot } from '../../components/plots/BasicPiePlot'
+import { BasicBarPlot } from '../../components/plots/BasicBarPlot'
+import { GroupedBarPlot } from '../../components/plots/GroupedBarPlot'
+import { QQPlot } from '../../components/plots/QQPlot'
 
 export enum PLOTS_SUB_PAGES_LABELS {
   BASIC_BOX_PLOT = '基础箱线图',
@@ -114,24 +114,24 @@ export const PLOTS_SUB_PAGES_MAP: Record<string, PLOTS_SUB_PAGES_LABELS[]> = {
   ],
 }
 
-import { OneSampleTTest } from '../components/statistics/OneSampleTTest'
-import { PeerSampleTTest } from '../components/statistics/PeerSampleTTest'
-import { TwoSampleTTest } from '../components/statistics/TwoSampleTTest'
-import { KolmogorovSmirnovTest } from '../components/statistics/KolmogorovSmirnovTest'
-import { PearsonCorrelationTest } from '../components/statistics/PearsonCorrelationTest'
-import { LeveneTest } from '../components/statistics/LeveneTest'
-import { Description } from '../components/statistics/Description'
-import { CorrReliability } from '../components/statistics/CorrReliability'
-import { HalfReliability } from '../components/statistics/HalfReliability'
-import { HomoReliability } from '../components/statistics/HomoReliability'
-import { OneLinearRegression } from '../components/statistics/OneLinearRegression'
-import { TwoLinearRegression } from '../components/statistics/TwoLinearRegression'
-import { KurtosisSkewness } from '../components/statistics/KurtosisSkewness'
-import { SimpleMediatorTest } from '../components/statistics/SimpleMediatorTest'
-import { WelchTTest } from '../components/statistics/WelchTTest'
-import { OneWayANOVA } from '../components/statistics/OneWayANOVA'
-import { PeerANOVA } from '../components/statistics/PeerANOVA'
-import { MultiLinearRegression } from '../components/statistics/MultiLinearRegression'
+import { OneSampleTTest } from '../../components/statistics/OneSampleTTest'
+import { PeerSampleTTest } from '../../components/statistics/PeerSampleTTest'
+import { TwoSampleTTest } from '../../components/statistics/TwoSampleTTest'
+import { KolmogorovSmirnovTest } from '../../components/statistics/KolmogorovSmirnovTest'
+import { PearsonCorrelationTest } from '../../components/statistics/PearsonCorrelationTest'
+import { LeveneTest } from '../../components/statistics/LeveneTest'
+import { Description } from '../../components/statistics/Description'
+import { CorrReliability } from '../../components/statistics/CorrReliability'
+import { HalfReliability } from '../../components/statistics/HalfReliability'
+import { HomoReliability } from '../../components/statistics/HomoReliability'
+import { OneLinearRegression } from '../../components/statistics/OneLinearRegression'
+import { TwoLinearRegression } from '../../components/statistics/TwoLinearRegression'
+import { KurtosisSkewness } from '../../components/statistics/KurtosisSkewness'
+import { SimpleMediatorTest } from '../../components/statistics/SimpleMediatorTest'
+import { WelchTTest } from '../../components/statistics/WelchTTest'
+import { OneWayANOVA } from '../../components/statistics/OneWayANOVA'
+import { PeerANOVA } from '../../components/statistics/PeerANOVA'
+import { MultiLinearRegression } from '../../components/statistics/MultiLinearRegression'
 
 export enum STATISTICS_SUB_PAGES_LABELS {
   DESCRIPTION = '描述统计',
@@ -216,9 +216,9 @@ export const STATISTICS_SUB_PAGES_MAP: Record<
   中介效应分析: [STATISTICS_SUB_PAGES_LABELS.SIMPLE_MEDIATOR_TEST],
 }
 
-import { NormalDistribution } from '../components/tools/NormalDistribution'
-import { TDistribution } from '../components/tools/TDistribution'
-import { StatisticToPvalue } from '../components/tools/StatisticToPvalue'
+import { NormalDistribution } from '../../components/tools/NormalDistribution'
+import { TDistribution } from '../../components/tools/TDistribution'
+import { StatisticToPvalue } from '../../components/tools/StatisticToPvalue'
 
 export enum TOOLS_VIEW_SUB_PAGES_LABELS {
   NORMAL_DISTRIBUTION = '正态分布动态演示',

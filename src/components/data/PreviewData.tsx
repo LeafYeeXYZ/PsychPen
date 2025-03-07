@@ -1,6 +1,7 @@
-import { useZustand } from '../../lib/useZustand'
-import { useRemoteR } from '../../lib/useRemoteR'
-import { useAssistant } from '../../lib/useAssistant'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
+import { useRemoteR } from '../../lib/hooks/useRemoteR'
+import { useAssistant } from '../../lib/hooks/useAssistant'
 import { useRef } from 'react'
 import { flushSync } from 'react-dom'
 import { downloadSheet, ExportTypes } from '@psych/sheet'
@@ -29,8 +30,8 @@ import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 const EXPORT_FILE_TYPES = Object.values(ExportTypes)
 
 export function PreviewData() {
-  const { _DataView_setData, dataCols, dataRows, disabled, setDisabled } =
-    useZustand()
+  const { setData, dataCols, dataRows } = useData()
+  const { disabled, setDisabled } = useStates()
   const [modalApi, contextHolder] = Modal.useModal()
   // 导出数据相关
   const handleExport = (filename: string, type: string) => {
@@ -52,7 +53,7 @@ export function PreviewData() {
               本地数据不受影响
             </span>
           }
-          onConfirm={async () => await _DataView_setData(null)}
+          onConfirm={async () => await setData(null)}
           okText='确定'
           cancelText='取消'
         >
@@ -118,9 +119,14 @@ export function PreviewData() {
           <Popover
             title={
               <span>
-                AI辅助分析设置 {'|'} 当前状态: {ai ? <Tag color='green'>可用</Tag> : <Tag color='red'>不可用</Tag>}
+                AI辅助分析设置 {'|'} 当前状态:{' '}
+                {ai ? (
+                  <Tag color='green'>可用</Tag>
+                ) : (
+                  <Tag color='red'>不可用</Tag>
+                )}
                 <Popover
-                  content={(
+                  content={
                     <div className='flex flex-col gap-1'>
                       <div>
                         在输入全部信息后, PsychPen 会自动验证 AI 服务是否可用
@@ -129,8 +135,10 @@ export function PreviewData() {
                         如果数秒后仍未显示可用, 请检查网络连接和信息是否填写正确
                       </div>
                     </div>
-                  )}
-                ><InfoCircleOutlined /></Popover>
+                  }
+                >
+                  <InfoCircleOutlined />
+                </Popover>
               </span>
             }
             trigger={['click', 'hover']}
@@ -142,7 +150,9 @@ export function PreviewData() {
             title={
               <span>
                 R语言服务器设置{' '}
-                <Popover content='详见使用文档或询问 AI 助手'><InfoCircleOutlined /></Popover>
+                <Popover content='详见使用文档或询问 AI 助手'>
+                  <InfoCircleOutlined />
+                </Popover>
               </span>
             }
             trigger={['click', 'hover']}
@@ -199,23 +209,28 @@ function ConfigAI() {
       <p className='w-full text-left pl-1'>
         API 地址 <Tag>baseUrl</Tag>
         <Popover
-          content={(
+          content={
             <div className='flex flex-col gap-1'>
+              <div>请填写各大模型提供商的 OpenAI 兼容 API 地址</div>
               <div>
-                请填写各大模型提供商的 OpenAI 兼容 API 地址
+                对于 <Tag style={{ margin: 0 }}>DeepSeek</Tag> 是{' '}
+                <Tag style={{ margin: 0 }}>https://api.deepseek.com/v1</Tag>
               </div>
               <div>
-                对于 <Tag style={{ margin: 0 }}>DeepSeek</Tag> 是 <Tag style={{ margin: 0 }}>https://api.deepseek.com/v1</Tag>
+                对于 <Tag style={{ margin: 0 }}>Qwen</Tag> 是{' '}
+                <Tag style={{ margin: 0 }}>
+                  https://dashscope.aliyuncs.com/compatible-mode/v1
+                </Tag>
               </div>
               <div>
-                对于 <Tag style={{ margin: 0 }}>Qwen</Tag> 是 <Tag style={{ margin: 0 }}>https://dashscope.aliyuncs.com/compatible-mode/v1</Tag>
-              </div>
-              <div>
-                对于 <Tag style={{ margin: 0 }}>OpenAI</Tag> 是 <Tag style={{ margin: 0 }}>https://api.openai.com/v1</Tag>
+                对于 <Tag style={{ margin: 0 }}>OpenAI</Tag> 是{' '}
+                <Tag style={{ margin: 0 }}>https://api.openai.com/v1</Tag>
               </div>
             </div>
-          )}
-        ><InfoCircleOutlined /></Popover>
+          }
+        >
+          <InfoCircleOutlined />
+        </Popover>
       </p>
       <div className='mb-2'>
         <Input
@@ -239,20 +254,30 @@ function ConfigAI() {
       <p className='w-full text-left pl-1'>
         AI 模型名称 <Tag>modelId</Tag>
         <Popover
-          content={(
+          content={
             <div className='flex flex-col gap-1'>
               <div>
-                请填写您所使用的 AI 模型的 ID (模型必须支持 <Tag style={{ margin: 0 }}>Function Calling</Tag> 功能)
+                请填写您所使用的 AI 模型的 ID (模型必须支持{' '}
+                <Tag style={{ margin: 0 }}>Function Calling</Tag> 功能)
               </div>
               <div>
-                如 <Tag style={{ margin: 0 }}>DeepSeek-V3</Tag> (ID 为 <Tag style={{ margin: 0 }}>deepseek-chat</Tag>), <Tag style={{ margin: 0 }}>Qwen</Tag> (ID 为 <Tag style={{ margin: 0 }}>qwen-max</Tag>), <Tag style={{ margin: 0 }}>GPT-4o</Tag> (ID 为 <Tag style={{ margin: 0 }}>gpt-4o</Tag>) 等
+                如 <Tag style={{ margin: 0 }}>DeepSeek-V3</Tag> (ID 为{' '}
+                <Tag style={{ margin: 0 }}>deepseek-chat</Tag>),{' '}
+                <Tag style={{ margin: 0 }}>Qwen</Tag> (ID 为{' '}
+                <Tag style={{ margin: 0 }}>qwen-max</Tag>),{' '}
+                <Tag style={{ margin: 0 }}>GPT-4o</Tag> (ID 为{' '}
+                <Tag style={{ margin: 0 }}>gpt-4o</Tag>) 等
               </div>
               <div>
-                不建议使用 <Tag style={{ margin: 0 }}>DeepSeek-R1</Tag>, <Tag style={{ margin: 0 }}>QwQ</Tag>, <Tag style={{ margin: 0 }}>o3-mini</Tag> 等推理模型
+                不建议使用 <Tag style={{ margin: 0 }}>DeepSeek-R1</Tag>,{' '}
+                <Tag style={{ margin: 0 }}>QwQ</Tag>,{' '}
+                <Tag style={{ margin: 0 }}>o3-mini</Tag> 等推理模型
               </div>
             </div>
-          )}
-        ><InfoCircleOutlined /></Popover>
+          }
+        >
+          <InfoCircleOutlined />
+        </Popover>
       </p>
       <div className='mb-2'>
         <Input
@@ -301,9 +326,7 @@ function ConfigR() {
           onChange={(value) => _DataView_setRenable(value === Open.TRUE)}
         />
       </div>
-      <p className='w-full text-left pl-1'>
-        服务器地址
-      </p>
+      <p className='w-full text-left pl-1'>服务器地址</p>
       <div className='mb-2'>
         <Input
           placeholder='请输入服务器地址'
@@ -312,9 +335,7 @@ function ConfigR() {
           onChange={(e) => _DataView_setRurl(e.target.value ?? '')}
         />
       </div>
-      <p className='w-full text-left pl-1'>
-        服务器密码
-      </p>
+      <p className='w-full text-left pl-1'>服务器密码</p>
       <div className='mb-2'>
         <Input.Password
           placeholder='请输入服务器密码'

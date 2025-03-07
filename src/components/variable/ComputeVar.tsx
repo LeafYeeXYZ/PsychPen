@@ -1,4 +1,5 @@
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
 import { Button, Input, Form, Tag, Select, Popconfirm } from 'antd'
 import { flushSync } from 'react-dom'
 import { useState } from 'react'
@@ -15,14 +16,8 @@ type Option = {
 }
 
 export function ComputeVar() {
-  const {
-    dataCols,
-    messageApi,
-    isLargeData,
-    disabled,
-    setDisabled,
-    _VariableView_addNewVar,
-  } = useZustand()
+  const { dataCols, isLargeData, addNewVar } = useData()
+  const { messageApi, disabled, setDisabled } = useStates()
   const [expression, setExpression] = useState<string>('')
   const [form] = Form.useForm<Option>()
   const handleFinish = async (values: Option) => {
@@ -30,7 +25,7 @@ export function ComputeVar() {
       messageApi?.loading('正在处理数据...')
       isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      await _VariableView_addNewVar(values.variable, values.expression)
+      await addNewVar(values.variable, values.expression)
       messageApi?.destroy()
       messageApi?.success(
         `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,

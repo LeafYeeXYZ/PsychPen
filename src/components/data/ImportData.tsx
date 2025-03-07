@@ -1,4 +1,5 @@
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
 import { Upload, Button, Tag } from 'antd'
 import { SlidersOutlined, LinkOutlined } from '@ant-design/icons'
 import { flushSync } from 'react-dom'
@@ -11,13 +12,8 @@ const LARGE_DATA_SIZE = 1024 * 1024 // 1 MB
 const ACCEPT_FILE_TYPES = Object.values(ImportTypes)
 
 export function ImportData() {
-  const {
-    _DataView_setData,
-    messageApi,
-    _DataView_setIsLargeData,
-    disabled,
-    setDisabled,
-  } = useZustand()
+  const { setData, setIsLargeData } = useData()
+  const { messageApi, setDisabled, disabled } = useStates()
 
   return (
     <div className='flex flex-col justify-center items-center w-full h-full relative text-rose-950 dark:text-white'>
@@ -45,9 +41,9 @@ export function ImportData() {
             // 如果文件比较大, 延迟等待通知加载
             if (file.size > LARGE_DATA_SIZE) {
               await new Promise((resolve) => setTimeout(resolve, 500))
-              await _DataView_setIsLargeData(true)
+              await setIsLargeData(true)
             } else {
-              await _DataView_setIsLargeData(false)
+              await setIsLargeData(false)
             }
             const reader = new FileReader()
             const ext = file.name.split('.').pop()?.toLowerCase()
@@ -66,7 +62,7 @@ export function ImportData() {
                     e.target.result as ArrayBuffer,
                     ext as ImportTypes,
                   )
-                  await _DataView_setData(data)
+                  await setData(data)
                 }
                 messageApi?.destroy('uploading')
                 messageApi?.success('数据导入完成', 0.5)

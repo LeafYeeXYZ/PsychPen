@@ -2,7 +2,7 @@ import {
   useNav,
   STATISTICS_SUB_PAGES_MAP,
   type STATISTICS_SUB_PAGES_LABELS,
-} from '../lib/useNav'
+} from '../lib/hooks/useNav'
 import { Cascader } from 'antd'
 
 export function StatisticsView() {

@@ -1,37 +1,33 @@
-import type { Variable } from '../types'
+import type { Variable } from '../../types'
 import { create } from 'zustand'
-import type { MessageInstance } from 'antd/es/message/interface'
-import { validateExpression } from './utils'
-import { Derive } from './calculates/derive'
-import { Missing } from './calculates/misssing'
-import { Describe } from './calculates/describe'
-import { Filter } from './calculates/filter'
+import { validateExpression } from '../utils'
+import { Derive } from '../calculates/derive'
+import { Missing } from '../calculates/misssing'
+import { Describe } from '../calculates/describe'
+import { Filter } from '../calculates/filter'
 import { get, set, del } from 'idb-keyval'
 
-type GlobalState = {
+type DataState = {
   /**
    * 原始数据
    */
   data: Record<string, unknown>[] | null
   /**
    * 设置原始数据
-   * @param data 原始数据 (WorkBook 类型)
-   * @important 仅在 DataView.tsx 中使用
+   * @param data 原始数据
    */
-  _DataView_setData: (data: Record<string, unknown>[] | null) => Promise<void>
+  setData: (data: Record<string, unknown>[] | null) => Promise<void>
   /**
    * 更新数据
    * @param cols 变量列表
-   * @important 仅在 VariableView.tsx 中使用
    */
-  _VariableView_updateData: (cols: Variable[]) => Promise<void>
+  updateData: (cols: Variable[]) => Promise<void>
   /**
    * 添加新变量
    * @param name 新变量名
    * @param expression 计算表达式
-   * @important 仅在 VariableView.tsx 中使用
    */
-  _VariableView_addNewVar: (name: string, expression: string) => Promise<void>
+  addNewVar: (name: string, expression: string) => Promise<void>
   /**
    * 数据列表
    */
@@ -48,34 +44,7 @@ type GlobalState = {
    * 设置数据量是否较大
    * @param isLargeData 是否数据量较大
    */
-  _DataView_setIsLargeData: (isLargeData: boolean) => Promise<void>
-  /**
-   * 消息提示 API
-   */
-  messageApi: MessageInstance | null
-  /**
-   * 设置消息提示 API
-   * @param api 消息提示 API
-   */
-  _App_setMessageApi: (api: MessageInstance) => void
-  /**
-   * 是否是黑暗模式
-   */
-  isDarkMode: boolean
-  /**
-   * 设置是否是黑暗模式
-   * @param isDarkMode 是否是黑暗模式
-   */
-  _App_setIsDarkMode: (isDarkMode: boolean) => void
-  /**
-   * 是否禁用各种按钮等
-   */
-  disabled: boolean
-  /**
-   * 设置是否禁用各种按钮等
-   * @param disabled 是否禁用
-   */
-  setDisabled: (disabled: boolean) => void
+  setIsLargeData: (isLargeData: boolean) => Promise<void>
 }
 
 /**
@@ -122,17 +91,17 @@ const localDataRows =
   (await get<Record<string, unknown>[]>(STORE_KEYS.DATA_ROWS)) || []
 const localIsLargeData = (await get<boolean>(STORE_KEYS.IS_LARGE_DATA)) || false
 
-export const useZustand = create<GlobalState>()((setState, getState) => {
+export const useData = create<DataState>()((setState, getState) => {
   return {
     data: localData,
     dataRows: localDataRows,
     dataCols: localDataCols,
     isLargeData: localIsLargeData,
-    _DataView_setIsLargeData: async (isLargeData) => {
+    setIsLargeData: async (isLargeData) => {
       await set(STORE_KEYS.IS_LARGE_DATA, isLargeData)
       setState({ isLargeData })
     },
-    _DataView_setData: async (rows) => {
+    setData: async (rows) => {
       if (rows) {
         const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
         const { calculatedCols, calculatedRows } = calculator(cols, rows)
@@ -152,7 +121,7 @@ export const useZustand = create<GlobalState>()((setState, getState) => {
         setState({ data: rows, dataRows: [], dataCols: [] })
       }
     },
-    _VariableView_updateData: async (cols) => {
+    updateData: async (cols) => {
       const { data } = getState()
       const { calculatedCols, calculatedRows } = calculator(cols, data!)
       await set(STORE_KEYS.DATA_COLS, calculatedCols)
@@ -162,7 +131,7 @@ export const useZustand = create<GlobalState>()((setState, getState) => {
         dataCols: calculatedCols,
       })
     },
-    _VariableView_addNewVar: async (name, expression) => {
+    addNewVar: async (name, expression) => {
       validateExpression(expression) // 检查表达式的安全性
       const { dataCols, dataRows, data } = getState()
       if (dataCols.find((col) => col.name == name)) {
@@ -217,11 +186,5 @@ export const useZustand = create<GlobalState>()((setState, getState) => {
         data: newData,
       })
     },
-    messageApi: null,
-    _App_setMessageApi: (api) => setState({ messageApi: api }),
-    disabled: false,
-    setDisabled: (disabled) => setState({ disabled }),
-    isDarkMode: matchMedia('(prefers-color-scheme: dark)').matches,
-    _App_setIsDarkMode: (isDarkMode) => setState({ isDarkMode }),
   }
 })

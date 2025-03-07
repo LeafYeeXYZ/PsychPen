@@ -1,4 +1,4 @@
-import { STATISTICS_SUB_PAGES_LABELS } from '../useNav'
+import { STATISTICS_SUB_PAGES_LABELS } from '../hooks/useNav'
 import type { AIFunction } from '../../types'
 
 export const nav_to_statistics_view: AIFunction = {

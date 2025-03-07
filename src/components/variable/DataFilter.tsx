@@ -1,4 +1,5 @@
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
 import {
   Button,
   Select,
@@ -30,22 +31,15 @@ type Option = {
 const FILTER_METHODS = Object.values(ALLOWED_FILTER_METHODS)
 
 export function DataFilter() {
-  const {
-    dataCols,
-    dataRows,
-    messageApi,
-    isLargeData,
-    disabled,
-    setDisabled,
-    _VariableView_updateData,
-  } = useZustand()
+  const { dataCols, dataRows, isLargeData, updateData } = useData()
+  const { messageApi, disabled, setDisabled } = useStates()
   const [form] = Form.useForm()
   const handleClear = async () => {
     try {
       messageApi?.loading('正在处理数据...')
       isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
       const timestamp = Date.now()
-      await _VariableView_updateData(
+      await updateData(
         dataCols.map((col) => ({
           ...col,
           filterMethod: undefined,
@@ -92,7 +86,7 @@ export function DataFilter() {
           return col
         }
       })
-      await _VariableView_updateData(cols)
+      await updateData(cols)
       messageApi?.destroy()
       messageApi?.success(
         `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,

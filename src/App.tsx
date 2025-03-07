@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useZustand } from './lib/useZustand'
-import { useNav, MAIN_PAGES_LABELS } from './lib/useNav'
+import { useStates } from './lib/hooks/useStates'
+import { useData } from './lib/hooks/useData'
+import { useNav, MAIN_PAGES_LABELS } from './lib/hooks/useNav'
 import {
   Button,
   ConfigProvider,
@@ -12,7 +13,7 @@ import {
 import { BarChartOutlined, CommentOutlined } from '@ant-design/icons'
 import Bowser from 'bowser'
 import { version } from '../package.json'
-import { useAssistant } from './lib/useAssistant'
+import { useAssistant } from './lib/hooks/useAssistant'
 import { AI } from './components/AI'
 
 const ANTD_THEME_LIGHT: ThemeConfig = {
@@ -31,15 +32,15 @@ const ANTD_THEME_DARK: ThemeConfig = {
 }
 
 export function App() {
-  const { data, _App_setMessageApi, disabled, isDarkMode, _App_setIsDarkMode } =
-    useZustand()
+  const { data } = useData()
+  const { disabled, isDarkMode, setIsDarkMode, setMessageApi } = useStates()
   // 页面切换
   const { activeMainPage, mainPage, setMainPage } = useNav()
   // 消息实例
   const [messageApi, contextHolder] = message.useMessage()
   // 检查浏览器版本
   useEffect(() => {
-    _App_setMessageApi(messageApi)
+    setMessageApi(messageApi)
     const browser = Bowser.getParser(navigator.userAgent)
     const valid = browser.satisfies({
       chrome: '>=110',
@@ -52,12 +53,12 @@ export function App() {
         '当前浏览器版本较低, 可能会导致部分功能无法正常使用, 请使用最新版本的 Chrome, Firefox, Safari 或 Edge 浏览器',
         8,
       )
-  }, [messageApi, _App_setMessageApi])
+  }, [messageApi, setMessageApi])
   // 动态设置主题
   useEffect(() => {
     const getIsDarkMode = () =>
       matchMedia('(prefers-color-scheme: dark)').matches
-    const subIsDarkMode = () => _App_setIsDarkMode(getIsDarkMode())
+    const subIsDarkMode = () => setIsDarkMode(getIsDarkMode())
     matchMedia('(prefers-color-scheme: dark)').addEventListener(
       'change',
       subIsDarkMode,
@@ -67,7 +68,7 @@ export function App() {
         'change',
         subIsDarkMode,
       )
-  }, [_App_setIsDarkMode])
+  }, [setIsDarkMode])
   // AI助手
   const { ai } = useAssistant()
   const [showAI, setShowAI] = useState<boolean>(false)

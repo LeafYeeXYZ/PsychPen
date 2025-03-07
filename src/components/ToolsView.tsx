@@ -1,4 +1,4 @@
-import { useNav, TOOLS_VIEW_SUB_PAGES_LABELS } from '../lib/useNav'
+import { useNav, TOOLS_VIEW_SUB_PAGES_LABELS } from '../lib/hooks/useNav'
 import { Cascader } from 'antd'
 
 export function ToolsView() {

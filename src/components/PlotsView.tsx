@@ -2,7 +2,7 @@ import {
   useNav,
   PLOTS_SUB_PAGES_MAP,
   type PLOTS_SUB_PAGES_LABELS,
-} from '../lib/useNav'
+} from '../lib/hooks/useNav'
 import { Cascader } from 'antd'
 
 export function PlotsView() {

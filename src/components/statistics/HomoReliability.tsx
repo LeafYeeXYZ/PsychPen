@@ -1,5 +1,6 @@
-import { useZustand } from '../../lib/useZustand'
-import { useRemoteR } from '../../lib/useRemoteR'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
+import { useRemoteR } from '../../lib/hooks/useRemoteR'
 import { Select, Button, Form, Radio, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -22,7 +23,8 @@ type Result = {
 } & Option
 
 export function HomoReliability() {
-  const { dataCols, dataRows, messageApi } = useZustand()
+  const { dataCols, dataRows } = useData()
+  const { messageApi } = useStates()
   const { Renable, executeRCode } = useRemoteR()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)

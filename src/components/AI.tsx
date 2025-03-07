@@ -1,8 +1,13 @@
 // 记得在 GREETTING 消息里说明可以使用的功能
 // TODO: 写好之后更新一下使用文档的 2.5
-import { type AIFunction, ALLOWED_DISCRETE_METHODS, type Variable } from '../types'
-import { useAssistant } from '../lib/useAssistant'
-import { useZustand } from '../lib/useZustand'
+import {
+  type AIFunction,
+  ALLOWED_DISCRETE_METHODS,
+  type Variable,
+} from '../types'
+import { useAssistant } from '../lib/hooks/useAssistant'
+import { useData } from '../lib/hooks/useData'
+import { useStates } from '../lib/hooks/useStates'
 import { useState, useRef, useEffect } from 'react'
 import {
   useNav,
@@ -11,7 +16,7 @@ import {
   PLOTS_SUB_PAGES_LABELS,
   STATISTICS_SUB_PAGES_LABELS,
   TOOLS_VIEW_SUB_PAGES_LABELS,
-} from '../lib/useNav'
+} from '../lib/hooks/useNav'
 import { flushSync } from 'react-dom'
 import { Space, Typography, Tag, Button } from 'antd'
 import { Bubble, Sender } from '@ant-design/x'
@@ -81,7 +86,6 @@ function GET_PROMPT(vars: Variable[]): string {
   return INSTRUCTION + varsText + docsText
 }
 
-
 export function AI() {
   const { ai, model } = useAssistant()
 
@@ -93,7 +97,8 @@ export function AI() {
     )
   }
 
-  const { messageApi, disabled, dataCols, data } = useZustand()
+  const { data, dataCols } = useData()
+  const { messageApi, disabled } = useStates()
   const nav = useNav()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -123,7 +128,7 @@ export function AI() {
         setInput('')
       })
       const system = GET_PROMPT(dataCols)
-      
+
       const stream = await ai.chat.completions.create({
         model: model,
         messages: [{ role: 'system', content: system }, ...old, user],
@@ -464,13 +469,8 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
   const id = toolCall.id
   const name = toolCall.function.name
   const args = toolCall.function.arguments
-  const {
-    dataRows,
-    _VariableView_addNewVar,
-    messageApi,
-    dataCols,
-    _VariableView_updateData,
-  } = useZustand()
+  const { dataRows, addNewVar, dataCols, updateData } = useData()
+  const { messageApi } = useStates()
   const [done, setDone] = useState(false)
   const formerDone = sessionStorage.getItem(id) === 'done'
   let element: React.ReactElement | null = null
@@ -509,7 +509,7 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
               block
               disabled={done}
               onClick={() => {
-                _VariableView_updateData(
+                updateData(
                   dataCols
                     .map((col) => {
                       if (variable_names.includes(col.name)) {
@@ -595,7 +595,7 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
               block
               disabled={done}
               onClick={() => {
-                _VariableView_updateData(
+                updateData(
                   dataCols
                     .map((col) => {
                       if (variable_names.includes(col.name)) {
@@ -677,7 +677,7 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
               block
               disabled={done}
               onClick={() => {
-                _VariableView_addNewVar(variable_name, calc_expression)
+                addNewVar(variable_name, calc_expression)
                 setDone(true)
                 sessionStorage.setItem(id, 'done')
                 messageApi?.success(`已成功生成新变量"${variable_name}"`)

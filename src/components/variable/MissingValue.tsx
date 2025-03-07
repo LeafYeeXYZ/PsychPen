@@ -1,4 +1,5 @@
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
 import { Button, Select, Form, Tag } from 'antd'
 import { flushSync } from 'react-dom'
 
@@ -10,14 +11,8 @@ type Option = {
 }
 
 export function MissingValue() {
-  const {
-    dataCols,
-    messageApi,
-    isLargeData,
-    disabled,
-    setDisabled,
-    _VariableView_updateData,
-  } = useZustand()
+  const { dataCols, isLargeData, updateData } = useData()
+  const { messageApi, disabled, setDisabled } = useStates()
 
   // 处理缺失值
   const handleFinish = async (values: Option) => {
@@ -41,7 +36,7 @@ export function MissingValue() {
           }
         })
       }
-      await _VariableView_updateData(cols)
+      await updateData(cols)
       messageApi?.destroy()
       messageApi?.success(
         `数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,

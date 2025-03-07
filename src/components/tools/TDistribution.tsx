@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons'
 import { mean as m, std as s, randomNormal } from '@psych/lib'
 import * as echarts from 'echarts'
-import { useZustand } from '../../lib/useZustand'
+import { useStates } from '../../lib/hooks/useStates'
 
 const DEFAULT_MEAN = 0
 const DEFAULT_STD = 2
@@ -30,7 +30,7 @@ function generateDate(data: number[]): {
 }
 
 export function TDistribution() {
-  const { isDarkMode } = useZustand()
+  const { isDarkMode } = useStates()
   // 基础数据
   const [mean, setMean] = useState<number>(DEFAULT_MEAN)
   const [std, setStd] = useState<number>(DEFAULT_STD)

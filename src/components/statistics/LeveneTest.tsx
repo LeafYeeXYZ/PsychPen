@@ -1,4 +1,5 @@
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
 import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { LeveneTest as T } from '@psych/lib'
@@ -22,7 +23,8 @@ type Result = {
 } & Option
 
 export function LeveneTest() {
-  const { dataCols, dataRows, messageApi } = useZustand()
+  const { dataCols, dataRows } = useData()
+  const { messageApi } = useStates()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = (values: Option) => {

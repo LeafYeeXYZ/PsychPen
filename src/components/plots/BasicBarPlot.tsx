@@ -1,6 +1,7 @@
 import * as echarts from 'echarts'
 import { Select, Button, Form, Input, Space, Radio, InputNumber } from 'antd'
-import { useZustand } from '../../lib/useZustand'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
@@ -40,8 +41,8 @@ type Option = {
 }
 
 export function BasicBarPlot() {
-  const { dataCols, dataRows, messageApi, isLargeData, isDarkMode } =
-    useZustand()
+  const { dataCols, dataRows, isLargeData } = useData()
+  const { isDarkMode, messageApi } = useStates()
   // 图形设置相关
   const [disabled, setDisabled] = useState<boolean>(false)
   const [rendered, setRendered] = useState<boolean>(false)
@@ -142,9 +143,9 @@ export function BasicBarPlot() {
                     const xValue = api.value(0)
                     const lowPoint = api.coord([xValue, api.value(1)])
                     const highPoint = api.coord([xValue, api.value(2)])
-                    // @ts-expect-error 没问题
                     const halfWidth = Math.min(
                       15,
+                      // @ts-expect-error 没问题
                       Number(api.size([1, 0])[0] / 8),
                     )
                     return {
@@ -270,9 +271,9 @@ export function BasicBarPlot() {
                     const xValue = api.value(0)
                     const lowPoint = api.coord([xValue, api.value(1)])
                     const highPoint = api.coord([xValue, api.value(2)])
-                    // @ts-expect-error 没问题
                     const halfWidth = Math.min(
                       15,
+                      // @ts-expect-error 没问题
                       Number(api.size([1, 0])[0] / 8),
                     )
                     return {
