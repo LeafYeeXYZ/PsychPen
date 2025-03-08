@@ -13,7 +13,7 @@ const LARGE_DATA_SIZE = 1024 * 1024 // 1 MB
 const ACCEPT_FILE_TYPES = Object.values(ImportTypes)
 
 export function ImportData() {
-  const { setData, setIsLargeData } = useData()
+  const { setData } = useData()
   const { messageApi, setDisabled, disabled } = useStates()
 
   return (
@@ -54,8 +54,7 @@ export function ImportData() {
                     e.target.result as ArrayBuffer,
                     ext as ImportTypes,
                   )
-                  await setData(data)
-                  await setIsLargeData(isLargeData)
+                  await setData(data, isLargeData)
                 }
                 messageApi?.destroy()
                 messageApi?.success('数据导入完成', 0.5)
