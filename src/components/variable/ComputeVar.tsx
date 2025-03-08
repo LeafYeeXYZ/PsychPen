@@ -9,10 +9,11 @@ type Option = {
   variable: string
   /**
    * 计算表达式
-   * 变量名语法为 :::name:::
    * 输入的表达式在将变量为替换为数字后, 必须能够被按照 JS 语法计算
    */
   expression: string
+  /** 变量列表 */
+  _variable?: string
 }
 
 export function ComputeVar() {
@@ -123,13 +124,13 @@ export function ComputeVar() {
           <Form.Item label='表达式预览'>
             <Expression value={expression} />
           </Form.Item>
-          <Form.Item label='变量列表(点击复制)'>
+          <Form.Item label='变量列表(点击复制)' name='_variable'>
             <Select
               placeholder='变量列表'
               allowClear
               showSearch
-              options={dataCols.map(({ name }) => ({
-                label: name,
+              options={dataCols.map(({ name, type }) => ({
+                label: `${name} (${type})`,
                 value: name,
               }))}
               onChange={async (value) => {
@@ -137,6 +138,7 @@ export function ComputeVar() {
                 const expression = `:::${value}:::`
                 try {
                   await navigator.clipboard.writeText(expression)
+                  form.resetFields(['_variable'])
                   messageApi?.success(`已复制 ${expression}`)
                 } catch (error) {
                   messageApi?.error(
@@ -166,11 +168,24 @@ export function ComputeVar() {
           为避免歧义, 请使用小括号 <Tag color='blue'>( )</Tag>明确运算顺序
         </p>
         <p className='intro-text'>
+          对于等距或等比数据, 可以使用 <Tag color='blue'>mean(:::name:::)</Tag>
+          表示变量的均值 (注意括号和冒号间没有空格)
+        </p>
+        <p className='intro-text'>
+          除均值外, 还可以使用 <Tag color='blue'>min</Tag>
+          <Tag color='blue'>max</Tag>
+          <Tag color='blue'>std</Tag>
+          <Tag color='blue'>mode</Tag>
+          <Tag color='blue'>q1</Tag>
+          <Tag color='blue'>q2</Tag>
+          <Tag color='blue'>q3</Tag>统计量
+        </p>
+        <p className='intro-text'>
           对数等高级运算请使用 <Tag color='green'>JavaScript</Tag>的{' '}
           <Tag color='blue'>Math</Tag>对象
         </p>
         <p className='intro-text'>
-          输入的表达式将在替换变量为数字后, 按照{' '}
+          输入的表达式将在替换变量为数值后, 按照{' '}
           <Tag color='green'>JavaScript</Tag>语法计算
         </p>
       </div>
@@ -179,18 +194,31 @@ export function ComputeVar() {
 }
 
 function Expression({ value }: { value: string }) {
+  const nameReg = /(:::.+?:::)/g
+  const computeReg = /(===|!==|==|!=|>=|<=|\+|-|\/|\*\*|>|<|\*)/g
   return (
     <>
-      {value.split(/(:::.+?:::)/g).map((part, index) => {
-        if (part.match(/:::.+?:::/)) {
-          return (
-            <Tag key={index} color='green' style={{ margin: 0 }}>
-              {part.slice(3, -3)}
-            </Tag>
-          )
-        }
-        return <span key={index}>{part}</span>
-      })}
+      {value
+        .split(nameReg)
+        .map((part) => part.split(computeReg))
+        .flat()
+        .map((part, index) => {
+          if (nameReg.test(part)) {
+            return (
+              <Tag key={index} color='green' style={{ margin: 0 }}>
+                {part.slice(3, -3)}
+              </Tag>
+            )
+          } else if (part.match(computeReg)) {
+            return (
+              <Tag key={index} color='blue' style={{ margin: 0 }}>
+                {part}
+              </Tag>
+            )
+          } else {
+            return <span key={index}>{part}</span>
+          }
+        })}
     </>
   )
 }

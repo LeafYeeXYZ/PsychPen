@@ -1,6 +1,6 @@
 import type { Variable } from '../../types'
 import { create } from 'zustand'
-import { validateExpression } from '../utils'
+import { validateExpression, computeExpression } from '../utils'
 import { Derive } from '../calculates/derive'
 import { Missing } from '../calculates/misssing'
 import { Describe } from '../calculates/describe'
@@ -138,38 +138,9 @@ export const useData = create<DataState>()((setState, getState) => {
         // 故意使用 == 而不是 ===
         throw new Error(`变量名 ${name} 已存在`)
       }
-      const vars = expression.match(/:::.+?:::/g) ?? []
-      if (vars.length > 0) {
-        vars.forEach((v) => {
-          if (!dataCols.find(({ name }) => name == v.slice(3, -3))) {
-            // 故意使用 == 而不是 ===
-            throw new Error(`变量 ${v} 不存在`)
-          }
-        })
-      }
       const newRows = dataRows.map((row) => {
-        // 如果参考的变量值不存在, 或已被按照缺失值定义删除, 则新变量值也是缺失值
-        if (vars.some((v) => row[v.slice(3, -3)] === undefined)) {
-          return { [name]: undefined, ...row }
-        }
-        const expressionWithValues = expression.replace(/:::.+?:::/g, (v) => {
-          const value = row[v.slice(3, -3)]
-          if (!value) {
-            return 'undefined'
-          }
-          if (!isNaN(Number(value))) {
-            return `${Number(value)}`
-          }
-          return `'${String(value)}'`
-        })
-        try {
-          const result = eval(expressionWithValues)
-          return { [name]: result, ...row }
-        } catch (error) {
-          throw new Error(
-            `执行表达式失败: ${error instanceof Error ? error.message : String(error)}`,
-          )
-        }
+        const value = computeExpression(expression, dataCols, row)
+        return { [name]: value, ...row }
       })
       const describe = new Describe([{ name }], newRows)
       const newCols = [...describe.updatedCols, ...dataCols]

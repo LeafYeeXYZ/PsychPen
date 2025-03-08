@@ -1,4 +1,148 @@
 import html2canvas from 'html2canvas'
+import type { Variable } from '../types'
+
+/**
+ * 计算变量的表达式 (如果引用的变量有缺失值, 则返回 undefined)
+ * @param expression 表达式
+ * @param variables 变量列表
+ * @param data 数据
+ * @throws 如果表达式不合法, 则抛出异常
+ * @returns 计算结果
+ */
+export function computeExpression(
+  expression: string,
+  variables: Variable[],
+  data: Record<string, unknown>,
+): number | string | undefined {
+  try {
+    const vars = expression.match(/:::.+?:::/g)
+    if (vars) {
+      vars.forEach((v) => {
+        const name = v.slice(3, -3)
+        if (!variables.find((v) => v.name == name)) {
+          throw new Error(`变量 ${name} 不存在`)
+        }
+      })
+      if (
+        vars.some((v) => {
+          const name = v.slice(3, -3)
+          const value = data[name]
+          return value === undefined || value === null
+        })
+      ) {
+        return undefined
+      }
+    }
+    const value = eval(embedValues(expression, variables, data))
+    return value
+  } catch (e) {
+    throw new Error(
+      `执行表达式失败: ${e instanceof Error ? e.message : String(e)}`,
+    )
+  }
+}
+
+/**
+ * 将数值或统计量嵌入表达式
+ * @param expression 表达式
+ * @param variables 变量列表
+ * @param data 数据
+ * @throws 如果变量不存在/引用了不存在的变量统计量, 则抛出异常
+ * @returns 嵌入数值或统计量后的表达式
+ */
+export function embedValues(
+  expression: string,
+  variables: Variable[],
+  data: Record<string, unknown>,
+): string {
+  // min(:::name:::)
+  expression = expression.replace(/min\((:::.+?:::)\)/g, (v) => {
+    const name = v.slice(7, -4)
+    const variable = variables.find((v) => v.name == name)
+    if (!variable) throw new Error(`变量 ${name} 不存在`)
+    if (variable.min === undefined)
+      throw new Error(`变量 ${name} 没有最小值, 请确认变量类型`)
+    return variable.min.toString()
+  })
+  // max(:::name:::)
+  expression = expression.replace(/max\((:::.+?:::)\)/g, (v) => {
+    const name = v.slice(7, -4)
+    const variable = variables.find((v) => v.name == name)
+    if (!variable) throw new Error(`变量 ${name} 不存在`)
+    if (variable.max === undefined)
+      throw new Error(`变量 ${name} 没有最大值, 请确认变量类型`)
+    return variable.max.toString()
+  })
+  // mean(:::name:::)
+  expression = expression.replace(/mean\((:::.+?:::)\)/g, (v) => {
+    const name = v.slice(8, -4)
+    const variable = variables.find((v) => v.name == name)
+    if (!variable) throw new Error(`变量 ${name} 不存在`)
+    if (variable.mean === undefined)
+      throw new Error(`变量 ${name} 没有均值, 请确认变量类型`)
+    return variable.mean.toString()
+  })
+  // mode(:::name:::)
+  expression = expression.replace(/mode\((:::.+?:::)\)/g, (v) => {
+    const name = v.slice(8, -4)
+    const variable = variables.find((v) => v.name == name)
+    if (!variable) throw new Error(`变量 ${name} 不存在`)
+    if (variable.mode === undefined)
+      throw new Error(`变量 ${name} 没有众数, 请确认变量类型`)
+    return variable.mode.toString()
+  })
+  // q1(:::name:::)
+  expression = expression.replace(/q1\((:::.+?:::)\)/g, (v) => {
+    const name = v.slice(6, -4)
+    const variable = variables.find((v) => v.name == name)
+    if (!variable) throw new Error(`变量 ${name} 不存在`)
+    if (variable.q1 === undefined)
+      throw new Error(`变量 ${name} 没有 25% 分位数, 请确认变量类型`)
+    return variable.q1.toString()
+  })
+  // q2(:::name:::)
+  expression = expression.replace(/q2\((:::.+?:::)\)/g, (v) => {
+    const name = v.slice(6, -4)
+    const variable = variables.find((v) => v.name == name)
+    if (!variable) throw new Error(`变量 ${name} 不存在`)
+    if (variable.q2 === undefined)
+      throw new Error(`变量 ${name} 没有 50% 分位数, 请确认变量类型`)
+    return variable.q2.toString()
+  })
+  // q3(:::name:::)
+  expression = expression.replace(/q3\((:::.+?:::)\)/g, (v) => {
+    const name = v.slice(6, -4)
+    const variable = variables.find((v) => v.name == name)
+    if (!variable) throw new Error(`变量 ${name} 不存在`)
+    if (variable.q3 === undefined)
+      throw new Error(`变量 ${name} 没有 75% 分位数, 请确认变量类型`)
+    return variable.q3.toString()
+  })
+  // std(:::name:::)
+  expression = expression.replace(/std\((:::.+?:::)\)/g, (v) => {
+    const name = v.slice(7, -4)
+    const variable = variables.find((v) => v.name == name)
+    if (!variable) throw new Error(`变量 ${name} 不存在`)
+    if (variable.std === undefined)
+      throw new Error(`变量 ${name} 没有标准差, 请确认变量类型`)
+    return variable.std.toString()
+  })
+  // :::name:::
+  expression = expression.replace(/:::.+?:::/g, (v) => {
+    const name = v.slice(3, -3)
+    const variable = variables.find((v) => v.name == name)
+    if (!variable) throw new Error(`变量 ${name} 不存在`)
+    const value = data[name]
+    if (value === undefined || value === null) {
+      throw new Error(`变量 ${name} 的值不存在`)
+    } else if (!isNaN(Number(value))) {
+      return `${Number(value)}`
+    } else {
+      return `"${String(value)}"`
+    }
+  })
+  return expression
+}
 
 /**
  * 检查计算变量的表达式的安全性
