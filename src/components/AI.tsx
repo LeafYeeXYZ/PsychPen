@@ -21,6 +21,7 @@ import { flushSync } from 'react-dom'
 import { Space, Typography, Tag, Button } from 'antd'
 import { Bubble, Sender } from '@ant-design/x'
 import { UserOutlined, BarChartOutlined } from '@ant-design/icons'
+import { Expression } from './widgets/Expression'
 import parseThink from '@leaf/parse-think'
 import { downloadSheet } from '@psych/sheet'
 import type {
@@ -40,6 +41,7 @@ import { nav_to_statistics_view } from '../lib/assistant/nav_to_statistics_view'
 import { nav_to_tools_view } from '../lib/assistant/nav_to_tools_view'
 import { create_new_var } from '../lib/assistant/create_new_var'
 import { create_sub_var, clear_sub_var } from '../lib/assistant/create_sub_var'
+import { apply_filter } from '../lib/assistant/apply_filter'
 
 const md = markdownit({ html: true, breaks: true })
 const funcs: AIFunction[] = [
@@ -52,10 +54,11 @@ const funcs: AIFunction[] = [
   create_new_var,
   create_sub_var,
   clear_sub_var,
+  apply_filter,
 ]
 
 const GREETTING =
-  '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、生成/清除子变量 (标准化/中心化/离散化)、生成新变量等. 请问有什么可以帮你的?'
+  '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、生成/清除子变量 (标准化/中心化/离散化)、生成新变量、筛选数据等. 请问有什么可以帮你的?'
 const INSTRUCTION =
   '你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. 你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具信息; 你的任务是按照用户的要求, 为用户提供帮助.'
 function GET_PROMPT(vars: Variable[]): string {
@@ -182,6 +185,12 @@ export function AI() {
 
         try {
           switch (toolCall.function.name) {
+            case 'apply_filter': {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const { filter_expression: _ } = JSON.parse(toolCall.function.arguments)
+              newMessages[1].content = `已请求设置数据筛选规则, 等待用户手动确认`
+              break
+            }
             case 'clear_sub_var': {
               const { variable_names } = JSON.parse(toolCall.function.arguments)
               if (
@@ -469,13 +478,53 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
   const id = toolCall.id
   const name = toolCall.function.name
   const args = toolCall.function.arguments
-  const { dataRows, addNewVar, dataCols, updateData } = useData()
+  const { dataRows, addNewVar, dataCols, updateData, setFilterExpression } = useData()
   const { messageApi } = useStates()
   const [done, setDone] = useState(false)
   const formerDone = sessionStorage.getItem(id) === 'done'
   let element: React.ReactElement | null = null
   let initDone = true
   switch (name) {
+    case 'apply_filter': {
+      const { filter_expression } = JSON.parse(args) as {
+        filter_expression: string
+      }
+      if (!formerDone) {
+        initDone = false
+      }
+      element = (
+        <>
+          <div>
+            执行函数{' '}
+            <Tag color='blue' style={{ margin: 0 }}>
+              {funcs.find(
+                (func) => func.tool.function.name === toolCall.function.name,
+              )?.label || `未知函数 (${toolCall.function.name})`}
+            </Tag>
+            {done ? ', 已' : ', 是否确认'}设置数据筛选规则, 表达式如下:
+          </div>
+          <div className='bg-white dark:bg-gray-800 rounded-md p-3 border'>
+            <Expression value={filter_expression} />
+          </div>
+          <div>
+            <Button
+              block
+              disabled={done}
+              onClick={async () => {
+                await setFilterExpression(filter_expression)
+                setDone(true)
+                sessionStorage.setItem(id, 'done')
+                messageApi?.success('已成功设置数据筛选规则')
+              }}
+            >
+              {done ? '已设置筛选规则' : '确认设置筛选规则'}
+            </Button>
+          </div>
+        </>
+      )
+      break
+    }
+
     case 'clear_sub_var': {
       const { variable_names } = JSON.parse(args) as {
         variable_names: string[]
@@ -659,18 +708,7 @@ function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
             , 计算表达式为如下:
           </div>
           <div className='bg-white dark:bg-gray-800 rounded-md p-3 border'>
-            {(calc_expression as string)
-              .split(/(:::.+?:::)/g)
-              .map((part, index) => {
-                if (part.match(/:::.+?:::/)) {
-                  return (
-                    <Tag key={index} style={{ margin: 0 }}>
-                      {part.slice(3, -3)}
-                    </Tag>
-                  )
-                }
-                return <span key={index}>{part}</span>
-              })}
+            <Expression value={calc_expression} />
           </div>
           <div>
             <Button
