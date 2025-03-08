@@ -4,6 +4,7 @@ import { Button, Input, Form, Tag, Select } from 'antd'
 import { flushSync } from 'react-dom'
 import { useState } from 'react'
 import { Expression } from '../widgets/Expression'
+import { sleep } from '../../lib/utils'
 
 type Option = {
   /**
@@ -29,8 +30,8 @@ export function DataFilter() {
   const [form] = Form.useForm<Option>()
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       await setFilterExpression(values.expression || '')
       messageApi?.destroy()

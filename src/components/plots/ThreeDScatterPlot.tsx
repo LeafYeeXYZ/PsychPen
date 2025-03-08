@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
 import 'echarts-gl'
-import { downloadImage } from '../../lib/utils'
+import { downloadImage, sleep } from '../../lib/utils'
 
 type Option = {
   /** X轴变量 */
@@ -36,8 +36,8 @@ export function ThreeDScatterPlot() {
 
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const { xVar, yVar, zVar, xLabel, yLabel, zLabel, title, dotSize } =
         values

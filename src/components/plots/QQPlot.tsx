@@ -5,7 +5,7 @@ import { useStates } from '../../lib/hooks/useStates'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
-import { downloadImage } from '../../lib/utils'
+import { downloadImage, sleep } from '../../lib/utils'
 import { sort, quantile, standardize, p2z, z2p } from '@psych/lib'
 
 type Option = {
@@ -41,8 +41,8 @@ export function QQPlot() {
 
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const {
         xVar,

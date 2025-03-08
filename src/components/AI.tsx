@@ -1,14 +1,10 @@
 // 记得在 GREETTING 消息里说明可以使用的功能
 // TODO: 写好之后更新一下使用文档的 2.5
-import {
-  type AIFunction,
-  ALLOWED_DISCRETE_METHODS,
-  type Variable,
-} from '../types'
+import { type Variable } from '../types'
 import { useAssistant } from '../lib/hooks/useAssistant'
 import { useData } from '../lib/hooks/useData'
 import { useStates } from '../lib/hooks/useStates'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import {
   useNav,
   MAIN_PAGES_LABELS,
@@ -18,44 +14,17 @@ import {
   TOOLS_VIEW_SUB_PAGES_LABELS,
 } from '../lib/hooks/useNav'
 import { flushSync } from 'react-dom'
-import { Space, Typography, Tag, Button } from 'antd'
-import { Bubble, Sender } from '@ant-design/x'
-import { UserOutlined, BarChartOutlined } from '@ant-design/icons'
-import { Expression } from './widgets/Expression'
+import { Messages } from './assistant/Messages'
+import { Space } from 'antd'
+import { Sender } from '@ant-design/x'
 import parseThink from '@leaf/parse-think'
-import { downloadSheet } from '@psych/sheet'
 import type {
-  ChatCompletionAssistantMessageParam,
   ChatCompletionUserMessageParam,
   ChatCompletionMessageToolCall,
   ChatCompletionMessageParam,
 } from 'openai/resources/index.mjs'
 import readme from '../../README.md?raw'
-// @ts-expect-error markdown-it does not have types
-import markdownit from 'markdown-it'
-import { export_data } from '../lib/assistant/export_data'
-import { nav_to_data_view } from '../lib/assistant/nav_to_data_view'
-import { nav_to_variable_view } from '../lib/assistant/nav_to_variable_view'
-import { nav_to_plots_view } from '../lib/assistant/nav_to_plots_view'
-import { nav_to_statistics_view } from '../lib/assistant/nav_to_statistics_view'
-import { nav_to_tools_view } from '../lib/assistant/nav_to_tools_view'
-import { create_new_var } from '../lib/assistant/create_new_var'
-import { create_sub_var, clear_sub_var } from '../lib/assistant/create_sub_var'
-import { apply_filter } from '../lib/assistant/apply_filter'
-
-const md = markdownit({ html: true, breaks: true })
-const funcs: AIFunction[] = [
-  export_data,
-  nav_to_data_view,
-  nav_to_variable_view,
-  nav_to_plots_view,
-  nav_to_statistics_view,
-  nav_to_tools_view,
-  create_new_var,
-  create_sub_var,
-  clear_sub_var,
-  apply_filter,
-]
+import { funcs } from './assistant/funcs'
 
 const GREETTING =
   '你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、生成/清除子变量 (标准化/中心化/离散化)、生成新变量、筛选数据等. 请问有什么可以帮你的?'
@@ -187,7 +156,9 @@ export function AI() {
           switch (toolCall.function.name) {
             case 'apply_filter': {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              const { filter_expression: _ } = JSON.parse(toolCall.function.arguments)
+              const { filter_expression: _ } = JSON.parse(
+                toolCall.function.arguments,
+              )
               newMessages[1].content = `已请求设置数据筛选规则, 等待用户手动确认`
               break
             }
@@ -374,7 +345,11 @@ export function AI() {
 
   return (
     <div className='w-full h-full flex flex-col justify-between items-center'>
-      <Messages messages={messages} showLoading={showLoading} />
+      <Messages
+        messages={messages}
+        showLoading={showLoading}
+        greeting={GREETTING}
+      />
       <Sender
         onSubmit={onSubmit}
         disabled={disabled}
@@ -402,392 +377,4 @@ export function AI() {
       />
     </div>
   )
-}
-
-function Messages({
-  messages,
-  showLoading,
-}: {
-  messages: ChatCompletionMessageParam[]
-  showLoading: boolean
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: 'smooth' })
-  }, [messages])
-  return (
-    <div
-      className='w-full h-full flex flex-col items-center justify-start gap-4 overflow-auto pt-4 pb-8 no-scrollbar'
-      ref={ref}
-    >
-      {[
-        { role: 'assistant', content: GREETTING },
-        ...messages,
-        ...(showLoading ? [{ role: 'assistant', content: '__loading__' }] : []),
-      ].map((message, index) => {
-        const tool_calls = (message as ChatCompletionAssistantMessageParam)
-          .tool_calls
-        return (
-          <Bubble
-            key={index}
-            className='w-full'
-            placement={message.role === 'user' ? 'end' : 'start'}
-            content={
-              tool_calls?.length ? (
-                <ToolCall toolCall={tool_calls[0]} />
-              ) : (
-                <Typography>
-                  <div
-                    className='-mb-[0.8rem]'
-                    dangerouslySetInnerHTML={{
-                      __html: md.render((message.content as string).trim()),
-                    }}
-                  />
-                </Typography>
-              )
-            }
-            loading={message.content === '__loading__'}
-            header={
-              message.role === 'user'
-                ? 'User'
-                : message.role === 'assistant'
-                  ? 'PsychPen'
-                  : 'PsychPen [系统]'
-            }
-            avatar={{
-              icon:
-                message.role === 'user' ? (
-                  <UserOutlined />
-                ) : (
-                  <BarChartOutlined />
-                ),
-              style: {
-                backgroundColor:
-                  message.role === 'user' ? '#f0f0ff' : '#fff0f0',
-                color: message.role === 'user' ? '#597ef7' : '#f75959',
-              },
-            }}
-          />
-        )
-      })}
-    </div>
-  )
-}
-
-function ToolCall({ toolCall }: { toolCall: ChatCompletionMessageToolCall }) {
-  const id = toolCall.id
-  const name = toolCall.function.name
-  const args = toolCall.function.arguments
-  const { dataRows, addNewVar, dataCols, updateData, setFilterExpression } = useData()
-  const { messageApi } = useStates()
-  const [done, setDone] = useState(false)
-  const formerDone = sessionStorage.getItem(id) === 'done'
-  let element: React.ReactElement | null = null
-  let initDone = true
-  switch (name) {
-    case 'apply_filter': {
-      const { filter_expression } = JSON.parse(args) as {
-        filter_expression: string
-      }
-      if (!formerDone) {
-        initDone = false
-      }
-      element = (
-        <>
-          <div>
-            执行函数{' '}
-            <Tag color='blue' style={{ margin: 0 }}>
-              {funcs.find(
-                (func) => func.tool.function.name === toolCall.function.name,
-              )?.label || `未知函数 (${toolCall.function.name})`}
-            </Tag>
-            {done ? ', 已' : ', 是否确认'}设置数据筛选规则, 表达式如下:
-          </div>
-          <div className='bg-white dark:bg-gray-800 rounded-md p-3 border'>
-            <Expression value={filter_expression} />
-          </div>
-          <div>
-            <Button
-              block
-              disabled={done}
-              onClick={async () => {
-                await setFilterExpression(filter_expression)
-                setDone(true)
-                sessionStorage.setItem(id, 'done')
-                messageApi?.success('已成功设置数据筛选规则')
-              }}
-            >
-              {done ? '已设置筛选规则' : '确认设置筛选规则'}
-            </Button>
-          </div>
-        </>
-      )
-      break
-    }
-
-    case 'clear_sub_var': {
-      const { variable_names } = JSON.parse(args) as {
-        variable_names: string[]
-      }
-      if (!formerDone) {
-        initDone = false
-      }
-      element = (
-        <>
-          <div>
-            执行函数{' '}
-            <Tag color='blue' style={{ margin: 0 }}>
-              {funcs.find(
-                (func) => func.tool.function.name === toolCall.function.name,
-              )?.label || `未知函数 (${toolCall.function.name})`}
-            </Tag>
-            {done ? ', 已' : ', 是否确认'}清除变量
-            {variable_names.map((name) => (
-              <Tag
-                key={name}
-                style={{ margin: 0, marginLeft: '0.3rem' }}
-                color='blue'
-              >
-                {name}
-              </Tag>
-            ))}{' '}
-            的所有子变量
-          </div>
-          <div>
-            <Button
-              block
-              disabled={done}
-              onClick={() => {
-                updateData(
-                  dataCols
-                    .map((col) => {
-                      if (variable_names.includes(col.name)) {
-                        return {
-                          ...col,
-                          subVars: undefined,
-                        }
-                      }
-                      return col
-                    })
-                    .filter((col) => col.derived !== true),
-                )
-                setDone(true)
-                sessionStorage.setItem(id, 'done')
-                messageApi?.success(
-                  `已成功清除变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的所有子变量`,
-                )
-              }}
-            >
-              {done ? '已清除子变量' : '确认清除子变量'}
-            </Button>
-          </div>
-        </>
-      )
-      break
-    }
-    case 'create_sub_var': {
-      const { variable_names, standardize, centralize, discretize } =
-        JSON.parse(args) as {
-          variable_names: string[]
-          standardize: boolean | undefined
-          centralize: boolean | undefined
-          discretize:
-            | {
-                method: ALLOWED_DISCRETE_METHODS
-                groups: number
-              }
-            | undefined
-        }
-      if (!formerDone) {
-        initDone = false
-      }
-      const ALLOWED_METHOD = Object.values(ALLOWED_DISCRETE_METHODS)
-      const shouldDiscritize = Boolean(
-        typeof discretize === 'object' &&
-          discretize.method &&
-          discretize.groups &&
-          ALLOWED_METHOD.includes(discretize.method),
-      )
-      element = (
-        <>
-          <div>
-            执行函数{' '}
-            <Tag color='blue' style={{ margin: 0 }}>
-              {funcs.find(
-                (func) => func.tool.function.name === toolCall.function.name,
-              )?.label || `未知函数 (${toolCall.function.name})`}
-            </Tag>
-            {done ? ', 已' : ', 是否确认'}生成变量
-            {variable_names.map((name) => (
-              <Tag
-                key={name}
-                style={{ margin: 0, marginLeft: '0.3rem' }}
-                color='blue'
-              >
-                {name}
-              </Tag>
-            ))}{' '}
-            的
-            {[
-              standardize ? '标准化' : '',
-              centralize ? '中心化' : '',
-              shouldDiscritize
-                ? `离散化 (${discretize!.method}, ${discretize!.groups} 组) `
-                : '',
-            ]
-              .filter((part) => part)
-              .join('、')}
-            子变量
-          </div>
-          <div>
-            <Button
-              block
-              disabled={done}
-              onClick={() => {
-                updateData(
-                  dataCols
-                    .map((col) => {
-                      if (variable_names.includes(col.name)) {
-                        return {
-                          ...col,
-                          subVars: {
-                            standard:
-                              Boolean(standardize) || col.subVars?.standard,
-                            center: Boolean(centralize) || col.subVars?.center,
-                            discrete: shouldDiscritize
-                              ? {
-                                  method: discretize!.method,
-                                  groups: discretize!.groups,
-                                }
-                              : col.subVars?.discrete,
-                          },
-                        }
-                      }
-                      return col
-                    })
-                    .filter((col) => col.derived !== true),
-                )
-                setDone(true)
-                sessionStorage.setItem(id, 'done')
-                messageApi?.success(
-                  `已成功生成变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的${[
-                    standardize ? '标准化' : '',
-                    centralize ? '中心化' : '',
-                    shouldDiscritize ? '离散化' : '',
-                  ]
-                    .filter((part) => part)
-                    .join('、')}子变量`,
-                )
-              }}
-            >
-              {done ? '已生成子变量' : '确认生成子变量'}
-            </Button>
-          </div>
-        </>
-      )
-      break
-    }
-    case 'create_new_var': {
-      const { variable_name, calc_expression } = JSON.parse(args)
-      if (!formerDone) {
-        initDone = false
-      }
-      element = (
-        <>
-          <div>
-            执行函数{' '}
-            <Tag color='blue' style={{ margin: 0 }}>
-              {funcs.find(
-                (func) => func.tool.function.name === toolCall.function.name,
-              )?.label || `未知函数 (${toolCall.function.name})`}
-            </Tag>
-            {done ? ', 已' : ', 是否确认'}生成新变量{' '}
-            <Tag style={{ margin: 0 }} color='blue'>
-              {variable_name}
-            </Tag>
-            , 计算表达式为如下:
-          </div>
-          <div className='bg-white dark:bg-gray-800 rounded-md p-3 border'>
-            <Expression value={calc_expression} />
-          </div>
-          <div>
-            <Button
-              block
-              disabled={done}
-              onClick={() => {
-                addNewVar(variable_name, calc_expression)
-                setDone(true)
-                sessionStorage.setItem(id, 'done')
-                messageApi?.success(`已成功生成新变量"${variable_name}"`)
-              }}
-            >
-              {done ? '已生成新变量' : '确认生成新变量'}
-            </Button>
-          </div>
-        </>
-      )
-      break
-    }
-    case 'export_data': {
-      const { file_name, file_type } = JSON.parse(args)
-      if (!formerDone) {
-        initDone = false
-      }
-      element = (
-        <>
-          <div>
-            执行函数{' '}
-            <Tag color='blue' style={{ margin: 0 }}>
-              {funcs.find(
-                (func) => func.tool.function.name === toolCall.function.name,
-              )?.label || `未知函数 (${toolCall.function.name})`}
-            </Tag>
-            {done ? ', 已' : ', 是否确认'}导出数据到文件{' '}
-            <Tag style={{ margin: 0 }} color='blue'>
-              {file_name || 'data'}.{file_type || 'xlsx'}
-            </Tag>
-          </div>
-          <div>
-            <Button
-              block
-              disabled={done}
-              onClick={() => {
-                downloadSheet(
-                  dataRows,
-                  file_type || 'xlsx',
-                  file_name || undefined,
-                )
-                setDone(true)
-                sessionStorage.setItem(id, 'done')
-                messageApi?.success(
-                  `已成功导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}"`,
-                )
-              }}
-            >
-              {done ? '已导出数据' : '确认导出数据'}
-            </Button>
-          </div>
-        </>
-      )
-      break
-    }
-    default: {
-      element = (
-        <div>
-          执行函数{' '}
-          <Tag color='blue' style={{ margin: 0 }}>
-            {funcs.find(
-              (func) => func.tool.function.name === toolCall.function.name,
-            )?.label || `未知函数 (${toolCall.function.name})`}
-          </Tag>
-        </div>
-      )
-    }
-  }
-  useEffect(() => {
-    if (initDone) {
-      setDone(true)
-    }
-  }, [])
-  return <div className='flex flex-col gap-3'>{element}</div>
 }

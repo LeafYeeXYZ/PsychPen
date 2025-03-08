@@ -6,7 +6,7 @@ import { useStates } from '../../lib/hooks/useStates'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
-import { downloadImage } from '../../lib/utils'
+import { downloadImage, sleep } from '../../lib/utils'
 import { median, mean, max, min } from '@psych/lib'
 
 type Statistic = 'mean' | 'median' | 'max' | 'min' | 'sum' | 'count'
@@ -40,8 +40,8 @@ export function ThreeDBarPlot() {
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const {
         xVar,

@@ -6,7 +6,7 @@ import { useStates } from '../../lib/hooks/useStates'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
-import { downloadImage } from '../../lib/utils'
+import { downloadImage, sleep } from '../../lib/utils'
 
 const REGRESSION_TYPES = [
   { value: 'linear', label: '线性回归' },
@@ -44,8 +44,8 @@ export function BasicScatterPlot() {
 
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const { xVar, yVar, xLabel, yLabel, title, regression, formula } = values
       // @ts-expect-error echarts-stat 没有提供正确的类型定义

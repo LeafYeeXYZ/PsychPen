@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import type { EChartsOption } from 'echarts'
 import { mean as mn, std as sd } from '@psych/lib'
-import { downloadImage } from '../../lib/utils'
+import { downloadImage, sleep } from '../../lib/utils'
 
 type Option = {
   /** 每组显示的被试内变量名 */
@@ -41,8 +41,8 @@ export function GroupedBarPlot() {
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const {
         group,

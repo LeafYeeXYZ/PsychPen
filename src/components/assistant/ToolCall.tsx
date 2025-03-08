@@ -1,0 +1,484 @@
+import { ALLOWED_DISCRETE_METHODS } from '../../types'
+import { useData } from '../../lib/hooks/useData'
+import { useStates } from '../../lib/hooks/useStates'
+import { useState, useEffect } from 'react'
+import { Tag, Button } from 'antd'
+import { Expression } from '../widgets/Expression'
+import { downloadSheet, ExportTypes } from '@psych/sheet'
+import type { ChatCompletionMessageToolCall } from 'openai/resources/index.mjs'
+import { funcs } from './funcs'
+
+export function ToolCall({
+  toolCall,
+}: {
+  toolCall: ChatCompletionMessageToolCall
+}) {
+  const id = toolCall.id
+  const name = toolCall.function.name
+  const args = toolCall.function.arguments
+  const [done, setDone] = useState(false)
+  const formerDone = sessionStorage.getItem(id) === 'done'
+  let element: React.ReactElement | null = null
+  let initDone = true
+  switch (name) {
+    case 'apply_filter': {
+      const { filter_expression } = JSON.parse(args) as {
+        filter_expression: string
+      }
+      if (!formerDone) {
+        initDone = false
+      }
+      element = (
+        <ApplyFilterTool
+          done={done}
+          setDone={setDone}
+          id={id}
+          filter_expression={filter_expression}
+        />
+      )
+      break
+    }
+
+    case 'clear_sub_var': {
+      const { variable_names } = JSON.parse(args) as {
+        variable_names: string[]
+      }
+      if (!formerDone) {
+        initDone = false
+      }
+      element = (
+        <ClearSubVarTool
+          done={done}
+          setDone={setDone}
+          id={id}
+          variable_names={variable_names}
+        />
+      )
+      break
+    }
+    case 'create_sub_var': {
+      const { variable_names, standardize, centralize, discretize } =
+        JSON.parse(args) as {
+          variable_names: string[]
+          standardize: boolean | undefined
+          centralize: boolean | undefined
+          discretize:
+            | {
+                method: ALLOWED_DISCRETE_METHODS
+                groups: number
+              }
+            | undefined
+        }
+      if (!formerDone) {
+        initDone = false
+      }
+      element = (
+        <CreateSubVarTool
+          done={done}
+          setDone={setDone}
+          id={id}
+          variable_names={variable_names}
+          standardize={standardize}
+          centralize={centralize}
+          discretize={discretize}
+        />
+      )
+      break
+    }
+    case 'create_new_var': {
+      const { variable_name, calc_expression } = JSON.parse(args) as {
+        variable_name: string
+        calc_expression: string
+      }
+      if (!formerDone) {
+        initDone = false
+      }
+      element = (
+        <CreateNewVarTool
+          done={done}
+          setDone={setDone}
+          id={id}
+          variable_name={variable_name}
+          calc_expression={calc_expression}
+        />
+      )
+      break
+    }
+    case 'export_data': {
+      const { file_name, file_type } = JSON.parse(args) as {
+        file_name: string
+        file_type: string
+      }
+      if (!formerDone) {
+        initDone = false
+      }
+      element = (
+        <ExportDataTool
+          done={done}
+          setDone={setDone}
+          id={id}
+          file_name={file_name}
+          file_type={file_type}
+        />
+      )
+      break
+    }
+    default: {
+      element = <DefaultTool toolCall={toolCall} />
+    }
+  }
+  useEffect(() => {
+    if (initDone) {
+      setDone(true)
+    }
+  }, [])
+  return <div className='flex flex-col gap-3'>{element}</div>
+}
+
+function DefaultTool({
+  toolCall,
+}: {
+  toolCall: ChatCompletionMessageToolCall
+}) {
+  return (
+    <div>
+      执行函数{' '}
+      <Tag color='blue' style={{ margin: 0 }}>
+        {funcs.find(
+          (func) => func.tool.function.name === toolCall.function.name,
+        )?.label || `未知函数 (${toolCall.function.name})`}
+      </Tag>
+    </div>
+  )
+}
+
+function ExportDataTool({
+  done,
+  setDone,
+  id,
+  file_name,
+  file_type,
+}: {
+  done: boolean
+  setDone: (done: boolean) => void
+  id: string
+  file_name: string
+  file_type: string
+}) {
+  const { dataRows } = useData()
+  const { messageApi } = useStates()
+  return (
+    <>
+      <div>
+        执行函数{' '}
+        <Tag color='blue' style={{ margin: 0 }}>
+          {
+            funcs.find((func) => func.tool.function.name === 'export_data')!
+              .label
+          }
+        </Tag>
+        {done ? ', 已' : ', 是否确认'}导出数据到文件{' '}
+        <Tag style={{ margin: 0 }} color='blue'>
+          {file_name || 'data'}.{file_type || 'xlsx'}
+        </Tag>
+      </div>
+      <div>
+        <Button
+          block
+          disabled={done}
+          onClick={() => {
+            downloadSheet(
+              dataRows,
+              Object.values(ExportTypes).includes(file_type as ExportTypes)
+                ? (file_type as ExportTypes)
+                : ExportTypes.XLSX,
+              file_name || undefined,
+            )
+            setDone(true)
+            sessionStorage.setItem(id, 'done')
+            messageApi?.success(
+              `已成功导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}"`,
+            )
+          }}
+        >
+          {done ? '已导出数据' : '确认导出数据'}
+        </Button>
+      </div>
+    </>
+  )
+}
+
+function CreateNewVarTool({
+  done,
+  setDone,
+  id,
+  variable_name,
+  calc_expression,
+}: {
+  done: boolean
+  setDone: (done: boolean) => void
+  id: string
+  variable_name: string
+  calc_expression: string
+}) {
+  const { addNewVar } = useData()
+  const { messageApi } = useStates()
+  return (
+    <>
+      <div>
+        执行函数{' '}
+        <Tag color='blue' style={{ margin: 0 }}>
+          {
+            funcs.find((func) => func.tool.function.name === 'create_new_var')!
+              .label
+          }
+        </Tag>
+        {done ? ', 已' : ', 是否确认'}生成新变量{' '}
+        <Tag style={{ margin: 0 }} color='blue'>
+          {variable_name}
+        </Tag>
+        , 计算表达式为如下:
+      </div>
+      <div className='bg-white dark:bg-gray-800 rounded-md p-3 border'>
+        <Expression value={calc_expression} />
+      </div>
+      <div>
+        <Button
+          block
+          disabled={done}
+          onClick={() => {
+            addNewVar(variable_name, calc_expression)
+            setDone(true)
+            sessionStorage.setItem(id, 'done')
+            messageApi?.success(`已成功生成新变量"${variable_name}"`)
+          }}
+        >
+          {done ? '已生成新变量' : '确认生成新变量'}
+        </Button>
+      </div>
+    </>
+  )
+}
+
+function CreateSubVarTool({
+  done,
+  setDone,
+  id,
+  variable_names,
+  standardize,
+  centralize,
+  discretize,
+}: {
+  done: boolean
+  setDone: (done: boolean) => void
+  id: string
+  variable_names: string[]
+  standardize: boolean | undefined
+  centralize: boolean | undefined
+  discretize:
+    | {
+        method: ALLOWED_DISCRETE_METHODS
+        groups: number
+      }
+    | undefined
+}) {
+  const { dataCols, updateData } = useData()
+  const { messageApi } = useStates()
+  const ALLOWED_METHOD = Object.values(ALLOWED_DISCRETE_METHODS)
+  const shouldDiscritize = Boolean(
+    typeof discretize === 'object' &&
+      discretize.method &&
+      discretize.groups &&
+      ALLOWED_METHOD.includes(discretize.method),
+  )
+  return (
+    <>
+      <div>
+        执行函数{' '}
+        <Tag color='blue' style={{ margin: 0 }}>
+          {
+            funcs.find((func) => func.tool.function.name === 'create_sub_var')!
+              .label
+          }
+        </Tag>
+        {done ? ', 已' : ', 是否确认'}生成变量
+        {variable_names.map((name) => (
+          <Tag
+            key={name}
+            style={{ margin: 0, marginLeft: '0.3rem' }}
+            color='blue'
+          >
+            {name}
+          </Tag>
+        ))}{' '}
+        的
+        {[
+          standardize ? '标准化' : '',
+          centralize ? '中心化' : '',
+          shouldDiscritize
+            ? `离散化 (${discretize!.method}, ${discretize!.groups} 组) `
+            : '',
+        ]
+          .filter((part) => part)
+          .join('、')}
+        子变量
+      </div>
+      <div>
+        <Button
+          block
+          disabled={done}
+          onClick={() => {
+            updateData(
+              dataCols
+                .map((col) => {
+                  if (variable_names.includes(col.name)) {
+                    return {
+                      ...col,
+                      subVars: {
+                        standard: Boolean(standardize) || col.subVars?.standard,
+                        center: Boolean(centralize) || col.subVars?.center,
+                        discrete: shouldDiscritize
+                          ? {
+                              method: discretize!.method,
+                              groups: discretize!.groups,
+                            }
+                          : col.subVars?.discrete,
+                      },
+                    }
+                  }
+                  return col
+                })
+                .filter((col) => col.derived !== true),
+            )
+            setDone(true)
+            sessionStorage.setItem(id, 'done')
+            messageApi?.success(
+              `已成功生成变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的${[
+                standardize ? '标准化' : '',
+                centralize ? '中心化' : '',
+                shouldDiscritize ? '离散化' : '',
+              ]
+                .filter((part) => part)
+                .join('、')}子变量`,
+            )
+          }}
+        >
+          {done ? '已生成子变量' : '确认生成子变量'}
+        </Button>
+      </div>
+    </>
+  )
+}
+
+function ClearSubVarTool({
+  done,
+  setDone,
+  id,
+  variable_names,
+}: {
+  done: boolean
+  setDone: (done: boolean) => void
+  id: string
+  variable_names: string[]
+}) {
+  const { dataCols, updateData } = useData()
+  const { messageApi } = useStates()
+  return (
+    <>
+      <div>
+        执行函数{' '}
+        <Tag color='blue' style={{ margin: 0 }}>
+          {
+            funcs.find((func) => func.tool.function.name === 'clear_sub_var')!
+              .label
+          }
+        </Tag>
+        {done ? ', 已' : ', 是否确认'}清除变量
+        {variable_names.map((name) => (
+          <Tag
+            key={name}
+            style={{ margin: 0, marginLeft: '0.3rem' }}
+            color='blue'
+          >
+            {name}
+          </Tag>
+        ))}{' '}
+        的所有子变量
+      </div>
+      <div>
+        <Button
+          block
+          disabled={done}
+          onClick={() => {
+            updateData(
+              dataCols
+                .map((col) => {
+                  if (variable_names.includes(col.name)) {
+                    return {
+                      ...col,
+                      subVars: undefined,
+                    }
+                  }
+                  return col
+                })
+                .filter((col) => col.derived !== true),
+            )
+            setDone(true)
+            sessionStorage.setItem(id, 'done')
+            messageApi?.success(
+              `已成功清除变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的所有子变量`,
+            )
+          }}
+        >
+          {done ? '已清除子变量' : '确认清除子变量'}
+        </Button>
+      </div>
+    </>
+  )
+}
+
+function ApplyFilterTool({
+  done,
+  setDone,
+  id,
+  filter_expression,
+}: {
+  done: boolean
+  setDone: (done: boolean) => void
+  id: string
+  filter_expression: string
+}) {
+  const { setFilterExpression } = useData()
+  const { messageApi } = useStates()
+  return (
+    <>
+      <div>
+        执行函数{' '}
+        <Tag color='blue' style={{ margin: 0 }}>
+          {
+            funcs.find((func) => func.tool.function.name === 'apply_filter')!
+              .label
+          }
+        </Tag>
+        {done ? ', 已' : ', 是否确认'}设置数据筛选规则, 表达式如下:
+      </div>
+      <div className='bg-white dark:bg-gray-800 rounded-md p-3 border'>
+        <Expression value={filter_expression} />
+      </div>
+      <div>
+        <Button
+          block
+          disabled={done}
+          onClick={async () => {
+            await setFilterExpression(filter_expression)
+            setDone(true)
+            sessionStorage.setItem(id, 'done')
+            messageApi?.success('已成功设置数据筛选规则')
+          }}
+        >
+          {done ? '已设置筛选规则' : '确认设置筛选规则'}
+        </Button>
+      </div>
+    </>
+  )
+}

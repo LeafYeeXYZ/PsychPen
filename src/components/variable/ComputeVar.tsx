@@ -4,6 +4,7 @@ import { Button, Input, Form, Tag, Select, Popconfirm } from 'antd'
 import { flushSync } from 'react-dom'
 import { useState } from 'react'
 import { Expression } from '../widgets/Expression'
+import { sleep } from '../../lib/utils'
 
 type Option = {
   /** 新变量名 */
@@ -24,8 +25,8 @@ export function ComputeVar() {
   const [form] = Form.useForm<Option>()
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       await addNewVar(values.variable, values.expression)
       messageApi?.destroy()

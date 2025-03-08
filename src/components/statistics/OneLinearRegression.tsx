@@ -3,7 +3,7 @@ import { useStates } from '../../lib/hooks/useStates'
 import { Select, Button, Form, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { markP, markS } from '../../lib/utils'
+import { markP, markS, sleep } from '../../lib/utils'
 import { LinearRegressionOne } from '@psych/lib'
 
 type Option = {
@@ -18,13 +18,14 @@ type Result = {
 } & Option
 
 export function OneLinearRegression() {
-  const { dataCols, dataRows } = useData()
+  const { dataCols, dataRows, isLargeData } = useData()
   const { messageApi } = useStates()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
-  const handleCalculate = (values: Option) => {
+  const handleCalculate = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const { x, y } = values
       const filteredRows = dataRows.filter((row) =>
@@ -54,9 +55,9 @@ export function OneLinearRegression() {
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
-          onFinish={(values) => {
+          onFinish={async (values) => {
             flushSync(() => setDisabled(true))
-            handleCalculate(values)
+            await handleCalculate(values)
             flushSync(() => setDisabled(false))
           }}
           autoComplete='off'

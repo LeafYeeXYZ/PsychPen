@@ -27,13 +27,15 @@ import { Expression } from '../widgets/Expression'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
+import { sleep } from '../../lib/utils'
 
 /** 可导出的文件类型 */
 const EXPORT_FILE_TYPES = Object.values(ExportTypes)
 
 export function PreviewData() {
-  const { setData, dataCols, dataRows, filterExpression, data } = useData()
-  const { disabled, setDisabled } = useStates()
+  const { setData, dataCols, dataRows, filterExpression, data, isLargeData } =
+    useData()
+  const { disabled, setDisabled, messageApi } = useStates()
   const [modalApi, contextHolder] = Modal.useModal()
   // 导出数据相关
   const handleExport = (filename: string, type: string) => {
@@ -55,7 +57,10 @@ export function PreviewData() {
               本地数据不受影响
             </span>
           }
-          onConfirm={async () => await setData(null)}
+          onConfirm={async () => {
+            await setData(null)
+            messageApi?.success('数据已清除', 0.5)
+          }}
           okText='确定'
           cancelText='取消'
         >
@@ -97,7 +102,9 @@ export function PreviewData() {
                   </Select>
                 </div>
               ),
-              onOk: () => {
+              onOk: async () => {
+                messageApi?.loading('正在导出数据...', 0)
+                isLargeData && (await sleep())
                 handleExport(
                   handleExportParams.current.filename?.length
                     ? handleExportParams.current.filename
@@ -108,6 +115,8 @@ export function PreviewData() {
                 )
                 handleExportParams.current.filename = undefined
                 handleExportParams.current.type = undefined
+                messageApi?.destroy()
+                messageApi?.success('数据导出成功', 1)
               },
               okText: '确定',
               cancelText: '取消',

@@ -12,7 +12,8 @@ export const apply_filter: AIFunction = {
         properties: {
           filter_expression: {
             type: 'string',
-            description: '过滤表达式 (语法见文档), 如果返回空字符串则表示清除过滤器',
+            description:
+              '过滤表达式 (语法见文档), 如果返回空字符串则表示清除过滤器',
           },
         },
         required: ['filter_expression'],

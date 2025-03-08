@@ -2,6 +2,7 @@ import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
 import { Button, Select, Form, Tag } from 'antd'
 import { flushSync } from 'react-dom'
+import { sleep } from '../../lib/utils'
 
 type Option = {
   /** 变量名 */
@@ -17,8 +18,8 @@ export function MissingValue() {
   // 处理缺失值
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const { variable, missing } = values
       const cols = dataCols

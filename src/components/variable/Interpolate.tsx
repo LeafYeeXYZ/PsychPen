@@ -3,6 +3,7 @@ import { useStates } from '../../lib/hooks/useStates'
 import { Button, Select, Form } from 'antd'
 import { flushSync } from 'react-dom'
 import { ALLOWED_INTERPOLATION_METHODS } from '../../types'
+import { sleep } from '../../lib/utils'
 
 type Option = {
   /** 变量名 */
@@ -22,8 +23,8 @@ export function Interpolate() {
   // 处理插值
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const cols = dataCols.map((col) => {
         if (values.variables.includes(col.name)) {

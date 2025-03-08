@@ -595,6 +595,7 @@ T分布是假设检验中最常见的分布之一. 在T分布可视化演示工�
     - `hooks/` 全局状态目录
     - `utils.ts` 工具函数
   - `components/` 组件目录
+    - `assistant/` AI辅助分析组件
     - `data/` 数据视图组件
     - `plots/` 绘图视图组件
     - `statistics/` 统计视图组件

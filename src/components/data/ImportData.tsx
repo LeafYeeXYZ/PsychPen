@@ -5,6 +5,7 @@ import { SlidersOutlined, LinkOutlined } from '@ant-design/icons'
 import { flushSync } from 'react-dom'
 import { importSheet, ImportTypes } from '@psych/sheet'
 import { version } from '../../../package.json'
+import { sleep } from '../../lib/utils'
 
 /** 数据量较大的阈值 */
 const LARGE_DATA_SIZE = 1024 * 1024 // 1 MB
@@ -31,31 +32,22 @@ export function ImportData() {
         accept={ACCEPT_FILE_TYPES.map((type) => `.${type}`).join(',')}
         beforeUpload={async (file) => {
           try {
-            messageApi?.open({
-              type: 'loading',
-              key: 'uploading',
-              content: '正在导入数据...',
-              duration: 0,
-            })
+            messageApi?.loading('正在导入数据...', 0)
             flushSync(() => setDisabled(true))
             // 如果文件比较大, 延迟等待通知加载
-            if (file.size > LARGE_DATA_SIZE) {
-              await new Promise((resolve) => setTimeout(resolve, 500))
-              await setIsLargeData(true)
-            } else {
-              await setIsLargeData(false)
-            }
+            const isLargeData = file.size > LARGE_DATA_SIZE
+            isLargeData && (await sleep())
             const reader = new FileReader()
             const ext = file.name.split('.').pop()?.toLowerCase()
             reader.onload = async (e) => {
               try {
                 if (!e.target?.result) {
-                  messageApi?.destroy('uploading')
+                  messageApi?.destroy()
                   messageApi?.error('文件读取失败, 请检查文件是否损坏')
                 } else if (
                   ACCEPT_FILE_TYPES.indexOf(ext as ImportTypes) === -1
                 ) {
-                  messageApi?.destroy('uploading')
+                  messageApi?.destroy()
                   messageApi?.error('文件读取失败, 不支持该文件格式')
                 } else {
                   const data = await importSheet(
@@ -63,11 +55,12 @@ export function ImportData() {
                     ext as ImportTypes,
                   )
                   await setData(data)
+                  await setIsLargeData(isLargeData)
                 }
-                messageApi?.destroy('uploading')
+                messageApi?.destroy()
                 messageApi?.success('数据导入完成', 0.5)
               } catch (error) {
-                messageApi?.destroy('uploading')
+                messageApi?.destroy()
                 messageApi?.error(
                   `文件读取失败: ${error instanceof Error ? error.message : String(error)}`,
                 )

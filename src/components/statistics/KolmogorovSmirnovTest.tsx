@@ -4,6 +4,7 @@ import { Select, Button, Form, Radio } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { OneSampleKSTest } from '@psych/lib'
+import { sleep } from '../../lib/utils'
 
 type Option = {
   /** 类型 */
@@ -20,13 +21,14 @@ type Result = {
 } & Option
 
 export function KolmogorovSmirnovTest() {
-  const { dataCols, dataRows } = useData()
+  const { dataCols, dataRows, isLargeData } = useData()
   const { messageApi } = useStates()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
-  const handleCalculate = (values: Option) => {
+  const handleCalculate = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const { variables, variable, group, type } = values
       if (type === 'paired') {
@@ -81,9 +83,9 @@ export function KolmogorovSmirnovTest() {
         <Form<Option>
           className='w-full py-4 overflow-auto'
           layout='vertical'
-          onFinish={(values) => {
+          onFinish={async (values) => {
             flushSync(() => setDisabled(true))
-            handleCalculate(values)
+            await handleCalculate(values)
             flushSync(() => setDisabled(false))
           }}
           autoComplete='off'

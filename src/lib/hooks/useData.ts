@@ -16,7 +16,7 @@ type DataState = {
    * 设置原始数据
    * @param data 原始数据
    */
-  setData: (data: Record<string, unknown>[] | null) => Promise<void>
+  setData: (data: Record<string, unknown>[] | null, isLarge?: boolean) => Promise<void>
   /**
    * 更新数据
    * @param cols 变量列表
@@ -40,11 +40,6 @@ type DataState = {
    * 是否数据量较大 (超过 LARGE_DATA_SIZE)
    */
   isLargeData: boolean
-  /**
-   * 设置数据量是否较大
-   * @param isLargeData 是否数据量较大
-   */
-  setIsLargeData: (isLargeData: boolean) => Promise<void>
   /**
    * 过滤表达式
    */
@@ -118,11 +113,7 @@ export const useData = create<DataState>()((setState, getState) => {
         dataCols: calculatedCols,
       })
     },
-    setIsLargeData: async (isLargeData) => {
-      await set(STORE_KEYS.IS_LARGE_DATA, isLargeData)
-      setState({ isLargeData })
-    },
-    setData: async (rows) => {
+    setData: async (rows, isLarge) => {
       if (rows) {
         const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
         const { calculatedCols, calculatedRows } = calculator(cols, rows)
@@ -130,11 +121,13 @@ export const useData = create<DataState>()((setState, getState) => {
         await set(STORE_KEYS.DATA_COLS, calculatedCols)
         await set(STORE_KEYS.DATA_ROWS, calculatedRows)
         await set(STORE_KEYS.FILTER_EXPRESSION, '')
+        await set(STORE_KEYS.IS_LARGE_DATA, Boolean(isLarge))
         setState({
           data: rows,
           dataRows: calculatedRows,
           dataCols: calculatedCols,
           filterExpression: '',
+          isLargeData: Boolean(isLarge),
         })
       } else {
         await del(STORE_KEYS.DATA)
@@ -147,6 +140,7 @@ export const useData = create<DataState>()((setState, getState) => {
           dataRows: [],
           dataCols: [],
           filterExpression: '',
+          isLargeData: false,
         })
       }
     },

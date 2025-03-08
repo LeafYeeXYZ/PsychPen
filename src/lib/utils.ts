@@ -2,6 +2,15 @@ import html2canvas from 'html2canvas'
 import type { Variable } from '../types'
 
 /**
+ * 在指定时间后兑现
+ * @param ms 时间 (毫秒)
+ * @returns Promise
+ */
+export function sleep(ms: number = 100): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/**
  * 将表达式转为布尔值
  * @param expression 表达式
  * @param variables 变量列表

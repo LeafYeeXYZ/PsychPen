@@ -12,7 +12,7 @@ import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { downloadImage } from '../../lib/utils'
+import { downloadImage, sleep } from '../../lib/utils'
 
 type Option = {
   /** 变量 */
@@ -37,8 +37,8 @@ export function ParallelLinePlot() {
   const [rendered, setRendered] = useState<boolean>(false)
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const { variables, labels, title, lineWidth, lineColor } = values
       const chart = echarts.init(document.getElementById('echarts-container')!)

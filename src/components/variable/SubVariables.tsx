@@ -4,6 +4,7 @@ import { Button, Select, Form, Tag, InputNumber, Space } from 'antd'
 import { flushSync } from 'react-dom'
 import { useState } from 'react'
 import { ALLOWED_DISCRETE_METHODS } from '../../types'
+import { sleep } from '../../lib/utils'
 
 type Option = {
   /** 变量名 */
@@ -40,8 +41,8 @@ export function SubVariables() {
   const [showDiscretize, setShowDiscretize] = useState(false)
   const handleFinish = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
-      isLargeData && (await new Promise((resolve) => setTimeout(resolve, 500)))
+      messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const cols = dataCols
         .map((col) => {

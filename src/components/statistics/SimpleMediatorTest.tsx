@@ -3,7 +3,7 @@ import { useStates } from '../../lib/hooks/useStates'
 import { Select, Button, Form, Tag, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { markP, markS } from '../../lib/utils'
+import { markP, markS, sleep } from '../../lib/utils'
 import {
   LinearRegressionTwo,
   LinearRegressionOne,
@@ -38,17 +38,15 @@ type Result = {
 } & Option
 
 export function SimpleMediatorTest() {
-  const { dataCols, dataRows, isLargeData } = useData()
+  const { dataCols, dataRows } = useData()
   const { messageApi } = useStates()
   const [result, setResult] = useState<Result | null>(null)
   const [disabled, setDisabled] = useState<boolean>(false)
   const handleCalculate = async (values: Option) => {
     try {
-      messageApi?.loading('正在处理数据...')
+      messageApi?.loading('正在处理数据...', 0)
+      await sleep()
       const { x, m, y, B } = values
-      if (isLargeData || B > 1000) {
-        await new Promise((resolve) => setTimeout(resolve, 500))
-      }
       const timestamp = Date.now()
       const filteredRows = dataRows.filter((row) =>
         [x, m, y].every(

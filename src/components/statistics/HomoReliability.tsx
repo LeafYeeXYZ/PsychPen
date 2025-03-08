@@ -5,7 +5,7 @@ import { Select, Button, Form, Radio, InputNumber } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
 import { AlphaRealiability } from '@psych/lib'
-import { jsArrayToRMatrix } from '../../lib/utils'
+import { jsArrayToRMatrix, sleep } from '../../lib/utils'
 
 type Option = {
   /** 变量名 */
@@ -23,7 +23,7 @@ type Result = {
 } & Option
 
 export function HomoReliability() {
-  const { dataCols, dataRows } = useData()
+  const { dataCols, dataRows, isLargeData } = useData()
   const { messageApi } = useStates()
   const { Renable, executeRCode } = useRemoteR()
   const [result, setResult] = useState<Result | null>(null)
@@ -31,6 +31,7 @@ export function HomoReliability() {
   const handleCalculate = async (values: Option) => {
     try {
       messageApi?.loading('正在处理数据...', 0)
+      isLargeData && (await sleep())
       const timestamp = Date.now()
       const { variables, group, calculateOmega, manualNFactors } = values
       const filteredRows = dataRows
