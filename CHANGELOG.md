@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.1.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.0.0...v2.1.0) (2025-03-08)
+
+
+### Features
+
+* 计算变量支持使用等距或等比变量的统计量 ([021592e](https://github.com/LeafYeeXYZ/PsychPen/commit/021592e732166b98e5d57769f967a8774b551db4))
+* 将子变量信息添加到 AI 助手上下文中 ([42c4618](https://github.com/LeafYeeXYZ/PsychPen/commit/42c4618a767f3819bc02250a851b9fdf023e5a80))
+* 为 AI 助手和 R 语言服务器设置提供更多引导 ([2ebbb23](https://github.com/LeafYeeXYZ/PsychPen/commit/2ebbb23c0213316a0209085d84f27ccee85864f9))
+* 新增标准多元线性回归 ([0892f9c](https://github.com/LeafYeeXYZ/PsychPen/commit/0892f9ccde9758d371cdce403abbdcf9938f437e))
+* 新增刷新后重新恢复上次导入的数据 ([f059bc5](https://github.com/LeafYeeXYZ/PsychPen/commit/f059bc5948d8ee1a3722a1bf31fcac3cab2a7a95))
+* AI助手的部分操作现在需要用户手动确认 ([b4b233e](https://github.com/LeafYeeXYZ/PsychPen/commit/b4b233ee3e14075e99affabd740745164d18fc56))
+* AI助手现在可以操作数据筛选 ([0a8f7e1](https://github.com/LeafYeeXYZ/PsychPen/commit/0a8f7e1ab0e19ebfe11255db4fc5d532186d1c1e))
+* AI助手现在可以直接操作生成/清除中心化/标准化/离散化子变量 ([99b0f06](https://github.com/LeafYeeXYZ/PsychPen/commit/99b0f066e90e260c640077066cd8aba3ccb51c4a))
+* AI助手现在可以直接操作生成新变量 ([09f62a9](https://github.com/LeafYeeXYZ/PsychPen/commit/09f62a9b051363cdf309afb6d635386554d38cf1))
+
+
+### Bug Fixes
+
+* 现在在数据被清除后将重制AI对话 ([7db07d0](https://github.com/LeafYeeXYZ/PsychPen/commit/7db07d05f4b1895a0a44cc827419c37666879df4))
+* 修改子变量重复定义的问题 ([dcc4a80](https://github.com/LeafYeeXYZ/PsychPen/commit/dcc4a80eb5d35eb5cff3a9d7dde48e2235516bde))
+
+
+### Refactoring
+
+* 拆分数据相关 Hook 和 UI 相关 Hook ([7e72720](https://github.com/LeafYeeXYZ/PsychPen/commit/7e7272078a4180613686687084d618de89abaee9))
+* 将部分类型重构为 enum 以便添加 AI 助手功能 ([9bd7e8b](https://github.com/LeafYeeXYZ/PsychPen/commit/9bd7e8b0006382724c5cfb0330ba99858d08d3ad))
+* 重构数据筛选逻辑, 使用和计算变量相同的表达式 ([afb8e41](https://github.com/LeafYeeXYZ/PsychPen/commit/afb8e4199a531468d805139679b56679e8992b83))
+
+
+### Improvements
+
+* 提高数据安全性 ([8ceadb2](https://github.com/LeafYeeXYZ/PsychPen/commit/8ceadb28761a1aa4b0d86d1385803d2cb67c1d26))
+* 优化消息通知效果 ([4f84568](https://github.com/LeafYeeXYZ/PsychPen/commit/4f845687714ed1f13116a703a77bef3f19f04d0c))
+* 优化AI执行命令时的成功和错误提示 ([8f0dc06](https://github.com/LeafYeeXYZ/PsychPen/commit/8f0dc06523df7ba78555e1399d2254980dd43e49))
+
 ## [2.0.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v1.9.0...v2.0.0) (2025-02-22)
 
 ### Features
