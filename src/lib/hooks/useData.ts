@@ -102,6 +102,7 @@ export const useData = create<DataState>()((setState, getState) => {
     isLargeData: localIsLargeData,
     filterExpression: localFilterExpression,
     setFilterExpression: async (filterExpression) => {
+      validateExpression(filterExpression) // 检查表达式的安全性
       const { data, dataCols } = getState()
       const { calculatedCols, calculatedRows } = calculator(
         dataCols,
