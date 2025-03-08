@@ -21,7 +21,9 @@ import {
   CloudServerOutlined,
   CommentOutlined,
   InfoCircleOutlined,
+  FilterOutlined,
 } from '@ant-design/icons'
+import { Expression } from '../widgets/Expression'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.min.css'
@@ -30,7 +32,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.min.css'
 const EXPORT_FILE_TYPES = Object.values(ExportTypes)
 
 export function PreviewData() {
-  const { setData, dataCols, dataRows } = useData()
+  const { setData, dataCols, dataRows, filterExpression, data } = useData()
   const { disabled, setDisabled } = useStates()
   const [modalApi, contextHolder] = Modal.useModal()
   // 导出数据相关
@@ -115,6 +117,24 @@ export function PreviewData() {
         >
           导出数据
         </Button>
+        <Popover
+          title={
+            <span>
+              当前过滤表达式{' '}
+              <Tag color='blue'>
+                已排除{data!.length - dataRows.length}条数据
+              </Tag>
+            </span>
+          }
+          content={
+            <span>
+              <Expression value={filterExpression} />
+            </span>
+          }
+          trigger={['click', 'hover']}
+        >
+          <Button icon={<FilterOutlined />} />
+        </Popover>
         <div className='absolute right-0 flex justify-end items-center gap-3'>
           <Popover
             title={

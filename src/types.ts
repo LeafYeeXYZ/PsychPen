@@ -63,14 +63,6 @@ export type Variable = {
   /** 标准差 */
   std?: number
   /**
-   * 自定义的过滤方法
-   * 默认为空, 即不过滤
-   */
-  filterMethod?: ALLOWED_FILTER_METHODS
-  filterValue?: (number | string)[]
-  filterRange?: [number, number]
-  filterRegex?: string
-  /**
    * 自定义的缺失值
    * 默认为空, 即只把本来就是 undefined 的值作为缺失值
    * 在比较时故意使用 == 而不是 ===, 以规避数字和字符串的比较问题

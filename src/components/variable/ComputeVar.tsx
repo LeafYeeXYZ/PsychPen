@@ -3,6 +3,7 @@ import { useStates } from '../../lib/hooks/useStates'
 import { Button, Input, Form, Tag, Select, Popconfirm } from 'antd'
 import { flushSync } from 'react-dom'
 import { useState } from 'react'
+import { Expression } from '../widgets/Expression'
 
 type Option = {
   /** 新变量名 */
@@ -161,8 +162,19 @@ export function ComputeVar() {
           的和乘以 2
         </p>
         <p className='intro-text'>
-          支持的运算符包括但不限于: <Tag color='blue'>+、-、*、/、**</Tag>
-          (加、减、乘、除、乘方)
+          支持的比较运算符包括: <Tag color='blue'>{'>'}</Tag>
+          <Tag color='blue'>{'<'}</Tag>
+          <Tag color='blue'>{'>='}</Tag>
+          <Tag color='blue'>{'<='}</Tag>
+          <Tag color='blue'>{'=='}</Tag>(等于) <Tag color='blue'>{'!='}</Tag>
+          (不等于) 等
+        </p>
+        <p className='intro-text'>
+          支持的算数运算符包括: <Tag color='blue'>+</Tag>
+          <Tag color='blue'>-</Tag>
+          <Tag color='blue'>*</Tag>
+          <Tag color='blue'>/</Tag>
+          <Tag color='blue'>%</Tag>(取余) <Tag color='blue'>**</Tag>(幂运算) 等
         </p>
         <p className='intro-text'>
           为避免歧义, 请使用小括号 <Tag color='blue'>( )</Tag>明确运算顺序
@@ -190,35 +202,5 @@ export function ComputeVar() {
         </p>
       </div>
     </div>
-  )
-}
-
-function Expression({ value }: { value: string }) {
-  const nameReg = /(:::.+?:::)/g
-  const computeReg = /(===|!==|==|!=|>=|<=|\+|-|\/|\*\*|>|<|\*)/g
-  return (
-    <>
-      {value
-        .split(nameReg)
-        .map((part) => part.split(computeReg))
-        .flat()
-        .map((part, index) => {
-          if (nameReg.test(part)) {
-            return (
-              <Tag key={index} color='green' style={{ margin: 0 }}>
-                {part.slice(3, -3)}
-              </Tag>
-            )
-          } else if (part.match(computeReg)) {
-            return (
-              <Tag key={index} color='blue' style={{ margin: 0 }}>
-                {part}
-              </Tag>
-            )
-          } else {
-            return <span key={index}>{part}</span>
-          }
-        })}
-    </>
   )
 }

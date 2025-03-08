@@ -1,10 +1,10 @@
 import type { Variable } from '../../types'
 import { create } from 'zustand'
 import { validateExpression, computeExpression } from '../utils'
-import { Derive } from '../calculates/derive'
-import { Missing } from '../calculates/misssing'
-import { Describe } from '../calculates/describe'
-import { Filter } from '../calculates/filter'
+import { derive } from '../calculates/derive'
+import { missing } from '../calculates/misssing'
+import { describe } from '../calculates/describe'
+import { filter } from '../calculates/filter'
 import { get, set, del } from 'idb-keyval'
 
 type DataState = {
@@ -45,6 +45,15 @@ type DataState = {
    * @param isLargeData 是否数据量较大
    */
   setIsLargeData: (isLargeData: boolean) => Promise<void>
+  /**
+   * 过滤表达式
+   */
+  filterExpression: string
+  /**
+   * 设置过滤表达式
+   * @param filterExpression 过滤表达式
+   */
+  setFilterExpression: (filterExpression: string) => Promise<void>
 }
 
 /**
@@ -56,25 +65,16 @@ type DataState = {
 const calculator = (
   dataCols: Variable[],
   dataRows: { [key: string]: unknown }[],
+  filterExpression?: string,
 ): {
   calculatedCols: Variable[]
   calculatedRows: { [key: string]: unknown }[]
 } => {
-  const TASKS = [
-    // Order matters
-    Missing,
-    Derive,
-    Filter,
-    Describe,
-  ]
-  let calculatedCols = dataCols
-  let calculatedRows = dataRows
-  for (let i = 0; i < TASKS.length; i++) {
-    const instance = new TASKS[i](calculatedCols, calculatedRows)
-    calculatedCols = instance.updatedCols
-    calculatedRows = instance.updatedRows
-  }
-  return { calculatedCols, calculatedRows }
+  const a = missing(dataCols, dataRows)
+  const b = derive(a.updatedCols, a.updatedRows)
+  const c = describe(b.updatedCols, b.updatedRows)
+  const d = filter(c.updatedCols, c.updatedRows, filterExpression)
+  return { calculatedCols: d.updatedCols, calculatedRows: d.updatedRows }
 }
 
 const enum STORE_KEYS {
@@ -82,6 +82,7 @@ const enum STORE_KEYS {
   DATA_COLS = 'data_cols',
   DATA_ROWS = 'data_rows',
   IS_LARGE_DATA = 'is_large_data',
+  FILTER_EXPRESSION = 'filter_expression',
 }
 
 const localData =
@@ -90,6 +91,8 @@ const localDataCols = (await get<Variable[]>(STORE_KEYS.DATA_COLS)) || []
 const localDataRows =
   (await get<Record<string, unknown>[]>(STORE_KEYS.DATA_ROWS)) || []
 const localIsLargeData = (await get<boolean>(STORE_KEYS.IS_LARGE_DATA)) || false
+const localFilterExpression =
+  (await get<string>(STORE_KEYS.FILTER_EXPRESSION)) || ''
 
 export const useData = create<DataState>()((setState, getState) => {
   return {
@@ -97,6 +100,23 @@ export const useData = create<DataState>()((setState, getState) => {
     dataRows: localDataRows,
     dataCols: localDataCols,
     isLargeData: localIsLargeData,
+    filterExpression: localFilterExpression,
+    setFilterExpression: async (filterExpression) => {
+      const { data, dataCols } = getState()
+      const { calculatedCols, calculatedRows } = calculator(
+        dataCols,
+        data!,
+        filterExpression,
+      )
+      await set(STORE_KEYS.FILTER_EXPRESSION, filterExpression)
+      await set(STORE_KEYS.DATA_COLS, calculatedCols)
+      await set(STORE_KEYS.DATA_ROWS, calculatedRows)
+      setState({
+        filterExpression,
+        dataRows: calculatedRows,
+        dataCols: calculatedCols,
+      })
+    },
     setIsLargeData: async (isLargeData) => {
       await set(STORE_KEYS.IS_LARGE_DATA, isLargeData)
       setState({ isLargeData })
@@ -108,22 +128,34 @@ export const useData = create<DataState>()((setState, getState) => {
         await set(STORE_KEYS.DATA, rows)
         await set(STORE_KEYS.DATA_COLS, calculatedCols)
         await set(STORE_KEYS.DATA_ROWS, calculatedRows)
+        await set(STORE_KEYS.FILTER_EXPRESSION, '')
         setState({
           data: rows,
           dataRows: calculatedRows,
           dataCols: calculatedCols,
+          filterExpression: '',
         })
       } else {
         await del(STORE_KEYS.DATA)
         await del(STORE_KEYS.DATA_COLS)
         await del(STORE_KEYS.DATA_ROWS)
         await del(STORE_KEYS.IS_LARGE_DATA)
-        setState({ data: rows, dataRows: [], dataCols: [] })
+        await del(STORE_KEYS.FILTER_EXPRESSION)
+        setState({
+          data: rows,
+          dataRows: [],
+          dataCols: [],
+          filterExpression: '',
+        })
       }
     },
     updateData: async (cols) => {
-      const { data } = getState()
-      const { calculatedCols, calculatedRows } = calculator(cols, data!)
+      const { data, filterExpression } = getState()
+      const { calculatedCols, calculatedRows } = calculator(
+        cols,
+        data!,
+        filterExpression,
+      )
       await set(STORE_KEYS.DATA_COLS, calculatedCols)
       await set(STORE_KEYS.DATA_ROWS, calculatedRows)
       setState({
@@ -133,28 +165,28 @@ export const useData = create<DataState>()((setState, getState) => {
     },
     addNewVar: async (name, expression) => {
       validateExpression(expression) // 检查表达式的安全性
-      const { dataCols, dataRows, data } = getState()
+      const { dataCols, dataRows, data, filterExpression } = getState()
       if (dataCols.find((col) => col.name == name)) {
         // 故意使用 == 而不是 ===
         throw new Error(`变量名 ${name} 已存在`)
       }
-      const newRows = dataRows.map((row) => {
-        const value = computeExpression(expression, dataCols, row)
-        return { [name]: value, ...row }
-      })
-      const describe = new Describe([{ name }], newRows)
-      const newCols = [...describe.updatedCols, ...dataCols]
       const newData = data!.map((row, i) => ({
-        [name]: newRows[i][name],
+        [name]: computeExpression(expression, dataCols, dataRows[i]),
         ...row,
       }))
+      const newCol = describe([{ name }], newData).updatedCols[0]
+      const { calculatedCols, calculatedRows } = calculator(
+        [newCol, ...dataCols],
+        newData,
+        filterExpression,
+      )
       await set(STORE_KEYS.DATA, newData)
-      await set(STORE_KEYS.DATA_COLS, newCols)
-      await set(STORE_KEYS.DATA_ROWS, newRows)
+      await set(STORE_KEYS.DATA_COLS, calculatedCols)
+      await set(STORE_KEYS.DATA_ROWS, calculatedRows)
       setState({
-        dataCols: newCols,
-        dataRows: newRows,
         data: newData,
+        dataCols: calculatedCols,
+        dataRows: calculatedRows,
       })
     },
   }

@@ -2,6 +2,29 @@ import html2canvas from 'html2canvas'
 import type { Variable } from '../types'
 
 /**
+ * 将表达式转为布尔值
+ * @param expression 表达式
+ * @param variables 变量列表
+ * @param data 数据
+ * @throws 如果表达式不合法, 则抛出异常
+ * @returns 布尔值
+ */
+export function booleanExpression(
+  expression: string,
+  variables: Variable[],
+  data: Record<string, unknown>,
+): boolean {
+  try {
+    const value = eval(`Boolean(${embedValues(expression, variables, data)})`)
+    return value
+  } catch (e) {
+    throw new Error(
+      `执行表达式失败: ${e instanceof Error ? e.message : String(e)}`,
+    )
+  }
+}
+
+/**
  * 计算变量的表达式 (如果引用的变量有缺失值, 则返回 undefined)
  * @param expression 表达式
  * @param variables 变量列表

@@ -2,31 +2,9 @@ import { useData } from '../../lib/hooks/useData'
 import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import type { ALLOWED_FILTER_METHODS } from '../../types'
 
 export function VariableTable() {
   const { dataCols } = useData()
-  const getFilterDescription = (
-    method: ALLOWED_FILTER_METHODS | undefined,
-    value: (number | string)[] | undefined,
-    range: [number, number] | undefined,
-    regex: string | undefined,
-  ): string | undefined => {
-    if (method === undefined) {
-      return undefined
-    }
-    if (value !== undefined) {
-      return `${method}: ${value.join(', ')}`
-    }
-    if (range !== undefined) {
-      return `${method}: ${range[0]} ~ ${range[1]}`
-    }
-    if (regex !== undefined) {
-      return `${method}: ${regex}`
-    }
-    return method
-  }
-
   return (
     <div className='w-full h-full grid grid-rows-[1fr_35%] gap-4'>
       <AgGridReact
@@ -43,12 +21,6 @@ export function VariableTable() {
             missingValues: col.missingValues?.join(', '),
             missingMethod: col.missingMethod ?? '删除法',
             missingRefer: col.missingRefer,
-            filter: getFilterDescription(
-              col.filterMethod,
-              col.filterValue,
-              col.filterRange,
-              col.filterRegex,
-            ),
             min: col.min?.toFixed(4),
             max: col.max?.toFixed(4),
             mean: col.mean?.toFixed(4),
@@ -68,7 +40,6 @@ export function VariableTable() {
           { headerName: '缺失值定义', field: 'missingValues', width: 130 },
           { headerName: '缺失值插值方法', field: 'missingMethod', width: 130 },
           { headerName: '插值的参考变量', field: 'missingRefer', width: 130 },
-          { headerName: '过滤器定义', field: 'filter', width: 130 },
           { headerName: '最小值', field: 'min', width: 130 },
           { headerName: '最大值', field: 'max', width: 130 },
           { headerName: '均值', field: 'mean', width: 130 },

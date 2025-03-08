@@ -1,63 +1,58 @@
-/**
- * @file 处理缺失值替换和插值
- */
-
 import { mean, median } from '@psych/lib'
 import { Variable, ALLOWED_INTERPOLATION_METHODS } from '../../types'
 
-/** 缺失值替换和插值 */
-export class Missing {
-  /**
-   * 缺失值替换和插值
-   * @param dataCols 数据列
-   * @param dataRows 数据行
-   * @important 返回值将排除派生变量 (即应在创建派生变量前调用)
-   */
-  constructor(dataCols: Variable[], dataRows: { [key: string]: unknown }[]) {
-    // 根据定义的缺失值替换数据
-    dataCols.forEach((col) => {
-      if (col.missingValues?.length) {
-        dataRows.forEach((row) => {
-          // 故意使用 == 而不是 ===
-          row[col.name] = col.missingValues?.some((m) => row[col.name] == m)
-            ? undefined
-            : row[col.name]
-        })
-      }
-    })
-    // 插值处理
-    const copy = JSON.parse(JSON.stringify(dataRows)) as {
-      [key: string]: unknown
-    }[] // 为了避免使用插值后的数据进行插值
-    this.updatedCols = dataCols.map((col) => {
-      if (col.missingMethod) {
-        const data = dataRows.map((row) =>
-          typeof row[col.name] !== 'undefined'
-            ? Number(row[col.name])
-            : undefined,
-        )
-        const peer = col.missingRefer
-          ? dataRows.map((row) =>
-              typeof row[col.missingRefer!] !== 'undefined'
-                ? Number(row[col.missingRefer!])
-                : undefined,
-            )
-          : undefined
-        const interpolatedData = new Interpolate(data, col.missingMethod, peer)
-          .interpolatedData
-        copy.forEach((row, i) => {
-          row[col.name] = interpolatedData[i]
-        })
-      }
-      return col
-    })
-    this.updatedRows = copy
-  }
-
-  /** 更新后的数据列 */
+/**
+ * 缺失值替换和插值
+ * @param dataCols 数据列
+ * @param dataRows 数据行
+ * @important 返回值将排除派生变量 (即应在创建派生变量前调用)
+ */
+export function missing(
+  dataCols: Variable[],
+  dataRows: { [key: string]: unknown }[],
+): {
   updatedCols: Variable[]
-  /** 更新后的数据行 */
-  updatedRows: { [key: string]: unknown }[]
+  updatedRows: Record<string, unknown>[]
+} {
+  // 根据定义的缺失值替换数据
+  dataCols.forEach((col) => {
+    if (col.missingValues?.length) {
+      dataRows.forEach((row) => {
+        // 故意使用 == 而不是 ===
+        row[col.name] = col.missingValues?.some((m) => row[col.name] == m)
+          ? undefined
+          : row[col.name]
+      })
+    }
+  })
+  // 插值处理
+  const copy = JSON.parse(JSON.stringify(dataRows)) as {
+    [key: string]: unknown
+  }[] // 为了避免使用插值后的数据进行插值
+  const updatedCols = dataCols.map((col) => {
+    if (col.missingMethod) {
+      const data = dataRows.map((row) =>
+        typeof row[col.name] !== 'undefined'
+          ? Number(row[col.name])
+          : undefined,
+      )
+      const peer = col.missingRefer
+        ? dataRows.map((row) =>
+            typeof row[col.missingRefer!] !== 'undefined'
+              ? Number(row[col.missingRefer!])
+              : undefined,
+          )
+        : undefined
+      const interpolatedData = new Interpolate(data, col.missingMethod, peer)
+        .interpolatedData
+      copy.forEach((row, i) => {
+        row[col.name] = interpolatedData[i]
+      })
+    }
+    return col
+  })
+  const updatedRows = copy
+  return { updatedCols, updatedRows }
 }
 
 /** 插值处理 */

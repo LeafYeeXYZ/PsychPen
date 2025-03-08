@@ -1,92 +1,87 @@
-/**
- * @file 处理派生变量, 包括标准化, 中心化, 离散化
- */
-
 import { max, min } from '@psych/lib'
 import { kmeans } from 'ml-kmeans'
 import { Variable, ALLOWED_DISCRETE_METHODS } from '../../types'
 
-/** 生成子变量 */
-export class Derive {
-  /**
-   * 生成子变量
-   * @param dataCols 数据列
-   * @param dataRows 数据行
-   */
-  constructor(dataCols: Variable[], dataRows: { [key: string]: unknown }[]) {
-    const derivedCols: Variable[] = []
-    dataCols.forEach((col) => {
-      if (col.derived) {
-        return
-      }
-      if (col.subVars?.standard) {
-        derivedCols.push({
-          name: `${col.name}_标准化`,
-          derived: true,
-          count: col.count,
-          missing: col.missing,
-          valid: col.valid,
-          unique: col.unique,
-          type: col.type,
-        })
-        dataRows.forEach((row) => {
-          row[`${col.name}_标准化`] =
-            (Number(row[col.name]) - col.mean!) / col.std!
-        })
-      }
-      if (col.subVars?.center) {
-        derivedCols.push({
-          name: `${col.name}_中心化`,
-          derived: true,
-          count: col.count,
-          missing: col.missing,
-          valid: col.valid,
-          unique: col.unique,
-          type: col.type,
-        })
-        dataRows.forEach((row) => {
-          row[`${col.name}_中心化`] = Number(row[col.name]) - col.mean!
-        })
-      }
-      if (col.subVars?.discrete) {
-        const groups = col.subVars.discrete.groups
-        const method = col.subVars.discrete.method
-        const discrete = new Discrete(
-          dataRows
-            .filter((row) => typeof row[col.name] !== 'undefined')
-            .map((row) => Number(row[col.name])),
-          groups,
-          method,
-        )
-        const predictedData = dataRows.map((row) =>
-          discrete.predictor(
-            typeof row[col.name] !== 'undefined'
-              ? Number(row[col.name])
-              : undefined,
-          ),
-        )
-        derivedCols.push({
-          name: `${col.name}_${method}离散`,
-          derived: true,
-          count: col.count,
-          missing: col.missing,
-          valid: col.valid,
-          unique: groups,
-          type: col.type,
-        })
-        predictedData.forEach((v, i) => {
-          dataRows[i][`${col.name}_${method}离散`] = v
-        })
-      }
-    })
-    this.updatedCols = [...derivedCols, ...dataCols]
-    this.updatedRows = dataRows
-  }
-
-  /** 更新后的数据列 */
+/**
+ * 生成子变量
+ * @param dataCols 数据列
+ * @param dataRows 数据行
+ */
+export function derive(
+  dataCols: Variable[],
+  dataRows: { [key: string]: unknown }[],
+): {
   updatedCols: Variable[]
-  /** 更新后的数据行 */
-  updatedRows: { [key: string]: unknown }[]
+  updatedRows: Record<string, unknown>[]
+} {
+  const derivedCols: Variable[] = []
+  dataCols.forEach((col) => {
+    if (col.derived) {
+      return
+    }
+    if (col.subVars?.standard) {
+      derivedCols.push({
+        name: `${col.name}_标准化`,
+        derived: true,
+        count: col.count,
+        missing: col.missing,
+        valid: col.valid,
+        unique: col.unique,
+        type: col.type,
+      })
+      dataRows.forEach((row) => {
+        row[`${col.name}_标准化`] =
+          (Number(row[col.name]) - col.mean!) / col.std!
+      })
+    }
+    if (col.subVars?.center) {
+      derivedCols.push({
+        name: `${col.name}_中心化`,
+        derived: true,
+        count: col.count,
+        missing: col.missing,
+        valid: col.valid,
+        unique: col.unique,
+        type: col.type,
+      })
+      dataRows.forEach((row) => {
+        row[`${col.name}_中心化`] = Number(row[col.name]) - col.mean!
+      })
+    }
+    if (col.subVars?.discrete) {
+      const groups = col.subVars.discrete.groups
+      const method = col.subVars.discrete.method
+      const discrete = new Discrete(
+        dataRows
+          .filter((row) => typeof row[col.name] !== 'undefined')
+          .map((row) => Number(row[col.name])),
+        groups,
+        method,
+      )
+      const predictedData = dataRows.map((row) =>
+        discrete.predictor(
+          typeof row[col.name] !== 'undefined'
+            ? Number(row[col.name])
+            : undefined,
+        ),
+      )
+      derivedCols.push({
+        name: `${col.name}_${method}离散`,
+        derived: true,
+        count: col.count,
+        missing: col.missing,
+        valid: col.valid,
+        unique: groups,
+        type: col.type,
+      })
+      predictedData.forEach((v, i) => {
+        dataRows[i][`${col.name}_${method}离散`] = v
+      })
+    }
+  })
+  const updatedCols = [...derivedCols, ...dataCols]
+  const updatedRows = dataRows
+  return { updatedCols, updatedRows }
 }
 
 /** 变量离散化 */
