@@ -7,6 +7,8 @@ import { Expression } from '../widgets/Expression'
 import { downloadSheet, ExportTypes } from '@psych/sheet'
 import type { ChatCompletionMessageToolCall } from 'openai/resources/index.mjs'
 import { funcs } from './funcs'
+import { sleep } from '../../lib/utils'
+import { flushSync } from 'react-dom'
 
 export function ToolCall({
   toolCall,
@@ -166,7 +168,7 @@ function ExportDataTool({
   file_type: string
 }) {
   const { dataRows } = useData()
-  const { messageApi } = useStates()
+  const { messageApi, disabled } = useStates()
   return (
     <>
       <div>
@@ -185,7 +187,7 @@ function ExportDataTool({
       <div>
         <Button
           block
-          disabled={done}
+          disabled={done || disabled}
           onClick={() => {
             downloadSheet(
               dataRows,
@@ -221,8 +223,8 @@ function CreateNewVarTool({
   variable_name: string
   calc_expression: string
 }) {
-  const { addNewVar } = useData()
-  const { messageApi } = useStates()
+  const { addNewVar, isLargeData } = useData()
+  const { messageApi, disabled, setDisabled } = useStates()
   return (
     <>
       <div>
@@ -245,12 +247,26 @@ function CreateNewVarTool({
       <div>
         <Button
           block
-          disabled={done}
-          onClick={() => {
-            addNewVar(variable_name, calc_expression)
-            setDone(true)
-            sessionStorage.setItem(id, 'done')
-            messageApi?.success(`已成功生成新变量"${variable_name}"`)
+          disabled={done || disabled}
+          onClick={async () => {
+            try {
+              flushSync(() => setDisabled(true))
+              messageApi?.loading('正在处理数据...', 0)
+              isLargeData && (await sleep())
+              const timestamp = Date.now()
+              await addNewVar(variable_name, calc_expression)
+              setDone(true)
+              sessionStorage.setItem(id, 'done')
+              messageApi?.destroy()
+              messageApi?.success(`已成功生成新变量"${variable_name}", 用时 ${Date.now() - timestamp} 毫秒`)
+            } catch (error) {
+              messageApi?.destroy()
+              messageApi?.error(
+                `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+              )
+            } finally {
+              setDisabled(false)
+            }
           }}
         >
           {done ? '已生成新变量' : '确认生成新变量'}
@@ -282,8 +298,8 @@ function CreateSubVarTool({
       }
     | undefined
 }) {
-  const { dataCols, updateData } = useData()
-  const { messageApi } = useStates()
+  const { dataCols, updateData, isLargeData } = useData()
+  const { messageApi, disabled, setDisabled } = useStates()
   const ALLOWED_METHOD = Object.values(ALLOWED_DISCRETE_METHODS)
   const shouldDiscritize = Boolean(
     typeof discretize === 'object' &&
@@ -326,41 +342,57 @@ function CreateSubVarTool({
       <div>
         <Button
           block
-          disabled={done}
-          onClick={() => {
-            updateData(
-              dataCols
-                .map((col) => {
-                  if (variable_names.includes(col.name)) {
-                    return {
-                      ...col,
-                      subVars: {
-                        standard: Boolean(standardize) || col.subVars?.standard,
-                        center: Boolean(centralize) || col.subVars?.center,
-                        discrete: shouldDiscritize
-                          ? {
-                              method: discretize!.method,
-                              groups: discretize!.groups,
-                            }
-                          : col.subVars?.discrete,
-                      },
+          disabled={done || disabled}
+          onClick={async () => {
+            try {
+              flushSync(() => setDisabled(true))
+              messageApi?.loading('正在处理数据...', 0)
+              isLargeData && (await sleep())
+              const timestamp = Date.now()
+              updateData(
+                dataCols
+                  .map((col) => {
+                    if (variable_names.includes(col.name)) {
+                      return {
+                        ...col,
+                        subVars: {
+                          standard: Boolean(standardize) || col.subVars?.standard,
+                          center: Boolean(centralize) || col.subVars?.center,
+                          discrete: shouldDiscritize
+                            ? {
+                                method: discretize!.method,
+                                groups: discretize!.groups,
+                              }
+                            : col.subVars?.discrete,
+                        },
+                      }
                     }
-                  }
-                  return col
-                })
-                .filter((col) => col.derived !== true),
-            )
-            setDone(true)
-            sessionStorage.setItem(id, 'done')
-            messageApi?.success(
-              `已成功生成变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的${[
-                standardize ? '标准化' : '',
-                centralize ? '中心化' : '',
-                shouldDiscritize ? '离散化' : '',
-              ]
-                .filter((part) => part)
-                .join('、')}子变量`,
-            )
+                    return col
+                  })
+                  .filter((col) => col.derived !== true),
+              )
+              setDone(true)
+              sessionStorage.setItem(id, 'done')
+              messageApi?.destroy()
+              messageApi?.success(
+                `已成功生成变量 ${variable_names
+                  .map((name) => `"${name}"`)
+                  .join('、')} 的${[
+                  standardize ? '标准化' : '',
+                  centralize ? '中心化' : '',
+                  shouldDiscritize ? '离散化' : '',
+                ]
+                  .filter((part) => part)
+                  .join('、')}子变量, 用时 ${Date.now() - timestamp} 毫秒`,
+              )
+            } catch (error) {
+              messageApi?.destroy()
+              messageApi?.error(
+                `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+              )
+            } finally {
+              setDisabled(false)
+            }
           }}
         >
           {done ? '已生成子变量' : '确认生成子变量'}
@@ -381,8 +413,8 @@ function ClearSubVarTool({
   id: string
   variable_names: string[]
 }) {
-  const { dataCols, updateData } = useData()
-  const { messageApi } = useStates()
+  const { dataCols, updateData, isLargeData } = useData()
+  const { messageApi, disabled, setDisabled } = useStates()
   return (
     <>
       <div>
@@ -408,26 +440,40 @@ function ClearSubVarTool({
       <div>
         <Button
           block
-          disabled={done}
-          onClick={() => {
-            updateData(
-              dataCols
-                .map((col) => {
-                  if (variable_names.includes(col.name)) {
-                    return {
-                      ...col,
-                      subVars: undefined,
+          disabled={done || disabled}
+          onClick={async () => {
+            try {
+              flushSync(() => setDisabled(true))
+              messageApi?.loading('正在处理数据...', 0)
+              isLargeData && (await sleep())
+              const timestamp = Date.now()
+              updateData(
+                dataCols
+                  .map((col) => {
+                    if (variable_names.includes(col.name)) {
+                      return {
+                        ...col,
+                        subVars: undefined,
+                      }
                     }
-                  }
-                  return col
-                })
-                .filter((col) => col.derived !== true),
-            )
-            setDone(true)
-            sessionStorage.setItem(id, 'done')
-            messageApi?.success(
-              `已成功清除变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的所有子变量`,
-            )
+                    return col
+                  })
+                  .filter((col) => col.derived !== true),
+              )
+              setDone(true)
+              sessionStorage.setItem(id, 'done')
+              messageApi?.destroy()
+              messageApi?.success(
+                `已成功清除变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的所有子变量, 用时 ${Date.now() - timestamp} 毫秒`,
+              )
+            } catch (error) {
+              messageApi?.destroy()
+              messageApi?.error(
+                `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+              )
+            } finally {
+              setDisabled(false)
+            }
           }}
         >
           {done ? '已清除子变量' : '确认清除子变量'}
@@ -448,8 +494,8 @@ function ApplyFilterTool({
   id: string
   filter_expression: string
 }) {
-  const { setFilterExpression } = useData()
-  const { messageApi } = useStates()
+  const { setFilterExpression, isLargeData } = useData()
+  const { messageApi, disabled, setDisabled } = useStates()
   return (
     <>
       <div>
@@ -468,12 +514,25 @@ function ApplyFilterTool({
       <div>
         <Button
           block
-          disabled={done}
+          disabled={done || disabled}
           onClick={async () => {
-            await setFilterExpression(filter_expression)
-            setDone(true)
-            sessionStorage.setItem(id, 'done')
-            messageApi?.success('已成功设置数据筛选规则')
+            try {
+              flushSync(() => setDisabled(true))
+              messageApi?.loading('正在处理数据...', 0)
+              isLargeData && (await sleep())
+              const timestamp = Date.now()
+              await setFilterExpression(filter_expression)
+              setDone(true)
+              sessionStorage.setItem(id, 'done')
+              messageApi?.success(`已成功设置数据筛选规则, 用时 ${Date.now() - timestamp} 毫秒`)
+            } catch (error) {
+              messageApi?.destroy()
+              messageApi?.error(
+                `数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+              )
+            } finally {
+              setDisabled(false)
+            }
           }}
         >
           {done ? '已设置筛选规则' : '确认设置筛选规则'}
