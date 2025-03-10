@@ -1,5 +1,5 @@
-import { PLOTS_SUB_PAGES_LABELS } from '../hooks/useNav'
 import type { AIFunction } from '../../types'
+import { PLOTS_SUB_PAGES_LABELS } from '../hooks/useNav'
 
 export const nav_to_plots_view: AIFunction = {
   label: '将页面导航到绘图视图的指定页面',
@@ -12,10 +12,9 @@ export const nav_to_plots_view: AIFunction = {
         type: 'object',
         properties: {
           page: {
-            type: 'string',
-            description: `页面 (${Object.values(PLOTS_SUB_PAGES_LABELS)
-              .map((label) => `"${label}"`)
-              .join(' / ')})`,
+            type: 'enum',
+            description: '页面',
+            enum: Object.values(PLOTS_SUB_PAGES_LABELS),
           },
         },
         required: ['page'],

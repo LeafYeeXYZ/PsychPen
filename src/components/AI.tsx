@@ -144,161 +144,159 @@ export function AI() {
           { role: 'tool', content: '', tool_call_id: toolCall.id },
         ]
 
-        flushSync(() => {
-          setShowLoading(true)
-          setMessages([...old, user, newMessages[0]])
-        })
-
         try {
-        switch (toolCall.function.name) {
-          case 'apply_filter': {
-            const { filter_expression } = JSON.parse(
-              toolCall.function.arguments,
-            )
-            if (typeof filter_expression !== 'string') {
-              throw new Error('筛选表达式参数错误')
-            }
-            newMessages[1].content = '已请求设置数据筛选规则, 等待用户手动确认'
-            break
-          }
-          case 'clear_sub_var': {
-            const { variable_names } = JSON.parse(toolCall.function.arguments)
-            if (
-              !Array.isArray(variable_names) ||
-              !variable_names.every(
-                (name) =>
-                  typeof name === 'string' &&
-                  dataCols.some((col) => col.name === name),
+          switch (toolCall.function.name) {
+            case 'apply_filter': {
+              const { filter_expression } = JSON.parse(
+                toolCall.function.arguments,
               )
-            ) {
-              throw new Error('变量名参数错误')
+              if (typeof filter_expression !== 'string') {
+                throw new Error('筛选表达式参数错误')
+              }
+              newMessages[1].content =
+                '已请求设置数据筛选规则, 等待用户手动确认'
+              break
             }
-            newMessages[1].content = `已请求清除变量 ${(variable_names as string[]).map((name) => `"${name}"`).join('、')} 的所有子变量, 等待用户手动确认`
-            break
-          }
-          case 'create_sub_var': {
-            const { variable_names, standardize, centralize, discretize } =
-              JSON.parse(toolCall.function.arguments) 
-            if (
-              !Array.isArray(variable_names) ||
-              !variable_names.every(
-                (name) =>
-                  typeof name === 'string' &&
-                  dataCols.some((col) => col.name === name),
+            case 'clear_sub_var': {
+              const { variable_names } = JSON.parse(toolCall.function.arguments)
+              if (
+                !Array.isArray(variable_names) ||
+                !variable_names.every(
+                  (name) =>
+                    typeof name === 'string' &&
+                    dataCols.some((col) => col.name === name),
+                )
+              ) {
+                throw new Error('变量名参数错误')
+              }
+              newMessages[1].content = `已请求清除变量 ${(variable_names as string[]).map((name) => `"${name}"`).join('、')} 的所有子变量, 等待用户手动确认`
+              break
+            }
+            case 'create_sub_var': {
+              const { variable_names, standardize, centralize, discretize } =
+                JSON.parse(toolCall.function.arguments)
+              if (
+                !Array.isArray(variable_names) ||
+                !variable_names.every(
+                  (name) =>
+                    typeof name === 'string' &&
+                    dataCols.some((col) => col.name === name),
+                )
+              ) {
+                throw new Error('变量名参数错误')
+              }
+              if (
+                discretize &&
+                (typeof discretize !== 'object' ||
+                  !discretize.method ||
+                  !discretize.groups ||
+                  typeof discretize.method !== 'string' ||
+                  typeof discretize.groups !== 'number')
+              ) {
+                throw new Error('离散化参数错误')
+              }
+              newMessages[1].content = `已请求生成变量 ${(variable_names as string[]).map((name) => `"${name}"`).join('、')} 的${[
+                standardize ? '标准化' : '',
+                centralize ? '中心化' : '',
+                discretize ? '离散化' : '',
+              ]
+                .filter((part) => part)
+                .join('、')}子变量, 等待用户手动确认`
+              break
+            }
+            case 'create_new_var': {
+              const { variable_name, calc_expression } = JSON.parse(
+                toolCall.function.arguments,
               )
-            ) {
-              throw new Error('变量名参数错误')
+              if (
+                typeof variable_name !== 'string' ||
+                typeof calc_expression !== 'string'
+              ) {
+                throw new Error('变量名或计算表达式参数错误')
+              }
+              newMessages[1].content = `已请求生成新变量"${variable_name}", 等待用户手动确认`
+              break
             }
-            if (
-              discretize &&
-              (typeof discretize !== 'object' ||
-              (!discretize.method ||
-                !discretize.groups ||
-                typeof discretize.method !== 'string' ||
-                typeof discretize.groups !== 'number'))
-            ) {
-              throw new Error('离散化参数错误')
+            case 'export_data': {
+              const { file_name, file_type } = JSON.parse(
+                toolCall.function.arguments,
+              )
+              if (
+                typeof file_name !== 'string' ||
+                typeof file_type !== 'string' ||
+                !Object.values(ExportTypes).includes(file_type as ExportTypes)
+              ) {
+                throw new Error('文件名或文件类型参数错误')
+              }
+              newMessages[1].content = `已请求导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}", 等待用户手动确认`
+              break
             }
-            newMessages[1].content = `已请求生成变量 ${(variable_names as string[]).map((name) => `"${name}"`).join('、')} 的${[
-              standardize ? '标准化' : '',
-              centralize ? '中心化' : '',
-              discretize ? '离散化' : '',
-            ]
-              .filter((part) => part)
-              .join('、')}子变量, 等待用户手动确认`
-            break
-          }
-          case 'create_new_var': {
-            const { variable_name, calc_expression } = JSON.parse(
-              toolCall.function.arguments,
-            )
-            if (
-              typeof variable_name !== 'string' ||
-              typeof calc_expression !== 'string'
-            ) {
-              throw new Error('变量名或计算表达式参数错误')
+            case 'nav_to_data_view': {
+              nav.setMainPage(MAIN_PAGES_LABELS.DATA)
+              newMessages[1].content = '已成功跳转到数据视图'
+              break
             }
-            newMessages[1].content = `已请求生成新变量"${variable_name}", 等待用户手动确认`
-            break
-          }
-          case 'export_data': {
-            const { file_name, file_type } = JSON.parse(
-              toolCall.function.arguments,
-            )
-            if (
-              typeof file_name !== 'string' ||
-              typeof file_type !== 'string' ||
-              !Object.values(ExportTypes).includes(file_type as ExportTypes)
-            ) {
-              throw new Error('文件名或文件类型参数错误')
+            case 'nav_to_variable_view': {
+              const { page } = JSON.parse(toolCall.function.arguments)
+              if (
+                !page ||
+                !Object.values(VARIABLE_SUB_PAGES_LABELS).includes(page)
+              ) {
+                throw new Error(`未知的子页面 (${page})`)
+              }
+              nav.setMainPage(MAIN_PAGES_LABELS.VARIABLE)
+              nav.setVariableViewSubPage(page)
+              newMessages[1].content = `已成功跳转到变量视图的${page}页面`
+              break
             }
-            newMessages[1].content = `已请求导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}", 等待用户手动确认`
-            break
-          }
-          case 'nav_to_data_view': {
-            nav.setMainPage(MAIN_PAGES_LABELS.DATA)
-            newMessages[1].content = '已成功跳转到数据视图'
-            break
-          }
-          case 'nav_to_variable_view': {
-            const { page } = JSON.parse(toolCall.function.arguments)
-            if (
-              !page ||
-              !Object.values(VARIABLE_SUB_PAGES_LABELS).includes(page)
-            ) {
-              throw new Error(`未知的子页面 (${page})`)
+            case 'nav_to_plots_view': {
+              const { page } = JSON.parse(toolCall.function.arguments)
+              if (
+                !page ||
+                !Object.values(PLOTS_SUB_PAGES_LABELS).includes(page)
+              ) {
+                throw new Error(`未知的子页面 (${page})`)
+              }
+              nav.setMainPage(MAIN_PAGES_LABELS.PLOTS)
+              nav.setPlotsViewSubPage(page)
+              newMessages[1].content = `已成功跳转到绘图视图的${page}页面`
+              break
             }
-            nav.setMainPage(MAIN_PAGES_LABELS.VARIABLE)
-            nav.setVariableViewSubPage(page)
-            newMessages[1].content = `已成功跳转到变量视图的${page}页面`
-            break
-          }
-          case 'nav_to_plots_view': {
-            const { page } = JSON.parse(toolCall.function.arguments)
-            if (
-              !page ||
-              !Object.values(PLOTS_SUB_PAGES_LABELS).includes(page)
-            ) {
-              throw new Error(`未知的子页面 (${page})`)
+            case 'nav_to_statistics_view': {
+              const { page } = JSON.parse(toolCall.function.arguments)
+              if (
+                !page ||
+                !Object.values(STATISTICS_SUB_PAGES_LABELS).includes(page)
+              ) {
+                throw new Error(`未知的子页面 (${page})`)
+              }
+              nav.setMainPage(MAIN_PAGES_LABELS.STATISTICS)
+              nav.setStatisticsViewSubPage(page)
+              newMessages[1].content = `已成功跳转到统计视图的${page}页面`
+              break
             }
-            nav.setMainPage(MAIN_PAGES_LABELS.PLOTS)
-            nav.setPlotsViewSubPage(page)
-            newMessages[1].content = `已成功跳转到绘图视图的${page}页面`
-            break
-          }
-          case 'nav_to_statistics_view': {
-            const { page } = JSON.parse(toolCall.function.arguments)
-            if (
-              !page ||
-              !Object.values(STATISTICS_SUB_PAGES_LABELS).includes(page)
-            ) {
-              throw new Error(`未知的子页面 (${page})`)
+            case 'nav_to_tools_view': {
+              const { page } = JSON.parse(toolCall.function.arguments)
+              if (
+                !page ||
+                !Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).includes(page)
+              ) {
+                throw new Error(`未知的子页面 (${page})`)
+              }
+              nav.setMainPage(MAIN_PAGES_LABELS.TOOLS)
+              nav.setToolsViewSubPage(page)
+              newMessages[1].content = `已成功跳转到工具视图的${page}页面`
+              break
             }
-            nav.setMainPage(MAIN_PAGES_LABELS.STATISTICS)
-            nav.setStatisticsViewSubPage(page)
-            newMessages[1].content = `已成功跳转到统计视图的${page}页面`
-            break
-          }
-          case 'nav_to_tools_view': {
-            const { page } = JSON.parse(toolCall.function.arguments)
-            if (
-              !page ||
-              !Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).includes(page)
-            ) {
-              throw new Error(`未知的子页面 (${page})`)
+            default: {
+              throw new Error(`未知函数 (${toolCall.function.name})`)
             }
-            nav.setMainPage(MAIN_PAGES_LABELS.TOOLS)
-            nav.setToolsViewSubPage(page)
-            newMessages[1].content = `已成功跳转到工具视图的${page}页面`
-            break
           }
-          default: {
-            throw new Error(`未知函数 (${toolCall.function.name})`)
-          }
+        } catch (e) {
+          throw new Error(
+            `AI函数调用错误: ${e instanceof Error ? e.message : String(e)}`,
+          )
         }
-      } catch (e) {
-        throw new Error(`AI函数调用错误: ${e instanceof Error ? e.message : String(e)}`)
-      }
 
         flushSync(() => {
           setShowLoading(true)

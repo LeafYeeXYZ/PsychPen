@@ -33,10 +33,9 @@ export const create_sub_var: AIFunction = {
             description: '如果要生成离散化子变量, 则需要指定离散化算法和分组数',
             properties: {
               method: {
-                type: 'string',
-                description: `离散化算法, 可选值为: ${Object.values(
-                  ALLOWED_DISCRETE_METHODS,
-                ).join(', ')}`,
+                type: 'enum',
+                description: '离散化算法',
+                enum: Object.values(ALLOWED_DISCRETE_METHODS),
               },
               groups: {
                 type: 'number',
@@ -47,7 +46,7 @@ export const create_sub_var: AIFunction = {
             additionalProperties: false,
           },
         },
-        required: ['variable_name'],
+        required: ['variable_names'],
         additionalProperties: false,
       },
       strict: true,
@@ -74,7 +73,7 @@ export const clear_sub_var: AIFunction = {
             },
           },
         },
-        required: ['variable_name'],
+        required: ['variable_names'],
         additionalProperties: false,
       },
       strict: true,

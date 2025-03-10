@@ -16,7 +16,10 @@ type DataState = {
    * 设置原始数据
    * @param data 原始数据
    */
-  setData: (data: Record<string, unknown>[] | null, isLarge?: boolean) => Promise<void>
+  setData: (
+    data: Record<string, unknown>[] | null,
+    isLarge?: boolean,
+  ) => Promise<void>
   /**
    * 更新数据
    * @param cols 变量列表

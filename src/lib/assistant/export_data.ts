@@ -1,5 +1,5 @@
-import { ExportTypes } from '@psych/sheet'
 import type { AIFunction } from '../../types'
+import { ExportTypes } from '@psych/sheet'
 
 export const export_data: AIFunction = {
   label: '导出数据',
@@ -17,10 +17,9 @@ export const export_data: AIFunction = {
             description: '文件名 (不含拓展名)',
           },
           file_type: {
-            type: 'string',
-            description: `文件类型 (${Object.values(ExportTypes)
-              .map((type) => `"${type}"`)
-              .join(' / ')})`,
+            type: 'enum',
+            description: '文件类型',
+            enum: Object.values(ExportTypes),
           },
         },
         required: ['file_name', 'file_type'],
