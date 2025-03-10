@@ -72,56 +72,59 @@ export function PreviewData() {
           icon={<SaveOutlined />}
           disabled={disabled}
           onClick={async () => {
-            flushSync(() => setDisabled(true))
-            await modalApi.confirm({
-              title: '导出数据',
-              content: (
-                <div className='flex flex-col gap-4 my-4'>
-                  <Input
-                    placeholder='请输入文件名 (可留空)'
-                    onChange={(e) =>
-                      (handleExportParams.current.filename = e.target.value)
-                    }
-                  />
-                  <Select
-                    placeholder='请选择导出格式'
-                    defaultValue={
-                      handleExportParams.current.type?.length
-                        ? handleExportParams.current.type
-                        : EXPORT_FILE_TYPES[0]
-                    }
-                    onChange={(value) =>
-                      (handleExportParams.current.type = value)
-                    }
-                  >
-                    {EXPORT_FILE_TYPES.map((type) => (
-                      <Select.Option key={type} value={type}>
-                        导出为 <Tag color='pink'>{type}</Tag>文件
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </div>
-              ),
-              onOk: async () => {
-                messageApi?.loading('正在导出数据...', 0)
-                isLargeData && (await sleep())
-                handleExport(
-                  handleExportParams.current.filename?.length
-                    ? handleExportParams.current.filename
-                    : 'psychpen',
-                  handleExportParams.current.type?.length
-                    ? handleExportParams.current.type
-                    : EXPORT_FILE_TYPES[0],
-                )
-                handleExportParams.current.filename = undefined
-                handleExportParams.current.type = undefined
-                messageApi?.destroy()
-                messageApi?.success('数据导出成功', 1)
-              },
-              okText: '确定',
-              cancelText: '取消',
-            })
-            flushSync(() => setDisabled(false))
+            try {
+              flushSync(() => setDisabled(true))
+              await modalApi.confirm({
+                title: '导出数据',
+                content: (
+                  <div className='flex flex-col gap-4 my-4'>
+                    <Input
+                      placeholder='请输入文件名 (可留空)'
+                      onChange={(e) =>
+                        (handleExportParams.current.filename = e.target.value)
+                      }
+                    />
+                    <Select
+                      placeholder='请选择导出格式'
+                      defaultValue={
+                        handleExportParams.current.type?.length
+                          ? handleExportParams.current.type
+                          : EXPORT_FILE_TYPES[0]
+                      }
+                      onChange={(value) =>
+                        (handleExportParams.current.type = value)
+                      }
+                    >
+                      {EXPORT_FILE_TYPES.map((type) => (
+                        <Select.Option key={type} value={type}>
+                          导出为 <Tag color='pink'>{type}</Tag>文件
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </div>
+                ),
+                onOk: async () => {
+                  messageApi?.loading('正在导出数据...', 0)
+                  isLargeData && (await sleep())
+                  handleExport(
+                    handleExportParams.current.filename?.length
+                      ? handleExportParams.current.filename
+                      : 'psychpen',
+                    handleExportParams.current.type?.length
+                      ? handleExportParams.current.type
+                      : EXPORT_FILE_TYPES[0],
+                  )
+                  handleExportParams.current.filename = undefined
+                  handleExportParams.current.type = undefined
+                  messageApi?.destroy()
+                  messageApi?.success('数据导出成功', 1)
+                },
+                okText: '确定',
+                cancelText: '取消',
+              })
+            } finally {
+              setDisabled(false)
+            }
           }}
         >
           导出数据

@@ -71,9 +71,12 @@ export function TwoSampleTTest() {
           className='w-full py-4 overflow-auto'
           layout='vertical'
           onFinish={async (values) => {
-            flushSync(() => setDisabled(true))
-            await handleCalculate(values)
-            flushSync(() => setDisabled(false))
+            try {
+              flushSync(() => setDisabled(true))
+              await handleCalculate(values)
+            } finally {
+              setDisabled(false)
+            }
           }}
           autoComplete='off'
           initialValues={{

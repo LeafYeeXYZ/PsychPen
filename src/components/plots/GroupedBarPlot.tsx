@@ -248,9 +248,12 @@ export function GroupedBarPlot() {
           className='w-full py-4 overflow-auto'
           layout='vertical'
           onFinish={async (values) => {
-            flushSync(() => setDisabled(true))
-            await handleFinish(values)
-            flushSync(() => setDisabled(false))
+            try {
+              flushSync(() => setDisabled(true))
+              await handleFinish(values)
+            } finally {
+              setDisabled(false)
+            }
           }}
           autoComplete='off'
           disabled={disabled}
