@@ -44,32 +44,30 @@ export function SubVariables() {
       messageApi?.loading('正在处理数据...', 0)
       isLargeData && (await sleep())
       const timestamp = Date.now()
-      const cols = dataCols
-        .map((col) => {
-          if (values.variables.includes(col.name)) {
-            return {
-              ...col,
-              subVars: values.subVars?.length
-                ? {
-                    standard:
-                      values.subVars.includes('standard') ||
-                      col.subVars?.standard,
-                    center:
-                      values.subVars.includes('center') || col.subVars?.center,
-                    discrete: values.subVars.includes('discretize')
-                      ? {
-                          method: values.discretizeMethod!,
-                          groups: values.discretizeGroups!,
-                        }
-                      : col.subVars?.discrete,
-                  }
-                : undefined,
-            }
-          } else {
-            return col
+      const cols = dataCols.map((col) => {
+        if (values.variables.includes(col.name)) {
+          return {
+            ...col,
+            subVars: values.subVars?.length
+              ? {
+                  standard:
+                    values.subVars.includes('standard') ||
+                    col.subVars?.standard,
+                  center:
+                    values.subVars.includes('center') || col.subVars?.center,
+                  discrete: values.subVars.includes('discretize')
+                    ? {
+                        method: values.discretizeMethod!,
+                        groups: values.discretizeGroups!,
+                      }
+                    : col.subVars?.discrete,
+                }
+              : undefined,
           }
-        })
-        .filter((col) => col.derived !== true)
+        } else {
+          return col
+        }
+      })
       await updateData(cols)
       messageApi?.destroy()
       messageApi?.success(

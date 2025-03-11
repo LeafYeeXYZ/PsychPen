@@ -25,9 +25,7 @@ export function MissingValue() {
       const cols = dataCols
       if (variable.includes('__ALL_VARIABLES__')) {
         cols.forEach((col) => {
-          if (col.derived !== true) {
-            col.missingValues = missing
-          }
+          col.missingValues = missing
         })
       } else {
         variable.forEach((variable) => {

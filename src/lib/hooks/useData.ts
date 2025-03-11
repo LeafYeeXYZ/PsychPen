@@ -103,7 +103,7 @@ export const useData = create<DataState>()((setState, getState) => {
       validateExpression(filterExpression) // 检查表达式的安全性
       const { data, dataCols } = getState()
       const { calculatedCols, calculatedRows } = calculator(
-        dataCols,
+        dataCols.filter((col) => col.derived !== true),
         data!,
         filterExpression,
       )
@@ -150,7 +150,7 @@ export const useData = create<DataState>()((setState, getState) => {
     updateData: async (cols) => {
       const { data, filterExpression } = getState()
       const { calculatedCols, calculatedRows } = calculator(
-        cols,
+        cols.filter((col) => col.derived !== true),
         data!,
         filterExpression,
       )
@@ -174,7 +174,7 @@ export const useData = create<DataState>()((setState, getState) => {
       }))
       const newCol = describe([{ name }], newData).updatedCols[0]
       const { calculatedCols, calculatedRows } = calculator(
-        [newCol, ...dataCols],
+        [newCol, ...dataCols.filter((col) => col.derived !== true)],
         newData,
         filterExpression,
       )

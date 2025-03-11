@@ -258,7 +258,9 @@ function CreateNewVarTool({
               setDone(true)
               sessionStorage.setItem(id, 'done')
               messageApi?.destroy()
-              messageApi?.success(`已成功生成新变量"${variable_name}", 用时 ${Date.now() - timestamp} 毫秒`)
+              messageApi?.success(
+                `已成功生成新变量"${variable_name}", 用时 ${Date.now() - timestamp} 毫秒`,
+              )
             } catch (error) {
               messageApi?.destroy()
               messageApi?.error(
@@ -350,26 +352,24 @@ function CreateSubVarTool({
               isLargeData && (await sleep())
               const timestamp = Date.now()
               updateData(
-                dataCols
-                  .map((col) => {
-                    if (variable_names.includes(col.name)) {
-                      return {
-                        ...col,
-                        subVars: {
-                          standard: Boolean(standardize) || col.subVars?.standard,
-                          center: Boolean(centralize) || col.subVars?.center,
-                          discrete: shouldDiscritize
-                            ? {
-                                method: discretize!.method,
-                                groups: discretize!.groups,
-                              }
-                            : col.subVars?.discrete,
-                        },
-                      }
+                dataCols.map((col) => {
+                  if (variable_names.includes(col.name)) {
+                    return {
+                      ...col,
+                      subVars: {
+                        standard: Boolean(standardize) || col.subVars?.standard,
+                        center: Boolean(centralize) || col.subVars?.center,
+                        discrete: shouldDiscritize
+                          ? {
+                              method: discretize!.method,
+                              groups: discretize!.groups,
+                            }
+                          : col.subVars?.discrete,
+                      },
                     }
-                    return col
-                  })
-                  .filter((col) => col.derived !== true),
+                  }
+                  return col
+                }),
               )
               setDone(true)
               sessionStorage.setItem(id, 'done')
@@ -448,17 +448,15 @@ function ClearSubVarTool({
               isLargeData && (await sleep())
               const timestamp = Date.now()
               updateData(
-                dataCols
-                  .map((col) => {
-                    if (variable_names.includes(col.name)) {
-                      return {
-                        ...col,
-                        subVars: undefined,
-                      }
+                dataCols.map((col) => {
+                  if (variable_names.includes(col.name)) {
+                    return {
+                      ...col,
+                      subVars: undefined,
                     }
-                    return col
-                  })
-                  .filter((col) => col.derived !== true),
+                  }
+                  return col
+                }),
               )
               setDone(true)
               sessionStorage.setItem(id, 'done')
@@ -524,7 +522,9 @@ function ApplyFilterTool({
               await setFilterExpression(filter_expression)
               setDone(true)
               sessionStorage.setItem(id, 'done')
-              messageApi?.success(`已成功设置数据筛选规则, 用时 ${Date.now() - timestamp} 毫秒`)
+              messageApi?.success(
+                `已成功设置数据筛选规则, 用时 ${Date.now() - timestamp} 毫秒`,
+              )
             } catch (error) {
               messageApi?.destroy()
               messageApi?.error(
