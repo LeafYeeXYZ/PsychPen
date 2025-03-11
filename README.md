@@ -1,10 +1,11 @@
-# P:ychPen
+# PsychPen
 
 **AI加持的在线统计分析和数据可视化软件**, 立即体验: <https://psychpen.leafyee.xyz>
 
 | ![](readme/data-1.png)  | ![](readme/data-2.png)  |  ![](readme/var-5.png)  |
 | :---------------------: | :---------------------: | :---------------------: |
 | ![](readme/intro-1.png) | ![](readme/intro-2.png) | ![](readme/intro-3.png) |
+| ![](readme/data-8.png)  | ![](readme/data-9.png)  | ![](readme/data-10.png) |
 
 ## 引用信息
 
@@ -15,7 +16,7 @@
 
 ## 目录
 
-- [P:ychPen](#pychpen)
+- [PsychPen](#psychpen)
   - [引用信息](#引用信息)
   - [目录](#目录)
 - [PsychPen 使用文档](#psychpen-使用文档)
