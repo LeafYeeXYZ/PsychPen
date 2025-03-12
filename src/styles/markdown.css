@@ -1,0 +1,34 @@
+.markdown {
+  position: relative;
+  overflow: hidden;
+  & .table-container {
+    overflow-x: auto;
+    & table {
+      position: relative;
+      border-top: 2px solid black;
+      border-bottom: 2px solid black;
+      max-width: 100%;
+      margin: 0 auto;
+      white-space: nowrap;
+      & th,
+      & td {
+        font-weight: normal;
+        white-space: nowrap;
+        padding: 5px 10px;
+        text-align: center;
+      }
+      & * {
+        overflow: hidden;
+        text-wrap: nowrap;
+      }
+      & thead::after {
+        /* 用来做三线表中间的横线 */
+        content: '';
+        display: block;
+        position: absolute;
+        border-top: 1px solid #00000060;
+        width: 100%;
+      }
+    }
+  }
+}

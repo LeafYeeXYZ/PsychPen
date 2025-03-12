@@ -1,16 +1,18 @@
 import { useRef, useEffect } from 'react'
-import { Typography } from 'antd'
 import { Bubble } from '@ant-design/x'
+import { Typography } from 'antd'
 import { UserOutlined, BarChartOutlined } from '@ant-design/icons'
 import type {
   ChatCompletionAssistantMessageParam,
   ChatCompletionMessageParam,
 } from 'openai/resources/index.mjs'
-// @ts-expect-error markdown-it does not have types
-import markdownit from 'markdown-it'
+import { marked } from 'marked'
 import { ToolCall } from './ToolCall'
+import '../../styles/markdown.css'
+import katex from 'marked-katex-extension'
+import 'katex/dist/katex.min.css'
 
-const md = markdownit({ html: true, breaks: true })
+marked.use(katex({ throwOnError: false }))
 
 export function Messages({
   messages,
@@ -48,9 +50,17 @@ export function Messages({
               ) : (
                 <Typography>
                   <div
-                    className='-mb-[0.8rem]'
+                    className='markdown -mb-[0.8rem]'
                     dangerouslySetInnerHTML={{
-                      __html: md.render((message.content as string).trim()),
+                      __html: marked
+                        .parse((message.content as string).trim(), {
+                          async: false,
+                        })
+                        .replace(
+                          /<table>/g,
+                          '<div class="table-container"><table>',
+                        )
+                        .replace(/<\/table>/g, '</table></div>'),
                     }}
                   />
                 </Typography>

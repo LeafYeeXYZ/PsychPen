@@ -21,23 +21,25 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          antd: ['antd'],
-          data: ['@psych/sheet'],
-          'chart-a': ['echarts'],
-          'chart-b': ['echarts-gl'],
-          table: ['ag-grid-react'],
-          utils: [
+          'antd': ['antd'],
+          'psych-sheet': ['@psych/sheet'],
+          'echarts': ['echarts'],
+          'echarts-extension': ['echarts-gl', 'echarts-stat', 'echarts-wordcloud'],
+          'ag-grid': ['ag-grid-react'],
+          'utils-a': [
             'html2canvas',
-            '@ant-design/icons',
             'bowser',
-            'echarts-wordcloud',
-            'echarts-stat',
+            '@ant-design/icons',
+            'openai',
+            '@leaf/parse-think',
+          ],
+          'utils-b': [
             '@psych/lib',
             'ml-kmeans',
             'jieba-wasm',
-            'openai',
-            '@leaf/parse-think',
-            'markdown-it',
+            'marked',
+            'marked-katex-extension',
+            'katex',
           ],
         },
       },
