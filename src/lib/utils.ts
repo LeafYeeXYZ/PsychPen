@@ -2,12 +2,40 @@ import html2canvas from 'html2canvas'
 import type { Variable } from '../types'
 
 /**
+ * 生成 UUID
+ * @returns UUID
+ */
+export function uuid(): string {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+		const r = (Math.random() * 16) | 0
+		const v = c == 'x' ? r : (r & 0x3) | 0x8
+		return v.toString(16)
+	})
+}
+
+/**
+ * 生成给定字符串的 MD5 哈希值
+ * @param str 字符串
+ * @returns MD5 哈希值
+ */
+export function md5(str: string): string {
+	let hash = 0
+	if (str.length == 0) return hash.toString()
+	for (let i = 0; i < str.length; i++) {
+		const char = str.charCodeAt(i)
+		hash = (hash << 5) - hash + char
+		hash = hash & hash
+	}
+	return hash.toString()
+}
+
+/**
  * 在指定时间后兑现
  * @param ms 时间 (毫秒)
  * @returns Promise
  */
-export function sleep(ms: number = 100): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+export function sleep(ms = 100): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /**
@@ -19,18 +47,18 @@ export function sleep(ms: number = 100): Promise<void> {
  * @returns 布尔值
  */
 export function booleanExpression(
-  expression: string,
-  variables: Variable[],
-  data: Record<string, unknown>,
+	expression: string,
+	variables: Variable[],
+	data: Record<string, unknown>,
 ): boolean {
-  try {
-    const value = eval(`Boolean(${embedValues(expression, variables, data)})`)
-    return value
-  } catch (e) {
-    throw new Error(
-      `执行表达式失败: ${e instanceof Error ? e.message : String(e)}`,
-    )
-  }
+	try {
+		const value = eval(`Boolean(${embedValues(expression, variables, data)})`)
+		return value
+	} catch (e) {
+		throw new Error(
+			`执行表达式失败: ${e instanceof Error ? e.message : String(e)}`,
+		)
+	}
 }
 
 /**
@@ -42,36 +70,36 @@ export function booleanExpression(
  * @returns 计算结果
  */
 export function computeExpression(
-  expression: string,
-  variables: Variable[],
-  data: Record<string, unknown>,
+	expression: string,
+	variables: Variable[],
+	data: Record<string, unknown>,
 ): number | string | undefined {
-  try {
-    const vars = expression.match(/:::.+?:::/g)
-    if (vars) {
-      vars.forEach((v) => {
-        const name = v.slice(3, -3)
-        if (!variables.find((v) => v.name == name)) {
-          throw new Error(`变量 ${name} 不存在`)
-        }
-      })
-      if (
-        vars.some((v) => {
-          const name = v.slice(3, -3)
-          const value = data[name]
-          return value === undefined || value === null
-        })
-      ) {
-        return undefined
-      }
-    }
-    const value = eval(embedValues(expression, variables, data))
-    return value
-  } catch (e) {
-    throw new Error(
-      `执行表达式失败: ${e instanceof Error ? e.message : String(e)}`,
-    )
-  }
+	try {
+		const vars = expression.match(/:::.+?:::/g)
+		if (vars) {
+			for (const v of vars) {
+				const name = v.slice(3, -3)
+				if (!variables.find((v) => v.name == name)) {
+					throw new Error(`变量 ${name} 不存在`)
+				}
+			}
+			if (
+				vars.some((v) => {
+					const name = v.slice(3, -3)
+					const value = data[name]
+					return value === undefined || value === null
+				})
+			) {
+				return undefined
+			}
+		}
+		const value = eval(embedValues(expression, variables, data))
+		return value
+	} catch (e) {
+		throw new Error(
+			`执行表达式失败: ${e instanceof Error ? e.message : String(e)}`,
+		)
+	}
 }
 
 /**
@@ -83,97 +111,98 @@ export function computeExpression(
  * @returns 嵌入数值或统计量后的表达式
  */
 export function embedValues(
-  expression: string,
-  variables: Variable[],
-  data: Record<string, unknown>,
+	expression: string,
+	variables: Variable[],
+	data: Record<string, unknown>,
 ): string {
-  // min(:::name:::)
-  expression = expression.replace(/min\((:::.+?:::)\)/g, (v) => {
-    const name = v.slice(7, -4)
-    const variable = variables.find((v) => v.name == name)
-    if (!variable) throw new Error(`变量 ${name} 不存在`)
-    if (variable.min === undefined)
-      throw new Error(`变量 ${name} 没有最小值, 请确认变量类型`)
-    return variable.min.toString()
-  })
-  // max(:::name:::)
-  expression = expression.replace(/max\((:::.+?:::)\)/g, (v) => {
-    const name = v.slice(7, -4)
-    const variable = variables.find((v) => v.name == name)
-    if (!variable) throw new Error(`变量 ${name} 不存在`)
-    if (variable.max === undefined)
-      throw new Error(`变量 ${name} 没有最大值, 请确认变量类型`)
-    return variable.max.toString()
-  })
-  // mean(:::name:::)
-  expression = expression.replace(/mean\((:::.+?:::)\)/g, (v) => {
-    const name = v.slice(8, -4)
-    const variable = variables.find((v) => v.name == name)
-    if (!variable) throw new Error(`变量 ${name} 不存在`)
-    if (variable.mean === undefined)
-      throw new Error(`变量 ${name} 没有均值, 请确认变量类型`)
-    return variable.mean.toString()
-  })
-  // mode(:::name:::)
-  expression = expression.replace(/mode\((:::.+?:::)\)/g, (v) => {
-    const name = v.slice(8, -4)
-    const variable = variables.find((v) => v.name == name)
-    if (!variable) throw new Error(`变量 ${name} 不存在`)
-    if (variable.mode === undefined)
-      throw new Error(`变量 ${name} 没有众数, 请确认变量类型`)
-    return variable.mode.toString()
-  })
-  // q1(:::name:::)
-  expression = expression.replace(/q1\((:::.+?:::)\)/g, (v) => {
-    const name = v.slice(6, -4)
-    const variable = variables.find((v) => v.name == name)
-    if (!variable) throw new Error(`变量 ${name} 不存在`)
-    if (variable.q1 === undefined)
-      throw new Error(`变量 ${name} 没有 25% 分位数, 请确认变量类型`)
-    return variable.q1.toString()
-  })
-  // q2(:::name:::)
-  expression = expression.replace(/q2\((:::.+?:::)\)/g, (v) => {
-    const name = v.slice(6, -4)
-    const variable = variables.find((v) => v.name == name)
-    if (!variable) throw new Error(`变量 ${name} 不存在`)
-    if (variable.q2 === undefined)
-      throw new Error(`变量 ${name} 没有 50% 分位数, 请确认变量类型`)
-    return variable.q2.toString()
-  })
-  // q3(:::name:::)
-  expression = expression.replace(/q3\((:::.+?:::)\)/g, (v) => {
-    const name = v.slice(6, -4)
-    const variable = variables.find((v) => v.name == name)
-    if (!variable) throw new Error(`变量 ${name} 不存在`)
-    if (variable.q3 === undefined)
-      throw new Error(`变量 ${name} 没有 75% 分位数, 请确认变量类型`)
-    return variable.q3.toString()
-  })
-  // std(:::name:::)
-  expression = expression.replace(/std\((:::.+?:::)\)/g, (v) => {
-    const name = v.slice(7, -4)
-    const variable = variables.find((v) => v.name == name)
-    if (!variable) throw new Error(`变量 ${name} 不存在`)
-    if (variable.std === undefined)
-      throw new Error(`变量 ${name} 没有标准差, 请确认变量类型`)
-    return variable.std.toString()
-  })
-  // :::name:::
-  expression = expression.replace(/:::.+?:::/g, (v) => {
-    const name = v.slice(3, -3)
-    const variable = variables.find((v) => v.name == name)
-    if (!variable) throw new Error(`变量 ${name} 不存在`)
-    const value = data[name]
-    if (value === undefined || value === null) {
-      throw new Error(`变量 ${name} 的值不存在`)
-    } else if (!isNaN(Number(value))) {
-      return `${Number(value)}`
-    } else {
-      return `"${String(value)}"`
-    }
-  })
-  return expression
+	let exp = expression
+	// min(:::name:::)
+	exp = exp.replace(/min\((:::.+?:::)\)/g, (v) => {
+		const name = v.slice(7, -4)
+		const variable = variables.find((v) => v.name == name)
+		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		if (variable.min === undefined)
+			throw new Error(`变量 ${name} 没有最小值, 请确认变量类型`)
+		return variable.min.toString()
+	})
+	// max(:::name:::)
+	exp = exp.replace(/max\((:::.+?:::)\)/g, (v) => {
+		const name = v.slice(7, -4)
+		const variable = variables.find((v) => v.name == name)
+		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		if (variable.max === undefined)
+			throw new Error(`变量 ${name} 没有最大值, 请确认变量类型`)
+		return variable.max.toString()
+	})
+	// mean(:::name:::)
+	exp = exp.replace(/mean\((:::.+?:::)\)/g, (v) => {
+		const name = v.slice(8, -4)
+		const variable = variables.find((v) => v.name == name)
+		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		if (variable.mean === undefined)
+			throw new Error(`变量 ${name} 没有均值, 请确认变量类型`)
+		return variable.mean.toString()
+	})
+	// mode(:::name:::)
+	exp = exp.replace(/mode\((:::.+?:::)\)/g, (v) => {
+		const name = v.slice(8, -4)
+		const variable = variables.find((v) => v.name == name)
+		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		if (variable.mode === undefined)
+			throw new Error(`变量 ${name} 没有众数, 请确认变量类型`)
+		return variable.mode.toString()
+	})
+	// q1(:::name:::)
+	exp = exp.replace(/q1\((:::.+?:::)\)/g, (v) => {
+		const name = v.slice(6, -4)
+		const variable = variables.find((v) => v.name == name)
+		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		if (variable.q1 === undefined)
+			throw new Error(`变量 ${name} 没有 25% 分位数, 请确认变量类型`)
+		return variable.q1.toString()
+	})
+	// q2(:::name:::)
+	exp = exp.replace(/q2\((:::.+?:::)\)/g, (v) => {
+		const name = v.slice(6, -4)
+		const variable = variables.find((v) => v.name == name)
+		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		if (variable.q2 === undefined)
+			throw new Error(`变量 ${name} 没有 50% 分位数, 请确认变量类型`)
+		return variable.q2.toString()
+	})
+	// q3(:::name:::)
+	exp = exp.replace(/q3\((:::.+?:::)\)/g, (v) => {
+		const name = v.slice(6, -4)
+		const variable = variables.find((v) => v.name == name)
+		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		if (variable.q3 === undefined)
+			throw new Error(`变量 ${name} 没有 75% 分位数, 请确认变量类型`)
+		return variable.q3.toString()
+	})
+	// std(:::name:::)
+	exp = exp.replace(/std\((:::.+?:::)\)/g, (v) => {
+		const name = v.slice(7, -4)
+		const variable = variables.find((v) => v.name == name)
+		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		if (variable.std === undefined)
+			throw new Error(`变量 ${name} 没有标准差, 请确认变量类型`)
+		return variable.std.toString()
+	})
+	// :::name:::
+	exp = exp.replace(/:::.+?:::/g, (v) => {
+		const name = v.slice(3, -3)
+		const variable = variables.find((v) => v.name == name)
+		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		const value = data[name]
+		if (value === undefined || value === null) {
+			throw new Error(`变量 ${name} 的值不存在`)
+		}
+		if (!Number.isNaN(Number(value))) {
+			return `${Number(value)}`
+		}
+		return `"${String(value)}"`
+	})
+	return expression
 }
 
 /**
@@ -182,28 +211,28 @@ export function embedValues(
  * @throws 如果表达式不安全, 则抛出异常
  */
 export function validateExpression(expression: string): void {
-  // 先排除变量名
-  expression = expression.replace(/:::.+?:::/g, '')
-  if (
-    // 阻止数据泄露
-    expression.includes('http://') ||
-    expression.includes('https://') ||
-    expression.includes('//') ||
-    expression.includes('fetch') ||
-    expression.includes('XMLHttpRequest') ||
-    // 阻止外部代码执行
-    expression.includes('import') ||
-    expression.includes('eval') ||
-    expression.includes('Function') ||
-    expression.includes('setTimeout') ||
-    expression.includes('setInterval') ||
-    expression.includes('setImmediate') ||
-    // 阻止本地存储
-    expression.includes('localStorage') ||
-    expression.includes('sessionStorage')
-  ) {
-    throw new Error('表达式不安全, 拒绝执行')
-  }
+	// 先排除变量名
+	const exp = expression.replace(/:::.+?:::/g, '')
+	if (
+		// 阻止数据泄露
+		exp.includes('http://') ||
+		exp.includes('https://') ||
+		exp.includes('//') ||
+		exp.includes('fetch') ||
+		exp.includes('XMLHttpRequest') ||
+		// 阻止外部代码执行
+		exp.includes('import') ||
+		exp.includes('eval') ||
+		exp.includes('Function') ||
+		exp.includes('setTimeout') ||
+		exp.includes('setInterval') ||
+		exp.includes('setImmediate') ||
+		// 阻止本地存储
+		exp.includes('localStorage') ||
+		exp.includes('sessionStorage')
+	) {
+		throw new Error('表达式不安全, 拒绝执行')
+	}
 }
 
 /**
@@ -212,9 +241,9 @@ export function validateExpression(expression: string): void {
  * @returns R 的数据框
  */
 export function jsObjectToRDataFrame(obj: Record<string, number[]>): string {
-  return `data.frame(\n${Object.entries(obj)
-    .map(([key, value]) => `${key} = c(${value.join(', ')})`)
-    .join(',\n')}\n)`
+	return `data.frame(\n${Object.entries(obj)
+		.map(([key, value]) => `${key} = c(${value.join(', ')})`)
+		.join(',\n')}\n)`
 }
 
 /**
@@ -224,8 +253,8 @@ export function jsObjectToRDataFrame(obj: Record<string, number[]>): string {
  * @returns R 的矩阵
  */
 export function jsArrayToRMatrix(arr: number[][], transpose = false): string {
-  const matrix = `matrix(c(${arr.flat().join(', ')}), nrow = ${arr.length})`
-  return transpose ? `t(${matrix})` : matrix
+	const matrix = `matrix(c(${arr.flat().join(', ')}), nrow = ${arr.length})`
+	return transpose ? `t(${matrix})` : matrix
 }
 
 /**
@@ -236,27 +265,28 @@ export function jsArrayToRMatrix(arr: number[][], transpose = false): string {
  * @returns 统计量
  */
 export function markS(statistic: number, p: number, hideZero = false): string {
-  if (hideZero) {
-    if (p < 0.001) {
-      return `${statistic.toFixed(3).slice(1)}***`
-    } else if (p < 0.01) {
-      return `${statistic.toFixed(3).slice(1)}**`
-    } else if (p < 0.05) {
-      return `${statistic.toFixed(3).slice(1)}*`
-    } else {
-      return statistic.toFixed(3).slice(1)
-    }
-  } else {
-    if (p < 0.001) {
-      return `${statistic.toFixed(3)}***`
-    } else if (p < 0.01) {
-      return `${statistic.toFixed(3)}**`
-    } else if (p < 0.05) {
-      return `${statistic.toFixed(3)}*`
-    } else {
-      return statistic.toFixed(3)
-    }
-  }
+	if (hideZero) {
+		if (p < 0.001) {
+			return `${statistic.toFixed(3).slice(1)}***`
+		}
+		if (p < 0.01) {
+			return `${statistic.toFixed(3).slice(1)}**`
+		}
+		if (p < 0.05) {
+			return `${statistic.toFixed(3).slice(1)}*`
+		}
+		return statistic.toFixed(3).slice(1)
+	}
+	if (p < 0.001) {
+		return `${statistic.toFixed(3)}***`
+	}
+	if (p < 0.01) {
+		return `${statistic.toFixed(3)}**`
+	}
+	if (p < 0.05) {
+		return `${statistic.toFixed(3)}*`
+	}
+	return statistic.toFixed(3)
 }
 
 /**
@@ -266,45 +296,49 @@ export function markS(statistic: number, p: number, hideZero = false): string {
  * @returns p 值
  */
 export function markP(p: number, hideZero = false): string {
-  if (hideZero) {
-    console.log(p)
-    if (p < 0.001) {
-      return '<.001***'
-    } else if (p < 0.01) {
-      return `${p.toFixed(3).slice(1)}**`
-    } else if (p < 0.05) {
-      return `${p.toFixed(3).slice(1)}*`
-    } else if (p < 1) {
-      return p.toFixed(3).slice(1)
-    } else {
-      return '1'
-    }
-  } else {
-    if (p < 0.001) {
-      return '<0.001***'
-    } else if (p < 0.01) {
-      return `${p.toFixed(3)}**`
-    } else if (p < 0.05) {
-      return `${p.toFixed(3)}*`
-    } else if (p < 1) {
-      return p.toFixed(3)
-    } else {
-      return '1'
-    }
-  }
+	if (hideZero) {
+		console.log(p)
+		if (p < 0.001) {
+			return '<.001***'
+		}
+		if (p < 0.01) {
+			return `${p.toFixed(3).slice(1)}**`
+		}
+		if (p < 0.05) {
+			return `${p.toFixed(3).slice(1)}*`
+		}
+		if (p < 1) {
+			return p.toFixed(3).slice(1)
+		}
+		return '1'
+	}
+	if (p < 0.001) {
+		return '<0.001***'
+	}
+	if (p < 0.01) {
+		return `${p.toFixed(3)}**`
+	}
+	if (p < 0.05) {
+		return `${p.toFixed(3)}*`
+	}
+	if (p < 1) {
+		return p.toFixed(3)
+	}
+	return '1'
 }
 
 /**
  * 把当前 echarts 图表保存为图片
  */
-export function downloadImage(): void {
-  html2canvas(
-    document.getElementById('echarts-container')!.firstChild as HTMLElement,
-  ).then((canvas) => {
-    const url = canvas.toDataURL('image/png')
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'psychpen.png'
-    a.click()
-  })
+export async function downloadImage(): Promise<void> {
+	const ele = document.getElementById('echarts-container')?.firstChild
+	if (!(ele instanceof HTMLElement)) {
+		throw new Error('图表元素不存在')
+	}
+	const canvas = await html2canvas(ele)
+	const url = canvas.toDataURL('image/png')
+	const a = document.createElement('a')
+	a.href = url
+	a.download = 'psychpen.png'
+	a.click()
 }

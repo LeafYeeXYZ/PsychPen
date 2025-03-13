@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /* 
   The default border color has changed to `currentColor` in Tailwind CSS v4,
@@ -9,82 +9,82 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
 }
 
 .no-scrollbar::-webkit-scrollbar {
-  display: none;
+	display: none;
 }
 .no-scrollbar {
-  scrollbar-width: none;
+	scrollbar-width: none;
 }
 * {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-gray-400) var(--color-gray-50);
+	scrollbar-width: thin;
+	scrollbar-color: var(--color-gray-400) var(--color-gray-50);
 }
 @media (prefers-color-scheme: dark) {
-  * {
-    scrollbar-color: var(--color-gray-600) var(--color-gray-800);
-  }
+	* {
+		scrollbar-color: var(--color-gray-600) var(--color-gray-800);
+	}
 }
 
 table.three-line-table {
-  @apply w-fit max-w-full text-center mx-auto;
-  & > thead {
-    @apply border-t-2 border-black border-b dark:border-white;
-  }
-  & > tbody {
-    @apply border-b-2 border-black dark:border-white;
-  }
-  & > thead td {
-    @apply py-2 px-4 text-sm;
-  }
-  & > tbody td {
-    @apply py-1 px-4 text-sm;
-  }
-  & > tbody > tr:first-of-type > td {
-    @apply pt-2;
-  }
-  & > tbody > tr:last-of-type > td {
-    @apply pb-2;
-  }
+	@apply w-fit max-w-full text-center mx-auto;
+	& > thead {
+		@apply border-t-2 border-black border-b dark:border-white;
+	}
+	& > tbody {
+		@apply border-b-2 border-black dark:border-white;
+	}
+	& > thead td {
+		@apply py-2 px-4 text-sm;
+	}
+	& > tbody td {
+		@apply py-1 px-4 text-sm;
+	}
+	& > tbody > tr:first-of-type > td {
+		@apply pt-2;
+	}
+	& > tbody > tr:last-of-type > td {
+		@apply pb-2;
+	}
 }
 
 .ag-theme-quartz {
-  --ag-cell-horizontal-border: solid 1px #dddddd;
-  --ag-row-hover-color: #fbfafa;
-  --ag-header-foreground-color: #450d1a;
-  --ag-foreground-color: #450d1a;
-  --ag-active-color: #450d1a;
+	--ag-cell-horizontal-border: solid 1px #dddddd;
+	--ag-row-hover-color: #fbfafa;
+	--ag-header-foreground-color: #450d1a;
+	--ag-foreground-color: #450d1a;
+	--ag-active-color: #450d1a;
 }
 
 p.intro-text {
-  @apply text-base text-gray-700 leading-8 w-full text-center dark:text-white;
+	@apply text-base text-gray-700 leading-8 w-full text-center dark:text-white;
 }
 
 /* 绘图和统计组件的主窗口 */
 .component-main {
-  @apply w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4;
+	@apply w-full h-full overflow-hidden flex justify-start items-center gap-4 p-4;
 }
 /* 绘图和统计组件的表单 */
 .component-form {
-  @apply w-96 h-full flex flex-col justify-center items-center rounded-md border bg-gray-50 p-4 overflow-hidden dark:bg-gray-800 dark:border-black;
+	@apply w-96 h-full flex flex-col justify-center items-center rounded-md border bg-gray-50 p-4 overflow-hidden dark:bg-gray-800 dark:border-black;
 }
 /* 绘图和统计组件的结果 */
 .component-result {
-  @apply w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-hidden p-4 relative dark:bg-gray-800 dark:border-black;
+	@apply w-[calc(100%-24rem)] h-full flex flex-col justify-start items-center gap-4 rounded-md border bg-white overflow-hidden p-4 relative dark:bg-gray-800 dark:border-black;
 }
 /* 变量组件的主窗口 */
 .component-main.variable-view {
-  @apply border rounded-md dark:bg-gray-900 dark:border-black;
+	@apply border rounded-md dark:bg-gray-900 dark:border-black;
 }
 /* 变量组件的结果 */
 .component-result.variable-view {
-  @apply justify-center gap-0;
+	@apply justify-center gap-0;
 }
