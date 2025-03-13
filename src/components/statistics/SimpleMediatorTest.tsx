@@ -106,7 +106,7 @@ export function SimpleMediatorTest() {
 					}}
 					autoComplete='off'
 					disabled={disabled}
-					initialValues={{ B: 1000 }}
+					initialValues={{ B: 5000 }}
 				>
 					<Form.Item
 						label={

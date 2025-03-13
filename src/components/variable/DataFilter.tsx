@@ -70,7 +70,7 @@ export function DataFilter() {
 							<span>
 								当前过滤表达式{' '}
 								<Tag color='blue'>
-									已排除{data?.length ?? Number.NaN - dataRows.length}条数据
+									已排除{(data?.length ?? Number.NaN) - dataRows.length}条数据
 								</Tag>
 							</span>
 						}
