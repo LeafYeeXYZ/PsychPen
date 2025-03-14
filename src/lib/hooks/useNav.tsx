@@ -129,7 +129,6 @@ import { PearsonCorrelationTest } from '../../components/statistics/PearsonCorre
 import { PeerANOVA } from '../../components/statistics/PeerANOVA'
 import { PeerSampleTTest } from '../../components/statistics/PeerSampleTTest'
 import { SimpleMediatorTest } from '../../components/statistics/SimpleMediatorTest'
-import { TwoLinearRegression } from '../../components/statistics/TwoLinearRegression'
 import { TwoSampleTTest } from '../../components/statistics/TwoSampleTTest'
 import { WelchTTest } from '../../components/statistics/WelchTTest'
 
@@ -146,7 +145,6 @@ export enum STATISTICS_SUB_PAGES_LABELS {
 	LEVENE_TEST = 'Levene 检验 (方差齐性检验)',
 	PEARSON_CORRELATION_TEST = 'Pearson 相关检验',
 	ONE_LINEAR_REGRESSION = '一元线性回归',
-	TWO_LINEAR_REGRESSION = '二元线性回归',
 	MULTI_LINEAR_REGRESSION = '多元线性回归',
 	CORR_RELIABILITY = '重测或复本信度',
 	HALF_RELIABILITY = '分半信度',
@@ -173,7 +171,6 @@ export const STATISTICS_SUB_PAGES_ELEMENTS: Record<
 		<PearsonCorrelationTest />
 	),
 	[STATISTICS_SUB_PAGES_LABELS.ONE_LINEAR_REGRESSION]: <OneLinearRegression />,
-	[STATISTICS_SUB_PAGES_LABELS.TWO_LINEAR_REGRESSION]: <TwoLinearRegression />,
 	[STATISTICS_SUB_PAGES_LABELS.MULTI_LINEAR_REGRESSION]: (
 		<MultiLinearRegression />
 	),
@@ -205,7 +202,6 @@ export const STATISTICS_SUB_PAGES_MAP: Record<
 	相关和回归: [
 		STATISTICS_SUB_PAGES_LABELS.PEARSON_CORRELATION_TEST,
 		STATISTICS_SUB_PAGES_LABELS.ONE_LINEAR_REGRESSION,
-		STATISTICS_SUB_PAGES_LABELS.TWO_LINEAR_REGRESSION,
 		STATISTICS_SUB_PAGES_LABELS.MULTI_LINEAR_REGRESSION,
 	],
 	信度分析: [

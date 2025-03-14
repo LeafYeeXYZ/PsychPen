@@ -1,6 +1,6 @@
 import {
 	LinearRegressionOne,
-	LinearRegressionTwo,
+	LinearRegression,
 	bootstrapTest,
 	mean,
 	standardize,
@@ -25,7 +25,7 @@ type Option = {
 type Result = {
 	x_m: LinearRegressionOne
 	x_y: LinearRegressionOne
-	xm_y: LinearRegressionTwo
+	xm_y: LinearRegression
 	count: number
 	/**
 	 * 非参数 Bootstrap 检验
@@ -64,7 +64,7 @@ export function SimpleMediatorTest() {
 			const yMean = mean(yData)
 			const x_m = new LinearRegressionOne(xData, mData)
 			const x_y = new LinearRegressionOne(mData, yData)
-			const xm_y = new LinearRegressionTwo(xData, mData, yData)
+			const xm_y = new LinearRegression(xData.map((_, i) => [xData[i], mData[i]]), yData)
 			const stded_x = standardize(xData, true, false, xMean)
 			const stded_m = standardize(mData, true, false, mMean)
 			const stded_y = standardize(yData, true, false, yMean)
@@ -78,7 +78,7 @@ export function SimpleMediatorTest() {
 				bootstrap: { lower, upper },
 				standardizedAB:
 					new LinearRegressionOne(stded_x, stded_m).b1 *
-					new LinearRegressionTwo(stded_x, stded_m, stded_y).b2,
+					new LinearRegression(stded_x.map((_, i) => [stded_x[i], stded_m[i]]), stded_y).coefficients[2],
 			})
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -246,10 +246,9 @@ export function SimpleMediatorTest() {
 								</tr>
 								<tr>
 									<td>c' (控制 m 后 x 对 y 的效应 / x 对 y 的直接效应)</td>
-									<td>{result.xm_y.b1.toFixed(3)}</td>
-									{/* biome-ignore lint/style/noNonNullAssertion: <explanation> */}
-									<td>{markS(result.xm_y.b1t!, result.xm_y.b1p)}</td>
-									<td>{markP(result.xm_y.b1p)}</td>
+									<td>{result.xm_y.coefficients[1].toFixed(3)}</td>
+									<td>{markS(result.xm_y.tValues[1], result.xm_y.pValues[1])}</td>
+									<td>{markP(result.xm_y.pValues[1])}</td>
 								</tr>
 								<tr>
 									<td>a (x 对 m 的效应)</td>
@@ -259,14 +258,13 @@ export function SimpleMediatorTest() {
 								</tr>
 								<tr>
 									<td>b (控制 x 后 m 对 y 的效应)</td>
-									<td>{result.xm_y.b2.toFixed(3)}</td>
-									{/* biome-ignore lint/style/noNonNullAssertion: <explanation> */}
-									<td>{markS(result.xm_y.b2t!, result.xm_y.b2p)}</td>
-									<td>{markP(result.xm_y.b2p)}</td>
+									<td>{result.xm_y.coefficients[2].toFixed(3)}</td>
+									<td>{markS(result.xm_y.tValues[2], result.xm_y.pValues[2])}</td>
+									<td>{markP(result.xm_y.pValues[2])}</td>
 								</tr>
 								<tr>
 									<td>ab (x 对 y 的中介效应)</td>
-									<td>{(result.x_m.b1 * result.xm_y.b2).toFixed(3)}</td>
+									<td>{(result.x_m.b1 * result.xm_y.coefficients[2]).toFixed(3)}</td>
 									<td>-</td>
 									<td>-</td>
 								</tr>
@@ -296,10 +294,10 @@ export function SimpleMediatorTest() {
 									<td>a = 0 或 b = 0</td>
 									<td>
 										p<sub>a</sub>: {result.x_m.p.toFixed(3)}, p<sub>b</sub>:{' '}
-										{result.xm_y.b2p.toFixed(3)}
+										{result.xm_y.pValues[2].toFixed(3)}
 									</td>
 									<td>
-										{result.x_m.p < 0.025 && result.xm_y.b2p < 0.025
+										{result.x_m.p < 0.025 && result.xm_y.pValues[2] < 0.025
 											? '拒绝原假设'
 											: '不通过'}
 									</td>
@@ -341,7 +339,7 @@ export function SimpleMediatorTest() {
 										P<sub>M</sub> = ab / c (中介效应占总效应的比例)
 									</td>
 									<td>
-										{((result.x_m.b1 * result.xm_y.b2) / result.x_y.b1).toFixed(
+										{((result.x_m.b1 * result.xm_y.coefficients[2]) / result.x_y.b1).toFixed(
 											3,
 										)}
 									</td>
@@ -352,8 +350,8 @@ export function SimpleMediatorTest() {
 									</td>
 									<td>
 										{(
-											(result.x_m.b1 * result.xm_y.b2) /
-											result.xm_y.b1
+											(result.x_m.b1 * result.xm_y.coefficients[2]) /
+											result.xm_y.coefficients[1]
 										).toFixed(3)}
 									</td>
 								</tr>
@@ -362,7 +360,7 @@ export function SimpleMediatorTest() {
 										v<sup>2</sup> = a<sup>2</sup>b<sup>2</sup>
 									</td>
 									<td>
-										{(result.x_m.b1 ** 2 * result.xm_y.b2 ** 2).toFixed(3)}
+										{(result.x_m.b1 ** 2 * result.xm_y.coefficients[2] ** 2).toFixed(3)}
 									</td>
 								</tr>
 								<tr>

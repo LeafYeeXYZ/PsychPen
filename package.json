@@ -29,12 +29,12 @@
 	},
 	"dependencies": {
 		"@ant-design/icons": "^5.6.1",
-		"@ant-design/x": "^1.0.5",
+		"@ant-design/x": "^1.0.6",
 		"@leaf/parse-think": "npm:@jsr/leaf__parse-think",
 		"@psych/lib": "npm:@jsr/psych__lib",
 		"@psych/sheet": "npm:@jsr/psych__sheet",
-		"ag-grid-react": "^32.3.3",
-		"antd": "^5.24.2",
+		"ag-grid-react": "^32.3.4",
+		"antd": "^5.24.3",
 		"bowser": "^2.11.0",
 		"echarts": "^5.6.0",
 		"echarts-gl": "^2.0.9",
@@ -47,24 +47,24 @@
 		"marked": "^15.0.7",
 		"marked-katex-extension": "^5.1.4",
 		"ml-kmeans": "^6.0.0",
-		"openai": "^4.85.4",
+		"openai": "^4.87.3",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"zustand": "^5.0.3"
 	},
 	"devDependencies": {
-		"@tailwindcss/vite": "^4.0.9",
+		"@tailwindcss/vite": "^4.0.14",
 		"@biomejs/biome": "1.9.4",
-		"@types/bun": "^1.2.4",
+		"@types/bun": "^1.2.5",
 		"@types/react": "^19.0.10",
 		"@types/react-dom": "^19.0.4",
 		"@vitejs/plugin-react": "^4.3.4",
 		"babel-plugin-react-compiler": "^19.0.0-beta-e552027-20250112",
 		"commit-and-tag-version": "^12.5.0",
 		"globals": "^15.15.0",
-		"tailwindcss": "^4.0.9",
-		"typescript": "^5.7.3",
-		"vite": "^6.2.0"
+		"tailwindcss": "^4.0.14",
+		"typescript": "^5.8.2",
+		"vite": "^6.2.2"
 	},
 	"commit-and-tag-version": {
 		"types": [

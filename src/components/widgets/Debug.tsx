@@ -16,16 +16,16 @@ export function Debug() {
 
 function _Debug() {
 	const [disabled, setDisabled] = useState<boolean>(false)
-  const { messageApi } = useStates()
+	const { messageApi } = useStates()
 	return (
 		<div className='flex flex-col items-center gap-2'>
 			<Button
-        block
+				block
 				disabled={disabled}
 				onClick={async () => {
 					try {
 						flushSync(() => setDisabled(true))
-            messageApi?.info('点击')
+						messageApi?.info('点击')
 					} catch (e) {
 						messageApi?.error(e instanceof Error ? e.message : String(e))
 					} finally {
