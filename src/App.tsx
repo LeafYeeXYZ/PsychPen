@@ -11,6 +11,7 @@ import Bowser from 'bowser'
 import { useEffect, useState } from 'react'
 import { version } from '../package.json'
 import { AI } from './components/AI'
+import { Debug } from './components/widgets/Debug'
 import { useAssistant } from './lib/hooks/useAssistant'
 import { useData } from './lib/hooks/useData'
 import { MAIN_PAGES_LABELS, useNav } from './lib/hooks/useNav'
@@ -181,6 +182,7 @@ export function App() {
 				<AI />
 			</Drawer>
 			{contextHolder}
+			{import.meta.env.DEV && <Debug />}
 		</ConfigProvider>
 	)
 }
