@@ -31,7 +31,7 @@ export default defineConfig({
 					],
 					'ag-grid': ['ag-grid-react'],
 					'utils-a': [
-						'html2canvas',
+						'html2canvas-pro',
 						'bowser',
 						'@ant-design/icons',
 						'openai',

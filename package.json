@@ -40,7 +40,7 @@
 		"echarts-gl": "^2.0.9",
 		"echarts-stat": "^1.2.0",
 		"echarts-wordcloud": "^2.1.0",
-		"html2canvas": "^1.4.1",
+		"html2canvas-pro": "^1.5.8",
 		"idb-keyval": "^6.2.1",
 		"jieba-wasm": "^2.2.0",
 		"katex": "^0.16.21",
