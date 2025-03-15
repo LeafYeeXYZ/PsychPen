@@ -1,5 +1,5 @@
 import {
-	LinearRegression,
+	LinearRegressionStandard,
 	LinearRegressionStepwise,
 	corr,
 } from '@psych/lib'
@@ -19,7 +19,7 @@ type Option = {
 	method: 'standard' | 'stepwise-fwd' | 'stepwise-bwd' | 'stepwise-both'
 }
 type Result<T extends 'standard' | 'stepwise'> = Option & {
-	m: T extends 'standard' ? LinearRegression : LinearRegressionStepwise
+	m: T extends 'standard' ? LinearRegressionStandard : LinearRegressionStepwise
 }
 
 export function MultiLinearRegression() {
@@ -50,7 +50,7 @@ export function MultiLinearRegression() {
 				yData.push(Number(row[y]))
 			}
 			const m = values.method === 'standard'
-				? new LinearRegression(xData, yData)
+				? new LinearRegressionStandard(xData, yData)
 				: new LinearRegressionStepwise(xData, yData, values.method === 'stepwise-fwd' ? 'forward' : values.method === 'stepwise-bwd' ? 'backward' : 'both')
 			setResult({ ...values, m })
 			messageApi?.destroy()
