@@ -3,7 +3,10 @@ import { Button, Popover } from 'antd'
 
 export function Debug() {
 	return (
-		<div className='absolute bottom-3 left-3 flex items-center justify-center p-1 rounded-md shadow-2xl border bg-white' id='debug-component'>
+		<div
+			className='absolute bottom-3 left-3 flex items-center justify-center p-1 rounded-md shadow-2xl border bg-white'
+			id='debug-component'
+		>
 			<Popover content={<_Debug />}>
 				<Button type='text' icon={<CodeOutlined />} />
 			</Popover>
