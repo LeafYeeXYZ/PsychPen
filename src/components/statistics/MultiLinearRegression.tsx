@@ -238,7 +238,8 @@ function SequenceLinearRegressionResult({
 		<div className='w-full h-full overflow-auto'>
 			<p className='text-lg mb-2 text-center w-full'>序列多元线性回归</p>
 			<p className='text-xs mb-2 text-center w-full'>
-				因变量: {result.y} | 自变量: {result.x.map((v, i) => `${v} (b${i + 1})`).join('、')}
+				因变量: {result.y} | 自变量:{' '}
+				{result.x.map((v, i) => `${v} (b${i + 1})`).join('、')}
 			</p>
 			<table className='three-line-table'>
 				<thead>
@@ -248,7 +249,9 @@ function SequenceLinearRegressionResult({
 						<td>
 							F<sub>model</sub>
 						</td>
-						<td>p<sub>model</sub></td>
+						<td>
+							p<sub>model</sub>
+						</td>
 						<td>
 							R<sup>2</sup>
 						</td>
@@ -256,10 +259,14 @@ function SequenceLinearRegressionResult({
 							调整后R<sup>2</sup>
 						</td>
 						<td>
-						  R<sup>2</sup>变化量
+							R<sup>2</sup>变化量
 						</td>
-						<td>F<sub>inc</sub></td>
-						<td>p<sub>inc</sub></td>
+						<td>
+							F<sub>inc</sub>
+						</td>
+						<td>
+							p<sub>inc</sub>
+						</td>
 					</tr>
 				</thead>
 				<tbody>
@@ -267,32 +274,25 @@ function SequenceLinearRegressionResult({
 						<tr key={uuid()}>
 							<td>模型 {index + 1}</td>
 							<td>
-								b0: {model.coefficients[0].toFixed(4)}{' (截距)'}
+								b0: {model.coefficients[0].toFixed(4)}
+								{' (截距)'}
 								<br />
-								{model.coefficients
-									.slice(1)
-									.map(
-										(coefficient, index) =>
-											(<span key={uuid()}>
-												{`b${index + 1}: ${coefficient.toFixed(4)}`}
-												{index !== model.coefficients.length - 2 && <br />}
-											</span>),
-									)
-								}
+								{model.coefficients.slice(1).map((coefficient, index) => (
+									<span key={uuid()}>
+										{`b${index + 1}: ${coefficient.toFixed(4)}`}
+										{index !== model.coefficients.length - 2 && <br />}
+									</span>
+								))}
 							</td>
 							<td>{markS(model.F, model.p)}</td>
 							<td>{markP(model.p)}</td>
 							<td>{model.r2.toFixed(4)}</td>
 							<td>{model.r2adj.toFixed(4)}</td>
-							<td>
-								{result.m.r2Changes[index].toFixed(4)}
-							</td>
+							<td>{result.m.r2Changes[index].toFixed(4)}</td>
 							<td>
 								{markS(result.m.fChanges[index], result.m.pChanges[index])}
 							</td>
-							<td>
-								{markP(result.m.pChanges[index])}
-							</td>
+							<td>{markP(result.m.pChanges[index])}</td>
 						</tr>
 					))}
 				</tbody>
