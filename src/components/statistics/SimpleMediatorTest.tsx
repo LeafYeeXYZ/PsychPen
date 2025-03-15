@@ -1,6 +1,4 @@
-import {
-	SimpleMediationModel
-} from '@psych/lib'
+import { SimpleMediationModel } from '@psych/lib'
 import { Button, Form, InputNumber, Select, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -21,7 +19,7 @@ type Option = {
 type Result = {
 	count: number
 	model: SimpleMediationModel
-	bootstrap: { 
+	bootstrap: {
 		a: [number, number]
 		b: [number, number]
 		ab: [number, number]
@@ -70,7 +68,7 @@ export function SimpleMediatorTest() {
 					RM: es.RM,
 					v2: es.v2,
 					standarizedAB: es.standarizedAB(),
-				}
+				},
 			})
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -361,25 +359,19 @@ export function SimpleMediatorTest() {
 									<td>
 										P<sub>M</sub> = ab / c (中介效应占总效应的比例)
 									</td>
-									<td>
-										{result.effectSize.PM.toFixed(3)}
-									</td>
+									<td>{result.effectSize.PM.toFixed(3)}</td>
 								</tr>
 								<tr>
 									<td>
 										R<sub>M</sub> = ab / c' (中介效应与直接效应之比)
 									</td>
-									<td>
-										{result.effectSize.RM.toFixed(3)}
-									</td>
+									<td>{result.effectSize.RM.toFixed(3)}</td>
 								</tr>
 								<tr>
 									<td>
 										v<sup>2</sup> = a<sup>2</sup>b<sup>2</sup>
 									</td>
-									<td>
-										{result.effectSize.v2.toFixed(3)}
-									</td>
+									<td>{result.effectSize.v2.toFixed(3)}</td>
 								</tr>
 								<tr>
 									<td>标准化的 ab</td>
