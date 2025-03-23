@@ -33,8 +33,10 @@ type Result<T extends 'standard' | 'stepwise' | 'sequence'> = Option & {
 }
 
 export function MultiLinearRegression() {
-	const { dataCols, dataRows, isLargeData } = useData()
-	const { messageApi } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
 	const [result, setResult] = useState<
 		Result<'standard'> | Result<'stepwise'> | Result<'sequence'> | null
 	>(null)

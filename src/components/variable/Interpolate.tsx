@@ -17,8 +17,12 @@ type Option = {
 const INTERPOLATE_METHODS = Object.values(ALLOWED_INTERPOLATION_METHODS)
 
 export function Interpolate() {
-	const { dataCols, isLargeData, updateData } = useData()
-	const { messageApi, disabled, setDisabled } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const isLargeData = useData((state) => state.isLargeData)
+	const updateData = useData((state) => state.updateData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
 
 	// 处理插值
 	const handleFinish = async (values: Option) => {

@@ -23,9 +23,12 @@ type Result = {
 } & Option
 
 export function HomoReliability() {
-	const { dataCols, dataRows, isLargeData } = useData()
-	const { messageApi } = useStates()
-	const { Renable, executeRCode } = useRemoteR()
+	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const Renable = useRemoteR((state) => state.Renable)
+	const executeRCode = useRemoteR((state) => state.executeRCode)
 	const [result, setResult] = useState<Result | null>(null)
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {

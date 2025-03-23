@@ -6,11 +6,13 @@ import {
 } from '../lib/hooks/useNav'
 
 export function StatisticsView() {
-	const {
-		activeStatisticsViewSubPage,
-		setStatisticsViewSubPage,
-		statisticsViewSubPage,
-	} = useNav()
+	const activeStatisticsViewSubPage = useNav(
+		(state) => state.activeStatisticsViewSubPage,
+	)
+	const setStatisticsViewSubPage = useNav(
+		(state) => state.setStatisticsViewSubPage,
+	)
+	const statisticsViewSubPage = useNav((state) => state.statisticsViewSubPage)
 
 	return (
 		<div className='w-full h-full overflow-hidden'>

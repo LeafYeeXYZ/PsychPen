@@ -33,8 +33,11 @@ const ANTD_THEME_DARK: ThemeConfig = {
 }
 
 export function App() {
-	const { data } = useData()
-	const { disabled, isDarkMode, setIsDarkMode, setMessageApi } = useStates()
+	const data = useData((state) => state.data)
+	const disabled = useStates((state) => state.disabled)
+	const isDarkMode = useStates((state) => state.isDarkMode)
+	const setIsDarkMode = useStates((state) => state.setIsDarkMode)
+	const setMessageApi = useStates((state) => state.setMessageApi)
 	// 页面切换
 	const { activeMainPage, mainPage, setMainPage } = useNav()
 	// 消息实例
@@ -71,7 +74,7 @@ export function App() {
 			)
 	}, [setIsDarkMode])
 	// AI助手
-	const { ai } = useAssistant()
+	const ai = useAssistant((state) => state.ai)
 	const [showAI, setShowAI] = useState<boolean>(false)
 
 	return (

@@ -64,8 +64,11 @@ type Option = {
 }
 
 export function WordCloudPlot() {
-	const { dataCols, dataRows, isLargeData } = useData()
-	const { isDarkMode, messageApi } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const isLargeData = useData((state) => state.isLargeData)
+	const isDarkMode = useStates((state) => state.isDarkMode)
+	const messageApi = useStates((state) => state.messageApi)
 	// 图形设置相关
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const [rendered, setRendered] = useState<boolean>(false)

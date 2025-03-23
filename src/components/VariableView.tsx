@@ -20,12 +20,12 @@ const ICONS: Record<VARIABLE_SUB_PAGES_LABELS, React.ReactElement> = {
 }
 
 export function VariableView() {
-	const {
-		activeVariableViewSubPage,
-		variableViewSubPage,
-		setVariableViewSubPage,
-	} = useNav()
-	const { disabled } = useStates()
+	const activeVariableViewSubPage = useNav(
+		(state) => state.activeVariableViewSubPage,
+	)
+	const setVariableViewSubPage = useNav((state) => state.setVariableViewSubPage)
+	const variableViewSubPage = useNav((state) => state.variableViewSubPage)
+	const disabled = useStates((state) => state.disabled)
 
 	return (
 		<div className='w-full h-full overflow-hidden'>

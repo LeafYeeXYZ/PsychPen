@@ -2,8 +2,9 @@ import { Cascader } from 'antd'
 import { TOOLS_VIEW_SUB_PAGES_LABELS, useNav } from '../lib/hooks/useNav'
 
 export function ToolsView() {
-	const { setToolsViewSubPage, toolsViewSubPage, activeToolsViewSubPage } =
-		useNav()
+	const activeToolsViewSubPage = useNav((state) => state.activeToolsViewSubPage)
+	const setToolsViewSubPage = useNav((state) => state.setToolsViewSubPage)
+	const toolsViewSubPage = useNav((state) => state.toolsViewSubPage)
 
 	return (
 		<div className='w-full h-full overflow-hidden'>

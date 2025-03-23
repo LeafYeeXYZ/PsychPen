@@ -34,8 +34,10 @@ type Option = {
 }
 
 export function BasicBoxPlot() {
-	const { dataCols, dataRows, isLargeData } = useData()
-	const { messageApi } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
 	// 图形设置相关
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const [rendered, setRendered] = useState<boolean>(false)

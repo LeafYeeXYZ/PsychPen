@@ -34,8 +34,12 @@ const ALLOW_SUBVARS: {
 ]
 
 export function SubVariables() {
-	const { dataCols, updateData, isLargeData } = useData()
-	const { messageApi, disabled, setDisabled } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const updateData = useData((state) => state.updateData)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
 
 	// 定义子变量
 	const [showDiscretize, setShowDiscretize] = useState(false)

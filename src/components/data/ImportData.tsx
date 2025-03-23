@@ -13,8 +13,10 @@ const LARGE_DATA_SIZE = 1024 * 1024 // 1 MB
 const ACCEPT_FILE_TYPES = Object.values(ImportTypes)
 
 export function ImportData() {
-	const { setData } = useData()
-	const { messageApi, setDisabled, disabled } = useStates()
+	const setData = useData((state) => state.setData)
+	const messageApi = useStates((state) => state.messageApi)
+	const setDisabled = useStates((state) => state.setDisabled)
+	const disabled = useStates((state) => state.disabled)
 
 	return (
 		<div className='flex flex-col justify-center items-center w-full h-full relative text-rose-950 dark:text-white'>

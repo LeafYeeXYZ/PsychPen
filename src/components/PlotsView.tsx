@@ -6,8 +6,9 @@ import {
 } from '../lib/hooks/useNav'
 
 export function PlotsView() {
-	const { activePlotsViewSubPage, setPlotsViewSubPage, plotsViewSubPage } =
-		useNav()
+	const activePlotsViewSubPage = useNav((state) => state.activePlotsViewSubPage)
+	const setPlotsViewSubPage = useNav((state) => state.setPlotsViewSubPage)
+	const plotsViewSubPage = useNav((state) => state.plotsViewSubPage)
 
 	return (
 		<div className='w-full h-full overflow-hidden'>

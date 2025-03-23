@@ -30,7 +30,7 @@ function generateDate(data: number[]): {
 }
 
 export function TDistribution() {
-	const { isDarkMode } = useStates()
+	const isDarkMode = useStates((state) => state.isDarkMode)
 	// 基础数据
 	const [mean, setMean] = useState<number>(DEFAULT_MEAN)
 	const [std, setStd] = useState<number>(DEFAULT_STD)

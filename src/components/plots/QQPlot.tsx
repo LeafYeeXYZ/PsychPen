@@ -32,8 +32,10 @@ const DEFAULT_DOT_COUNT = 50
 const DEFAULT_DOT_SIZE = 10
 
 export function QQPlot() {
-	const { dataCols, dataRows, isLargeData } = useData()
-	const { messageApi } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
 	const [form] = Form.useForm<Option>()
 	// 图形设置相关
 	const [disabled, setDisabled] = useState<boolean>(false)

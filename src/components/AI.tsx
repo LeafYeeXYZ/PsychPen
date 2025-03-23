@@ -55,7 +55,8 @@ function GET_PROMPT(vars: Variable[]): string {
 }
 
 export function AI() {
-	const { ai, model } = useAssistant()
+	const ai = useAssistant((state) => state.ai)
+	const model = useAssistant((state) => state.model)
 
 	if (ai === null) {
 		return (
@@ -65,8 +66,10 @@ export function AI() {
 		)
 	}
 
-	const { data, dataCols } = useData()
-	const { messageApi, disabled } = useStates()
+	const data = useData((state) => state.data)
+	const dataCols = useData((state) => state.dataCols)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
 	const nav = useNav()
 	const [input, setInput] = useState('')
 	const [loading, setLoading] = useState(false)

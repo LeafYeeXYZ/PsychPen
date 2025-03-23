@@ -24,8 +24,10 @@ type Result = {
 } & Option
 
 export function WelchTTest() {
-	const { dataCols, dataRows, isLargeData } = useData()
-	const { messageApi } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
 	const [result, setResult] = useState<Result | null>(null)
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {

@@ -33,9 +33,15 @@ import { sleep } from '../../lib/utils'
 const EXPORT_FILE_TYPES = Object.values(ExportTypes)
 
 export function PreviewData() {
-	const { setData, dataCols, dataRows, filterExpression, data, isLargeData } =
-		useData()
-	const { disabled, setDisabled, messageApi } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const filterExpression = useData((state) => state.filterExpression)
+	const data = useData((state) => state.data)
+	const isLargeData = useData((state) => state.isLargeData)
+	const setData = useData((state) => state.setData)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
+	const messageApi = useStates((state) => state.messageApi)
 	const [modalApi, contextHolder] = Modal.useModal()
 	// 导出数据相关
 	const handleExport = (filename: string, type: string) => {
@@ -43,7 +49,7 @@ export function PreviewData() {
 	}
 	const handleExportParams = useRef<{ filename?: string; type?: string }>({})
 	// 标注AI状态
-	const { ai } = useAssistant()
+	const ai = useAssistant((state) => state.ai)
 
 	return (
 		<div className='flex flex-col justify-start items-center w-full h-full p-4'>

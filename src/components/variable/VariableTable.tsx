@@ -4,7 +4,7 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 
 export function VariableTable() {
-	const { dataCols } = useData()
+	const dataCols = useData((state) => state.dataCols)
 	return (
 		<div className='w-full h-full grid grid-rows-[1fr_35%] gap-4'>
 			<AgGridReact

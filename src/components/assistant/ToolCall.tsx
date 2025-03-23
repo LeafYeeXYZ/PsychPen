@@ -152,8 +152,9 @@ function ExportDataTool({
 	file_name: string
 	file_type: string
 }) {
-	const { dataRows } = useData()
-	const { messageApi, disabled } = useStates()
+	const dataRows = useData((state) => state.dataRows)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
 	return (
 		<>
 			<div>
@@ -208,8 +209,11 @@ function CreateNewVarTool({
 	variable_name: string
 	calc_expression: string
 }) {
-	const { addNewVar, isLargeData } = useData()
-	const { messageApi, disabled, setDisabled } = useStates()
+	const addNewVar = useData((state) => state.addNewVar)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
 	return (
 		<>
 			<div>
@@ -285,8 +289,12 @@ function CreateSubVarTool({
 		  }
 		| undefined
 }) {
-	const { dataCols, updateData, isLargeData } = useData()
-	const { messageApi, disabled, setDisabled } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const updateData = useData((state) => state.updateData)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
 	const ALLOWED_METHOD = Object.values(ALLOWED_DISCRETE_METHODS)
 	const shouldDiscritize = Boolean(
 		typeof discretize === 'object' &&
@@ -400,8 +408,12 @@ function ClearSubVarTool({
 	id: string
 	variable_names: string[]
 }) {
-	const { dataCols, updateData, isLargeData } = useData()
-	const { messageApi, disabled, setDisabled } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const updateData = useData((state) => state.updateData)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
 	return (
 		<>
 			<div>
@@ -479,8 +491,11 @@ function ApplyFilterTool({
 	id: string
 	filter_expression: string
 }) {
-	const { setFilterExpression, isLargeData } = useData()
-	const { messageApi, disabled, setDisabled } = useStates()
+	const setFilterExpression = useData((state) => state.setFilterExpression)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
 	return (
 		<>
 			<div>

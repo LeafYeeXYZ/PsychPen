@@ -19,8 +19,12 @@ type Option = {
 }
 
 export function ComputeVar() {
-	const { dataCols, isLargeData, addNewVar } = useData()
-	const { messageApi, disabled, setDisabled } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const isLargeData = useData((state) => state.isLargeData)
+	const addNewVar = useData((state) => state.addNewVar)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
 	const [expression, setExpression] = useState<string>('')
 	const [form] = Form.useForm<Option>()
 	const handleFinish = async (values: Option) => {

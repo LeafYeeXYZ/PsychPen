@@ -17,15 +17,15 @@ type Option = {
 }
 
 export function DataFilter() {
-	const {
-		dataCols,
-		isLargeData,
-		setFilterExpression,
-		filterExpression,
-		data,
-		dataRows,
-	} = useData()
-	const { messageApi, disabled, setDisabled } = useStates()
+	const dataCols = useData((state) => state.dataCols)
+	const isLargeData = useData((state) => state.isLargeData)
+	const setFilterExpression = useData((state) => state.setFilterExpression)
+	const filterExpression = useData((state) => state.filterExpression)
+	const data = useData((state) => state.data)
+	const dataRows = useData((state) => state.dataRows)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
 	const [expression, setExpression] = useState<string>('')
 	const [form] = Form.useForm<Option>()
 	const handleFinish = async (values: Option) => {
