@@ -202,7 +202,7 @@ export function embedValues(
 		}
 		return `"${String(value)}"`
 	})
-	return expression
+	return exp
 }
 
 /**
