@@ -1,4 +1,4 @@
-import {
+import {""
 	vari as _vari,
 	max,
 	mean,
@@ -8,6 +8,7 @@ import {
 	quantile,
 	range,
 	std,
+	sum,
 } from '@psych/lib'
 import { Button, Form, Radio, Select } from 'antd'
 import { useState } from 'react'
@@ -17,6 +18,7 @@ import { useStates } from '../../lib/hooks/useStates'
 import { sleep, uuid } from '../../lib/utils'
 
 type AvialableStat =
+  | 'total'
 	| 'min'
 	| 'max'
 	| 'mean'
@@ -34,6 +36,7 @@ type AvialableStat =
 const STAT_OPTIONS: { value: AvialableStat; label: string }[] = [
 	{ value: 'count', label: '有效值数' },
 	{ value: 'unique', label: '唯一值数' },
+	{ value: 'total', label: '总和' },
 	{ value: 'mean', label: '均值' },
 	{ value: 'median', label: '中位数' },
 	{ value: 'std', label: '标准差' },
@@ -99,6 +102,8 @@ export function Description() {
 						.map((v) => Number(v))
 					const data = statistic.map((stat) => {
 						switch (stat) {
+							case 'total':
+								return { value: +sum(rows).toFixed(4), label: '总和' }
 							case 'min':
 								return { value: +min(rows).toFixed(4), label: '最小值' }
 							case 'max':
@@ -152,6 +157,8 @@ export function Description() {
 						.map((v) => Number(v))
 					const data = statistic.map((stat) => {
 						switch (stat) {
+							case 'total':
+								return { value: +sum(rows).toFixed(4), label: '总和' }
 							case 'min':
 								return { value: +min(rows).toFixed(4), label: '最小值' }
 							case 'max':
