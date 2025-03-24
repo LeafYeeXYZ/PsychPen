@@ -296,7 +296,7 @@ export function WordCloudPlot() {
 						rules={[
 							({ getFieldValue }) => ({
 								validator(_, value) {
-									if (!getFieldValue('split') && value) {
+									if (!getFieldValue('split') && value?.length) {
 										return Promise.reject(
 											'如果需要进行内容过滤, 请启用词语切分',
 										)
