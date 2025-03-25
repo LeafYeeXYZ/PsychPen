@@ -18,7 +18,7 @@ import { useStates } from '../../lib/hooks/useStates'
 import { sleep, uuid } from '../../lib/utils'
 
 type AvialableStat =
-  | 'total'
+	| 'total'
 	| 'min'
 	| 'max'
 	| 'mean'

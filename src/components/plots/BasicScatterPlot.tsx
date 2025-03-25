@@ -25,8 +25,6 @@ type Option = {
 	xLabel?: string
 	/** 自定义 y轴 标签 */
 	yLabel?: string
-	/** 自定义标题 */
-	title?: string
 	/** 自定义点大小 */
 	dotSize?: number
 	/** 回归类型 */
@@ -50,7 +48,7 @@ export function BasicScatterPlot() {
 			messageApi?.loading('正在处理数据...', 0)
 			isLargeData && (await sleep())
 			const timestamp = Date.now()
-			const { xVar, yVar, xLabel, yLabel, title, regression, formula } = values
+			const { xVar, yVar, xLabel, yLabel, regression, formula } = values
 			// @ts-expect-error echarts-stat 没有提供正确的类型定义
 			echarts.registerTransform(ecStat.transform.regression)
 			const ele = document.getElementById('echarts-container')
@@ -59,10 +57,6 @@ export function BasicScatterPlot() {
 			}
 			const chart = echarts.init(ele)
 			const option: EChartsOption = {
-				title: {
-					text: title,
-					left: 'center',
-				},
 				xAxis: {
 					name: xLabel || xVar,
 					nameLocation: 'middle',
@@ -216,29 +210,18 @@ export function BasicScatterPlot() {
 							</Form.Item>
 						</Space.Compact>
 					</Form.Item>
-					<Form.Item label='自定义标题和点大小'>
-						<Space.Compact block>
-							<Form.Item name='title' noStyle>
-								<Input
-									addonBefore='标题'
-									className='w-full'
-									placeholder='默认无标题'
-								/>
-							</Form.Item>
-							<Form.Item
-								name='dotSize'
-								noStyle
-								rules={[{ required: true, message: '请输入点大小' }]}
-							>
-								<InputNumber
-									addonBefore='点大小'
-									className='w-52'
-									placeholder='默认10'
-									min={1}
-									step={1}
-								/>
-							</Form.Item>
-						</Space.Compact>
+					<Form.Item
+						name='dotSize'
+						label='自定义点大小'
+						rules={[{ required: true, message: '请输入点大小' }]}
+					>
+						<InputNumber
+							addonBefore='点大小'
+							className='w-52'
+							placeholder='默认10'
+							min={1}
+							step={1}
+						/>
 					</Form.Item>
 					<Form.Item label='回归线类型与通项公式'>
 						<Space.Compact block>

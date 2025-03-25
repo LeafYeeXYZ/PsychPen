@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from 'antd'
+import { Button, Form, Select } from 'antd'
 import * as echarts from 'echarts'
 import type { EChartsOption } from 'echarts'
 import { useState } from 'react'
@@ -14,8 +14,6 @@ type Option = {
 	labels?: string[]
 	/** 自定义图例 */
 	label: 'count' | 'percent' | 'both'
-	/** 自定义标题 */
-	title?: string
 }
 
 const LABEL_OPTIONS = {
@@ -48,7 +46,7 @@ export function BasicPiePlot() {
 			messageApi?.loading('正在处理数据...', 0)
 			isLargeData && (await sleep())
 			const timestamp = Date.now()
-			const { variable, title, labels, label } = values
+			const { variable, labels, label } = values
 			const ele = document.getElementById('echarts-container')
 			if (!ele) {
 				throw new Error('无法找到图表容器')
@@ -63,13 +61,6 @@ export function BasicPiePlot() {
 			)
 			const counts = value.map((v) => data.filter((d) => d === v).length)
 			const option: EChartsOption = {
-				title: {
-					text: title,
-					left: 'center',
-					textStyle: {
-						color: isDarkMode ? 'white' : 'black',
-					},
-				},
 				legend: {
 					orient: 'vertical',
 					left: 'left',
@@ -160,9 +151,6 @@ export function BasicPiePlot() {
 					</Form.Item>
 					<Form.Item name='labels' label='自定义标签'>
 						<Select className='w-full' mode='tags' placeholder='默认为属性值' />
-					</Form.Item>
-					<Form.Item label='自定义标题' name='title'>
-						<Input className='w-full' placeholder='默认无标题' />
 					</Form.Item>
 					<div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
 						<Button

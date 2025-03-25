@@ -21,8 +21,6 @@ type Option = {
 	standardize: boolean
 	/** 点数 */
 	dotCount: number
-	/** 自定义标题 */
-	title?: string
 	/** 自定义点大小 */
 	dotSize: number
 }
@@ -46,15 +44,7 @@ export function QQPlot() {
 			messageApi?.loading('正在处理数据...', 0)
 			isLargeData && (await sleep())
 			const timestamp = Date.now()
-			const {
-				xVar,
-				yVar,
-				xLabel,
-				yLabel,
-				title,
-				standardize: std,
-				dotCount,
-			} = values
+			const { xVar, yVar, xLabel, yLabel, standardize: std, dotCount } = values
 			const filteredData = dataRows.filter((row) => {
 				if (xVar !== '__stdnorm__' && typeof row[xVar] === 'undefined')
 					return false
@@ -103,10 +93,6 @@ export function QQPlot() {
 				2,
 			)
 			const option: EChartsOption = {
-				title: {
-					text: title,
-					left: 'center',
-				},
 				xAxis: {
 					name: xLabel || (xVar === '__stdnorm__' ? '标准正态分布' : xVar),
 					nameLocation: 'middle',
@@ -305,29 +291,18 @@ export function QQPlot() {
 							</Form.Item>
 						</Space.Compact>
 					</Form.Item>
-					<Form.Item label='自定义标题和点大小'>
-						<Space.Compact block>
-							<Form.Item name='title' noStyle>
-								<Input
-									addonBefore='标题'
-									className='w-full'
-									placeholder='默认无标题'
-								/>
-							</Form.Item>
-							<Form.Item
-								name='dotSize'
-								noStyle
-								rules={[{ required: true, message: '请输入点大小' }]}
-							>
-								<InputNumber
-									addonBefore='点大小'
-									className='w-52'
-									placeholder='默认10'
-									min={1}
-									step={1}
-								/>
-							</Form.Item>
-						</Space.Compact>
+					<Form.Item
+						name='dotSize'
+						label='自定义点大小'
+						rules={[{ required: true, message: '请输入点大小' }]}
+					>
+						<InputNumber
+							addonBefore='点大小'
+							className='w-52'
+							placeholder='默认10'
+							min={1}
+							step={1}
+						/>
 					</Form.Item>
 					<div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
 						<Button

@@ -28,9 +28,6 @@ type Option = {
 	xLabel?: string
 	/** 自定义 y轴 标签 */
 	yLabel?: string
-
-	/** 自定义标题 */
-	title?: string
 }
 
 export function BasicBoxPlot() {
@@ -51,7 +48,6 @@ export function BasicBoxPlot() {
 				groupVar,
 				xLabel,
 				yLabel,
-				title,
 				type,
 				variables,
 				peerLabel,
@@ -80,10 +76,6 @@ export function BasicBoxPlot() {
 				)
 				const option: EChartsOption = {
 					title: [
-						{
-							text: title,
-							left: 'center',
-						},
 						{
 							text: '上离群值: Q3 + 1.5 * IQR\n下离群值: Q1 - 1.5 * IQR',
 							borderColor: '#a0a0a0',
@@ -199,10 +191,6 @@ export function BasicBoxPlot() {
 				)
 				const option: EChartsOption = {
 					title: [
-						{
-							text: title,
-							left: 'center',
-						},
 						{
 							text: '上离群值: Q3 + 1.5 * IQR\n下离群值: Q1 - 1.5 * IQR',
 							borderColor: '#a0a0a0',
@@ -448,9 +436,6 @@ export function BasicBoxPlot() {
 							</Form.Item>
 						</>
 					)}
-					<Form.Item label='自定义标题' name='title'>
-						<Input className='w-full' placeholder='默认无标题' />
-					</Form.Item>
 					<div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
 						<Button
 							className='w-full mt-4'

@@ -24,8 +24,6 @@ type Option = {
 	yLabel?: string
 	/** 自定义 z轴 标签 */
 	zLabel?: string
-	/** 自定义标题 */
-	title?: string
 	/** 统计量 */
 	statistic: Statistic
 	/** 柱状图透明度 */
@@ -46,17 +44,8 @@ export function ThreeDBarPlot() {
 			messageApi?.loading('正在处理数据...', 0)
 			isLargeData && (await sleep())
 			const timestamp = Date.now()
-			const {
-				xVar,
-				yVar,
-				zVar,
-				xLabel,
-				yLabel,
-				zLabel,
-				title,
-				statistic,
-				opacity,
-			} = values
+			const { xVar, yVar, zVar, xLabel, yLabel, zLabel, statistic, opacity } =
+				values
 			const ele = document.getElementById('echarts-container')
 			if (!ele) {
 				throw new Error('无法找到图表容器')
@@ -157,10 +146,6 @@ export function ThreeDBarPlot() {
 				}
 			}
 			const option: EChartsOption = {
-				title: {
-					text: title,
-					left: 'center',
-				},
 				xAxis3D: {
 					name: xLabel || xVar,
 					type: 'category',
@@ -410,9 +395,6 @@ export function ThreeDBarPlot() {
 								/>
 							</Form.Item>
 						</Space.Compact>
-					</Form.Item>
-					<Form.Item label='自定义标题' name='title'>
-						<Input className='w-full' placeholder='默认无标题' />
 					</Form.Item>
 					<div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
 						<Button

@@ -32,8 +32,6 @@ type Option = {
 	/** 自定义 y轴 标签 */
 	yLabel?: string
 
-	/** 自定义标题 */
-	title?: string
 	/** 折线图统计量 */
 	statistic: Statistic
 	/** 是否启用曲线平滑 */
@@ -60,7 +58,6 @@ export function BasicLinePlot() {
 				groupVar,
 				xLabel,
 				yLabel,
-				title,
 				variables,
 				peerLabel,
 				dataLabel,
@@ -118,12 +115,6 @@ export function BasicLinePlot() {
 					}
 				})
 				const option: EChartsOption = {
-					title: [
-						{
-							text: title,
-							left: 'center',
-						},
-					],
 					xAxis: {
 						name: xLabel || groupVar,
 						nameLocation: 'middle',
@@ -163,12 +154,6 @@ export function BasicLinePlot() {
 				}
 				// 被试内数据处理
 				const option: EChartsOption = {
-					title: [
-						{
-							text: title,
-							left: 'center',
-						},
-					],
 					xAxis: {
 						name: peerLabel || 'X',
 						nameLocation: 'middle',
@@ -399,9 +384,6 @@ export function BasicLinePlot() {
 								</Select>
 							</Form.Item>
 						</Space.Compact>
-					</Form.Item>
-					<Form.Item label='自定义标题' name='title'>
-						<Input className='w-full' placeholder='默认无标题' />
 					</Form.Item>
 					<div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
 						<Button

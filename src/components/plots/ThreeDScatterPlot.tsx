@@ -21,8 +21,6 @@ type Option = {
 	yLabel?: string
 	/** 自定义 z轴 标签 */
 	zLabel?: string
-	/** 自定义标题 */
-	title?: string
 	/** 自定义点大小 */
 	dotSize: number
 }
@@ -42,18 +40,13 @@ export function ThreeDScatterPlot() {
 			messageApi?.loading('正在处理数据...', 0)
 			isLargeData && (await sleep())
 			const timestamp = Date.now()
-			const { xVar, yVar, zVar, xLabel, yLabel, zLabel, title, dotSize } =
-				values
+			const { xVar, yVar, zVar, xLabel, yLabel, zLabel, dotSize } = values
 			const ele = document.getElementById('echarts-container')
 			if (!ele) {
 				throw new Error('无法找到图表容器')
 			}
 			const chart = echarts.init(ele)
 			const option: EChartsOption = {
-				title: {
-					text: title,
-					left: 'center',
-				},
 				xAxis3D: {
 					name: xLabel || xVar,
 					nameLocation: 'middle',
@@ -219,29 +212,18 @@ export function ThreeDScatterPlot() {
 							</Form.Item>
 						</Space.Compact>
 					</Form.Item>
-					<Form.Item label='自定义标题和点大小'>
-						<Space.Compact block>
-							<Form.Item name='title' noStyle>
-								<Input
-									addonBefore='标题'
-									className='w-full'
-									placeholder='默认无标题'
-								/>
-							</Form.Item>
-							<Form.Item
-								name='dotSize'
-								noStyle
-								rules={[{ required: true, message: '请输入点大小' }]}
-							>
-								<InputNumber
-									addonBefore='点大小'
-									className='w-52'
-									placeholder='默认8'
-									min={1}
-									step={1}
-								/>
-							</Form.Item>
-						</Space.Compact>
+					<Form.Item
+						name='dotSize'
+						label='自定义点大小'
+						rules={[{ required: true, message: '请输入点大小' }]}
+					>
+						<InputNumber
+							addonBefore='点大小'
+							className='w-52'
+							placeholder='默认8'
+							min={1}
+							step={1}
+						/>
 					</Form.Item>
 					<div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
 						<Button

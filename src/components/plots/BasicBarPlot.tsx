@@ -30,8 +30,6 @@ type Option = {
 	/** 自定义 y轴 标签 */
 	yLabel?: string
 
-	/** 自定义标题 */
-	title?: string
 	/** 是否显示数据标签 */
 	label: 'mean' | 'std' | 'both' | 'none'
 	/** 误差棒数据 */
@@ -59,7 +57,6 @@ export function BasicBarPlot() {
 				groupVar,
 				xLabel,
 				yLabel,
-				title,
 				variables,
 				peerLabel,
 				dataLabel,
@@ -101,13 +98,6 @@ export function BasicBarPlot() {
 					std.push([i, _mean - error * _std, _mean + error * _std, _std])
 				})
 				const option: EChartsOption = {
-					title: [
-						{
-							text: title,
-							left: 'center',
-							textStyle: { color: isDarkMode ? '#fff' : '#000' },
-						},
-					],
 					xAxis: {
 						name: xLabel || groupVar,
 						nameLocation: 'middle',
@@ -233,13 +223,6 @@ export function BasicBarPlot() {
 					std.push([i, _mean - error * _std, _mean + error * _std, _std])
 				})
 				const option: EChartsOption = {
-					title: [
-						{
-							text: title,
-							left: 'center',
-							textStyle: { color: isDarkMode ? '#fff' : '#000' },
-						},
-					],
 					xAxis: {
 						name: peerLabel || 'X',
 						nameLocation: 'middle',
@@ -491,24 +474,17 @@ export function BasicBarPlot() {
 							</Form.Item>
 						</>
 					)}
-					<Form.Item label='数据标签内容和标题设置'>
-						<Space.Compact className='w-full'>
-							<Form.Item noStyle name='label'>
-								<Select
-									className='w-full'
-									placeholder='数据标签内容'
-									options={[
-										{ label: '只显示均值', value: 'mean' },
-										{ label: '只显示标准差', value: 'std' },
-										{ label: '均值和标准差', value: 'both' },
-										{ label: '隐藏数据标签', value: 'none' },
-									]}
-								/>
-							</Form.Item>
-							<Form.Item noStyle name='title'>
-								<Input className='w-full' placeholder='默认无标题' />
-							</Form.Item>
-						</Space.Compact>
+					<Form.Item label='数据标签内容' name='label'>
+						<Select
+							className='w-full'
+							placeholder='数据标签内容'
+							options={[
+								{ label: '只显示均值', value: 'mean' },
+								{ label: '只显示标准差', value: 'std' },
+								{ label: '均值和标准差', value: 'both' },
+								{ label: '隐藏数据标签', value: 'none' },
+							]}
+						/>
 					</Form.Item>
 					<Form.Item label='误差棒内容和Y轴最大值'>
 						<Space.Compact className='w-full'>

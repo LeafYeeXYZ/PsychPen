@@ -1,12 +1,4 @@
-import {
-	Button,
-	ColorPicker,
-	Form,
-	Input,
-	InputNumber,
-	Select,
-	Space,
-} from 'antd'
+import { Button, ColorPicker, Form, InputNumber, Select, Space } from 'antd'
 import * as echarts from 'echarts'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -19,8 +11,6 @@ type Option = {
 	variables: string[]
 	/** 标签 */
 	labels: string[]
-	/** 标题 */
-	title?: string
 	/** 线粗细 */
 	lineWidth: number
 	/** 线颜色 */
@@ -42,7 +32,7 @@ export function ParallelLinePlot() {
 			messageApi?.loading('正在处理数据...', 0)
 			isLargeData && (await sleep())
 			const timestamp = Date.now()
-			const { variables, labels, title, lineWidth, lineColor } = values
+			const { variables, labels, lineWidth, lineColor } = values
 			const ele = document.getElementById('echarts-container')
 			if (!ele) {
 				throw new Error('无法找到图表容器')
@@ -53,7 +43,6 @@ export function ParallelLinePlot() {
 			)
 			chart.setOption(
 				{
-					title: [{ text: title || '', left: 'center' }],
 					parallelAxis: variables.map((variable, index) => ({
 						dim: index,
 						name: labels ? labels[index] : variable,
@@ -183,9 +172,6 @@ export function ParallelLinePlot() {
 								<ColorPicker className='w-full' showText format='hex' />
 							</Form.Item>
 						</Space.Compact>
-					</Form.Item>
-					<Form.Item label='自定义标题' name='title'>
-						<Input className='w-full' placeholder='默认无标题' />
 					</Form.Item>
 					<div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
 						<Button
