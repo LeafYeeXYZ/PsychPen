@@ -12,7 +12,6 @@ export const nav_to_statistics_view: AIFunction = {
 				type: 'object',
 				properties: {
 					page: {
-						type: 'enum',
 						description: '页面',
 						enum: Object.values(STATISTICS_SUB_PAGES_LABELS),
 					},

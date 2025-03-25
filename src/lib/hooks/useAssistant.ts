@@ -66,7 +66,7 @@ export const useAssistant = create<AssistantState>()((set, get) => {
 			}
 			const { openaiEnable, openaiApiKey, model } = get()
 			timer = setTimeout(async () => {
-				const ai = await getAI(openaiEnable, endpoint, openaiApiKey, model)
+				const ai = await getAI(openaiEnable, endpoint, openaiApiKey, model).catch(() => null)
 				set({ ai })
 			}, delay)
 		},

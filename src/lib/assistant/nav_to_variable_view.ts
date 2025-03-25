@@ -12,7 +12,6 @@ export const nav_to_variable_view: AIFunction = {
 				type: 'object',
 				properties: {
 					page: {
-						type: 'enum',
 						description: '页面',
 						enum: Object.values(VARIABLE_SUB_PAGES_LABELS),
 					},

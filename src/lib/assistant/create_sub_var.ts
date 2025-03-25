@@ -33,7 +33,6 @@ export const create_sub_var: AIFunction = {
 						description: '如果要生成离散化子变量, 则需要指定离散化算法和分组数',
 						properties: {
 							method: {
-								type: 'enum',
 								description: '离散化算法',
 								enum: Object.values(ALLOWED_DISCRETE_METHODS),
 							},

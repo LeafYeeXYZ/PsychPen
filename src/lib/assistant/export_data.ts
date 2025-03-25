@@ -17,7 +17,6 @@ export const export_data: AIFunction = {
 						description: '文件名 (不含拓展名)',
 					},
 					file_type: {
-						type: 'enum',
 						description: '文件类型',
 						enum: Object.values(ExportTypes),
 					},
