@@ -231,6 +231,8 @@ export const TOOLS_VIEW_SUB_PAGES_ELEMENTS: Record<
 }
 
 type NavState = {
+  currentPageInfo: () => string
+
 	mainPage: React.ReactElement
 	activeMainPage: MAIN_PAGES_LABELS
 	setMainPage: (page: MAIN_PAGES_LABELS) => void
@@ -258,7 +260,24 @@ const DEFAULT_STATISTICS_SUB_PAGE =
 	STATISTICS_SUB_PAGES_LABELS.ONE_SAMPLE_T_TEST
 const DEFAULT_TOOLS_SUB_PAGE = TOOLS_VIEW_SUB_PAGES_LABELS.STATISTIC_TO_PVALUE
 
-export const useNav = create<NavState>()((setState) => ({
+export const useNav = create<NavState>()((setState, getState) => ({
+	currentPageInfo: () => {
+		const state = getState()
+		switch (state.activeMainPage) {
+			case MAIN_PAGES_LABELS.DATA:
+				return '数据视图'
+			case MAIN_PAGES_LABELS.VARIABLE:
+				return `变量视图的"${state.activeVariableViewSubPage}"页面`
+			case MAIN_PAGES_LABELS.PLOTS:
+				return `绘图视图的"${state.activePlotsViewSubPage}"页面`
+			case MAIN_PAGES_LABELS.STATISTICS:
+				return `统计视图的"${state.activeStatisticsViewSubPage}"页面`
+			case MAIN_PAGES_LABELS.TOOLS:
+				return `工具视图的"${state.activeToolsViewSubPage}"页面`
+			default:
+				throw new Error('发现未知页面')
+		}
+	},
 	mainPage: MAIN_PAGES_ELEMENTS[MAIN_PAGES_LABELS.DATA],
 	activeMainPage: MAIN_PAGES_LABELS.DATA,
 	setMainPage: (page) =>
