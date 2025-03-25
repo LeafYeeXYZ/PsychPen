@@ -205,7 +205,7 @@ curl http://localhost:8000/execute -X POST -d '{"password": "xxx", "code": "1 + 
 
 PsychPen 创新性地引入了 AI 辅助分析功能, 可以让 AI 助手基于你的数据和需求, 针对性地给出建议或直接替你操作 PsychPen 完成变量处理、统计分析和图表绘制
 
-PsychPen 支持所有实现了 [function calling](https://platform.openai.com/docs/guides/function-calling) 并兼容 OpenAI API 规范的大语言模型 (如 [DeepSeek-V3](https://platform.deepseek.com/)、[GPT-4o](https://platform.openai.com/docs/guides)、[Qwen-max](https://bailian.console.aliyun.com/#/model-market)), 你只需根据你所用的 AI 模型提供商的使用文档, 在右上角的 `AI辅助分析设置` 中点击 `开启AI辅助分析` 按钮, 并天蝎 `baseUrl`、`apiKey`、`modelId` 等参数, 即可点击页面右上角的 `Ask AI` 按钮, 与 AI 助手进行交互
+PsychPen 支持所有实现了 [function calling](https://platform.openai.com/docs/guides/function-calling) 并兼容 OpenAI API 规范的大语言模型 (如 [DeepSeek-V3](https://platform.deepseek.com/)、[GPT-4o](https://platform.openai.com/docs/guides)、[Qwen-max](https://bailian.console.aliyun.com/#/model-market)), 你只需根据你所用的 AI 模型提供商的使用文档, 在右上角的 `AI辅助分析设置` 中点击 `开启AI辅助分析` 按钮, 并填写 `baseUrl`、`apiKey`、`modelId` 等参数, 即可点击页面右上角的 `Ask AI` 按钮, 与 AI 助手进行交互
 
 ![](readme/data-7.png)
 
@@ -213,30 +213,42 @@ PsychPen 支持所有实现了 [function calling](https://platform.openai.com/do
 
 在根据[2.4 AI辅助分析设置](#24-ai辅助分析设置) 设置好 AI 辅助分析后, 你可以点击右上角的 `Ask AI` 按钮, 与 AI 助手进行交互. 你可以询问它 PsychPen 的使用方法、对你的数据的见解、统计分析的建议等, 也可以直接指示它帮你操作 PsychPen 完成数据导出、变量处理、统计分析、图表绘制等操作
 
-> 注: 以下所有示例操作使用的AI模型均为 `qwen-plus-latest` (`Qwen` 系列的中等规模模型的 `2025.01.17` 更新版本, 性能介于 `qwen-max` 和 `qwen-turbo` 之间), 如果使用性能更强/弱的AI模型, 可能会得到更好/差的效果
+> 注: 以下所有示例操作如果使用性能更强/弱的AI模型, 可能会得到更好/差的效果
 
 #### 2.5.1 让AI助手操作数据导出
+
+> 以下示例使用 `qwen-plus-latest` (`2025.01.17` 更新版本) 模型
 
 ![](readme/data-8.png)
 
 #### 2.5.2 让AI助手操作变量标准化
 
+> 以下示例使用 `qwen-plus-latest` (`2025.01.17` 更新版本) 模型
+
 ![](readme/data-9.png)
 
 #### 2.5.3 让AI助手操作计算变量
+
+> 以下示例使用 `deepseek-chat` (`deepseek-v3-0324` 版本) 模型
 
 ![](readme/data-10.png)
 
 #### 2.5.4 让AI助手操作数据筛选
 
+> 以下示例使用 `qwen-plus-latest` (`2025.01.17` 更新版本) 模型
+
 ![](readme/data-11.png)
 
 #### 2.5.5 询问AI助手数据分析建议
+
+> 以下示例使用 `qwen-plus-latest` (`2025.01.17` 更新版本) 模型
 
 | ![](readme/data-12.png) | ![](readme/data-13.png) |
 | :---------------------: | :---------------------: |
 
 #### 2.5.6 让AI助手介绍PsychPen
+
+> 以下示例使用 `qwen-plus-latest` (`2025.01.17` 更新版本) 模型
 
 ![](readme/data-14.png)
 

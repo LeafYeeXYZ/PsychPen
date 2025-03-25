@@ -36,7 +36,7 @@ export function Messages({
 		>
 			{[
 				{ role: 'assistant', content: greeting },
-				...messages,
+				...messages.filter((message) => message.role !== 'tool'),
 				...(showLoading ? [{ role: 'assistant', content: '__loading__' }] : []),
 			].map((message) => {
 				const tool_calls = (message as ChatCompletionAssistantMessageParam)
@@ -69,13 +69,7 @@ export function Messages({
 							)
 						}
 						loading={message.content === '__loading__'}
-						header={
-							message.role === 'user'
-								? 'User'
-								: message.role === 'assistant'
-									? 'PsychPen'
-									: 'PsychPen [系统]'
-						}
+						header={message.role === 'user' ? 'User' : 'PsychPen'}
 						avatar={{
 							icon:
 								message.role === 'user' ? (

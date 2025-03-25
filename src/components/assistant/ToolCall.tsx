@@ -109,6 +109,30 @@ export function ToolCall({
 			)
 			break
 		}
+		case 'nav_to_data_view': {
+			element = <NavToPageTool mainPageName='数据视图' />
+			break
+		}
+		case 'nav_to_variable_view': {
+			const { page } = JSON.parse(args) as { page: string }
+			element = <NavToPageTool mainPageName='变量视图' subPageName={page} />
+			break
+		}
+		case 'nav_to_plots_view': {
+			const { page } = JSON.parse(args) as { page: string }
+			element = <NavToPageTool mainPageName='绘图视图' subPageName={page} />
+			break
+		}
+		case 'nav_to_statistics_view': {
+			const { page } = JSON.parse(args) as { page: string }
+			element = <NavToPageTool mainPageName='统计视图' subPageName={page} />
+			break
+		}
+		case 'nav_to_tools_view': {
+			const { page } = JSON.parse(args) as { page: string }
+			element = <NavToPageTool mainPageName='工具视图' subPageName={page} />
+			break
+		}
 		default: {
 			element = <DefaultTool toolCall={toolCall} />
 		}
@@ -135,6 +159,33 @@ function DefaultTool({
 					(func) => func.tool.function.name === toolCall.function.name,
 				)?.label || `未知函数 (${toolCall.function.name})`}
 			</Tag>
+		</div>
+	)
+}
+
+function NavToPageTool({
+	mainPageName,
+	subPageName,
+}: {
+	mainPageName: string
+	subPageName?: string
+}) {
+	return (
+		<div>
+		  跳转到{' '}
+			<Tag color='blue' style={{ margin: 0 }}>
+				{mainPageName}
+			</Tag>
+			{subPageName && (
+				<>
+					{' '}
+					下的{' '}
+					<Tag color='blue' style={{ margin: 0 }}>
+						{subPageName}
+					</Tag>
+					{' '}页面
+				</>
+			)}
 		</div>
 	)
 }
