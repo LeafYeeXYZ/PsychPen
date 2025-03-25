@@ -1,10 +1,10 @@
 import { WelchTTest as T } from '@psych/lib'
 import { Button, Form, Input, InputNumber, Select, Space } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { markP, markS, sleep } from '../../lib/utils'
+import { markP, markS, renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 数据变量 */
@@ -18,17 +18,17 @@ type Option = {
 	/** 显著性水平, 默认 0.05 */
 	alpha: number
 }
-type Result = {
-	groups: string[]
-	m: T
-} & Option
 
 export function WelchTTest() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -51,11 +51,33 @@ export function WelchTTest() {
 					row[groupVar] == groups[1] && data2.push(Number(row[dataVar]))
 				}
 			}
-			setResult({
-				...values,
-				groups: groups.map(String),
-				m: new T(data1, data2, twoside, expect, alpha),
-			})
+			const m = new T(data1, data2, twoside, expect, alpha)
+			setStatResult(`
+## 1 Welch's T Test
+
+对被试间变量"${dataVar}" (分组变量: "${groupVar}") 进行${twoside ? '双尾' : '单尾'} Welch's T Test. 原假设 (H<sub>0</sub>) 为"均值差异 = ${expect}"; 显著性水平 (α) 为 ${alpha}.
+
+结果如表 1 所示.
+
+> 表 1 - Welch's T Test 结果
+
+| 均值差异 | 自由度 | t | p | ${(100 - alpha * 100).toFixed(3)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| ${m.meanDiff.toFixed(3)} | ${m.df.toFixed(3)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${m.ci[0].toFixed(3)}, ${m.ci[1].toFixed(3)}) | ${m.cohenD.toFixed(3)} | ${m.r2.toFixed(3)} |
+
+## 2 描述统计
+
+对被试间变量"${dataVar}" (分组变量: "${groupVar}") 进行描述统计.
+
+结果如表 2 所示.
+
+> 表 2 - 描述统计结果
+
+| 组别 | 均值 | 标准差 | 样本量 | 自由度 |
+| :---: | :---: | :---: | :---: | :---: |
+| ${groups[0]} | ${m.meanA.toFixed(3)} | ${m.stdA.toFixed(3)} | ${m.dfA + 1} | ${m.dfA} |
+| ${groups[1]} | ${m.meanB.toFixed(3)} | ${m.stdB.toFixed(3)} | ${m.dfB + 1} | ${m.dfB} |
+			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {
@@ -191,73 +213,13 @@ export function WelchTTest() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>
-							Welch's T Test ({result.twoside ? '双尾' : '单尾'})
-						</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							H<sub>0</sub>: 均值差异={result.expect} | 显著性水平(α):{' '}
-							{result.alpha}
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>均值差异</td>
-									<td>自由度</td>
-									<td>t</td>
-									<td>p</td>
-									<td>{(100 - result.alpha * 100).toFixed(3)}%置信区间</td>
-									<td>效应量 (Cohen's d)</td>
-									<td>
-										测定系数 (R<sup>2</sup>)
-									</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>{result.m.meanDiff.toFixed(3)}</td>
-									<td>{result.m.df.toFixed(3)}</td>
-									<td>{markS(result.m.t, result.m.p)}</td>
-									<td>{markP(result.m.p)}</td>
-									<td>{`[${result.m.ci[0].toFixed(3)}, ${result.m.ci[1].toFixed(3)})`}</td>
-									<td>{result.m.cohenD.toFixed(3)}</td>
-									<td>{result.m.r2.toFixed(3)}</td>
-								</tr>
-							</tbody>
-						</table>
-
-						<p className='text-lg mb-2 text-center w-full mt-8'>描述统计</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							分组变量: {result.groupVar}
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>组别</td>
-									<td>均值</td>
-									<td>标准差</td>
-									<td>样本量</td>
-									<td>自由度</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>{result.groups[0]}</td>
-									<td>{result.m.meanA.toFixed(3)}</td>
-									<td>{result.m.stdA.toFixed(3)}</td>
-									<td>{result.m.dfA + 1}</td>
-									<td>{result.m.dfA}</td>
-								</tr>
-								<tr>
-									<td>{result.groups[1]}</td>
-									<td>{result.m.meanB.toFixed(3)}</td>
-									<td>{result.m.stdB.toFixed(3)}</td>
-									<td>{result.m.dfB + 1}</td>
-									<td>{result.m.dfB}</td>
-								</tr>
-							</tbody>
-						</table>
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

@@ -1,10 +1,10 @@
 import { CorrRealiability } from '@psych/lib'
 import { Button, Form, Select } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { sleep, uuid } from '../../lib/utils'
+import { renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 变量名 */
@@ -12,16 +12,17 @@ type Option = {
 	/** 分组变量 */
 	group?: string
 }
-type Result = {
-	m: CorrRealiability
-} & Option
 
 export function CorrReliability() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -40,7 +41,19 @@ export function CorrReliability() {
 			const g = values.group
 			const group = g ? filteredRows.map((row) => String(row[g])) : undefined
 			const m = new CorrRealiability(x1, x2, group)
-			setResult({ m, ...values })
+			setStatResult(`
+## 1 重测信度/复本信度分析
+
+对前后测变量"${values.variables[0]}"和"${values.variables[1]}"进行重测信度/复本信度分析 (即皮尔逊相关系数)${group ? `, 分组变量为"${g}"` : ''}.
+
+结果如表 1 所示.
+
+> 表 1 - 重测信度/复本信度分析结果
+
+| 分组 | 相关系数(r<sub>xx</sub>) | 测定系数(r<sub>xx</sub><sup>2</sup>) |
+| :---: | :---: | :---: |
+${m.r.map((_, i) => `| ${m.group[i]} | ${m.r[i].toFixed(3)} | ${m.r2[i].toFixed(3)} |`).join('\n')}
+			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {
@@ -105,42 +118,13 @@ export function CorrReliability() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>
-							重测信度/复本信度分析
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>分组</td>
-									<td>
-										相关系数(r<sub>xx</sub>)
-									</td>
-									<td>
-										测定系数(r<sub>xx</sub>
-										<sup>2</sup>)
-									</td>
-								</tr>
-							</thead>
-							<tbody>
-								{result.m.r.map((_, i) => (
-									<tr key={uuid()}>
-										<td>{result.m.group[i]}</td>
-										<td>{result.m.r[i].toFixed(3)}</td>
-										<td>{result.m.r2[i].toFixed(3)}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-						<p className='text-xs mt-3 text-center w-full'>
-							配对变量: {result.variables.join(', ')}
-						</p>
-						{result.group && (
-							<p className='text-xs mt-2 text-center w-full'>
-								分组变量: {result.group}
-							</p>
-						)}
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

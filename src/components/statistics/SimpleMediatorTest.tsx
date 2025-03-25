@@ -1,10 +1,10 @@
 import { SimpleMediationModel } from '@psych/lib'
-import { Button, Form, InputNumber, Select, Tag } from 'antd'
-import { useState } from 'react'
+import { Button, Form, InputNumber, Select, Tag, Collapse } from 'antd'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { markP, markS, sleep } from '../../lib/utils'
+import { markP, markS, renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 自变量 */
@@ -16,29 +16,16 @@ type Option = {
 	/** Bootstrap 重抽样次数 */
 	B: number
 }
-type Result = {
-	count: number
-	model: SimpleMediationModel
-	bootstrap: {
-		a: [number, number]
-		b: [number, number]
-		ab: [number, number]
-		c: [number, number]
-		cPrime: [number, number]
-	}
-	effectSize: {
-		PM: number
-		RM: number
-		v2: number
-		standarizedAB: number
-	}
-} & Option
 
 export function SimpleMediatorTest() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -59,18 +46,53 @@ export function SimpleMediatorTest() {
 			const model = new SimpleMediationModel(xData, mData, yData)
 			const bs = model.bootstrap(B)
 			const es = model.effectSize
-			setResult({
-				...values,
-				count: filteredRows.length,
-				model: model,
-				bootstrap: bs,
-				effectSize: {
-					PM: es.PM,
-					RM: es.RM,
-					v2: es.v2,
-					standarizedAB: es.standarizedAB(),
-				},
-			})
+			setStatResult(`
+## 1 简单中介效应模型
+
+以"${x}"为自变量，"${m}"为中介变量，"${y}"为因变量构建简单中介效应模型.
+
+结果如表 1 所示.
+
+> 表 1 - 简单中介效应模型
+
+| 参数 | 值 | 统计量 (t) | 显著性 (p) | 95%置信区间 |
+| :---: | :---: | :---: | :---: | :---: |
+| c (x 对 y 的总效应) | ${model.c.toFixed(3)} | ${markS(model.cT, model.cP)} | ${markP(model.cP)} | [${bs.c[0].toFixed(3)}, ${bs.c[1].toFixed(3)}) |
+| c' (控制 m 后 x 对 y 的效应 / x 对 y 的直接效应) | ${model.cPrime.toFixed(3)} | ${markS(model.cPrimeT, model.cPrimeP)} | ${markP(model.cPrimeP)} | [${bs.cPrime[0].toFixed(3)}, ${bs.cPrime[1].toFixed(3)}) |
+| a (x 对 m 的效应) | ${model.a.toFixed(3)} | ${markS(model.aT, model.aP)} | ${markP(model.aP)} | [${bs.a[0].toFixed(3)}, ${bs.a[1].toFixed(3)}) |
+| b (控制 x 后 m 对 y 的效应) | ${model.b.toFixed(3)} | ${markS(model.bT, model.bP)} | ${markP(model.bP)} | [${bs.b[0].toFixed(3)}, ${bs.b[1].toFixed(3)}) |
+| ab (x 对 y 的中介效应) | ${model.ab.toFixed(3)} | - | - | [${bs.ab[0].toFixed(3)}, ${bs.ab[1].toFixed(3)}) |
+
+## 2 中介效应显著性检验
+
+样本量为 ${filteredRows.length}，Bootstrap 抽样次数为 ${B}. 依次检验法中 a、b 的显著性阈值为 0.025.
+
+结果如表 2 所示.
+
+> 表 2 - 中介效应显著性检验
+
+| 方法 | H<sub>0</sub> | 统计量 | 结果 |
+| :---: | :---: | :---: | :---: |
+| 依次检验法 | a = 0 或 b = 0 | p<sub>a</sub>: ${model.aP.toFixed(3)}, p<sub>b</sub>: ${model.bP.toFixed(3)} | ${
+				model.aP < 0.025 && model.bP < 0.025 ? '拒绝原假设' : '不通过'
+			} |
+| 非参数 Bootstrap 检验 | ab = 0 | 95%置信区间: [${bs.ab[0].toFixed(3)}, ${bs.ab[1].toFixed(3)}) | ${
+				bs.ab[0] > 0 || bs.ab[1] < 0 ? '拒绝原假设' : '不通过'
+			} |
+
+## 3 中介效应的效应量
+
+结果如表 3 所示.
+
+> 表 3 - 中介效应的效应量
+
+| 方法 | 结果 |
+| :---: | :---: |
+| P<sub>M</sub> = ab / c (中介效应占总效应的比例) | ${es.PM.toFixed(3)} |
+| R<sub>M</sub> = ab / c' (中介效应与直接效应之比) | ${es.RM.toFixed(3)} |
+| v<sup>2</sup> = a<sup>2</sup>b<sup>2</sup> | ${es.v2.toFixed(3)} |
+| 标准化的 ab | ${es.standarizedAB().toFixed(3)} |
+			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {
@@ -99,6 +121,21 @@ export function SimpleMediatorTest() {
 					disabled={disabled}
 					initialValues={{ B: 5000 }}
 				>
+					<div className='mb-4'>
+						<Collapse
+							items={[{
+								key: 'smm',
+								label: '简单中介效应模型示意图 (点击展开)',
+								children: (
+									<img
+										src='/smm.png'
+										alt='simple mediator model'
+										className='w-full'
+									/>
+								),
+							}]}
+						/>
+					</div>
 					<Form.Item
 						label={
 							<span>
@@ -213,173 +250,13 @@ export function SimpleMediatorTest() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>简单中介效应模型</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							模型: x ({result.x}) -{'>'} m ({result.m}) -{'>'} y ({result.y})
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>参数</td>
-									<td>值</td>
-									<td>统计量 (t)</td>
-									<td>显著性 (p)</td>
-									<td>95%置信区间</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>c (x 对 y 的总效应)</td>
-									<td>{result.model.c.toFixed(3)}</td>
-									<td>{markS(result.model.cT, result.model.cP)}</td>
-									<td>{markP(result.model.cP)}</td>
-									<td>
-										{'['}
-										{result.bootstrap.c[0].toFixed(3)},{' '}
-										{result.bootstrap.c[1].toFixed(3)}
-										{')'}
-									</td>
-								</tr>
-								<tr>
-									<td>c' (控制 m 后 x 对 y 的效应 / x 对 y 的直接效应)</td>
-									<td>{result.model.cPrime.toFixed(3)}</td>
-									<td>{markS(result.model.cPrimeT, result.model.cPrimeP)}</td>
-									<td>{markP(result.model.cPrimeP)}</td>
-									<td>
-										{'['}
-										{result.bootstrap.cPrime[0].toFixed(3)},{' '}
-										{result.bootstrap.cPrime[1].toFixed(3)}
-										{')'}
-									</td>
-								</tr>
-								<tr>
-									<td>a (x 对 m 的效应)</td>
-									<td>{result.model.a.toFixed(3)}</td>
-									<td>{markS(result.model.aT, result.model.aP)}</td>
-									<td>{markP(result.model.aP)}</td>
-									<td>
-										{'['}
-										{result.bootstrap.a[0].toFixed(3)},{' '}
-										{result.bootstrap.a[1].toFixed(3)}
-										{')'}
-									</td>
-								</tr>
-								<tr>
-									<td>b (控制 x 后 m 对 y 的效应)</td>
-									<td>{result.model.b.toFixed(3)}</td>
-									<td>{markS(result.model.bT, result.model.bP)}</td>
-									<td>{markP(result.model.bP)}</td>
-									<td>
-										{'['}
-										{result.bootstrap.b[0].toFixed(3)},{' '}
-										{result.bootstrap.b[1].toFixed(3)}
-										{')'}
-									</td>
-								</tr>
-								<tr>
-									<td>ab (x 对 y 的中介效应)</td>
-									<td>{result.model.ab.toFixed(3)}</td>
-									<td>-</td>
-									<td>-</td>
-									<td>
-										{'['}
-										{result.bootstrap.ab[0].toFixed(3)},{' '}
-										{result.bootstrap.ab[1].toFixed(3)}
-										{')'}
-									</td>
-								</tr>
-							</tbody>
-						</table>
-
-						<p className='text-lg mb-2 text-center w-full mt-8'>
-							中介效应显著性检验
-						</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							样本量: {result.count} | Bootstrap 抽样次数: {result.B}
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>方法</td>
-									<td>
-										H<sub>0</sub>
-									</td>
-									<td>统计量</td>
-									<td>结果</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>依次检验法</td>
-									<td>a = 0 或 b = 0</td>
-									<td>
-										p<sub>a</sub>: {result.model.aP.toFixed(3)}, p<sub>b</sub>:{' '}
-										{result.model.bP.toFixed(3)}
-									</td>
-									<td>
-										{result.model.aP < 0.025 && result.model.bP < 0.025
-											? '拒绝原假设'
-											: '不通过'}
-									</td>
-								</tr>
-								<tr>
-									<td>非参数 Bootstrap 检验</td>
-									<td>ab = 0</td>
-									<td>
-										95%置信区间: {'['}
-										{result.bootstrap.ab[0].toFixed(3)},{' '}
-										{result.bootstrap.ab[1].toFixed(3)}
-										{')'}
-									</td>
-									<td>
-										{result.bootstrap.ab[0] > 0 || result.bootstrap.ab[1] < 0
-											? '拒绝原假设'
-											: '不通过'}
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<p className='text-xs mt-3 text-center w-full'>
-							注: 依次检验法中 a、b 的显著性阈值为 0.025
-						</p>
-
-						<p className='text-lg mb-2 text-center w-full mt-8'>
-							中介效应的效应量
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>方法</td>
-									<td>结果</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>
-										P<sub>M</sub> = ab / c (中介效应占总效应的比例)
-									</td>
-									<td>{result.effectSize.PM.toFixed(3)}</td>
-								</tr>
-								<tr>
-									<td>
-										R<sub>M</sub> = ab / c' (中介效应与直接效应之比)
-									</td>
-									<td>{result.effectSize.RM.toFixed(3)}</td>
-								</tr>
-								<tr>
-									<td>
-										v<sup>2</sup> = a<sup>2</sup>b<sup>2</sup>
-									</td>
-									<td>{result.effectSize.v2.toFixed(3)}</td>
-								</tr>
-								<tr>
-									<td>标准化的 ab</td>
-									<td>{result.effectSize.standarizedAB.toFixed(3)}</td>
-								</tr>
-							</tbody>
-						</table>
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

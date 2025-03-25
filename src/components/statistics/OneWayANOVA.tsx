@@ -1,11 +1,10 @@
 import { OneWayAnova, std } from '@psych/lib'
-import type { BonferroniResult, ScheffeResult, TukeyResult } from '@psych/lib'
 import { Button, Form, Select } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { markP, markS, sleep, uuid } from '../../lib/utils'
+import { markP, markS, renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 因变量 */
@@ -20,19 +19,17 @@ const METHODS = {
 	Bonferroni: 'Bonferroni 事后检验',
 	Tukey: "Tukey's HSD 事后检验",
 }
-type Result = {
-	m: OneWayAnova
-	scheffe?: ScheffeResult[]
-	bonferroni?: BonferroniResult[]
-	tukey?: TukeyResult[]
-} & Option
 
 export function OneWayANOVA() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -60,7 +57,140 @@ export function OneWayANOVA() {
 				throw new Error("Tukey's HSD 要求每组样本量相等, 请移除此检验后重试")
 			}
 			const tukey = method?.includes('Tukey') ? m.tukey() : undefined
-			setResult({ ...values, m, scheffe, bonferroni, tukey })
+			setStatResult(`
+## 1 单因素方差分析	
+
+对被试间变量"${value}" (分组变量: "${group}") 进行单因素方差分析 (One-way ANOVA). 原假设 (H<sub>0</sub>) 为"各组均值相等". 显著性水平 (α) 为 0.05.
+
+结果如表 1 和表 2 所示.
+
+> 表 1 - 单因素方差分析结果
+
+| 样本量 | 水平数 | 自由度 (组间/组内) | F | p | η² | Conhen's f |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| ${m.dfT + 1} | ${m.dfB + 1} | ${m.dfB} / ${m.dfW} | ${markS(m.f, m.p)} | ${markP(m.p)} | ${m.r2.toFixed(3)} | ${m.cohenF.toFixed(3)} |
+
+> 表 2 - 分析细节
+
+| 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
+| :---: | :---: | :---: | :---: |
+| 总和 (T) | ${m.dfT} | ${m.SSt.toFixed(3)} | ${m.MSt.toFixed(3)} |
+| 组间 (B) | ${m.dfB} | ${m.SSb.toFixed(3)} | ${m.MSb.toFixed(3)} |
+| 组内 (W) | ${m.dfW} | ${m.SSw.toFixed(3)} | ${m.MSw.toFixed(3)} |
+
+## 2 描述统计
+
+对被试间变量"${value}" (分组变量: "${group}") 进行分组描述统计.
+
+结果如表 3 所示.
+
+> 表 3 - 分组描述统计
+
+| 组别 | 计数 | 均值 | 标准差 | 总和 |
+| :---: | :---: | :---: | :---: | :---: |
+${m.groups
+	.map(
+		(group, index) =>
+			`| ${group} | ${m.groupsCount[index]} | ${m.groupsMean[index].toFixed(3)} | ${std(
+				m.values[index],
+				true,
+				m.groupsMean[index],
+			).toFixed(3)} | ${m.groupsSum[index].toFixed(3)} |`,
+	)
+	.join('\n')}
+
+## 3 组间差异
+
+对被试间变量"${value}" (分组变量: "${group}") 进行组间差异分析.
+
+结果如表 4 所示.
+
+> 表 4 - 组间差异
+
+| 组A | 组B | 均值差异 | Cohen's d |
+| :---: | :---: | :---: | :---: |
+${m.cohenD
+	.map(
+		(row) =>
+			`| ${row.groupA} | ${row.groupB} | ${row.diff.toFixed(3)} | ${row.d.toFixed(3)} |`,
+	)
+	.join('\n')}
+
+${
+	scheffe
+		? `
+## 4 Scheffe 事后检验
+
+对被试间变量"${value}" (分组变量: "${group}") 进行 Scheffe 事后检验.
+
+结果如表 5 所示.
+
+> 表 5 - Scheffe 事后检验
+
+| 组A | 组B | 均值差异 | F | p |
+| :---: | :---: | :---: | :---: | :---: |
+${scheffe
+	.map(
+		(row) =>
+			`| ${row.groupA} | ${row.groupB} | ${row.diff.toFixed(3)} | ${row.f.toFixed(3)} | ${markP(
+				row.p,
+			)} |`,
+	)
+	.join('\n')}
+`
+		: ''
+}
+
+${
+	bonferroni
+		? `
+## ${scheffe ? '5' : '4'} Bonferroni 事后检验
+
+对被试间变量"${value}" (分组变量: "${group}") 进行 Bonferroni 事后检验. 使用 MS<sub>within</sub> 代替 S<sub>p</sub><sup>2</sup> (检验更严格). 临界显著性水平应为 ${bonferroni[0].sig.toFixed(4)} (即 0.05 除以成对比较次数).
+
+结果如表 ${scheffe ? '6' : '5'} 所示.
+
+> 表 ${scheffe ? '6' : '5'} - Bonferroni 事后检验
+
+| 组A | 组B | 均值差异 | t | p |
+| :---: | :---: | :---: | :---: | :---: |
+${bonferroni
+	.map(
+		(row) =>
+			`| ${row.groupA} | ${row.groupB} | ${row.diff.toFixed(3)} | ${row.t.toFixed(3)} | ${
+				row.p < row.sig ? '<span style="color: red;">' : ''
+			}${row.p.toFixed(4)}${row.p < row.sig ? '</span>' : ''} |`,
+	)
+	.join('\n')}
+`
+		: ''
+}
+
+${
+	tukey
+		? `
+## ${scheffe && bonferroni ? '6' : (scheffe || bonferroni) ? '5' : '4'} Tukey's HSD 事后检验
+
+对被试间变量"${value}" (分组变量: "${group}") 进行 Tukey's HSD 事后检验. 均值差异显著的临界值 HSD = ${tukey[0].HSD.toFixed(3)}.
+
+结果如表 ${scheffe && bonferroni ? '7' : (scheffe || bonferroni) ? '6' : '5'} 所示.
+
+> 表 ${scheffe && bonferroni ? '7' : (scheffe || bonferroni) ? '6' : '5'} - Tukey's HSD 事后检验
+
+| 组A | 组B | 均值差异 | q | p |
+| :---: | :---: | :---: | :---: | :---: |
+${tukey
+	.map(
+		(row) =>
+			`| ${row.groupA} | ${row.groupB} | ${row.diff.toFixed(3)} | ${markS(row.q, row.p)} | ${markP(
+				row.p,
+			)} |`,
+	)
+	.join('\n')}
+`
+		: ''
+}
+			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {
@@ -155,238 +285,13 @@ export function OneWayANOVA() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>单因素方差分析</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							H<sub>0</sub>: 各组均值相等
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>样本量</td>
-									<td>水平数</td>
-									<td>自由度 (组间/组内)</td>
-									<td>F</td>
-									<td>p</td>
-									<td>η²</td>
-									<td>Conhen's f</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>{result.m.dfT + 1}</td>
-									<td>{result.m.dfB + 1}</td>
-									<td>
-										{result.m.dfB} / {result.m.dfW}
-									</td>
-									<td>{markS(result.m.f, result.m.p)}</td>
-									<td>{markP(result.m.p)}</td>
-									<td>{result.m.r2.toFixed(3)}</td>
-									<td>{result.m.cohenF.toFixed(3)}</td>
-								</tr>
-							</tbody>
-						</table>
-						<p className='text-xs mt-3 text-center w-full'>
-							因变量: {result.value} | 分组变量: {result.group}
-						</p>
-
-						<p className='text-lg mb-2 text-center w-full mt-8'>分析细节</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>误差项</td>
-									<td>自由度 (df)</td>
-									<td>平方和 (SS)</td>
-									<td>均方 (MS)</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>总和 (T)</td>
-									<td>{result.m.dfT}</td>
-									<td>{result.m.SSt.toFixed(3)}</td>
-									<td>{result.m.MSt.toFixed(3)}</td>
-								</tr>
-								<tr>
-									<td>组间 (B)</td>
-									<td>{result.m.dfB}</td>
-									<td>{result.m.SSb.toFixed(3)}</td>
-									<td>{result.m.MSb.toFixed(3)}</td>
-								</tr>
-								<tr>
-									<td>组内 (W)</td>
-									<td>{result.m.dfW}</td>
-									<td>{result.m.SSw.toFixed(3)}</td>
-									<td>{result.m.MSw.toFixed(3)}</td>
-								</tr>
-							</tbody>
-						</table>
-
-						<p className='text-lg mb-2 text-center w-full mt-8'>分组描述统计</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>组别</td>
-									<td>计数</td>
-									<td>均值</td>
-									<td>标准差</td>
-									<td>总和</td>
-								</tr>
-							</thead>
-							<tbody>
-								{result.m.groups.map((group, index) => (
-									<tr key={uuid()}>
-										<td>{group}</td>
-										<td>{result.m.groupsCount[index]}</td>
-										<td>{result.m.groupsMean[index].toFixed(3)}</td>
-										<td>
-											{std(
-												result.m.values[index],
-												true,
-												result.m.groupsMean[index],
-											).toFixed(3)}
-										</td>
-										<td>{result.m.groupsSum[index].toFixed(3)}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-
-						<p className='text-lg mb-2 text-center w-full mt-8'>组间差异</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>组A</td>
-									<td>组B</td>
-									<td>均值差异</td>
-									<td>Cohen's d</td>
-								</tr>
-							</thead>
-							<tbody>
-								{result.m.cohenD.map((row) => (
-									<tr key={uuid()}>
-										<td>{row.groupA}</td>
-										<td>{row.groupB}</td>
-										<td>{row.diff.toFixed(3)}</td>
-										<td>{row.d.toFixed(3)}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-
-						{result.scheffe && (
-							<>
-								<p className='text-lg mb-2 text-center w-full mt-8'>
-									Scheffe 事后检验
-								</p>
-								<table className='three-line-table'>
-									<thead>
-										<tr>
-											<td>组A</td>
-											<td>组B</td>
-											<td>均值差异</td>
-											<td>F</td>
-											<td>p</td>
-										</tr>
-									</thead>
-									<tbody>
-										{result.scheffe.map((row) => (
-											<tr key={uuid()}>
-												<td>{row.groupA}</td>
-												<td>{row.groupB}</td>
-												<td>{row.diff.toFixed(3)}</td>
-												<td>{row.f.toFixed(3)}</td>
-												<td>{markP(row.p)}</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-								<p className='text-xs mt-3 text-center w-full'>
-									分组变量: {result.group}
-								</p>
-							</>
-						)}
-
-						{result.bonferroni && (
-							<>
-								<p className='text-lg mb-2 text-center w-full mt-8'>
-									Bonferroni 事后检验
-								</p>
-								<table className='three-line-table'>
-									<thead>
-										<tr>
-											<td>组A</td>
-											<td>组B</td>
-											<td>均值差异</td>
-											<td>t</td>
-											<td>p</td>
-										</tr>
-									</thead>
-									<tbody>
-										{result.bonferroni.map((row) => (
-											<tr key={uuid()}>
-												<td>{row.groupA}</td>
-												<td>{row.groupB}</td>
-												<td>{row.diff.toFixed(3)}</td>
-												<td>{row.t.toFixed(3)}</td>
-												<td className={row.p < row.sig ? 'text-red-500' : ''}>
-													{row.p.toFixed(4)}
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-								<p className='text-xs mt-3 text-center w-full'>
-									分组变量: {result.group} | 使用 MS<sub>within</sub> 代替 S
-									<sub>p</sub>
-									<sup>2</sup> (检验更严格)
-								</p>
-								<p className='text-xs mt-2 text-center w-full'>
-									临界显著性水平应为:{' '}
-									<span className='text-red-500'>
-										{result.bonferroni[0].sig.toFixed(4)}
-									</span>{' '}
-									(即 0.05 除以成对比较次数)
-								</p>
-							</>
-						)}
-
-						{result.tukey && (
-							<>
-								<p className='text-lg mb-2 text-center w-full mt-8'>
-									Tukey's HSD 事后检验
-								</p>
-								<p className='text-xs mb-3 text-center w-full'>
-									均值差异显著的临界值 HSD = {result.tukey[0].HSD.toFixed(3)}
-								</p>
-								<table className='three-line-table'>
-									<thead>
-										<tr>
-											<td>组A</td>
-											<td>组B</td>
-											<td>均值差异</td>
-											<td>q</td>
-											<td>p</td>
-										</tr>
-									</thead>
-									<tbody>
-										{result.tukey.map((row) => (
-											<tr key={uuid()}>
-												<td>{row.groupA}</td>
-												<td>{row.groupB}</td>
-												<td>{row.diff.toFixed(3)}</td>
-												<td>{markS(row.q, row.p)}</td>
-												<td>{markP(row.p)}</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-								<p className='text-xs mt-3 text-center w-full'>
-									分组变量: {result.group}
-								</p>
-							</>
-						)}
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

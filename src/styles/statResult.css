@@ -1,0 +1,103 @@
+* {
+	font-family: "Times", "Times New Roman", "宋体", "SimSun", "华文宋体",
+		"STSong", sans-serif; /* 所有数字和英文字体都用 Times New Roman */
+	line-height: 1.55em; /* 1.5倍行距 */
+	margin: 0;
+}
+h1 {
+	/* 中文题目: 二号黑体 */
+	font-size: 29px;
+	font-weight: normal;
+	font-family: "黑体", "SimHei", "华文黑体", "STHeiti", sans-serif;
+	text-align: center;
+	margin-bottom: 9px;
+}
+h2 {
+	/* 一级标题: 四号宋体 */
+	font-size: 18px;
+	font-weight: normal;
+	margin: 7px 0;
+}
+h3 {
+	/* 二级标题: 五号黑体 */
+	font-size: 14px;
+	font-weight: normal;
+	font-family: "黑体", "SimHei", "华文黑体", "STHeiti", sans-serif;
+	margin: 5px 0;
+}
+h4 {
+	/* 三级标题: 五号黑体 */
+	font-size: 14px;
+	font-weight: normal;
+	font-family: "黑体", "SimHei", "华文黑体", "STHeiti", sans-serif;
+	margin: 3px 0;
+}
+p {
+	/* 正文: 五号宋体 */
+	font-size: 14px;
+	text-indent: 24px;
+	text-align: justify;
+}
+h5 {
+	/* "参考文献": 五号黑体 */
+	font-size: 14px;
+	font-weight: normal;
+	font-family: "黑体", "SimHei", "华文黑体", "STHeiti", sans-serif;
+	text-align: center;
+	margin-bottom: 7px;
+	margin-top: 20px;
+}
+ul,
+ol {
+	/* 参考文献的项目: 小五号宋体 */
+	list-style-type: none;
+	padding: 0;
+	& > li {
+		font-size: 12px;
+		margin: 6px 0;
+		text-align: justify;
+		text-indent: -24px;
+		padding-left: 24px;
+	}
+	& a {
+		text-decoration: none;
+		color: black;
+	}
+}
+blockquote {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+blockquote > p {
+	/* 图片和表格的标题: 小五号宋体 */
+	font-weight: normal;
+	font-size: 12px;
+	margin: 6px 0;
+	margin-right: 1rem;
+}
+table {
+	/* 表格: 小五号宋体 */
+	font-size: 12px;
+	position: relative;
+	border-top: 2px solid black;
+	border-bottom: 2px solid black;
+	/* width: 100%; */
+	max-width: 100%;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	& th,
+	& td {
+		font-weight: normal;
+		padding: 3px 8px;
+	}
+	& thead::after {
+		/* 用来做三线表中间的横线 */
+		content: "";
+		display: block;
+		position: absolute;
+		border-top: 1px solid #00000060;
+		width: 100%;
+	}
+}

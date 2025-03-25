@@ -5,11 +5,11 @@ import {
 	corr,
 } from '@psych/lib'
 import { Button, Form, Select, Tag } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { markP, markS, sleep, uuid } from '../../lib/utils'
+import { markP, markS, renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 自变量 */
@@ -37,9 +37,11 @@ export function MultiLinearRegression() {
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<
-		Result<'standard'> | Result<'stepwise'> | Result<'sequence'> | null
-	>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -63,30 +65,42 @@ export function MultiLinearRegression() {
 			}
 			switch (values.method) {
 				case 'standard':
-					setResult({
-						...values,
-						m: new LinearRegressionStandard(xData, yData),
-					})
+					setStatResult(
+						getStandardLinearRegressionResult({
+							result: {
+								...values,
+								m: new LinearRegressionStandard(xData, yData),
+							},
+						}),
+					)
 					break
 				case 'sequence':
-					setResult({
-						...values,
-						m: new LinearRegressionSequential(xData, yData),
-					})
+					setStatResult(
+						getSequenceLinearRegressionResult({
+							result: {
+								...values,
+								m: new LinearRegressionSequential(xData, yData),
+							},
+						}),
+					)
 					break
 				default:
-					setResult({
-						...values,
-						m: new LinearRegressionStepwise(
-							xData,
-							yData,
-							values.method === 'stepwise-fwd'
-								? 'forward'
-								: values.method === 'stepwise-bwd'
-									? 'backward'
-									: 'both',
-						),
-					})
+					setStatResult(
+						getStepwiseLinearRegressionResult({
+							result: {
+								...values,
+								m: new LinearRegressionStepwise(
+									xData,
+									yData,
+									values.method === 'stepwise-fwd'
+										? 'forward'
+										: values.method === 'stepwise-bwd'
+											? 'backward'
+											: 'both',
+								),
+							},
+						}),
+					)
 					break
 			}
 			messageApi?.destroy()
@@ -211,18 +225,14 @@ export function MultiLinearRegression() {
 			</div>
 
 			<div className='component-result'>
-				{result?.method === 'standard' ? (
-					<StandardLinearRegressionResult
-						result={result as Result<'standard'>}
-					/>
-				) : result?.method === 'sequence' ? (
-					<SequenceLinearRegressionResult
-						result={result as Result<'sequence'>}
-					/>
-				) : result ? (
-					<StepwiseLinearRegressionResult
-						result={result as Result<'stepwise'>}
-					/>
+				{statResult ? (
+					<div className='w-full h-full overflow-auto'>
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
+					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>
 						<span>请填写参数并点击计算</span>
@@ -233,528 +243,243 @@ export function MultiLinearRegression() {
 	)
 }
 
-function SequenceLinearRegressionResult({
+function getSequenceLinearRegressionResult({
 	result,
-}: { result: Result<'sequence'> }) {
-	return (
-		<div className='w-full h-full overflow-auto'>
-			<p className='text-lg mb-2 text-center w-full'>序列多元线性回归</p>
-			<p className='text-xs mb-2 text-center w-full'>
-				因变量: {result.y} | 自变量:{' '}
-				{result.x.map((v, i) => `${v} (b${i + 1})`).join('、')}
-			</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>模型</td>
-						<td>参数</td>
-						<td>
-							F<sub>model</sub>
-						</td>
-						<td>
-							p<sub>model</sub>
-						</td>
-						<td>
-							R<sup>2</sup>
-						</td>
-						<td>
-							调整后R<sup>2</sup>
-						</td>
-						<td>
-							R<sup>2</sup>变化量
-						</td>
-						<td>
-							F<sub>inc</sub>
-						</td>
-						<td>
-							p<sub>inc</sub>
-						</td>
-					</tr>
-				</thead>
-				<tbody>
-					{result.m.models.map((model, index) => (
-						<tr key={uuid()}>
-							<td>模型 {index + 1}</td>
-							<td>
-								b0: {model.coefficients[0].toFixed(4)}
-								{' (截距)'}
-								<br />
-								{model.coefficients.slice(1).map((coefficient, index) => (
-									<span key={uuid()}>
-										{`b${index + 1}: ${coefficient.toFixed(4)}`}
-										{index !== model.coefficients.length - 2 && <br />}
-									</span>
-								))}
-							</td>
-							<td>{markS(model.F, model.p)}</td>
-							<td>{markP(model.p)}</td>
-							<td>{model.r2.toFixed(4)}</td>
-							<td>{model.r2adj.toFixed(4)}</td>
-							<td>{result.m.r2Changes[index].toFixed(4)}</td>
-							<td>
-								{markS(result.m.fChanges[index], result.m.pChanges[index])}
-							</td>
-							<td>{markP(result.m.pChanges[index])}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+}: { result: Result<'sequence'> }): string {
+	return `
+## 1 序列多元线性回归
 
-			<p className='text-lg mb-2 text-center w-full mt-8'>最终模型</p>
-			<p className='text-xs mb-2 text-center w-full'>
-				y = {result.m.model.coefficients[0].toFixed(4)} +{' '}
-				{result.m.model.coefficients
-					.slice(1)
-					.map(
-						(coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`,
-					)
-					.join(' + ')}
-			</p>
-			<p className='text-xs mb-3 text-center w-full'>
-				测定系数 (R<sup>2</sup>): {result.m.model.r2.toFixed(4)} |
-				调整后测定系数 (R
-				<sup>2</sup>
-				<sub>adj</sub>): {result.m.model.r2adj.toFixed(4)}
-			</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>参数</td>
-						<td>值</td>
-						<td>
-							H<sub>0</sub>
-						</td>
-						<td>统计量</td>
-						<td>显著性</td>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>模型</td>
-						<td>
-							b0: {result.m.model.coefficients[0].toFixed(4)} |{' '}
-							{result.m.model.coefficients
-								.slice(1)
-								.map(
-									(coefficient, index) =>
-										`b${index + 1}: ${coefficient.toFixed(4)}`,
-								)
-								.join(' | ')}
-						</td>
-						<td>
-							{result.m.model.coefficients
-								.slice(1)
-								.map((_, index) => `b${index + 1}`)
-								.join(' = ')}{' '}
-							= 0
-						</td>
-						<td>F = {markS(result.m.model.F, result.m.model.p)}</td>
-						<td>{markP(result.m.model.p)}</td>
-					</tr>
-					{result.m.model.coefficients.slice(1).map((_, index) => (
-						<tr key={uuid()}>
-							<td>b{index + 1}</td>
-							<td>
-								{result.m.model.coefficients[index + 1].toFixed(4)} (偏回归系数)
-							</td>
-							<td>b{index + 1} = 0</td>
-							<td>
-								t ={' '}
-								{markS(
-									result.m.model.tValues[index],
-									result.m.model.pValues[index],
-								)}
-							</td>
-							<td>{markP(result.m.model.pValues[index])}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-			<p className='text-xs mt-3 text-center w-full'>
-				{result.x
-					.map((variable, index) => `x${index + 1}: ${variable}`)
-					.join(' | ')}{' '}
-				| y: {result.y}
-			</p>
+基于自变量${result.x.map((v, i) => `"${v}" (x${i+1})`).join('、')}和因变量"${result.y}"构建序列多元线性回归模型.
 
-			<p className='text-lg mb-2 text-center w-full mt-8'>模型细节</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>误差项</td>
-						<td>自由度 (df)</td>
-						<td>平方和 (SS)</td>
-						<td>均方 (MS)</td>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>总和 (T)</td>
-						<td>{result.m.model.dfT}</td>
-						<td>{result.m.model.SSt.toFixed(4)}</td>
-						<td>{(result.m.model.SSt / result.m.model.dfT).toFixed(4)}</td>
-					</tr>
-					<tr>
-						<td>回归 (R)</td>
-						<td>{result.m.model.dfR}</td>
-						<td>{result.m.model.SSr.toFixed(4)}</td>
-						<td>{(result.m.model.SSr / result.m.model.dfR).toFixed(4)}</td>
-					</tr>
-					<tr>
-						<td>残差 (E)</td>
-						<td>{result.m.model.dfE}</td>
-						<td>{result.m.model.SSe.toFixed(4)}</td>
-						<td>{(result.m.model.SSe / result.m.model.dfE).toFixed(4)}</td>
-					</tr>
-				</tbody>
-			</table>
+结果如表 1 所示.
 
-			<p className='text-lg mb-2 text-center w-full mt-8'>描述统计</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>变量</td>
-						<td>均值</td>
-						<td>标准差</td>
-						<td>与Y相关系数</td>
-					</tr>
-				</thead>
-				<tbody>
-					{result.x.map((variable, index) => (
-						<tr key={uuid()}>
-							<td>
-								{variable} (x{index + 1})
-							</td>
-							<td>{result.m.ivMeans[index].toFixed(4)}</td>
-							<td>{result.m.ivStds[index].toFixed(4)}</td>
-							<td>
-								{corr(
-									result.m.iv.map((xRow) => xRow[index]),
-									result.m.dv,
-								).toFixed(4)}
-							</td>
-						</tr>
-					))}
-					<tr>
-						<td>{result.y} (y)</td>
-						<td>{result.m.dvMean.toFixed(4)}</td>
-						<td>{result.m.dvStd.toFixed(4)}</td>
-						<td>1</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+> 表 1 - 序列多元线性回归模型
+
+| 模型 | 参数 | F<sub>model</sub> | p<sub>model</sub> | R<sup>2</sup> | 调整后R<sup>2</sup> | R<sup>2</sup>变化量 | F<sub>inc</sub> | p<sub>inc</sub> |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+${result.m.models
+	.map(
+		(model, index) => `| 模型 ${index + 1} | ${model.coefficients
+			.map(
+				(coefficient, i) =>
+					`b${i}: ${coefficient.toFixed(4)}${i === 0 ? ' (截距)' : ''}`,
+			)
+			.join(
+				'<br />',
+			)} | ${markS(model.F, model.p)} | ${markP(model.p)} | ${model.r2.toFixed(4)} | ${model.r2adj.toFixed(4)} | ${result.m.r2Changes[index].toFixed(4)} | ${markS(result.m.fChanges[index], result.m.pChanges[index])} | ${markP(result.m.pChanges[index])} |
+`,
 	)
+	.join('')}
+
+## 2 最终模型
+
+最终模型为: y = ${result.m.model.coefficients[0].toFixed(4)} + ${result.m.model.coefficients
+	.slice(1)
+	.map((coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`)
+	.join(' + ')}, 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.model.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.model.r2adj.toFixed(4)}.
+
+具体参数和细节如表 2 和表 3 所示.
+
+> 表 2 - 最终模型参数
+
+| 参数 | 值 | H<sub>0</sub> | 统计量 | 显著性 |
+| :---: | :---: | :---: | :---: | :---: |
+| 模型 | ${result.m.model.coefficients.map((v, i) => `b${i}: ${v.toFixed(4)}${i === 0 ? ' (截距)' : ''}`).join('<br />')} | ${result.m.model.coefficients
+	.slice(1)
+	.map((_, index) => `b${index + 1}`)
+	.join(' = ')} = 0 | F = ${markS(result.m.model.F, result.m.model.p)} | ${markP(result.m.model.p)} |
+${result.m.model.coefficients
+	.slice(1)
+	.map(
+		(_, index) =>
+			`| b${index + 1} | ${result.m.model.coefficients[index + 1].toFixed(
+				4,
+			)} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+				result.m.model.tValues[index],
+				result.m.model.pValues[index],
+			)} | ${markP(result.m.model.pValues[index])} |`,
+	)
+	.join('\n')}
+
+> 表 3 - 模型细节
+
+| 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
+| :---: | :---: | :---: | :---: |
+| 总和 (T) | ${result.m.model.dfT} | ${result.m.model.SSt.toFixed(4)} | ${(result.m.model.SSt / result.m.model.dfT).toFixed(4)} |
+| 回归 (R) | ${result.m.model.dfR} | ${result.m.model.SSr.toFixed(4)} | ${(result.m.model.SSr / result.m.model.dfR).toFixed(4)} |
+| 残差 (E) | ${result.m.model.dfE} | ${result.m.model.SSe.toFixed(4)} | ${(result.m.model.SSe / result.m.model.dfE).toFixed(4)} |
+
+## 3 描述统计
+
+对自变量${result.x.map((v, i) => `"${v}" (x${i + 1})`).join('、')}和因变量"${result.y}"进行描述统计分析. 
+
+结果如表 4 所示.
+
+> 表 4 - 描述统计
+
+| 变量 | 均值 | 标准差 | 与Y相关系数 |
+| :---: | :---: | :---: | :---: |
+${result.x
+	.map(
+		(variable, index) =>
+			`| ${variable} (x${index + 1}) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
+				result.m.iv.map((xRow) => xRow[index]),
+				result.m.dv,
+			).toFixed(4)} |`,
+	)
+	.join('\n')}
+| ${result.y} (y) | ${result.m.dvMean.toFixed(4)} | ${result.m.dvStd.toFixed(4)} | 1 |
+	`
 }
 
-function StepwiseLinearRegressionResult({
-	result,
-}: { result: Result<'stepwise'> }) {
-	return (
-		<div className='w-full h-full overflow-auto'>
-			<p className='text-lg mb-2 text-center w-full'>
-				逐步多元线性回归 (
-				{result.method === 'stepwise-fwd'
-					? '向前选择'
-					: result.method === 'stepwise-bwd'
-						? '向后剔除'
-						: '双向选择'}
-				)
-			</p>
-			<p className='text-xs mb-2 text-center w-full'>
-				模型: y = {result.m.coefficients[0].toFixed(4)} +{' '}
-				{result.m.coefficients
-					.slice(1)
-					.map(
-						(coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`,
-					)
-					.join(' + ')}
-			</p>
-			<p className='text-xs mb-3 text-center w-full'>
-				测定系数 (R<sup>2</sup>): {result.m.r2.toFixed(4)} | 调整后测定系数 (R
-				<sup>2</sup>
-				<sub>adj</sub>): {result.m.r2adj.toFixed(4)}
-			</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>参数</td>
-						<td>值</td>
-						<td>
-							H<sub>0</sub>
-						</td>
-						<td>统计量</td>
-						<td>显著性</td>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>模型</td>
-						<td>
-							b0: {result.m.coefficients[0].toFixed(4)} |{' '}
-							{result.m.coefficients
-								.slice(1)
-								.map(
-									(coefficient, index) =>
-										`b${index + 1}: ${coefficient.toFixed(4)}`,
-								)
-								.join(' | ')}
-						</td>
-						<td>
-							{result.m.coefficients
-								.slice(1)
-								.map((_, index) => `b${index + 1}`)
-								.join(' + ')}{' '}
-							= 0
-						</td>
-						<td>F = {markS(result.m.F, result.m.p)}</td>
-						<td>{markP(result.m.p)}</td>
-					</tr>
-					{result.m.coefficients.slice(1).map((_, index) => (
-						<tr key={uuid()}>
-							<td>
-								b{index + 1} ({result.x[result.m.selectedVariables[index]]})
-							</td>
-							<td>
-								{result.m.coefficients[index + 1].toFixed(4)} (偏回归系数)
-							</td>
-							<td>b{index + 1} = 0</td>
-							<td>
-								t = {markS(result.m.tValues[index], result.m.pValues[index])}
-							</td>
-							<td>{markP(result.m.pValues[index])}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-			<p className='text-xs mt-3 text-center w-full'>
-				{result.m.selectedVariables
-					.map((index, i) => `x${i + 1}: ${result.x[index]}`)
-					.join(' | ')}{' '}
-				| y: {result.y} | 已剔除变量:{' '}
-				{result.x
-					.filter((_, index) => !result.m.selectedVariables.includes(index))
-					.map((variable) => variable)
-					.join('、')}
-			</p>
+function getStepwiseLinearRegressionResult({
+    result,
+}: { result: Result<'stepwise'> }): string {
+    return `
+## 1 逐步多元线性回归 (${result.method === 'stepwise-fwd'
+        ? '向前选择'
+        : result.method === 'stepwise-bwd'
+            ? '向后剔除'
+            : '双向选择'})
 
-			<p className='text-lg mb-2 text-center w-full mt-8'>模型细节</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>误差项</td>
-						<td>自由度 (df)</td>
-						<td>平方和 (SS)</td>
-						<td>均方 (MS)</td>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>总和 (T)</td>
-						<td>{result.m.dfT}</td>
-						<td>{result.m.SSt.toFixed(4)}</td>
-						<td>{(result.m.SSt / result.m.dfT).toFixed(4)}</td>
-					</tr>
-					<tr>
-						<td>回归 (R)</td>
-						<td>{result.m.dfR}</td>
-						<td>{result.m.SSr.toFixed(4)}</td>
-						<td>{(result.m.SSr / result.m.dfR).toFixed(4)}</td>
-					</tr>
-					<tr>
-						<td>残差 (E)</td>
-						<td>{result.m.dfE}</td>
-						<td>{result.m.SSe.toFixed(4)}</td>
-						<td>{(result.m.SSe / result.m.dfE).toFixed(4)}</td>
-					</tr>
-				</tbody>
-			</table>
+最终模型为 y = ${result.m.coefficients[0].toFixed(4)} + ${result.m.coefficients
+        .slice(1)
+        .map(
+            (coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`,
+        )
+        .join(' + ')}, 其中${result.m.selectedVariables
+				.map((index, i) => `"${result.x[index]}" (x${i + 1})`)
+				.join('、')}为自变量, 因变量为"${result.y}". 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.r2adj.toFixed(4)}.
 
-			<p className='text-lg mb-2 text-center w-full mt-8'>描述统计</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>变量</td>
-						<td>均值</td>
-						<td>标准差</td>
-						<td>与Y相关系数</td>
-					</tr>
-				</thead>
-				<tbody>
-					{result.x.map((variable, index) => (
-						<tr key={uuid()}>
-							<td>
-								{variable} (
-								{result.m.selectedVariables.findIndex((i) => i === index) + 1
-									? `x${result.m.selectedVariables.findIndex((i) => i === index) + 1}`
-									: '已剔除'}
-								)
-							</td>
-							<td>{result.m.ivMeans[index].toFixed(4)}</td>
-							<td>{result.m.ivStds[index].toFixed(4)}</td>
-							<td>
-								{corr(
-									result.m.iv.map((xRow) => xRow[index]),
-									result.m.dv,
-								).toFixed(4)}
-							</td>
-						</tr>
-					))}
-					<tr>
-						<td>{result.y} (y)</td>
-						<td>{result.m.dvMean.toFixed(4)}</td>
-						<td>{result.m.dvStd.toFixed(4)}</td>
-						<td>1</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	)
+变量${result.x
+				.filter((_, index) => !result.m.selectedVariables.includes(index))
+				.map((variable) => `"${variable}"`)	
+				.join('、')}已在逐步回归中剔除.
+
+结果如表 1 和表 2 所示.
+
+> 表 1 - 模型参数
+
+| 参数 | 值 | H<sub>0</sub> | 统计量 | 显著性 |
+| :---: | :---: | :---: | :---: | :---: |
+| 模型 | b0: ${result.m.coefficients[0].toFixed(4)} | ${result.m.coefficients
+        .slice(1)
+        .map((_, index) => `b${index + 1}`)
+        .join(' + ')} = 0 | F = ${markS(result.m.F, result.m.p)} | ${markP(result.m.p)} |
+${result.m.coefficients
+        .slice(1)
+        .map(
+            (_, index) =>
+                `| b${index + 1} (${result.x[result.m.selectedVariables[index]]}) | ${result.m.coefficients[index + 1].toFixed(
+                    4,
+                )} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+                    result.m.tValues[index],
+                    result.m.pValues[index],
+                )} | ${markP(result.m.pValues[index])} |`,
+        )
+        .join('\n')}
+
+> 表 2 - 模型细节
+
+| 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
+| :---: | :---: | :---: | :---: |
+| 总和 (T) | ${result.m.dfT} | ${result.m.SSt.toFixed(4)} | ${(result.m.SSt / result.m.dfT).toFixed(4)} |
+| 回归 (R) | ${result.m.dfR} | ${result.m.SSr.toFixed(4)} | ${(result.m.SSr / result.m.dfR).toFixed(4)} |
+| 残差 (E) | ${result.m.dfE} | ${result.m.SSe.toFixed(4)} | ${(result.m.SSe / result.m.dfE).toFixed(4)} |
+
+## 2 描述统计
+
+对输入的自变量${result.x.map((v) => `"${v}"`).join('、')}和因变量"${result.y}"进行描述统计分析.
+
+结果如表 3 所示.
+
+> 表 3 - 变量描述统计
+
+| 变量 | 均值 | 标准差 | 与Y相关系数 |
+| :---: | :---: | :---: | :---: |
+${result.x
+        .map(
+            (variable, index) =>
+                `| ${variable} (${
+                    result.m.selectedVariables.findIndex((i) => i === index) + 1
+                        ? `x${result.m.selectedVariables.findIndex((i) => i === index) + 1}`
+                        : '已剔除'
+                }) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
+                    result.m.iv.map((xRow) => xRow[index]),
+                    result.m.dv,
+                ).toFixed(4)} |`,
+        )
+        .join('\n')}
+| ${result.y} (y) | ${result.m.dvMean.toFixed(4)} | ${result.m.dvStd.toFixed(4)} | 1 |
+    `
 }
 
-function StandardLinearRegressionResult({
-	result,
-}: { result: Result<'standard'> }) {
-	return (
-		<div className='w-full h-full overflow-auto'>
-			<p className='text-lg mb-2 text-center w-full'>标准多元线性回归</p>
-			<p className='text-xs mb-2 text-center w-full'>
-				模型: y = {result.m.coefficients[0].toFixed(4)} +{' '}
-				{result.m.coefficients
-					.slice(1)
-					.map(
-						(coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`,
-					)
-					.join(' + ')}
-			</p>
-			<p className='text-xs mb-3 text-center w-full'>
-				测定系数 (R<sup>2</sup>): {result.m.r2.toFixed(4)} | 调整后测定系数 (R
-				<sup>2</sup>
-				<sub>adj</sub>): {result.m.r2adj.toFixed(4)}
-			</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>参数</td>
-						<td>值</td>
-						<td>
-							H<sub>0</sub>
-						</td>
-						<td>统计量</td>
-						<td>显著性</td>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>模型</td>
-						<td>
-							b0: {result.m.coefficients[0].toFixed(4)} |{' '}
-							{result.m.coefficients
-								.slice(1)
-								.map(
-									(coefficient, index) =>
-										`b${index + 1}: ${coefficient.toFixed(4)}`,
-								)
-								.join(' | ')}
-						</td>
-						<td>
-							{result.m.coefficients
-								.slice(1)
-								.map((_, index) => `b${index + 1}`)
-								.join(' + ')}{' '}
-							= 0
-						</td>
-						<td>F = {markS(result.m.F, result.m.p)}</td>
-						<td>{markP(result.m.p)}</td>
-					</tr>
-					{result.m.coefficients.slice(1).map((_, index) => (
-						<tr key={uuid()}>
-							<td>b{index + 1}</td>
-							<td>
-								{result.m.coefficients[index + 1].toFixed(4)} (偏回归系数)
-							</td>
-							<td>b{index + 1} = 0</td>
-							<td>
-								t = {markS(result.m.tValues[index], result.m.pValues[index])}
-							</td>
-							<td>{markP(result.m.pValues[index])}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-			<p className='text-xs mt-3 text-center w-full'>
-				{result.x
-					.map((variable, index) => `x${index + 1}: ${variable}`)
-					.join(' | ')}{' '}
-				| y: {result.y}
-			</p>
+function getStandardLinearRegressionResult({
+    result,
+}: { result: Result<'standard'> }): string {
+    return `
+## 1 标准多元线性回归
 
-			<p className='text-lg mb-2 text-center w-full mt-8'>模型细节</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>误差项</td>
-						<td>自由度 (df)</td>
-						<td>平方和 (SS)</td>
-						<td>均方 (MS)</td>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>总和 (T)</td>
-						<td>{result.m.dfT}</td>
-						<td>{result.m.SSt.toFixed(4)}</td>
-						<td>{(result.m.SSt / result.m.dfT).toFixed(4)}</td>
-					</tr>
-					<tr>
-						<td>回归 (R)</td>
-						<td>{result.m.dfR}</td>
-						<td>{result.m.SSr.toFixed(4)}</td>
-						<td>{(result.m.SSr / result.m.dfR).toFixed(4)}</td>
-					</tr>
-					<tr>
-						<td>残差 (E)</td>
-						<td>{result.m.dfE}</td>
-						<td>{result.m.SSe.toFixed(4)}</td>
-						<td>{(result.m.SSe / result.m.dfE).toFixed(4)}</td>
-					</tr>
-				</tbody>
-			</table>
+对自变量${result.x.map((v, i) => `"${v}" (x${i+1})`).join('、')}和因变量"${result.y}"进行标准多元线性回归分析. 原假设 (H<sub>0</sub>) 为"所有自变量的回归系数均为0", 显著性水平 (α) 为 0.05. 
 
-			<p className='text-lg mb-2 text-center w-full mt-8'>描述统计</p>
-			<table className='three-line-table'>
-				<thead>
-					<tr>
-						<td>变量</td>
-						<td>均值</td>
-						<td>标准差</td>
-						<td>与Y相关系数</td>
-					</tr>
-				</thead>
-				<tbody>
-					{result.x.map((variable, index) => (
-						<tr key={uuid()}>
-							<td>
-								{variable} (x{index + 1})
-							</td>
-							<td>{result.m.ivMeans[index].toFixed(4)}</td>
-							<td>{result.m.ivStds[index].toFixed(4)}</td>
-							<td>
-								{corr(
-									result.m.iv.map((xRow) => xRow[index]),
-									result.m.dv,
-								).toFixed(4)}
-							</td>
-						</tr>
-					))}
-					<tr>
-						<td>{result.y} (y)</td>
-						<td>{result.m.dvMean.toFixed(4)}</td>
-						<td>{result.m.dvStd.toFixed(4)}</td>
-						<td>1</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	)
+最终模型为 y = ${result.m.coefficients[0].toFixed(4)} + ${result.m.coefficients
+        .slice(1)
+        .map(
+            (coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`,
+        )
+        .join(' + ')}
+, 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.r2adj.toFixed(4)}.
+
+结果如表 1 和表 2 所示.
+
+> 表 1 - 模型参数
+
+| 参数 | 值 | H<sub>0</sub> | 统计量 | 显著性 |
+| :---: | :---: | :---: | :---: | :---: |
+| 模型 | ${result.m.coefficients.map((v, i) => `b${i}: ${v.toFixed(4)}${i === 0 ? ' (截距)' : ''}`).join('<br />')} | ${result.m.coefficients
+        .slice(1)
+        .map((_, index) => `b${index + 1}`)
+        .join(' + ')} = 0 | F = ${markS(result.m.F, result.m.p)} | ${markP(result.m.p)} |
+${result.m.coefficients
+        .slice(1)
+        .map(
+            (_, index) =>
+                `| b${index + 1} | ${result.m.coefficients[index + 1].toFixed(
+                    4,
+                )} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+                    result.m.tValues[index],
+                    result.m.pValues[index],
+                )} | ${markP(result.m.pValues[index])} |`,
+        )
+        .join('\n')}
+
+> 表 2 - 模型细节
+
+| 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
+| :---: | :---: | :---: | :---: |
+| 总和 (T) | ${result.m.dfT} | ${result.m.SSt.toFixed(4)} | ${(result.m.SSt / result.m.dfT).toFixed(4)} |
+| 回归 (R) | ${result.m.dfR} | ${result.m.SSr.toFixed(4)} | ${(result.m.SSr / result.m.dfR).toFixed(4)} |
+| 残差 (E) | ${result.m.dfE} | ${result.m.SSe.toFixed(4)} | ${(result.m.SSe / result.m.dfE).toFixed(4)} |
+
+## 2 描述统计
+
+对自变量${result.x.map((v, i) => `"${v}" (x${i + 1})`).join('、')}和因变量"${result.y}"进行描述统计分析.
+
+结果如表 3 所示.
+
+> 表 3 - 变量描述统计
+
+| 变量 | 均值 | 标准差 | 与Y相关系数 |
+| :---: | :---: | :---: | :---: |
+${result.x
+        .map(
+            (variable, index) =>
+                `| ${variable} (x${index + 1}) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
+                    result.m.iv.map((xRow) => xRow[index]),
+                    result.m.dv,
+                ).toFixed(4)} |`,
+        )
+        .join('\n')}
+| ${result.y} (y) | ${result.m.dvMean.toFixed(4)} | ${result.m.dvStd.toFixed(4)} | 1 |
+    `
 }

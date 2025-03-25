@@ -172,7 +172,7 @@ function NavToPageTool({
 }) {
 	return (
 		<div>
-		  跳转到{' '}
+			跳转到{' '}
 			<Tag color='blue' style={{ margin: 0 }}>
 				{mainPageName}
 			</Tag>
@@ -182,8 +182,8 @@ function NavToPageTool({
 					下的{' '}
 					<Tag color='blue' style={{ margin: 0 }}>
 						{subPageName}
-					</Tag>
-					{' '}页面
+					</Tag>{' '}
+					页面
 				</>
 			)}
 		</div>

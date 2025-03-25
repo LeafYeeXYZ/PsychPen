@@ -1,10 +1,10 @@
 import { KurtosisTest, SkewnessTest } from '@psych/lib'
 import { Button, Form, Radio, Select } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { markP, markS, sleep, uuid } from '../../lib/utils'
+import { markP, markS, renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 类型 */
@@ -16,19 +16,17 @@ type Option = {
 	/** 分组 */
 	group?: string
 }
-type Result = {
-	kurtosis: KurtosisTest[]
-	skewness: SkewnessTest[]
-	labels: string[]
-	counts: number[]
-} & Option
 
 export function KurtosisSkewness() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -48,13 +46,23 @@ export function KurtosisSkewness() {
 				)
 				const k = data.map((arr) => new KurtosisTest(arr))
 				const s = data.map((arr) => new SkewnessTest(arr))
-				setResult({
-					kurtosis: k,
-					skewness: s,
-					labels: variables,
-					counts: data.map((arr) => arr.length),
-					...values,
-				})
+				setStatResult(`
+## 1 峰度和偏度检验
+
+对被试内变量${variables.map((v) => `"${v}"`).join(', ')}进行峰度和偏度检验. 原假设 (H<sub>0</sub>) 为"峰度/偏度等于零"; 显著性水平 (α) 为 0.05.
+
+结果如表 1 所示.
+
+> 表 1 - 峰度和偏度检验结果
+
+| 变量 | 样本量 | 峰度 | z | p | 偏度 | z | p |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+${k
+	.map(
+		(k, i) => `| ${variables[i]} | ${data[i].length} | ${k.kurtosis.toFixed(3)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${s[i].skewness.toFixed(3)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
+	)
+	.join('\n')}
+        `)
 			} else {
 				if (!variable || !group) {
 					throw new Error('请选择数据变量和分组变量')
@@ -71,13 +79,23 @@ export function KurtosisSkewness() {
 				)
 				const k = data.map((arr) => new KurtosisTest(arr))
 				const s = data.map((arr) => new SkewnessTest(arr))
-				setResult({
-					kurtosis: k,
-					skewness: s,
-					labels: groups,
-					counts: data.map((arr) => arr.length),
-					...values,
-				})
+				setStatResult(`
+## 1 峰度和偏度检验
+
+对被试间变量"${variable}" (分组变量: "${group}") 进行峰度和偏度检验. 原假设 (H<sub>0</sub>) 为"峰度/偏度等于零"; 显著性水平 (α) 为 0.05.
+
+结果如表 1 所示.
+
+> 表 1 - 峰度和偏度检验结果
+
+| 组别 | 样本量 | 峰度 | z | p | 偏度 | z | p |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+${k
+	.map(
+		(k, i) => `| ${groups[i]} | ${data[i].length} | ${k.kurtosis.toFixed(3)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${s[i].skewness.toFixed(3)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
+	)
+	.join('\n')}
+        `)
 			}
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -181,45 +199,13 @@ export function KurtosisSkewness() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>峰度和偏度检验</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							H<sub>0</sub>: 峰度/偏度等于零 | 显著性水平(α): 0.05
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>{result.type === 'paired' ? '变量' : '组别'}</td>
-									<td>样本量</td>
-									<td>峰度</td>
-									<td>z</td>
-									<td>p</td>
-									<td>偏度</td>
-									<td>z</td>
-									<td>p</td>
-								</tr>
-							</thead>
-							<tbody>
-								{result.labels.map((label, i) => (
-									<tr key={uuid()}>
-										<td>{label}</td>
-										<td>{result.counts[i]}</td>
-										<td>{result.kurtosis[i].kurtosis.toFixed(3)}</td>
-										<td>{markS(result.kurtosis[i].z, result.kurtosis[i].p)}</td>
-										<td>{markP(result.kurtosis[i].p)}</td>
-										<td>{result.skewness[i].skewness.toFixed(3)}</td>
-										<td>{markS(result.skewness[i].z, result.skewness[i].p)}</td>
-										<td>{markP(result.skewness[i].p)}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-						{result.type === 'independent' && (
-							<p className='text-xs mt-3 text-center w-full'>
-								分组变量: {result.group}
-							</p>
-						)}
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

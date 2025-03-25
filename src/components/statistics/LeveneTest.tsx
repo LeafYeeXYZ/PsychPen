@@ -1,10 +1,10 @@
 import { LeveneTest as T } from '@psych/lib'
 import { Button, Form, Radio, Select } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { markP, markS, sleep, uuid } from '../../lib/utils'
+import { markP, markS, renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 类别 */
@@ -18,16 +18,17 @@ type Option = {
 	/** 中心化方法 */
 	center: 'mean' | 'median'
 }
-type Result = {
-	m: T
-} & Option
 
 export function LeveneTest() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -69,10 +70,36 @@ export function LeveneTest() {
 				}
 			}
 			const m = new T(value, group, center)
-			setResult({
-				...values,
-				m,
-			})
+			setStatResult(`
+## 1 Levene 检验
+
+对被试${type === 'independent' ? '间' : '内'}变量${type === 'independent' ? `"${variable}" (分组变量: "${groups}")` : variables?.map((v) => `"${v}"`).join(', ')}进行 Levene's Test (方差齐性检验). 原假设 (H<sub>0</sub>) 为"各${type === 'independent' ? '组' : '变量'}满足方差齐性".
+
+结果如表 1 所示.
+
+> 表 1 - Levene's Test 结果
+
+| 自由度 | F (w) | p |
+| :---: | :---: | :---: |
+| ${m.dfB}, ${m.dfW} | ${markS(m.w, m.p)} | ${markP(m.p)} |
+
+## 2 描述统计
+
+对被试${type === 'independent' ? '间' : '内'}变量${type === 'independent' ? `"${variable}" (分组变量: "${groups}")` : variables?.map((v) => `"${v}"`).join(', ')}进行描述统计. 中心化方法为基于${center === 'mean' ? '均值' : '中位数'} (注: 此处中心化指离中心的"距离" (即差异的绝对值)).
+
+结果如表 2 所示.
+
+> 表 2 - 描述统计结果
+
+| ${type === 'independent' ? '组别' : '变量'} | 样本量 | 原始均值 | 原始中位数 | 中心化均值 | 中心化中位数 |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+${m.groups
+	.map(
+		(group, index) =>
+			`| ${group} | ${m.groupsCount[index]} | ${m.groupsMeanR[index].toFixed(3)} | ${m.groupsMedianR[index].toFixed(3)} | ${m.groupsMeanC[index].toFixed(3)} | ${m.groupsMedianC[index].toFixed(3)} |`,
+	)
+	.join('\n')}
+			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {
@@ -197,62 +224,13 @@ export function LeveneTest() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>Levene 检验</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							H<sub>0</sub>: 各变量/组满足方差齐性
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>自由度</td>
-									<td>F (w)</td>
-									<td>p</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>
-										{result.m.dfB}, {result.m.dfW}
-									</td>
-									<td>{markS(result.m.w, result.m.p)}</td>
-									<td>{markP(result.m.p)}</td>
-								</tr>
-							</tbody>
-						</table>
-
-						<p className='text-lg mb-2 mt-8 text-center w-full'>描述统计</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							中心化方法: {result.center === 'mean' ? '均值' : '中位数'}
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>变量/组</td>
-									<td>样本量</td>
-									<td>原始均值</td>
-									<td>原始中位数</td>
-									<td>中心化均值</td>
-									<td>中心化中位数</td>
-								</tr>
-							</thead>
-							<tbody>
-								{result.m.groups.map((group, index) => (
-									<tr key={uuid()}>
-										<td>{group}</td>
-										<td>{result.m.groupsCount[index]}</td>
-										<td>{result.m.groupsMeanR[index].toFixed(3)}</td>
-										<td>{result.m.groupsMedianR[index].toFixed(3)}</td>
-										<td>{result.m.groupsMeanC[index].toFixed(3)}</td>
-										<td>{result.m.groupsMedianC[index].toFixed(3)}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-						<p className='text-xs mt-3 text-center w-full'>
-							注: 此处中心化指离中心的"距离" (即差异的绝对值)
-						</p>
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

@@ -9,11 +9,6 @@ import type {
 import { useEffect, useRef } from 'react'
 import { md5 } from '../../lib/utils'
 import { ToolCall } from './ToolCall'
-import '../../styles/markdown.css'
-import katex from 'marked-katex-extension'
-import 'katex/dist/katex.min.css'
-
-marked.use(katex({ throwOnError: false }))
 
 export function Messages({
 	messages,

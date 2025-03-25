@@ -1,5 +1,35 @@
 import html2canvas from 'html2canvas-pro'
+import katexCss from 'katex/dist/katex.min.css?raw'
+import { marked } from 'marked'
+import themeCss from '../styles/statResult.css?raw'
 import type { Variable } from '../types'
+
+/**
+ * 把统计结果渲染为 HTML
+ * @param result 统计结果
+ * @returns HTML
+ */
+export function renderStatResult(result: string): string {
+	return `
+		<!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+      <meta charset="UTF-8">
+      <title>预览</title>
+      <style>${`\n${themeCss}\n`}</style>
+      <style>${`\n${katexCss}\n`}</style>
+      <style>
+        * { scrollbar-width: none; }
+      </style>
+    </head>
+    <body>
+		  <div style="max-width: 100%">
+				${marked.parse(result, { async: false })}
+			</div>
+    </body>
+    </html>
+	`
+}
 
 /**
  * 生成 UUID

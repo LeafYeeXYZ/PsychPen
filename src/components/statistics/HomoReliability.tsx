@@ -1,11 +1,11 @@
 import { AlphaRealiability } from '@psych/lib'
 import { Button, Form, InputNumber, Radio, Select } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useRemoteR } from '../../lib/hooks/useRemoteR'
 import { useStates } from '../../lib/hooks/useStates'
-import { jsArrayToRMatrix, sleep, uuid } from '../../lib/utils'
+import { jsArrayToRMatrix, renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 变量名 */
@@ -17,10 +17,6 @@ type Option = {
 	/** Omega 系数的因子数 */
 	manualNFactors?: number
 }
-type Result = {
-	m: AlphaRealiability
-	omega?: number[]
-} & Option
 
 export function HomoReliability() {
 	const dataCols = useData((state) => state.dataCols)
@@ -29,7 +25,11 @@ export function HomoReliability() {
 	const messageApi = useStates((state) => state.messageApi)
 	const Renable = useRemoteR((state) => state.Renable)
 	const executeRCode = useRemoteR((state) => state.executeRCode)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -76,17 +76,69 @@ export function HomoReliability() {
 						])) as number[]
 						omega.push(result[0])
 					}
-					setResult({ m, omega, ...values })
+					setStatResult(`
+## 1 同质性信度分析
+
+对量表题目${variables.map((v) => `"${v}"`).join(', ')}进行同质性信度分析. 分组变量为"${group}". 应用中, alpha 的值至少要大于 0.5, 最好能大于 0.7. 而 omega 是一种更为准确的信度系数, 详见 Hayes, A. F., & Coutts, J. J. (2020).
+
+结果如表 1 所示.
+
+> 表 1 - 同质性信度分析结果
+
+| 分组 | 量表题目数 | alpha 系数 | omega 系数 |
+| :---: | :---: | :---: | :---: |
+${m.group
+	.map((g, i) => {
+		return `| ${g} | ${variables.length} | ${m.alpha[i].toFixed(3)} | ${omega[i].toFixed(3)} |`
+	})
+	.join('\n')}
+
+##### 参考文献
+
+> Hayes, A. F., & Coutts, J. J. (2020). Use Omega Rather than Cronbach’s Alpha for Estimating Reliability. But…. Communication Methods and Measures, 14(1), 1–24. https://doi.org/10.1080/19312458.2020.1718629
+					`)
 				} else {
 					const omega = (await executeRCode(code(items), [
 						'psych',
 						'jsonlite',
 						'GPArotation',
 					])) as number[]
-					setResult({ m, omega, ...values })
+					setStatResult(`
+## 1 同质性信度分析
+
+对量表题目${variables.map((v) => `"${v}"`).join(', ')}进行同质性信度分析. 应用中, alpha 的值至少要大于 0.5, 最好能大于 0.7. 而 omega 是一种更为准确的信度系数, 详见 Hayes, A. F., & Coutts, J. J. (2020).
+
+结果如表 1 所示.
+
+> 表 1 - 同质性信度分析结果
+
+| 量表题目数 | alpha 系数 | omega 系数 |
+| :---: | :---: | :---: |
+| ${variables.length} | ${m.alpha[0].toFixed(3)} | ${omega[0].toFixed(3)} |
+
+##### 参考文献
+
+> Hayes, A. F., & Coutts, J. J. (2020). Use Omega Rather than Cronbach’s Alpha for Estimating Reliability. But…. Communication Methods and Measures, 14(1), 1–24. https://doi.org/10.1080/19312458.2020.1718629
+					`)
 				}
 			} else {
-				setResult({ m, ...values })
+				setStatResult(`
+## 1 同质性信度分析
+
+对量表题目${variables.map((v) => `"${v}"`).join(', ')}进行同质性信度分析. ${group ? `分组变量为"${group}". ` : ''}应用中, alpha 的值至少要大于 0.5, 最好能大于 0.7.
+
+结果如表 1 所示.
+
+> 表 1 - 同质性信度分析结果
+
+| 分组 | 量表题目数 | alpha 系数 |
+| :---: | :---: | :---: |
+${m.group
+	.map((g, i) => {
+		return `| ${g} | ${variables.length} | ${m.alpha[i].toFixed(3)} |`
+	})
+	.join('\n')}
+				`)
 			}
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -180,40 +232,13 @@ export function HomoReliability() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>同质性信度分析</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>分组</td>
-									<td>量表题目数</td>
-									<td>alpha 系数</td>
-									{result.omega && <td>omega 系数</td>}
-								</tr>
-							</thead>
-							<tbody>
-								{result.m.alpha.map((a, i) => (
-									<tr key={uuid()}>
-										<td>{result.m.group[i]}</td>
-										<td>{result.variables.length}</td>
-										<td>{a.toFixed(3)}</td>
-										{result.omega && <td>{result.omega[i].toFixed(3)}</td>}
-									</tr>
-								))}
-							</tbody>
-						</table>
-						<p className='text-xs mt-3 text-center w-full'>
-							应用中, alpha 的值至少要大于 0.5, 最好能大于 0.7
-						</p>
-						<p className='text-xs mt-2 text-center w-full'>
-							量表题目: {result.variables.join(', ')}
-						</p>
-						{result.group && (
-							<p className='text-xs mt-2 text-center w-full'>
-								分组变量: {result.group}
-							</p>
-						)}
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

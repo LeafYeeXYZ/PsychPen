@@ -1,10 +1,10 @@
 import { OneSampleKSTest } from '@psych/lib'
 import { Button, Form, Radio, Select } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { sleep, uuid } from '../../lib/utils'
+import { renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 类型 */
@@ -16,16 +16,17 @@ type Option = {
 	/** 分组 */
 	group?: string
 }
-type Result = {
-	m: (OneSampleKSTest & { name: string })[]
-} & Option
 
 export function KolmogorovSmirnovTest() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -50,7 +51,24 @@ export function KolmogorovSmirnovTest() {
 						name: variables[index],
 					}
 				})
-				setResult({ ...values, m: result })
+				setStatResult(`
+## 1 单样本 Kolmogorov-Smirnov 检验
+
+对被试内变量${variables.map((v) => `"${v}"`).join(', ')}进行单样本 Kolmogorov-Smirnov 检验. 原假设 (H<sub>0</sub>) 为"数据符合正态分布"; 显著性水平 (α) 为 0.05. 注意: p值使用渐进估计, 所以样本量较小时可能误差较大, 请以D临界值结果为准.
+
+结果如表 1 所示.
+
+> 表 1 - 单样本 Kolmogorov-Smirnov 检验结果
+
+| 变量 | 样本量 | D | D临界值 | 结果 |
+| :---: | :---: | :---: | :---: | :---: |
+${result.map(
+	(row) =>
+		`| ${row.name} | ${row.count} | ${row.d?.toFixed(3)} | ${row.decide?.toFixed(3)} | ${
+			row.rejected ? '不符合正态分布' : '符合正态分布'
+		} (p: ${row.p?.toFixed(3)}) |`,
+).join('\n')}
+				`)
 			} else {
 				if (!variable || !group) {
 					throw new Error('请选择数据变量和分组变量')
@@ -72,7 +90,24 @@ export function KolmogorovSmirnovTest() {
 						name: groups[index],
 					}
 				})
-				setResult({ ...values, m: result })
+				setStatResult(`
+## 1 单样本 Kolmogorov-Smirnov 检验
+
+对被试间变量"${variable}" (分组变量: "${group}") 进行单样本 Kolmogorov-Smirnov 检验. 原假设 (H<sub>0</sub>) 为"数据符合正态分布"; 显著性水平 (α) 为 0.05. 注意: p值使用渐进估计, 所以样本量较小时可能误差较大, 请以D临界值结果为准.
+
+结果如表 1 所示.
+
+> 表 1 - 单样本 Kolmogorov-Smirnov 检验结果
+
+| 组别 | 样本量 | D | D临界值 | 结果 |
+| :---: | :---: | :---: | :---: | :---: |
+${result.map(
+	(row) =>
+		`| ${row.name} | ${row.count} | ${row.d?.toFixed(3)} | ${row.decide?.toFixed(3)} | ${
+			row.rejected ? '不符合正态分布' : '符合正态分布'
+		} (p: ${row.p?.toFixed(3)}) |`,
+).join('\n')}
+				`)
 			}
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -176,45 +211,13 @@ export function KolmogorovSmirnovTest() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>
-							单样本 Kolmogorov-Smirnov 检验
-						</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							H<sub>0</sub>: 数据符合正态分布 | 显著性水平(α): 0.05
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>{result.type === 'paired' ? '变量' : '组别'}</td>
-									<td>样本量</td>
-									<td>D</td>
-									<td>D临界值</td>
-									<td>结果</td>
-								</tr>
-							</thead>
-							<tbody>
-								{result.m.map((row) => (
-									<tr key={uuid()}>
-										<td>{row.name}</td>
-										<td>{row?.count}</td>
-										<td>{row.d?.toFixed(3)}</td>
-										<td>{row.decide?.toFixed(3)}</td>
-										<td>
-											{row?.rejected ? '不符合正态分布' : '符合正态分布'}{' '}
-											<span className='text-xs opacity-40'>
-												p: {row.p?.toFixed(3)}
-											</span>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-						<p className='text-xs mt-3 text-center w-full'>
-							P值使用渐进估计, 小样本时请以D临界值结果为准
-							{result.type === 'independent' && ` | 分组变量: ${result.group}`}
-						</p>
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

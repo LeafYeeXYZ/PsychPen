@@ -3,6 +3,15 @@ import { create } from 'zustand'
 
 type GlobalState = {
 	/**
+	 * 统计结果
+	 */
+	statResult: string
+	/**
+	 * 设置统计结果
+	 * @param statResult
+	 */
+	setStatResult: (statResult: string) => void
+	/**
 	 * 消息提示 API
 	 */
 	messageApi: MessageInstance | null
@@ -33,6 +42,8 @@ type GlobalState = {
 
 export const useStates = create<GlobalState>()((setState) => {
 	return {
+		statResult: '',
+		setStatResult: (statResult) => setState({ statResult }),
 		messageApi: null,
 		setMessageApi: (api) => setState({ messageApi: api }),
 		disabled: false,

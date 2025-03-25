@@ -26,13 +26,10 @@ import { Messages } from './assistant/Messages'
 import { funcs } from './assistant/funcs'
 
 const GREETTING =
-	'你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、变量标准化/中心化/离散化、生成新变量、筛选数据等. 请问有什么可以帮你的?'
+	'你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、变量标准化/中心化/离散化、生成新变量、筛选数据、解释你当前的统计结果等. 请问有什么可以帮你的?'
 const INSTRUCTION =
 	'你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. \n\n你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具 (函数) 信息. \n\n你的任务是按照用户的要求, 对用户进行回复, 或调用工具 (函数). 在调用工具 (函数) 前, 请确保你已经明确知晓了用户的意图, 否则请通过进一步和用户对话来确认细节. \n\n你的回复中如果包含数学公式和符号, 请使用 TeX 语法, 并将行内公式用 `$` 包裹 (类似于 Markdown 的行内代码), 将块级公式用 `$$` 包裹 (类似于 Markdown 的代码块).'
-function GET_PROMPT(
-	vars: Variable[],
-	page: string,
-): string {
+function GET_PROMPT(vars: Variable[], page: string, stat: string): string {
 	const varsInfo = vars.map((col) => {
 		if (col.type === '称名或等级数据') {
 			return `| ${col.name} | ${col.type} | ${col.valid} | ${col.missing} | ${col.unique} | - | - | - | - | - | - |`
@@ -50,7 +47,7 @@ function GET_PROMPT(
 			: '未定义任何子变量'
 		return `| ${col.name} | ${col.type} | ${col.valid} | ${col.missing} | ${col.unique} | ${col.mean?.toFixed(4) || '-'} | ${col.std?.toFixed(4) || '-'} | ${col.q2?.toFixed(4) || '-'} | ${col.min?.toFixed(4) || '-'} | ${col.max?.toFixed(4) || '-'} | ${subVarInfo} |`
 	})
-	const userText = `\n\n# 用户信息\n\n用户当前所处的页面为: ${page}`
+	const userText = `\n\n# 用户信息\n\n用户当前所处的页面为: ${page}${stat && `, 当前统计结果为: \n\n\`\`\`markdown\n${stat}\n\`\`\``}`
 	const varsText = `\n\n# 变量信息\n\n| 变量名 | 变量类型 | 有效值数量 | 缺失值数量 | 唯一值数量 | 均值 | 标准差 | 中位数 | 最小值 | 最大值 | 子变量信息 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n${varsInfo.join('\n')}`
 	const docsText = `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\``
 	return INSTRUCTION + userText + varsText + docsText
@@ -71,8 +68,17 @@ export function AI() {
 	const data = useData((state) => state.data)
 	const dataCols = useData((state) => state.dataCols)
 	const messageApi = useStates((state) => state.messageApi)
+	const statResult = useStates((state) => state.statResult)
 	const disabled = useStates((state) => state.disabled)
-	const nav = useNav()
+	const activeMainPage = useNav((state) => state.activeMainPage)
+	const currentPageInfo = useNav((state) => state.currentPageInfo)
+	const setMainPage = useNav((state) => state.setMainPage)
+	const setStatisticsViewSubPage = useNav(
+		(state) => state.setStatisticsViewSubPage,
+	)
+	const setVariableViewSubPage = useNav((state) => state.setVariableViewSubPage)
+	const setPlotsViewSubPage = useNav((state) => state.setPlotsViewSubPage)
+	const setToolsViewSubPage = useNav((state) => state.setToolsViewSubPage)
 	const [input, setInput] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [showLoading, setShowLoading] = useState(false)
@@ -100,7 +106,14 @@ export function AI() {
 				setMessages([...old, user])
 				setInput('')
 			})
-			const system = GET_PROMPT(dataCols, nav.currentPageInfo())
+			const system = GET_PROMPT(
+				dataCols,
+				currentPageInfo(),
+				statResult ||
+					(activeMainPage === MAIN_PAGES_LABELS.STATISTICS
+						? '(还未进行统计分析)'
+						: ''),
+			)
 
 			const stream = await ai.chat.completions.create({
 				model: model,
@@ -239,7 +252,7 @@ export function AI() {
 							break
 						}
 						case 'nav_to_data_view': {
-							nav.setMainPage(MAIN_PAGES_LABELS.DATA)
+							setMainPage(MAIN_PAGES_LABELS.DATA)
 							newMessages[1].content = '已成功跳转到数据视图'
 							break
 						}
@@ -251,8 +264,8 @@ export function AI() {
 							) {
 								throw new Error(`未知的子页面 (${page})`)
 							}
-							nav.setMainPage(MAIN_PAGES_LABELS.VARIABLE)
-							nav.setVariableViewSubPage(page)
+							setMainPage(MAIN_PAGES_LABELS.VARIABLE)
+							setVariableViewSubPage(page)
 							newMessages[1].content = `已成功跳转到变量视图的${page}页面`
 							break
 						}
@@ -264,8 +277,8 @@ export function AI() {
 							) {
 								throw new Error(`未知的子页面 (${page})`)
 							}
-							nav.setMainPage(MAIN_PAGES_LABELS.PLOTS)
-							nav.setPlotsViewSubPage(page)
+							setMainPage(MAIN_PAGES_LABELS.PLOTS)
+							setPlotsViewSubPage(page)
 							newMessages[1].content = `已成功跳转到绘图视图的${page}页面`
 							break
 						}
@@ -277,8 +290,8 @@ export function AI() {
 							) {
 								throw new Error(`未知的子页面 (${page})`)
 							}
-							nav.setMainPage(MAIN_PAGES_LABELS.STATISTICS)
-							nav.setStatisticsViewSubPage(page)
+							setMainPage(MAIN_PAGES_LABELS.STATISTICS)
+							setStatisticsViewSubPage(page)
 							newMessages[1].content = `已成功跳转到统计视图的${page}页面`
 							break
 						}
@@ -290,8 +303,8 @@ export function AI() {
 							) {
 								throw new Error(`未知的子页面 (${page})`)
 							}
-							nav.setMainPage(MAIN_PAGES_LABELS.TOOLS)
-							nav.setToolsViewSubPage(page)
+							setMainPage(MAIN_PAGES_LABELS.TOOLS)
+							setToolsViewSubPage(page)
 							newMessages[1].content = `已成功跳转到工具视图的${page}页面`
 							break
 						}

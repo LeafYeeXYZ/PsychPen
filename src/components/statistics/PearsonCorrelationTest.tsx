@@ -1,10 +1,10 @@
 import { PearsonCorrTest } from '@psych/lib'
 import { Button, Form, InputNumber, Select } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { markP, markS, sleep, uuid } from '../../lib/utils'
+import { markP, markS, renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 变量名 */
@@ -29,7 +29,11 @@ export function PearsonCorrelationTest() {
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -62,10 +66,50 @@ export function PearsonCorrelationTest() {
 					})
 				}
 			}
-			setResult({
-				...values,
-				data: results,
-			})
+			setStatResult(`
+## 1 Pearson 相关系数检验
+
+对变量${variable.map((v) => `"${v}"`).join(', ')}进行 Pearson 相关系数检验. 原假设 (H<sub>0</sub>) 为"两个变量的相关系数等于零"; 显著性水平 (α) 为 ${alpha}.
+
+结果如表 1 所示.
+
+> 表 1 - Pearson 相关系数检验结果
+
+| 变量A | 变量B | 相关系数(r) | 测定系数(r²) | ${(100 - alpha * 100).toFixed(3)}%置信区间 | t | p | 自由度 |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+${results
+	.map(
+		(row) =>
+			`| ${row.peer[0]} | ${row.peer[1]} | ${row.r} | ${row.r2} | ${row.ci} | ${row.t} | ${row.p} | ${row.df} |`,
+	)
+	.join('\n')}
+
+## 2 相关系数矩阵
+
+绘制变量${variable.map((v) => `"${v}"`).join(', ')}的相关系数矩阵.
+
+结果如表 2 所示.
+
+> 表 2 - 相关系数矩阵
+
+|  | ${variable.join(' | ')} |
+| :---: | ${variable.map(() => ' :---: ').join(' | ')} |
+${variable
+	.map(
+		(variableA, indexA) =>
+			`| ${variableA} | ${variable
+				.map((variableB, indexB) =>
+					indexA === indexB
+						? '-'
+						: results.find(
+								(row) =>
+									row.peer.includes(variableA) && row.peer.includes(variableB),
+							)?.r,
+				)
+				.join(' | ')} |`,
+	)
+	.join('\n')}
+			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {
@@ -136,73 +180,13 @@ export function PearsonCorrelationTest() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>
-							Pearson 相关系数检验
-						</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							H<sub>0</sub>: 两个变量的相关系数等于零 | 显著性水平(α):{' '}
-							{result.alpha}
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>变量A</td>
-									<td>变量B</td>
-									<td>相关系数(r)</td>
-									<td>测定系数(r²)</td>
-									<td>{(100 - result.alpha * 100).toFixed(3)}%置信区间</td>
-									<td>t</td>
-									<td>p</td>
-									<td>自由度</td>
-								</tr>
-							</thead>
-							<tbody>
-								{result.data.map((row) => (
-									<tr key={uuid()}>
-										<td>{row.peer[0]}</td>
-										<td>{row.peer[1]}</td>
-										<td>{row.r}</td>
-										<td>{row.r2}</td>
-										<td>{row.ci}</td>
-										<td>{row.t}</td>
-										<td>{row.p}</td>
-										<td>{row.df}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-
-						<p className='text-lg mb-3 mt-8 text-center w-full'>相关系数矩阵</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td />
-									{result.variable.map((variable) => (
-										<td key={uuid()}>{variable}</td>
-									))}
-								</tr>
-							</thead>
-							<tbody>
-								{result.variable.map((variableA, indexA) => (
-									<tr key={uuid()}>
-										<td>{variableA}</td>
-										{result.variable.map((variableB, indexB) => (
-											<td key={uuid()}>
-												{indexA === indexB
-													? '-'
-													: result.data.find(
-															(row) =>
-																row.peer.includes(variableA) &&
-																row.peer.includes(variableB),
-														)?.r}
-											</td>
-										))}
-									</tr>
-								))}
-							</tbody>
-						</table>
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

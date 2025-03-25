@@ -1,10 +1,10 @@
 import { LinearRegressionOne } from '@psych/lib'
 import { Button, Form, Select, Tag } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { markP, markS, sleep } from '../../lib/utils'
+import { markP, markS, renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** x 变量 */
@@ -12,17 +12,17 @@ type Option = {
 	/** y 变量 */
 	y: string
 }
-type Result = {
-	/** 模型 */
-	m: LinearRegressionOne
-} & Option
 
 export function OneLinearRegression() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -40,7 +40,40 @@ export function OneLinearRegression() {
 			const xData = filteredRows.map((row) => Number(row[x]))
 			const yData = filteredRows.map((row) => Number(row[y]))
 			const m = new LinearRegressionOne(xData, yData)
-			setResult({ x, y, m })
+			setStatResult(`
+## 1 一元线性回归
+
+对自变量 (x) "${x}"和因变量 (y) "${y}"进行一元线性回归分析. 原假设 (H<sub>0</sub>) 为"斜率 = 0"; 显著性水平 (α) 为 0.05. 最终模型为 y = ${m.b0.toFixed(4)} + ${m.b1.toFixed(4)} * x.
+
+结果如表 1 和表 2 所示.
+
+> 表 1 - 一元线性回归模型
+
+| a (截距) | b (斜率) | F | t | p | 测定系数 (R²) |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ${m.b0.toFixed(4)} | ${m.b1.toFixed(4)} | ${markS(m.F, m.p)} | ${markS(m.t, m.p)} | ${markP(m.p)} | ${m.r2.toFixed(4)} |
+
+> 表 2 - 模型细节
+
+| 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
+| :---: | :---: | :---: | :---: |
+| 总和 (T) | ${m.dfT} | ${m.SSt.toFixed(4)} | ${(m.SSt / m.dfT).toFixed(4)} |
+| 回归 (R) | ${m.dfR} | ${m.SSr.toFixed(4)} | ${(m.SSr / m.dfR).toFixed(4)} |
+| 残差 (E) | ${m.dfE} | ${m.SSe.toFixed(4)} | ${(m.SSe / m.dfE).toFixed(4)} |
+
+## 2 描述统计
+
+对自变量"${x}"和因变量"${y}"进行描述统计分析. 
+
+结果如表 3 所示.
+
+> 表 3 - 描述统计
+
+| 变量 | 均值 | 标准差 |
+| :---: | :---: | :---: |
+| ${x} | ${m.xMean.toFixed(4)} | ${m.xStd.toFixed(4)} |
+| ${y} | ${m.yMean.toFixed(4)} | ${m.yStd.toFixed(4)} |
+			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {
@@ -134,93 +167,13 @@ export function OneLinearRegression() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>一元线性回归</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							模型: y = {result.m.b0.toFixed(4)} + {result.m.b1.toFixed(4)} * x
-							| H<sub>0</sub>: b<sub>1</sub> = 0
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>a (截距)</td>
-									<td>b (斜率)</td>
-									<td>F</td>
-									<td>t</td>
-									<td>p</td>
-									<td>测定系数 (R²)</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>{result.m.b0.toFixed(4)}</td>
-									<td>{result.m.b1.toFixed(4)}</td>
-									<td>{markS(result.m.F, result.m.p)}</td>
-									<td>{markS(result.m.t, result.m.p)}</td>
-									<td>{markP(result.m.p)}</td>
-									<td>{result.m.r2.toFixed(4)}</td>
-								</tr>
-							</tbody>
-						</table>
-						<p className='text-xs mt-3 text-center w-full'>
-							x: {result.x} | y: {result.y}
-						</p>
-
-						<p className='text-lg mb-2 text-center w-full mt-8'>模型细节</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>误差项</td>
-									<td>自由度 (df)</td>
-									<td>平方和 (SS)</td>
-									<td>均方 (MS)</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>总和 (T)</td>
-									<td>{result.m.dfT}</td>
-									<td>{result.m.SSt.toFixed(4)}</td>
-									<td>{(result.m.SSt / result.m.dfT).toFixed(4)}</td>
-								</tr>
-								<tr>
-									<td>回归 (R)</td>
-									<td>{result.m.dfR}</td>
-									<td>{result.m.SSr.toFixed(4)}</td>
-									<td>{(result.m.SSr / result.m.dfR).toFixed(4)}</td>
-								</tr>
-								<tr>
-									<td>残差 (E)</td>
-									<td>{result.m.dfE}</td>
-									<td>{result.m.SSe.toFixed(4)}</td>
-									<td>{(result.m.SSe / result.m.dfE).toFixed(4)}</td>
-								</tr>
-							</tbody>
-						</table>
-
-						<p className='text-lg mb-2 text-center w-full mt-8'>描述统计</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>变量</td>
-									<td>均值</td>
-									<td>标准差</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>{result.x}</td>
-									<td>{result.m.xMean.toFixed(4)}</td>
-									<td>{result.m.xStd.toFixed(4)}</td>
-								</tr>
-								<tr>
-									<td>{result.y}</td>
-									<td>{result.m.yMean.toFixed(4)}</td>
-									<td>{result.m.yStd.toFixed(4)}</td>
-								</tr>
-							</tbody>
-						</table>
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

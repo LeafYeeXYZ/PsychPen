@@ -11,11 +11,11 @@ import {
 	sum,
 } from '@psych/lib'
 import { Button, Form, Radio, Select } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { sleep, uuid } from '../../lib/utils'
+import { renderStatResult, sleep } from '../../lib/utils'
 
 type AvialableStat =
 	| 'total'
@@ -62,28 +62,17 @@ type Option = {
 	/** 统计量 */
 	statistic: AvialableStat[]
 }
-type Result = {
-	/** 类别 */
-	type: 'peer' | 'independent'
-	/** 被试间变量名 */
-	variable?: string
-	/** 分组变量 */
-	group?: string
-	/** 描述性数据 */
-	data: {
-		/** 变量名/组名 */
-		var: string
-		/** 统计量 */
-		data: { value: string | number; label: string }[]
-	}[]
-}
 
 export function Description() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -143,7 +132,21 @@ export function Description() {
 					})
 					return { var: vari, data }
 				})
-				setResult({ type, data })
+				setStatResult(`
+## 1 描述统计
+
+对被试内变量${variables.map((v) => `"${v}"`).join(', ')}进行描述统计.
+
+结果如表 1 所示.
+
+> 表 1 - 描述统计结果
+
+| 变量 | ${statistic.map((s) => STAT_OPTIONS.find((o) => o.value === s)?.label).join(' | ')} |
+| :---: | ${statistic.map(() => ' :---: ').join(' | ')} |
+${data
+	.map((d) => `| ${d.var} | ${d.data.map((v) => v.value).join(' | ')} |`)
+	.join('\n')}
+				`)
 			} else {
 				if (!variable || !group) {
 					throw new Error('请选择数据变量和分组变量')
@@ -198,12 +201,22 @@ export function Description() {
 					})
 					return { var: String(g), data }
 				})
-				setResult({
-					type,
-					variable,
-					group,
-					data: data.sort((a, b) => Number(a.var) - Number(b.var)),
-				})
+				setStatResult(`
+## 1 描述统计
+
+对被试间变量"${variable}"进行描述统计, 分组变量为"${group}".
+
+结果如表 1 所示.
+
+> 表 1 - 描述统计结果
+
+| 组别 | ${statistic.map((s) => STAT_OPTIONS.find((o) => o.value === s)?.label).join(' | ')} |
+| :---: | ${statistic.map(() => ' :---: ').join(' | ')} |
+${data
+	.sort((a, b) => Number(a.var) - Number(b.var))
+	.map((d) => `| ${d.var} | ${d.data.map((v) => v.value).join(' | ')} |`)
+	.join('\n')}
+				`)
 			}
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
@@ -319,36 +332,13 @@ export function Description() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>描述统计</p>
-						<p className='text-xs mb-3 text-center w-full'>
-							{result.type === 'peer'
-								? `被试内变量: ${result.data.map((d) => d.var).join(', ')}`
-								: `被试间变量: ${result.variable} | 分组变量: ${result.group} (${result.data.map((d) => d.var).join(', ')})`}
-						</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td key={result.type}>
-										{result.type === 'peer' ? '变量' : '组别'}
-									</td>
-									{result.data[0].data.map((d) => (
-										<td key={uuid()}>{d.label}</td>
-									))}
-								</tr>
-							</thead>
-							<tbody>
-								{result.data.map((d) => (
-									<tr key={uuid()}>
-										<td key={uuid()}>{d.var}</td>
-										{d.data.map((v) => (
-											<td key={uuid()}>{v.value}</td>
-										))}
-									</tr>
-								))}
-							</tbody>
-						</table>
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

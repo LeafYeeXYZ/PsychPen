@@ -1,10 +1,10 @@
 import { HalfRealiability } from '@psych/lib'
 import { Button, Form, Select } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
-import { sleep, uuid } from '../../lib/utils'
+import { renderStatResult, sleep } from '../../lib/utils'
 
 type Option = {
 	/** 前一半变量名 */
@@ -14,16 +14,17 @@ type Option = {
 	/** 分组变量 */
 	group?: string
 }
-type Result = {
-	m: HalfRealiability
-} & Option
 
 export function HalfReliability() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const [result, setResult] = useState<Result | null>(null)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	useEffect(() => {
+		setStatResult('')
+	}, [setStatResult])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
@@ -53,7 +54,25 @@ export function HalfReliability() {
 					? filteredRows.map((row) => String(row[group]))
 					: undefined,
 			)
-			setResult({ m, ...values })
+			setStatResult(`
+## 1 分半信度分析
+
+进行分半信度分析, 前半部分题目包括${variablesA.map((v) => `"${v}"`).join('、')}, 后半部分题目包括${variablesB.map((v) => `"${v}"`).join('、')}. ${
+				group ? `分组变量为"${group}".` : ''
+			}
+
+结果如表 1 所示.
+
+> 表 1 - 分半信度分析结果
+
+| 分组 | 前半部分题目数 | 后半部分题目数 | 修正后相关系数(r<sub>xx</sub>) |
+| :---: | :---: | :---: | :---: |
+${m.r
+	.map((r, i) => {
+		return `| ${m.group[i]} | ${variablesA.length} | ${variablesB.length} | ${r.toFixed(3)} |`
+	})
+	.join('\n')}
+			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {
@@ -157,42 +176,13 @@ export function HalfReliability() {
 			</div>
 
 			<div className='component-result'>
-				{result ? (
+				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<p className='text-lg mb-2 text-center w-full'>分半信度分析</p>
-						<table className='three-line-table'>
-							<thead>
-								<tr>
-									<td>分组</td>
-									<td>前半部分题目数</td>
-									<td>后半部分题目数</td>
-									<td>
-										修正后相关系数(r<sub>xx</sub>)
-									</td>
-								</tr>
-							</thead>
-							<tbody>
-								{result.m.r.map((r, i) => (
-									<tr key={uuid()}>
-										<td>{result.m.group[i]}</td>
-										<td>{result.variablesA.length}</td>
-										<td>{result.variablesB.length}</td>
-										<td>{r.toFixed(3)}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-						<p className='text-xs mt-3 text-center w-full'>
-							前半部分题目: {result.variablesA.join(', ')}
-						</p>
-						<p className='text-xs mt-2 text-center w-full'>
-							后半部分题目: {result.variablesB.join(', ')}
-						</p>
-						{result.group && (
-							<p className='text-xs mt-2 text-center w-full'>
-								分组变量: {result.group}
-							</p>
-						)}
+						<iframe
+							srcDoc={renderStatResult(statResult)}
+							className='w-full h-full'
+							title='statResult'
+						/>
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

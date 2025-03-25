@@ -231,7 +231,7 @@ export const TOOLS_VIEW_SUB_PAGES_ELEMENTS: Record<
 }
 
 type NavState = {
-  currentPageInfo: () => string
+	currentPageInfo: () => string
 
 	mainPage: React.ReactElement
 	activeMainPage: MAIN_PAGES_LABELS
