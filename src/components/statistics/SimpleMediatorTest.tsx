@@ -1,5 +1,5 @@
 import { SimpleMediationModel } from '@psych/lib'
-import { Button, Form, InputNumber, Select, Tag, Collapse } from 'antd'
+import { Button, Collapse, Form, InputNumber, Select, Tag } from 'antd'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
@@ -123,17 +123,19 @@ export function SimpleMediatorTest() {
 				>
 					<div className='mb-4'>
 						<Collapse
-							items={[{
-								key: 'smm',
-								label: '简单中介效应模型示意图 (点击展开)',
-								children: (
-									<img
-										src='/smm.png'
-										alt='simple mediator model'
-										className='w-full'
-									/>
-								),
-							}]}
+							items={[
+								{
+									key: 'smm',
+									label: '简单中介效应模型示意图 (点击展开)',
+									children: (
+										<img
+											src='/smm.png'
+											alt='simple mediator model'
+											className='w-full'
+										/>
+									),
+								},
+							]}
 						/>
 					</div>
 					<Form.Item

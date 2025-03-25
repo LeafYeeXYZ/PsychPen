@@ -62,12 +62,14 @@ export function KolmogorovSmirnovTest() {
 
 | 变量 | 样本量 | D | D临界值 | 结果 |
 | :---: | :---: | :---: | :---: | :---: |
-${result.map(
-	(row) =>
-		`| ${row.name} | ${row.count} | ${row.d?.toFixed(3)} | ${row.decide?.toFixed(3)} | ${
-			row.rejected ? '不符合正态分布' : '符合正态分布'
-		} (p: ${row.p?.toFixed(3)}) |`,
-).join('\n')}
+${result
+	.map(
+		(row) =>
+			`| ${row.name} | ${row.count} | ${row.d?.toFixed(3)} | ${row.decide?.toFixed(3)} | ${
+				row.rejected ? '不符合正态分布' : '符合正态分布'
+			} (p: ${row.p?.toFixed(3)}) |`,
+	)
+	.join('\n')}
 				`)
 			} else {
 				if (!variable || !group) {
@@ -101,12 +103,14 @@ ${result.map(
 
 | 组别 | 样本量 | D | D临界值 | 结果 |
 | :---: | :---: | :---: | :---: | :---: |
-${result.map(
-	(row) =>
-		`| ${row.name} | ${row.count} | ${row.d?.toFixed(3)} | ${row.decide?.toFixed(3)} | ${
-			row.rejected ? '不符合正态分布' : '符合正态分布'
-		} (p: ${row.p?.toFixed(3)}) |`,
-).join('\n')}
+${result
+	.map(
+		(row) =>
+			`| ${row.name} | ${row.count} | ${row.d?.toFixed(3)} | ${row.decide?.toFixed(3)} | ${
+				row.rejected ? '不符合正态分布' : '符合正态分布'
+			} (p: ${row.p?.toFixed(3)}) |`,
+	)
+	.join('\n')}
 				`)
 			}
 			messageApi?.destroy()

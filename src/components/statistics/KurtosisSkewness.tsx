@@ -59,7 +59,8 @@ export function KurtosisSkewness() {
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 ${k
 	.map(
-		(k, i) => `| ${variables[i]} | ${data[i].length} | ${k.kurtosis.toFixed(3)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${s[i].skewness.toFixed(3)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
+		(k, i) =>
+			`| ${variables[i]} | ${data[i].length} | ${k.kurtosis.toFixed(3)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${s[i].skewness.toFixed(3)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
 	)
 	.join('\n')}
         `)
@@ -92,7 +93,8 @@ ${k
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 ${k
 	.map(
-		(k, i) => `| ${groups[i]} | ${data[i].length} | ${k.kurtosis.toFixed(3)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${s[i].skewness.toFixed(3)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
+		(k, i) =>
+			`| ${groups[i]} | ${data[i].length} | ${k.kurtosis.toFixed(3)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${s[i].skewness.toFixed(3)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
 	)
 	.join('\n')}
         `)

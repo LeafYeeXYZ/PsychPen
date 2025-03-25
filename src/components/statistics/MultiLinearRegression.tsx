@@ -249,7 +249,7 @@ function getSequenceLinearRegressionResult({
 	return `
 ## 1 序列多元线性回归
 
-基于自变量${result.x.map((v, i) => `"${v}" (x${i+1})`).join('、')}和因变量"${result.y}"构建序列多元线性回归模型.
+基于自变量${result.x.map((v, i) => `"${v}" (x${i + 1})`).join('、')}和因变量"${result.y}"构建序列多元线性回归模型.
 
 结果如表 1 所示.
 
@@ -274,9 +274,11 @@ ${result.m.models
 ## 2 最终模型
 
 最终模型为: y = ${result.m.model.coefficients[0].toFixed(4)} + ${result.m.model.coefficients
-	.slice(1)
-	.map((coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`)
-	.join(' + ')}, 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.model.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.model.r2adj.toFixed(4)}.
+		.slice(1)
+		.map((coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`)
+		.join(
+			' + ',
+		)}, 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.model.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.model.r2adj.toFixed(4)}.
 
 具体参数和细节如表 2 和表 3 所示.
 
@@ -285,9 +287,11 @@ ${result.m.models
 | 参数 | 值 | H<sub>0</sub> | 统计量 | 显著性 |
 | :---: | :---: | :---: | :---: | :---: |
 | 模型 | ${result.m.model.coefficients.map((v, i) => `b${i}: ${v.toFixed(4)}${i === 0 ? ' (截距)' : ''}`).join('<br />')} | ${result.m.model.coefficients
-	.slice(1)
-	.map((_, index) => `b${index + 1}`)
-	.join(' = ')} = 0 | F = ${markS(result.m.model.F, result.m.model.p)} | ${markP(result.m.model.p)} |
+		.slice(1)
+		.map((_, index) => `b${index + 1}`)
+		.join(
+			' = ',
+		)} = 0 | F = ${markS(result.m.model.F, result.m.model.p)} | ${markP(result.m.model.p)} |
 ${result.m.model.coefficients
 	.slice(1)
 	.map(
@@ -333,28 +337,30 @@ ${result.x
 }
 
 function getStepwiseLinearRegressionResult({
-    result,
+	result,
 }: { result: Result<'stepwise'> }): string {
-    return `
-## 1 逐步多元线性回归 (${result.method === 'stepwise-fwd'
-        ? '向前选择'
-        : result.method === 'stepwise-bwd'
-            ? '向后剔除'
-            : '双向选择'})
+	return `
+## 1 逐步多元线性回归 (${
+		result.method === 'stepwise-fwd'
+			? '向前选择'
+			: result.method === 'stepwise-bwd'
+				? '向后剔除'
+				: '双向选择'
+	})
 
 最终模型为 y = ${result.m.coefficients[0].toFixed(4)} + ${result.m.coefficients
-        .slice(1)
-        .map(
-            (coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`,
-        )
-        .join(' + ')}, 其中${result.m.selectedVariables
-				.map((index, i) => `"${result.x[index]}" (x${i + 1})`)
-				.join('、')}为自变量, 因变量为"${result.y}". 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.r2adj.toFixed(4)}.
+		.slice(1)
+		.map((coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`)
+		.join(' + ')}, 其中${result.m.selectedVariables
+		.map((index, i) => `"${result.x[index]}" (x${i + 1})`)
+		.join(
+			'、',
+		)}为自变量, 因变量为"${result.y}". 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.r2adj.toFixed(4)}.
 
 变量${result.x
-				.filter((_, index) => !result.m.selectedVariables.includes(index))
-				.map((variable) => `"${variable}"`)	
-				.join('、')}已在逐步回归中剔除.
+		.filter((_, index) => !result.m.selectedVariables.includes(index))
+		.map((variable) => `"${variable}"`)
+		.join('、')}已在逐步回归中剔除.
 
 结果如表 1 和表 2 所示.
 
@@ -363,21 +369,23 @@ function getStepwiseLinearRegressionResult({
 | 参数 | 值 | H<sub>0</sub> | 统计量 | 显著性 |
 | :---: | :---: | :---: | :---: | :---: |
 | 模型 | b0: ${result.m.coefficients[0].toFixed(4)} | ${result.m.coefficients
-        .slice(1)
-        .map((_, index) => `b${index + 1}`)
-        .join(' + ')} = 0 | F = ${markS(result.m.F, result.m.p)} | ${markP(result.m.p)} |
+		.slice(1)
+		.map((_, index) => `b${index + 1}`)
+		.join(
+			' + ',
+		)} = 0 | F = ${markS(result.m.F, result.m.p)} | ${markP(result.m.p)} |
 ${result.m.coefficients
-        .slice(1)
-        .map(
-            (_, index) =>
-                `| b${index + 1} (${result.x[result.m.selectedVariables[index]]}) | ${result.m.coefficients[index + 1].toFixed(
-                    4,
-                )} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
-                    result.m.tValues[index],
-                    result.m.pValues[index],
-                )} | ${markP(result.m.pValues[index])} |`,
-        )
-        .join('\n')}
+	.slice(1)
+	.map(
+		(_, index) =>
+			`| b${index + 1} (${result.x[result.m.selectedVariables[index]]}) | ${result.m.coefficients[
+				index + 1
+			].toFixed(4)} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+				result.m.tValues[index],
+				result.m.pValues[index],
+			)} | ${markP(result.m.pValues[index])} |`,
+	)
+	.join('\n')}
 
 > 表 2 - 模型细节
 
@@ -398,36 +406,34 @@ ${result.m.coefficients
 | 变量 | 均值 | 标准差 | 与Y相关系数 |
 | :---: | :---: | :---: | :---: |
 ${result.x
-        .map(
-            (variable, index) =>
-                `| ${variable} (${
-                    result.m.selectedVariables.findIndex((i) => i === index) + 1
-                        ? `x${result.m.selectedVariables.findIndex((i) => i === index) + 1}`
-                        : '已剔除'
-                }) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
-                    result.m.iv.map((xRow) => xRow[index]),
-                    result.m.dv,
-                ).toFixed(4)} |`,
-        )
-        .join('\n')}
+	.map(
+		(variable, index) =>
+			`| ${variable} (${
+				result.m.selectedVariables.findIndex((i) => i === index) + 1
+					? `x${result.m.selectedVariables.findIndex((i) => i === index) + 1}`
+					: '已剔除'
+			}) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
+				result.m.iv.map((xRow) => xRow[index]),
+				result.m.dv,
+			).toFixed(4)} |`,
+	)
+	.join('\n')}
 | ${result.y} (y) | ${result.m.dvMean.toFixed(4)} | ${result.m.dvStd.toFixed(4)} | 1 |
     `
 }
 
 function getStandardLinearRegressionResult({
-    result,
+	result,
 }: { result: Result<'standard'> }): string {
-    return `
+	return `
 ## 1 标准多元线性回归
 
-对自变量${result.x.map((v, i) => `"${v}" (x${i+1})`).join('、')}和因变量"${result.y}"进行标准多元线性回归分析. 原假设 (H<sub>0</sub>) 为"所有自变量的回归系数均为0", 显著性水平 (α) 为 0.05. 
+对自变量${result.x.map((v, i) => `"${v}" (x${i + 1})`).join('、')}和因变量"${result.y}"进行标准多元线性回归分析. 原假设 (H<sub>0</sub>) 为"所有自变量的回归系数均为0", 显著性水平 (α) 为 0.05. 
 
 最终模型为 y = ${result.m.coefficients[0].toFixed(4)} + ${result.m.coefficients
-        .slice(1)
-        .map(
-            (coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`,
-        )
-        .join(' + ')}
+		.slice(1)
+		.map((coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`)
+		.join(' + ')}
 , 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.r2adj.toFixed(4)}.
 
 结果如表 1 和表 2 所示.
@@ -437,21 +443,23 @@ function getStandardLinearRegressionResult({
 | 参数 | 值 | H<sub>0</sub> | 统计量 | 显著性 |
 | :---: | :---: | :---: | :---: | :---: |
 | 模型 | ${result.m.coefficients.map((v, i) => `b${i}: ${v.toFixed(4)}${i === 0 ? ' (截距)' : ''}`).join('<br />')} | ${result.m.coefficients
-        .slice(1)
-        .map((_, index) => `b${index + 1}`)
-        .join(' + ')} = 0 | F = ${markS(result.m.F, result.m.p)} | ${markP(result.m.p)} |
+		.slice(1)
+		.map((_, index) => `b${index + 1}`)
+		.join(
+			' + ',
+		)} = 0 | F = ${markS(result.m.F, result.m.p)} | ${markP(result.m.p)} |
 ${result.m.coefficients
-        .slice(1)
-        .map(
-            (_, index) =>
-                `| b${index + 1} | ${result.m.coefficients[index + 1].toFixed(
-                    4,
-                )} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
-                    result.m.tValues[index],
-                    result.m.pValues[index],
-                )} | ${markP(result.m.pValues[index])} |`,
-        )
-        .join('\n')}
+	.slice(1)
+	.map(
+		(_, index) =>
+			`| b${index + 1} | ${result.m.coefficients[index + 1].toFixed(
+				4,
+			)} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+				result.m.tValues[index],
+				result.m.pValues[index],
+			)} | ${markP(result.m.pValues[index])} |`,
+	)
+	.join('\n')}
 
 > 表 2 - 模型细节
 
@@ -472,14 +480,14 @@ ${result.m.coefficients
 | 变量 | 均值 | 标准差 | 与Y相关系数 |
 | :---: | :---: | :---: | :---: |
 ${result.x
-        .map(
-            (variable, index) =>
-                `| ${variable} (x${index + 1}) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
-                    result.m.iv.map((xRow) => xRow[index]),
-                    result.m.dv,
-                ).toFixed(4)} |`,
-        )
-        .join('\n')}
+	.map(
+		(variable, index) =>
+			`| ${variable} (x${index + 1}) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
+				result.m.iv.map((xRow) => xRow[index]),
+				result.m.dv,
+			).toFixed(4)} |`,
+	)
+	.join('\n')}
 | ${result.y} (y) | ${result.m.dvMean.toFixed(4)} | ${result.m.dvStd.toFixed(4)} | 1 |
     `
 }
