@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.2.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.1.0...v2.2.0) (2025-03-25)
+
+
+### Features
+
+* 简单中介效应分析新增每一个参数的置信区间 ([95911ea](https://github.com/LeafYeeXYZ/PsychPen/commit/95911eaf0e26f0be51b474d79400f5fc99293caf))
+* 描述统计新增统计量“总和” ([3e74c41](https://github.com/LeafYeeXYZ/PsychPen/commit/3e74c413f03785bdfa4b228fcf4cc0aeb596a761))
+* 使用 biome 代替 prettier 和 eslint 并新增数项运行时类型检查 ([7f581e5](https://github.com/LeafYeeXYZ/PsychPen/commit/7f581e556f64152c42d79e4f5982544bac491992))
+* 新增开发调试组件 ([81e70c6](https://github.com/LeafYeeXYZ/PsychPen/commit/81e70c6b47c49ef4ecc92f9961c457e418e4f5e3))
+* 新增序列多元线性回归 ([08d9364](https://github.com/LeafYeeXYZ/PsychPen/commit/08d93649dff75ce8416d951adf225b3aaef54fa2))
+* 新增逐步多元线性回归 ([f8add9c](https://github.com/LeafYeeXYZ/PsychPen/commit/f8add9c17aa8ee0f1eae88953080a355abcefbb1))
+* 支持渲染AI助手输出的 TeX 公式 ([cb35355](https://github.com/LeafYeeXYZ/PsychPen/commit/cb353553a2ea03d2e04ac5b35cb7b83196a20b37))
+* 重构统计结果渲染方式, AI助手现在可以获取当前统计结果 ([4c546e5](https://github.com/LeafYeeXYZ/PsychPen/commit/4c546e51d5de6dc65acb78df5ec70b3bc6b26a2d))
+* AI助手现在可以知道用户当前所在页面 ([2c267b5](https://github.com/LeafYeeXYZ/PsychPen/commit/2c267b5e726c2c98e8f3f7fa9143cf604e01ac11))
+
+
+### Bug Fixes
+
+* 修复 JSON Schema 错误 ([502c2d3](https://github.com/LeafYeeXYZ/PsychPen/commit/502c2d384212f43ee47d8b297b098ff730ba9083))
+* 修复保存图表时 oklch 颜色格式不支持的问题 ([5e36cac](https://github.com/LeafYeeXYZ/PsychPen/commit/5e36cac8fc4fa98d021016572244c2204b3ee322))
+* 修复出错后系统未正常解除禁用状态的问题 ([39856b4](https://github.com/LeafYeeXYZ/PsychPen/commit/39856b40e6b6a6886b5eafd978fa89d46c166c98))
+* 修复词云图无法关闭切分的问题 ([7a62ab7](https://github.com/LeafYeeXYZ/PsychPen/commit/7a62ab7cb143371e6678223bb91e8b31b46f0ada))
+* 修复函数调用时的错误未捕获问题 ([084c7e9](https://github.com/LeafYeeXYZ/PsychPen/commit/084c7e933bc9676cecb59a84a9147d1e8aace123))
+* 修复计算变量函数返回值错误的问题 ([f11349e](https://github.com/LeafYeeXYZ/PsychPen/commit/f11349e58fdc56262ed15faf2cf82ca5d48362b0))
+* 修复子变量重复生成的问题 ([dec7f71](https://github.com/LeafYeeXYZ/PsychPen/commit/dec7f71f7b2545e6a358d5c341dad1205eb70e05))
+* 移除废弃的接口调用 ([1283a91](https://github.com/LeafYeeXYZ/PsychPen/commit/1283a91a6df9ce06d2050efb0c37e05350163b3c))
+
+
+### Improvements
+
+* 修改默认 Bootstrap 抽样次数为 5000 ([64a7500](https://github.com/LeafYeeXYZ/PsychPen/commit/64a750043bf2e1c970f690f288313eafac75251e))
+* 优化 AI 助手工作流程 ([c0305ed](https://github.com/LeafYeeXYZ/PsychPen/commit/c0305ed6042c5ec9dfc6aee0793b1e0c08aad4b7))
+* 优化函数调用参数验证和错误处理 ([1fa38ee](https://github.com/LeafYeeXYZ/PsychPen/commit/1fa38ee903f84532f0f936bd5fa33362f0d6947e))
+* 优化全局状态使用, 减少重新渲染 ([37cf99f](https://github.com/LeafYeeXYZ/PsychPen/commit/37cf99febe756599ea5153bfcbf98edbe9992be1))
+* 优化小规模模型函数调用的稳定性 ([27108d1](https://github.com/LeafYeeXYZ/PsychPen/commit/27108d1517213fc4ca333b050888381c649075dd))
+
 ## [2.1.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.0.0...v2.1.0) (2025-03-08)
 
 ### Features
