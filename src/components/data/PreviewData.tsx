@@ -169,7 +169,8 @@ export function PreviewData() {
 									content={
 										<div className='flex flex-col gap-1'>
 											<div>
-												在输入全部信息后, 请点击确认, 系统将自动检查AI服务是否可用
+												在输入全部信息后, 请点击确认,
+												系统将自动检查AI服务是否可用
 											</div>
 										</div>
 									}
@@ -355,7 +356,9 @@ function ConfigAI() {
 							await _DataView_validate()
 							messageApi?.success('AI辅助分析开启成功')
 						} catch (e) {
-							messageApi?.error(`AI辅助分析开启失败: ${e instanceof Error ? e.message : e}`)
+							messageApi?.error(
+								`AI辅助分析开启失败: ${e instanceof Error ? e.message : e}`,
+							)
 						} finally {
 							setDisabled(false)
 						}
