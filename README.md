@@ -206,7 +206,7 @@ curl http://localhost:8000/execute -X POST -d '{"password": "xxx", "code": "1 + 
 
 PsychPen 创新性地引入了 AI 辅助分析功能, 可以让 AI 助手基于你的数据和需求, 针对性地给出建议或直接替你操作 PsychPen 完成变量处理、统计分析和图表绘制
 
-PsychPen 支持所有实现了 [function calling](https://platform.openai.com/docs/guides/function-calling) 并兼容 OpenAI API 规范的大语言模型 (如 [DeepSeek-V3](https://platform.deepseek.com/)、[GPT-4o](https://platform.openai.com/docs/guides)、[Qwen-max](https://bailian.console.aliyun.com/#/model-market)), 你只需根据你所用的 AI 模型提供商的使用文档, 在右上角的 `AI辅助分析设置` 中点击 `开启AI辅助分析` 按钮, 并填写 `baseUrl`、`apiKey`、`modelId` 等参数, 即可点击页面右上角的 `Ask AI` 按钮, 与 AI 助手进行交互
+PsychPen 支持所有实现了 [function calling](https://platform.openai.com/docs/guides/function-calling) 并兼容 OpenAI API 规范的大语言模型 (如 [DeepSeek-V3](https://platform.deepseek.com/)、[GPT-4o](https://platform.openai.com/docs/guides)、[Qwen-max](https://bailian.console.aliyun.com/#/model-market)), 你只需根据你所用的 AI 模型提供商的使用文档, 在右上角的 `AI辅助分析设置` 中点击 `开启AI辅助分析` 按钮, 并填写 `baseUrl`、`apiKey`、`modelId` 等参数, 之后点击 `确认` 按钮, 即可点击页面右上角的 `Ask AI` 按钮, 与 AI 助手进行交互
 
 ![](readme/data-7.png)
 

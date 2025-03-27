@@ -18,7 +18,7 @@ import {
 	Select,
 	Tag,
 } from 'antd'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useAssistant } from '../../lib/hooks/useAssistant'
 import { useData } from '../../lib/hooks/useData'
@@ -169,10 +169,7 @@ export function PreviewData() {
 									content={
 										<div className='flex flex-col gap-1'>
 											<div>
-												在输入全部信息后, PsychPen 会自动验证 AI 服务是否可用
-											</div>
-											<div>
-												如果数秒后仍未显示可用, 请检查网络连接和信息是否填写正确
+												在输入全部信息后, 请点击确认, 系统将自动检查AI服务是否可用
 											</div>
 										</div>
 									}
@@ -221,16 +218,24 @@ export function PreviewData() {
 }
 
 function ConfigAI() {
-	const {
-		_DataView_setOpenaiEndpoint,
-		_DataView_setOpenaiApiKey,
-		_DataView_setModel,
-		_DataView_setOpenaiEnable,
-		openaiEndpoint,
-		openaiApiKey,
-		model,
-		openaiEnable,
-	} = useAssistant()
+	const _DataView_setModel = useAssistant((state) => state._DataView_setModel)
+	const _DataView_setOpenaiEndpoint = useAssistant(
+		(state) => state._DataView_setOpenaiEndpoint,
+	)
+	const _DataView_setOpenaiApiKey = useAssistant(
+		(state) => state._DataView_setOpenaiApiKey,
+	)
+	const _DataView_setOpenaiEnable = useAssistant(
+		(state) => state._DataView_setOpenaiEnable,
+	)
+	const model = useAssistant((state) => state.model)
+	const openaiEndpoint = useAssistant((state) => state.openaiEndpoint)
+	const openaiApiKey = useAssistant((state) => state.openaiApiKey)
+	const openaiEnable = useAssistant((state) => state.openaiEnable)
+	const _DataView_validate = useAssistant((state) => state._DataView_validate)
+	const _DataView_clearAI = useAssistant((state) => state._DataView_clearAI)
+	const messageApi = useStates((state) => state.messageApi)
+	const [disabled, setDisabled] = useState<boolean>(false)
 	enum Open {
 		TRUE = '开启AI辅助分析',
 		FALSE = '关闭AI辅助分析',
@@ -243,7 +248,10 @@ function ConfigAI() {
 					className='border dark:border-[#424242]'
 					defaultValue={openaiEnable ? Open.TRUE : Open.FALSE}
 					options={[Open.TRUE, Open.FALSE]}
-					onChange={(value) => _DataView_setOpenaiEnable(value === Open.TRUE)}
+					onChange={(value) => {
+						_DataView_setOpenaiEnable(value === Open.TRUE)
+						value === Open.FALSE && _DataView_clearAI()
+					}}
 				/>
 			</div>
 			<p className='w-full text-left pl-1'>
@@ -277,7 +285,10 @@ function ConfigAI() {
 					placeholder='请输入OpenAI兼容API端点 (baseUrl)'
 					defaultValue={openaiEndpoint}
 					disabled={!openaiEnable}
-					onChange={(e) => _DataView_setOpenaiEndpoint(e.target.value ?? '')}
+					onChange={(e) => {
+						_DataView_setOpenaiEndpoint(e.target.value ?? '')
+						_DataView_clearAI()
+					}}
 				/>
 			</div>
 			<p className='w-full text-left pl-1'>
@@ -288,7 +299,10 @@ function ConfigAI() {
 					placeholder='请输入OpenAI兼容API密钥 (apiKey)'
 					defaultValue={openaiApiKey}
 					disabled={!openaiEnable}
-					onChange={(e) => _DataView_setOpenaiApiKey(e.target.value ?? '')}
+					onChange={(e) => {
+						_DataView_setOpenaiApiKey(e.target.value ?? '')
+						_DataView_clearAI()
+					}}
 				/>
 			</div>
 			<p className='w-full text-left pl-1'>
@@ -324,8 +338,31 @@ function ConfigAI() {
 					placeholder='请输入AI模型名称 (modelId)'
 					defaultValue={model}
 					disabled={!openaiEnable}
-					onChange={(e) => _DataView_setModel(e.target.value ?? '')}
+					onChange={(e) => {
+						_DataView_setModel(e.target.value ?? '')
+						_DataView_clearAI()
+					}}
 				/>
+			</div>
+			<div className='mb-2'>
+				<Button
+					block
+					loading={disabled}
+					disabled={!openaiEnable || !openaiEndpoint || !openaiApiKey || !model}
+					onClick={async () => {
+						try {
+							flushSync(() => setDisabled(true))
+							await _DataView_validate()
+							messageApi?.success('AI辅助分析开启成功')
+						} catch (e) {
+							messageApi?.error(`AI辅助分析开启失败: ${e instanceof Error ? e.message : e}`)
+						} finally {
+							setDisabled(false)
+						}
+					}}
+				>
+					确认并检查AI服务是否可用
+				</Button>
 			</div>
 			<div className='flex flex-col gap-1'>
 				<p className='w-full text-xs text-center px-2'>
@@ -343,14 +380,14 @@ function ConfigAI() {
 }
 
 function ConfigR() {
-	const {
-		_DataView_setRurl,
-		_DataView_setRpassword,
-		_DataView_setRenable,
-		Rurl,
-		Rpassword,
-		Renable,
-	} = useRemoteR()
+	const _DataView_setRurl = useRemoteR((state) => state._DataView_setRurl)
+	const _DataView_setRpassword = useRemoteR(
+		(state) => state._DataView_setRpassword,
+	)
+	const _DataView_setRenable = useRemoteR((state) => state._DataView_setRenable)
+	const Rurl = useRemoteR((state) => state.Rurl)
+	const Rpassword = useRemoteR((state) => state.Rpassword)
+	const Renable = useRemoteR((state) => state.Renable)
 	enum Open {
 		TRUE = '开启R语言服务器',
 		FALSE = '关闭R语言服务器',

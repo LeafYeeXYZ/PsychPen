@@ -11,10 +11,10 @@ type AssistantState = {
 	_DataView_setOpenaiEndpoint: (endpoint: string) => void
 	_DataView_setOpenaiApiKey: (apiKey: string) => void
 	_DataView_setOpenaiEnable: (enable: boolean) => void
-}
 
-let timer: number | null = null
-const delay = 1000
+	_DataView_clearAI: () => void
+	_DataView_validate: () => Promise<void>
+}
 
 const openaiEndpoint = localStorage.getItem('openaiEndpoint') ?? ''
 const openaiApiKey = localStorage.getItem('openaiApiKey') ?? ''
@@ -26,95 +26,68 @@ async function getAI(
 	endpoint: string,
 	apiKey: string,
 	model: string,
-): Promise<OpenAI | null> {
-	try {
-		if (!enable || !endpoint || !apiKey || !model) {
-			return null
-		}
-		const ai = new OpenAI({
-			baseURL: endpoint,
-			apiKey,
-			dangerouslyAllowBrowser: true,
-		})
-		const models = (await ai.models.list()).data
-		if (!models.some((m) => m.id === model)) {
-			return null
-		}
-		return ai
-	} catch {
-		return null
+): Promise<OpenAI> {
+	if (!enable) {
+		throw new Error('请先开启AI辅助分析')
 	}
+	if (!endpoint) {
+		throw new Error('请填写AI服务地址')
+	}
+	if (!apiKey) {
+		throw new Error('请填写AI服务密钥')
+	}
+	if (!model) {
+		throw new Error('请填写AI模型ID')
+	}
+	const ai = new OpenAI({
+		baseURL: endpoint,
+		apiKey,
+		dangerouslyAllowBrowser: true,
+	})
+	const models = await ai.models.list()
+	if (!models.data.some((m) => m.id === model)) {
+		throw new Error('AI模型ID不正确')
+	}
+	return ai
+}
+
+let ai: OpenAI | null = null
+try {
+	ai = await getAI(openaiEnable, openaiEndpoint, openaiApiKey, openaiModelName)
+} catch {
+	ai = null
 }
 
 export const useAssistant = create<AssistantState>()((set, get) => {
-	getAI(openaiEnable, openaiEndpoint, openaiApiKey, openaiModelName)
-		.then((ai) => {
-			set({ ai })
-		})
-		.catch(() => {})
 	return {
+		_DataView_validate: async () => {
+			const { openaiEnable, openaiEndpoint, openaiApiKey, model } = get()
+			const ai = await getAI(openaiEnable, openaiEndpoint, openaiApiKey, model)
+			set({ ai })
+		},
+		_DataView_clearAI: () => {
+			set({ ai: null })
+		},
 		openaiEndpoint,
 		openaiApiKey,
 		openaiEnable,
 		model: openaiModelName,
-		ai: null,
+		ai,
 		_DataView_setOpenaiEndpoint: (endpoint) => {
 			localStorage.setItem('openaiEndpoint', endpoint)
 			set({ openaiEndpoint: endpoint })
-			if (timer) {
-				clearTimeout(timer)
-			}
-			const { openaiEnable, openaiApiKey, model } = get()
-			timer = setTimeout(async () => {
-				const ai = await getAI(
-					openaiEnable,
-					endpoint,
-					openaiApiKey,
-					model,
-				).catch(() => null)
-				set({ ai })
-			}, delay)
 		},
 		_DataView_setOpenaiApiKey: (apiKey) => {
 			localStorage.setItem('openaiApiKey', apiKey)
 			set({ openaiApiKey: apiKey })
-			if (timer) {
-				clearTimeout(timer)
-			}
-			const { openaiEnable, openaiEndpoint, model } = get()
-			timer = setTimeout(async () => {
-				const ai = await getAI(openaiEnable, openaiEndpoint, apiKey, model)
-				set({ ai })
-			}, delay)
 		},
 		_DataView_setOpenaiEnable: (enable) => {
 			localStorage.setItem('openaiEnable', enable ? 'true' : 'false')
 			set({ openaiEnable: enable })
-			if (timer) {
-				clearTimeout(timer)
-			}
-			const { openaiEndpoint, openaiApiKey, model } = get()
-			timer = setTimeout(async () => {
-				const ai = await getAI(enable, openaiEndpoint, openaiApiKey, model)
-				set({ ai })
-			}, delay)
 		},
 		_DataView_setModel: (modelName) => {
 			localStorage.setItem('openaiModelName', modelName)
 			set({ model: modelName })
-			if (timer) {
-				clearTimeout(timer)
-			}
-			const { openaiEnable, openaiEndpoint, openaiApiKey } = get()
-			timer = setTimeout(async () => {
-				const ai = await getAI(
-					openaiEnable,
-					openaiEndpoint,
-					openaiApiKey,
-					modelName,
-				)
-				set({ ai })
-			}, delay)
 		},
 	}
 })
