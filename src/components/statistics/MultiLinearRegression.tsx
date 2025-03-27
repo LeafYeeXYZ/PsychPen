@@ -39,9 +39,10 @@ export function MultiLinearRegression() {
 	const messageApi = useStates((state) => state.messageApi)
 	const statResult = useStates((state) => state.statResult)
 	const setStatResult = useStates((state) => state.setStatResult)
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		setStatResult('')
-	}, [setStatResult])
+	}, [])
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const handleCalculate = async (values: Option) => {
 		try {
