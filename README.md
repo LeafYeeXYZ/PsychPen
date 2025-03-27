@@ -169,7 +169,7 @@ curl http://localhost:8000/execute -X POST -d '{"password": "psychpen", "code": 
 docker run -d -p 8000:8000 -e PSYCH_PEN_API_PASSWORD=xxx leafyee/psych-pen-api:v1.0.1-arm64
 ```
 
-### 2.3.2 本地构建和运行R语言服务端镜像
+#### 2.3.2 本地构建和运行R语言服务端镜像
 
 ```bash
 # 进入服务端目录
@@ -188,7 +188,7 @@ curl http://localhost:8000/execute -X POST -d '{"password": "xxx", "code": "1 + 
 docker run -d -p 8000:8000 -e PSYCH_PEN_API_PASSWORD=xxx psych-pen-api
 ```
 
-### 2.3.3 直接运行R脚本启动R语言服务器
+#### 2.3.3 直接运行R脚本启动R语言服务器
 
 ```bash
 # 进入服务端目录
