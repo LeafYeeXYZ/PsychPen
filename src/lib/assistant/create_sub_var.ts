@@ -14,7 +14,7 @@ export const create_sub_var: AIFunction = {
 				properties: {
 					variable_names: {
 						type: 'array',
-						description: '所有要生成子变量的变量名',
+						description: '所有要生成子变量的变量名 (必须是等距或等比数据)',
 						items: {
 							type: 'string',
 							description: '变量名',
@@ -65,7 +65,7 @@ export const clear_sub_var: AIFunction = {
 				properties: {
 					variable_names: {
 						type: 'array',
-						description: '所有要清除子变量的变量名',
+						description: '所有要清除子变量的变量名 (必须是等距或等比数据)',
 						items: {
 							type: 'string',
 							description: '变量名',

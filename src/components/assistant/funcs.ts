@@ -5,6 +5,14 @@ import {
 	create_sub_var,
 } from '../../lib/assistant/create_sub_var'
 import { export_data } from '../../lib/assistant/export_data'
+import {
+	clear_interpolate,
+	define_interpolate,
+} from '../../lib/assistant/interpolate'
+import {
+	clear_missing_value,
+	define_missing_value,
+} from '../../lib/assistant/missing_value'
 import { nav_to_data_view } from '../../lib/assistant/nav_to_data_view'
 import { nav_to_plots_view } from '../../lib/assistant/nav_to_plots_view'
 import { nav_to_statistics_view } from '../../lib/assistant/nav_to_statistics_view'
@@ -23,4 +31,8 @@ export const funcs: AIFunction[] = [
 	create_sub_var,
 	clear_sub_var,
 	apply_filter,
+	define_missing_value,
+	clear_missing_value,
+	define_interpolate,
+	clear_interpolate,
 ]

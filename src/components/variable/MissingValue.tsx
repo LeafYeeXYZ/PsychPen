@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
 import { sleep } from '../../lib/utils'
+import { ALL_VARS_IDENTIFIER } from '../../types'
 
 type Option = {
 	/** 变量名 */
@@ -27,7 +28,7 @@ export function MissingValue() {
 			const timestamp = Date.now()
 			const { variable, missing } = values
 			const cols = dataCols
-			if (variable.includes('__ALL_VARIABLES__')) {
+			if (variable.includes(ALL_VARS_IDENTIFIER)) {
 				for (const col of cols) {
 					col.missingValues = missing
 				}
@@ -78,7 +79,7 @@ export function MissingValue() {
 							() => ({
 								validator(_, value) {
 									if (
-										value?.includes('__ALL_VARIABLES__') &&
+										value?.includes(ALL_VARS_IDENTIFIER) &&
 										value?.length > 1
 									) {
 										return Promise.reject(
@@ -97,7 +98,7 @@ export function MissingValue() {
 							options={[
 								{
 									label: `全部变量 (共${dataCols.filter((col) => col.derived !== true).length}个)`,
-									value: '__ALL_VARIABLES__',
+									value: ALL_VARS_IDENTIFIER,
 								},
 								...dataCols
 									.filter((col) => col.derived !== true)

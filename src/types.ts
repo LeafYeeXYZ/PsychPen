@@ -1,23 +1,10 @@
 import type { ChatCompletionTool } from 'openai/resources/index.mjs'
 
+export const ALL_VARS_IDENTIFIER = '__ALL_VARIABLES__'
+
 export type AIFunction = {
 	label: string
 	tool: ChatCompletionTool
-}
-
-export enum ALLOWED_FILTER_METHODS {
-	EQUAL = '等于',
-	NOT_EQUAL = '不等于',
-	GREATER_THAN = '大于',
-	GREATER_THAN_OR_EQUAL = '大于等于',
-	LESS_THAN = '小于',
-	LESS_THAN_OR_EQUAL = '小于等于',
-	RANGE = '区间',
-	REGEX = '正则表达式',
-	ABOVE_MEAN = '高于平均值',
-	BELOW_MEAN = '低于平均值',
-	ABOVE_MEDIAN = '高于中位数',
-	BELOW_MEDIAN = '低于中位数',
 }
 
 export enum ALLOWED_INTERPOLATION_METHODS {

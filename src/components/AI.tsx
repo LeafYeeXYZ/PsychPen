@@ -22,17 +22,18 @@ import {
 } from '../lib/hooks/useNav'
 import { useStates } from '../lib/hooks/useStates'
 import type { Variable } from '../types'
+import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../types'
 import { Messages } from './assistant/Messages'
 import { funcs } from './assistant/funcs'
 
 const GREETTING =
-	'你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、变量标准化/中心化/离散化、生成新变量、筛选数据、解释你当前的统计结果等. 请问有什么可以帮你的?'
+	'你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果等. 请问有什么可以帮你的?'
 const INSTRUCTION =
 	'你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. \n\n你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具 (函数) 信息. \n\n你的任务是按照用户的要求, 对用户进行回复, 或调用工具 (函数). 在调用工具 (函数) 前, 请确保你已经明确知晓了用户的意图, 否则请通过进一步和用户对话来确认细节. \n\n你的回复中如果包含数学公式和符号, 请使用 TeX 语法, 并将行内公式用 `$` 包裹 (类似于 Markdown 的行内代码), 将块级公式用 `$$` 包裹 (类似于 Markdown 的代码块).'
 function GET_PROMPT(vars: Variable[], page: string, stat: string): string {
 	const varsInfo = vars.map((col) => {
 		if (col.type === '称名或等级数据') {
-			return `| ${col.name} | ${col.type} | ${col.valid} | ${col.missing} | ${col.unique} | - | - | - | - | - | - |`
+			return `| ${col.name} | ${col.type} | ${col.valid} | ${col.missing} | ${col.missingValues ? col.missingValues.map((v) => `"${v}"`).join('、') : '(未定义缺失值)'} | ${col.unique} | - | - | - | - | - | - |`
 		}
 		const subVarInfo = col.subVars
 			? `已定义${[
@@ -45,10 +46,10 @@ function GET_PROMPT(vars: Variable[], page: string, stat: string): string {
 					.filter((part) => part)
 					.join('、')}子变量`
 			: '未定义任何子变量'
-		return `| ${col.name} | ${col.type} | ${col.valid} | ${col.missing} | ${col.unique} | ${col.mean?.toFixed(4) || '-'} | ${col.std?.toFixed(4) || '-'} | ${col.q2?.toFixed(4) || '-'} | ${col.min?.toFixed(4) || '-'} | ${col.max?.toFixed(4) || '-'} | ${subVarInfo} |`
+		return `| ${col.name} | ${col.type} | ${col.valid} | ${col.missing} | ${col.missingValues ? col.missingValues.map((v) => `"${v}"`).join('、') : '(未定义缺失值)'} | ${col.unique} | ${col.mean?.toFixed(4) || '-'} | ${col.std?.toFixed(4) || '-'} | ${col.q2?.toFixed(4) || '-'} | ${col.min?.toFixed(4) || '-'} | ${col.max?.toFixed(4) || '-'} | ${subVarInfo} |`
 	})
 	const userText = `\n\n# 用户信息\n\n用户当前所处的页面为: ${page}${stat && `, 当前统计结果为: \n\n\`\`\`markdown\n${stat}\n\`\`\``}`
-	const varsText = `\n\n# 变量信息\n\n| 变量名 | 变量类型 | 有效值数量 | 缺失值数量 | 唯一值数量 | 均值 | 标准差 | 中位数 | 最小值 | 最大值 | 子变量信息 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n${varsInfo.join('\n')}`
+	const varsText = `\n\n# 变量信息\n\n| 变量名 | 变量类型 | 有效值数量 | 缺失值数量 | 缺失值定义 | 唯一值数量 | 均值 | 标准差 | 中位数 | 最小值 | 最大值 | 子变量信息 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n${varsInfo.join('\n')}`
 	const docsText = `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\``
 	return INSTRUCTION + userText + varsText + docsText
 }
@@ -167,6 +168,107 @@ export function AI() {
 					]
 					try {
 						switch (toolCall.function.name) {
+							case 'define_interpolate': {
+								const { variable_names, method, reference_variable } =
+									JSON.parse(toolCall.function.arguments)
+								if (
+									!Array.isArray(variable_names) ||
+									(!variable_names.every(
+										(name) =>
+											typeof name === 'string' &&
+											dataCols.some(
+												(col) =>
+													col.name === name && col.type === '等距或等比数据',
+											),
+									) &&
+										!variable_names.includes(ALL_VARS_IDENTIFIER))
+								) {
+									throw new Error('变量名参数错误')
+								}
+								if (
+									!Object.values(ALLOWED_INTERPOLATION_METHODS).includes(method)
+								) {
+									throw new Error('插值方法参数错误')
+								}
+								if (
+									(method === ALLOWED_INTERPOLATION_METHODS.NEAREST ||
+										method === ALLOWED_INTERPOLATION_METHODS.LAGRANGE) &&
+									(typeof reference_variable !== 'string' ||
+										!dataCols.some(
+											(col) =>
+												col.name === reference_variable &&
+												col.type === '等距或等比数据',
+										))
+								) {
+									throw new Error('插值参考变量参数错误')
+								}
+								newMessages[1].content =
+									'已请求为指定变量设置插值方法, 等待用户手动确认'
+								break
+							}
+							case 'clear_interpolate': {
+								const { variable_names } = JSON.parse(
+									toolCall.function.arguments,
+								)
+								if (
+									!Array.isArray(variable_names) ||
+									(!variable_names.every(
+										(name) =>
+											typeof name === 'string' &&
+											dataCols.some(
+												(col) =>
+													col.name === name && col.type === '等距或等比数据',
+											),
+									) &&
+										!variable_names.includes(ALL_VARS_IDENTIFIER))
+								) {
+									throw new Error('变量名参数错误')
+								}
+								newMessages[1].content =
+									'已请求清除指定变量的插值方法, 等待用户手动确认'
+								break
+							}
+							case 'define_missing_value': {
+								const { variable_names, missing_values } = JSON.parse(
+									toolCall.function.arguments,
+								)
+								if (
+									!Array.isArray(variable_names) ||
+									!variable_names.every(
+										(name) =>
+											typeof name === 'string' &&
+											(dataCols.some((col) => col.name === name) ||
+												name === ALL_VARS_IDENTIFIER),
+									)
+								) {
+									throw new Error('变量名参数错误')
+								}
+								if (!Array.isArray(missing_values)) {
+									throw new Error('缺失值参数错误')
+								}
+								newMessages[1].content =
+									'已请求为指定变量设置缺失值, 等待用户手动确认'
+								break
+							}
+							case 'clear_missing_value': {
+								const { variable_names } = JSON.parse(
+									toolCall.function.arguments,
+								)
+								if (
+									!Array.isArray(variable_names) ||
+									!variable_names.every(
+										(name) =>
+											typeof name === 'string' &&
+											(dataCols.some((col) => col.name === name) ||
+												name === ALL_VARS_IDENTIFIER),
+									)
+								) {
+									throw new Error('变量名参数错误')
+								}
+								newMessages[1].content =
+									'已请求清除指定变量的缺失值定义, 等待用户手动确认'
+								break
+							}
 							case 'apply_filter': {
 								const { filter_expression } = JSON.parse(
 									toolCall.function.arguments,
@@ -187,7 +289,10 @@ export function AI() {
 									!variable_names.every(
 										(name) =>
 											typeof name === 'string' &&
-											dataCols.some((col) => col.name === name),
+											dataCols.some(
+												(col) =>
+													col.name === name && col.type === '等距或等比数据',
+											),
 									)
 								) {
 									throw new Error('变量名参数错误')
@@ -203,7 +308,10 @@ export function AI() {
 									!variable_names.every(
 										(name) =>
 											typeof name === 'string' &&
-											dataCols.some((col) => col.name === name),
+											dataCols.some(
+												(col) =>
+													col.name === name && col.type === '等距或等比数据',
+											),
 									)
 								) {
 									throw new Error('变量名参数错误')

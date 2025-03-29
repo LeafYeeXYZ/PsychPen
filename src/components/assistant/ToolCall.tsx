@@ -6,7 +6,11 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../lib/hooks/useData'
 import { useStates } from '../../lib/hooks/useStates'
 import { sleep } from '../../lib/utils'
-import { ALLOWED_DISCRETE_METHODS } from '../../types'
+import {
+	ALLOWED_DISCRETE_METHODS,
+	type ALLOWED_INTERPOLATION_METHODS,
+	ALL_VARS_IDENTIFIER,
+} from '../../types'
 import { Expression } from '../widgets/Expression'
 import { funcs } from './funcs'
 
@@ -36,7 +40,6 @@ export function ToolCall({
 			)
 			break
 		}
-
 		case 'clear_sub_var': {
 			const { variable_names } = JSON.parse(args) as {
 				variable_names: string[]
@@ -131,6 +134,70 @@ export function ToolCall({
 		case 'nav_to_tools_view': {
 			const { page } = JSON.parse(args) as { page: string }
 			element = <NavToPageTool mainPageName='工具视图' subPageName={page} />
+			break
+		}
+		case 'define_missing_value': {
+			const { variable_names, missing_values } = JSON.parse(args) as {
+				variable_names: string[]
+				missing_values: unknown[]
+			}
+			element = (
+				<DefineMissingValueTool
+					done={done}
+					setDone={setDone}
+					id={id}
+					variable_names={variable_names}
+					missing_values={missing_values}
+				/>
+			)
+			break
+		}
+		case 'clear_missing_value': {
+			const { variable_names } = JSON.parse(args) as {
+				variable_names: string[]
+			}
+			element = (
+				<ClearMissingValueTool
+					done={done}
+					setDone={setDone}
+					id={id}
+					variable_names={variable_names}
+				/>
+			)
+			break
+		}
+		case 'define_interpolate': {
+			const { variable_names, method, reference_variable } = JSON.parse(
+				args,
+			) as {
+				variable_names: string[]
+				method: ALLOWED_INTERPOLATION_METHODS
+				reference_variable?: string
+			}
+			element = (
+				<DefineInterpolateTool
+					done={done}
+					setDone={setDone}
+					id={id}
+					variable_names={variable_names}
+					method={method}
+					reference_variable={reference_variable}
+				/>
+			)
+			break
+		}
+		case 'clear_interpolate': {
+			const { variable_names } = JSON.parse(args) as {
+				variable_names: string[]
+			}
+			element = (
+				<ClearInterpolateTool
+					done={done}
+					setDone={setDone}
+					id={id}
+					variable_names={variable_names}
+				/>
+			)
 			break
 		}
 		default: {
@@ -312,6 +379,485 @@ function CreateNewVarTool({
 					}}
 				>
 					{done ? '已生成新变量' : '确认生成新变量'}
+				</Button>
+			</div>
+		</>
+	)
+}
+
+function DefineInterpolateTool({
+	done,
+	setDone,
+	id,
+	variable_names,
+	method,
+	reference_variable,
+}: {
+	done: boolean
+	setDone: (done: boolean) => void
+	id: string
+	variable_names: string[]
+	method: ALLOWED_INTERPOLATION_METHODS
+	reference_variable?: string
+}) {
+	const dataCols = useData((state) => state.dataCols)
+	const updateData = useData((state) => state.updateData)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
+	return (
+		<>
+			<div>
+				执行函数{' '}
+				<Tag color='blue' style={{ margin: 0 }}>
+					{
+						funcs.find(
+							(func) => func.tool.function.name === 'define_interpolate',
+						)?.label
+					}
+				</Tag>
+				{done ? ', 已' : ', 是否确认'}设置变量
+				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
+					<Tag style={{ margin: 0, marginLeft: '0.3rem' }} color='blue'>
+						所有变量
+					</Tag>
+				) : (
+					<>
+						{variable_names.map((name) => (
+							<Tag
+								key={name}
+								style={{ margin: 0, marginLeft: '0.3rem' }}
+								color='blue'
+							>
+								{name}
+							</Tag>
+						))}
+					</>
+				)}{' '}
+				的插值方法为:
+				<Tag style={{ margin: 0, marginLeft: '0.3rem' }} color='yellow'>
+					{method}
+				</Tag>
+				{reference_variable && (
+					<>
+						, 插值参考变量为:
+						<Tag style={{ margin: 0, marginLeft: '0.3rem' }} color='yellow'>
+							{reference_variable}
+						</Tag>
+					</>
+				)}
+			</div>
+			<div>
+				<Button
+					block
+					disabled={done || disabled}
+					onClick={async () => {
+						try {
+							messageApi?.loading('正在处理数据...', 0)
+							isLargeData && (await sleep())
+							const timestamp = Date.now()
+							if (variable_names.includes(ALL_VARS_IDENTIFIER)) {
+								updateData(
+									dataCols.map((col) => {
+										if (col.type === '等距或等比数据') {
+											return {
+												...col,
+												missingMethod: method,
+												missingRefer: reference_variable,
+											}
+										}
+										return col
+									}),
+								)
+								setDone(true)
+								sessionStorage.setItem(id, 'done')
+								messageApi?.destroy()
+								messageApi?.success(
+									`已成功为所有变量设置插值方法, 用时 ${Date.now() - timestamp} 毫秒`,
+								)
+							} else {
+								updateData(
+									dataCols.map((col) => {
+										if (variable_names.includes(col.name)) {
+											return {
+												...col,
+												missingMethod: method,
+												missingRefer: reference_variable,
+											}
+										}
+										return col
+									}),
+								)
+								setDone(true)
+								sessionStorage.setItem(id, 'done')
+								messageApi?.destroy()
+								messageApi?.success(
+									`已成功为变量 ${variable_names
+										.map((name) => `"${name}"`)
+										.join(
+											'、',
+										)} 设置插值方法, 用时 ${Date.now() - timestamp} 毫秒`,
+								)
+							}
+						} catch (error) {
+							messageApi?.destroy()
+							messageApi?.error(
+								`数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+							)
+						} finally {
+							setDisabled(false)
+						}
+					}}
+				>
+					{done ? '已设置插值方法' : '确认设置插值方法'}
+				</Button>
+			</div>
+		</>
+	)
+}
+
+function ClearInterpolateTool({
+	done,
+	setDone,
+	id,
+	variable_names,
+}: {
+	done: boolean
+	setDone: (done: boolean) => void
+	id: string
+	variable_names: string[]
+}) {
+	const dataCols = useData((state) => state.dataCols)
+	const updateData = useData((state) => state.updateData)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
+	return (
+		<>
+			<div>
+				执行函数{' '}
+				<Tag color='blue' style={{ margin: 0 }}>
+					{
+						funcs.find(
+							(func) => func.tool.function.name === 'clear_interpolate',
+						)?.label
+					}
+				</Tag>
+				{done ? ', 已' : ', 是否确认'}清除变量
+				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
+					<Tag style={{ margin: 0, marginLeft: '0.3rem' }} color='blue'>
+						所有变量
+					</Tag>
+				) : (
+					<>
+						{variable_names.map((name) => (
+							<Tag
+								key={name}
+								style={{ margin: 0, marginLeft: '0.3rem' }}
+								color='blue'
+							>
+								{name}
+							</Tag>
+						))}
+					</>
+				)}{' '}
+				的插值方法
+			</div>
+			<div>
+				<Button
+					block
+					disabled={done || disabled}
+					onClick={async () => {
+						try {
+							flushSync(() => setDisabled(true))
+							messageApi?.loading('正在处理数据...', 0)
+							isLargeData && (await sleep())
+							const timestamp = Date.now()
+							if (variable_names.includes(ALL_VARS_IDENTIFIER)) {
+								updateData(
+									dataCols.map((col) => {
+										if (col.type === '等距或等比数据') {
+											return {
+												...col,
+												missingMethod: undefined,
+												missingRefer: undefined,
+											}
+										}
+										return col
+									}),
+								)
+								setDone(true)
+								sessionStorage.setItem(id, 'done')
+								messageApi?.destroy()
+								messageApi?.success(
+									`已成功清除所有变量的插值方法, 用时 ${Date.now() - timestamp} 毫秒`,
+								)
+							} else {
+								updateData(
+									dataCols.map((col) => {
+										if (variable_names.includes(col.name)) {
+											return {
+												...col,
+												missingMethod: undefined,
+												missingRefer: undefined,
+											}
+										}
+										return col
+									}),
+								)
+								setDone(true)
+								sessionStorage.setItem(id, 'done')
+								messageApi?.destroy()
+								messageApi?.success(
+									`已成功清除变量 ${variable_names
+										.map((name) => `"${name}"`)
+										.join(
+											'、',
+										)} 的插值方法, 用时 ${Date.now() - timestamp} 毫秒`,
+								)
+							}
+						} catch (error) {
+							messageApi?.destroy()
+							messageApi?.error(
+								`数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+							)
+						} finally {
+							setDisabled(false)
+						}
+					}}
+				>
+					{done ? '已清除插值方法' : '确认清除插值方法'}
+				</Button>
+			</div>
+		</>
+	)
+}
+
+function DefineMissingValueTool({
+	done,
+	setDone,
+	id,
+	variable_names,
+	missing_values,
+}: {
+	done: boolean
+	setDone: (done: boolean) => void
+	id: string
+	variable_names: string[]
+	missing_values: unknown[]
+}) {
+	const dataCols = useData((state) => state.dataCols)
+	const updateData = useData((state) => state.updateData)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
+	return (
+		<>
+			<div>
+				执行函数{' '}
+				<Tag color='blue' style={{ margin: 0 }}>
+					{
+						funcs.find(
+							(func) => func.tool.function.name === 'define_missing_value',
+						)?.label
+					}
+				</Tag>
+				{done ? ', 已' : ', 是否确认'}定义变量
+				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
+					<Tag style={{ margin: 0, marginLeft: '0.3rem' }} color='blue'>
+						所有变量
+					</Tag>
+				) : (
+					<>
+						{variable_names.map((name) => (
+							<Tag
+								key={name}
+								style={{ margin: 0, marginLeft: '0.3rem' }}
+								color='blue'
+							>
+								{name}
+							</Tag>
+						))}
+					</>
+				)}{' '}
+				的缺失值为:
+				{missing_values.map((value) => (
+					<Tag
+						key={String(value)}
+						style={{ margin: 0, marginLeft: '0.3rem' }}
+						color='yellow'
+					>
+						{String(value)}
+					</Tag>
+				))}
+			</div>
+			<div>
+				<Button
+					block
+					disabled={done || disabled}
+					onClick={async () => {
+						try {
+							flushSync(() => setDisabled(true))
+							messageApi?.loading('正在处理数据...', 0)
+							isLargeData && (await sleep())
+							const timestamp = Date.now()
+							if (variable_names.includes(ALL_VARS_IDENTIFIER)) {
+								updateData(
+									dataCols.map((col) => ({
+										...col,
+										missingValues: missing_values,
+									})),
+								)
+								setDone(true)
+								sessionStorage.setItem(id, 'done')
+								messageApi?.destroy()
+								messageApi?.success(
+									`已成功为所有变量定义缺失值, 用时 ${Date.now() - timestamp} 毫秒`,
+								)
+							} else {
+								updateData(
+									dataCols.map((col) => {
+										if (variable_names.includes(col.name)) {
+											return {
+												...col,
+												missingValues: missing_values,
+											}
+										}
+										return col
+									}),
+								)
+								setDone(true)
+								sessionStorage.setItem(id, 'done')
+								messageApi?.destroy()
+								messageApi?.success(
+									`已成功为变量 ${variable_names
+										.map((name) => `"${name}"`)
+										.join(
+											'、',
+										)} 定义缺失值, 用时 ${Date.now() - timestamp} 毫秒`,
+								)
+							}
+						} catch (error) {
+							messageApi?.destroy()
+							messageApi?.error(
+								`数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+							)
+						} finally {
+							setDisabled(false)
+						}
+					}}
+				>
+					{done ? '已定义缺失值' : '确认定义缺失值'}
+				</Button>
+			</div>
+		</>
+	)
+}
+
+function ClearMissingValueTool({
+	done,
+	setDone,
+	id,
+	variable_names,
+}: {
+	done: boolean
+	setDone: (done: boolean) => void
+	id: string
+	variable_names: string[]
+}) {
+	const dataCols = useData((state) => state.dataCols)
+	const updateData = useData((state) => state.updateData)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const disabled = useStates((state) => state.disabled)
+	const setDisabled = useStates((state) => state.setDisabled)
+	return (
+		<>
+			<div>
+				执行函数{' '}
+				<Tag color='blue' style={{ margin: 0 }}>
+					{
+						funcs.find(
+							(func) => func.tool.function.name === 'clear_missing_value',
+						)?.label
+					}
+				</Tag>
+				{done ? ', 已' : ', 是否确认'}清除变量
+				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
+					<Tag style={{ margin: 0, marginLeft: '0.3rem' }} color='blue'>
+						所有变量
+					</Tag>
+				) : (
+					<>
+						{variable_names.map((name) => (
+							<Tag
+								key={name}
+								style={{ margin: 0, marginLeft: '0.3rem' }}
+								color='blue'
+							>
+								{name}
+							</Tag>
+						))}
+					</>
+				)}{' '}
+				的缺失值定义
+			</div>
+			<div>
+				<Button
+					block
+					disabled={done || disabled}
+					onClick={async () => {
+						try {
+							flushSync(() => setDisabled(true))
+							messageApi?.loading('正在处理数据...', 0)
+							isLargeData && (await sleep())
+							const timestamp = Date.now()
+							if (variable_names.includes(ALL_VARS_IDENTIFIER)) {
+								updateData(
+									dataCols.map((col) => ({
+										...col,
+										missingValues: undefined,
+									})),
+								)
+								setDone(true)
+								sessionStorage.setItem(id, 'done')
+								messageApi?.destroy()
+								messageApi?.success(
+									`已成功清除所有变量的缺失值定义, 用时 ${Date.now() - timestamp} 毫秒`,
+								)
+							} else {
+								updateData(
+									dataCols.map((col) => {
+										if (variable_names.includes(col.name)) {
+											return {
+												...col,
+												missingValues: undefined,
+											}
+										}
+										return col
+									}),
+								)
+								setDone(true)
+								sessionStorage.setItem(id, 'done')
+								messageApi?.destroy()
+								messageApi?.success(
+									`已成功清除变量 ${variable_names.map((name) => `"${name}"`).join('、')} 的缺失值定义, 用时 ${Date.now() - timestamp} 毫秒`,
+								)
+							}
+						} catch (error) {
+							messageApi?.destroy()
+							messageApi?.error(
+								`数据处理失败: ${error instanceof Error ? error.message : String(error)}`,
+							)
+						} finally {
+							setDisabled(false)
+						}
+					}}
+				>
+					{done ? '已清除缺失值定义' : '确认清除缺失值定义'}
 				</Button>
 			</div>
 		</>
