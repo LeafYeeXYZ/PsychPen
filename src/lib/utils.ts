@@ -327,7 +327,6 @@ export function markS(statistic: number, p: number, hideZero = false): string {
  */
 export function markP(p: number, hideZero = false): string {
 	if (hideZero) {
-		console.log(p)
 		if (p < 0.001) {
 			return '<.001***'
 		}
