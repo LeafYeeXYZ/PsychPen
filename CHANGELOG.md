@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.3.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.2.0...v2.3.0) (2025-03-30)
+
+
+### Features
+
+* 新增全局错误捕获机制 ([6191b63](https://github.com/LeafYeeXYZ/PsychPen/commit/6191b63d9989a2fa861a2b829f07e514a9d1e89f))
+* 新增示例数据, 可直接点击导入 ([9756da2](https://github.com/LeafYeeXYZ/PsychPen/commit/9756da22833dd01af9a0d06e0680ee79deca5fb1))
+* AI助手现在可以操作缺失值定义和插值 ([734e29a](https://github.com/LeafYeeXYZ/PsychPen/commit/734e29a9284081f5281dca68341f031192bbdd00))
+* AI助手现在可以进行连续函数调用 ([95f324b](https://github.com/LeafYeeXYZ/PsychPen/commit/95f324b9765289355a3a2f6c36f476f46d8aabbf))
+
+
+### Bug Fixes
+
+* 修复离开页面后未正确清理统计结果的问题 ([d25d432](https://github.com/LeafYeeXYZ/PsychPen/commit/d25d432fc0ffa898e981cd09a083d87a5eddc340))
+* 修改AI助手验证方法, 减少和明确错误 ([18057e0](https://github.com/LeafYeeXYZ/PsychPen/commit/18057e0721eba8455507ef5552238b6bf46bca9b))
+
 ## [2.2.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.1.0...v2.2.0) (2025-03-25)
 
 
