@@ -1121,6 +1121,7 @@ function ApplyFilterTool({
 							await setFilterExpression(filter_expression)
 							setDone(true)
 							sessionStorage.setItem(id, 'done')
+							messageApi?.destroy()
 							messageApi?.success(
 								`已成功设置数据筛选规则, 用时 ${Date.now() - timestamp} 毫秒`,
 							)
