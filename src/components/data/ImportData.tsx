@@ -1,4 +1,4 @@
-import { LinkOutlined, SlidersOutlined, BookOutlined } from '@ant-design/icons'
+import { LinkOutlined, SlidersOutlined, BookOutlined, ExportOutlined } from '@ant-design/icons'
 import { ImportTypes, importSheet } from '@psych/sheet'
 import { Button, Tag, Upload, Popover } from 'antd'
 import { flushSync } from 'react-dom'
@@ -31,54 +31,17 @@ export function ImportData() {
 				格式
 			</p>
 			<div className='flex gap-4 mt-2'>
-				<Popover content={
-					<div>
-            数据来自作者的一项课程论文
-						<Button
-						  className='ml-1'
-							size='small'
-							onClick={() => {
-								window.open(
-									'https://blog.leafyee.xyz/2024/05/22/FaceIdentify/',
-									'_blank',
-								)
-							}}
-						>
-							点击查看
-						</Button>
-					</div>
-				 } trigger={['hover', 'click']}>
-					<Button
-						icon={<BookOutlined />}
-						disabled={disabled}
-						loading={disabled}
-						onClick={async () => {
-							try {
-								messageApi?.loading('正在加载示例数据...', 0)
-								flushSync(() => setDisabled(true))
-								const res = await fetch('/demo.csv')
-								if (!res.ok) {
-									throw new Error('示例数据下载失败')
-								}
-								const blob = await res.blob()
-								const buffer = await blob.arrayBuffer()
-								const data = await importSheet(buffer, ImportTypes.CSV)
-								await setData(data, false)
-								messageApi?.destroy()
-								messageApi?.success('示例数据加载完成', 0.5)
-							} catch (error) {
-								messageApi?.destroy()
-								messageApi?.error(
-									`示例数据加载失败: ${error instanceof Error ? error.message : String(error)}`,
-								)
-							} finally {
-								setDisabled(false)
-							}
-						}}
-					>
-						打开示例数据
-					</Button>
-				</Popover>
+				<Button
+					icon={<ExportOutlined />}
+					onClick={() => {
+						window.open(
+							'https://github.com/LeafYeeXYZ/PsychPen?tab=readme-ov-file#psychpen',
+							'_blank',
+						)
+					}}
+				>
+					查看使用手册
+				</Button>
 				<Upload
 					accept={ACCEPT_FILE_TYPES.map((type) => `.${type}`).join(',')}
 					beforeUpload={async (file) => {
@@ -139,6 +102,54 @@ export function ImportData() {
 						点击导入数据
 					</Button>
 				</Upload>
+				<Popover content={
+					<div>
+            数据来自作者的一项课程论文
+						<Button
+						  className='ml-1'
+							size='small'
+							onClick={() => {
+								window.open(
+									'https://blog.leafyee.xyz/2024/05/22/FaceIdentify/',
+									'_blank',
+								)
+							}}
+						>
+							点击查看
+						</Button>
+					</div>
+				 } trigger={['hover', 'click']}>
+					<Button
+						icon={<BookOutlined />}
+						disabled={disabled}
+						loading={disabled}
+						onClick={async () => {
+							try {
+								messageApi?.loading('正在加载示例数据...', 0)
+								flushSync(() => setDisabled(true))
+								const res = await fetch('/demo.csv')
+								if (!res.ok) {
+									throw new Error('示例数据下载失败')
+								}
+								const blob = await res.blob()
+								const buffer = await blob.arrayBuffer()
+								const data = await importSheet(buffer, ImportTypes.CSV)
+								await setData(data, false)
+								messageApi?.destroy()
+								messageApi?.success('示例数据加载完成', 0.5)
+							} catch (error) {
+								messageApi?.destroy()
+								messageApi?.error(
+									`示例数据加载失败: ${error instanceof Error ? error.message : String(error)}`,
+								)
+							} finally {
+								setDisabled(false)
+							}
+						}}
+					>
+						打开示例数据
+					</Button>
+				</Popover>
 			</div>
 			<p className='text-sm p-4 absolute top-1 w-full text-center opacity-70'>
 				如只须使用小工具, 点击上方的工具按钮即可
