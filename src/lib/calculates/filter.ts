@@ -6,7 +6,6 @@ import { booleanExpression } from '../utils'
  * @param dataCols 数据列
  * @param dataRows 数据行
  * @param filter 过滤表达式
- * @important 返回值将排除派生变量 (即应在创建派生变量前调用)
  */
 export function filter(
 	dataCols: Variable[],
@@ -23,8 +22,7 @@ export function filter(
 		try {
 			return booleanExpression(filter, dataCols, row)
 		} catch (e) {
-			console.error('过滤器发生错误:', e)
-			return false
+			throw new Error(`过滤器发生错误: ${e instanceof Error ? e.message : String(e)}`)
 		}
 	})
 	return { updatedCols: dataCols, updatedRows }
