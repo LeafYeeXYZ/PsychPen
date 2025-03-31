@@ -82,7 +82,7 @@ export function booleanExpression(
 	data: Record<string, unknown>,
 ): boolean {
 	try {
-		const value = eval(`Boolean(${embedValues(expression, variables, data)})`)
+		const value = eval(`Boolean(${embedValues(expression, variables, data, true)})`)
 		return value
 	} catch (e) {
 		throw new Error(
@@ -144,6 +144,7 @@ export function embedValues(
 	expression: string,
 	variables: Variable[],
 	data: Record<string, unknown>,
+	allowUndefinedAndNull = false,
 ): string {
 	let exp = expression
 	// min(:::name:::)
@@ -224,8 +225,14 @@ export function embedValues(
 		const variable = variables.find((v) => v.name == name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		const value = data[name]
-		if (value === undefined || value === null) {
+		if ((value === undefined || value === null) && !allowUndefinedAndNull) {
 			throw new Error(`变量 ${name} 的值不存在`)
+		}
+		if (value === undefined) {
+			return 'undefined'
+		}
+		if (value === null) {
+			return 'null'
 		}
 		if (!Number.isNaN(Number(value))) {
 			return `${Number(value)}`
