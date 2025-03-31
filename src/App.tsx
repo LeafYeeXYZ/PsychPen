@@ -71,7 +71,7 @@ export function App() {
 			<ErrorBoundary FallbackComponent={ErrorFallback}>
 				<main className='grid grid-rows-[auto_1fr] w-dvw h-dvh min-w-[640px] min-h-[480px] overflow-auto bg-white dark:bg-gray-950 dark:text-white'>
 					<Nav setShowAI={setShowAI} />
-          {mainPage}
+					{mainPage}
 				</main>
 				<Drawer
 					placement='right'

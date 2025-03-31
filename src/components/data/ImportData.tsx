@@ -1,6 +1,11 @@
-import { LinkOutlined, SlidersOutlined, BookOutlined, ExportOutlined } from '@ant-design/icons'
+import {
+	BookOutlined,
+	ExportOutlined,
+	LinkOutlined,
+	SlidersOutlined,
+} from '@ant-design/icons'
 import { ImportTypes, importSheet } from '@psych/sheet'
-import { Button, Tag, Upload, Popover } from 'antd'
+import { Button, Popover, Tag, Upload } from 'antd'
 import { flushSync } from 'react-dom'
 import { version } from '../../../package.json'
 import { useData } from '../../lib/hooks/useData'
@@ -102,23 +107,26 @@ export function ImportData() {
 						点击导入数据
 					</Button>
 				</Upload>
-				<Popover content={
-					<div>
-            数据来自作者的一项课程论文
-						<Button
-						  className='ml-1'
-							size='small'
-							onClick={() => {
-								window.open(
-									'https://blog.leafyee.xyz/2024/05/22/FaceIdentify/',
-									'_blank',
-								)
-							}}
-						>
-							点击查看
-						</Button>
-					</div>
-				 } trigger={['hover', 'click']}>
+				<Popover
+					content={
+						<div>
+							数据来自作者的一项课程论文
+							<Button
+								className='ml-1'
+								size='small'
+								onClick={() => {
+									window.open(
+										'https://blog.leafyee.xyz/2024/05/22/FaceIdentify/',
+										'_blank',
+									)
+								}}
+							>
+								点击查看
+							</Button>
+						</div>
+					}
+					trigger={['hover', 'click']}
+				>
 					<Button
 						icon={<BookOutlined />}
 						disabled={disabled}
