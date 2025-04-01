@@ -5,7 +5,7 @@ import { useState } from 'react'
 export function Debug() {
 	return (
 		<div
-			className='absolute bottom-3 left-3 flex items-center justify-center p-1 rounded-md shadow-2xl border bg-white'
+			className='absolute bottom-3 left-3 flex items-center justify-center p-1 rounded-md shadow-2xl border bg-white dark:bg-gray-800 dark:border-gray-700'
 			id='debug-component'
 		>
 			<Popover content={<_Debug />}>

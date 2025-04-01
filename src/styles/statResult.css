@@ -1,3 +1,15 @@
+@media (prefers-color-scheme: dark) {
+	* {
+		color: white;
+	}
+	table {
+		border-top: 2px solid #ffffff!important;
+		border-bottom: 2px solid #ffffff!important;
+		& thead:after {
+			border-top: 1px solid #ffffff!important;
+		}
+	}
+}
 * {
 	font-family: "Times", "Times New Roman", "宋体", "SimSun", "华文宋体",
 		"STSong", sans-serif; /* 所有数字和英文字体都用 Times New Roman */
