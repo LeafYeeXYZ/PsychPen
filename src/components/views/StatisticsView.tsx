@@ -3,7 +3,7 @@ import {
 	type STATISTICS_SUB_PAGES_LABELS,
 	STATISTICS_SUB_PAGES_MAP,
 	useNav,
-} from '../lib/hooks/useNav'
+} from '../../hooks/useNav'
 
 export function StatisticsView() {
 	const activeStatisticsViewSubPage = useNav(

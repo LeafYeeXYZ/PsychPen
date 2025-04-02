@@ -14,9 +14,10 @@ import {
 import { Button, Form, Popover, Radio, Select } from 'antd'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../lib/hooks/useData'
-import { useStates } from '../../lib/hooks/useStates'
-import { renderStatResult, sleep } from '../../lib/utils'
+import { useData } from '../../hooks/useData'
+import { useStates } from '../../hooks/useStates'
+import { sleep } from '../../lib/utils'
+import { Result } from '../widgets/Result'
 
 type AvialableStat =
 	| 'total'
@@ -383,11 +384,7 @@ ${data
 			<div className='component-result'>
 				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<iframe
-							srcDoc={renderStatResult(statResult)}
-							className='w-full h-full'
-							title='statResult'
-						/>
+						<Result result={statResult} />
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

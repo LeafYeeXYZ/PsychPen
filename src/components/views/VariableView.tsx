@@ -7,8 +7,8 @@ import {
 	ZoomOutOutlined,
 } from '@ant-design/icons'
 import { Button } from 'antd'
-import { VARIABLE_SUB_PAGES_LABELS, useNav } from '../lib/hooks/useNav'
-import { useStates } from '../lib/hooks/useStates'
+import { VARIABLE_SUB_PAGES_LABELS, useNav } from '../../hooks/useNav'
+import { useStates } from '../../hooks/useStates'
 
 const ICONS: Record<VARIABLE_SUB_PAGES_LABELS, React.ReactElement> = {
 	变量表格: <TableOutlined />,

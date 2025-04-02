@@ -16,12 +16,12 @@ import {
 import { useEffect, useState } from 'react'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { version } from '../package.json'
-import { AI } from './components/AI'
+import { AI } from './components/assistant/AI'
 import { Debug } from './components/widgets/Debug'
-import { useAssistant } from './lib/hooks/useAssistant'
-import { useData } from './lib/hooks/useData'
-import { MAIN_PAGES_LABELS, useNav } from './lib/hooks/useNav'
-import { useStates } from './lib/hooks/useStates'
+import { useAssistant } from './hooks/useAssistant'
+import { useData } from './hooks/useData'
+import { MAIN_PAGES_LABELS, useNav } from './hooks/useNav'
+import { useStates } from './hooks/useStates'
 
 const ANTD_THEME_LIGHT: ThemeConfig = {
 	token: {

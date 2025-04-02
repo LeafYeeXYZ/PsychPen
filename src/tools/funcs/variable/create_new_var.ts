@@ -1,4 +1,4 @@
-import type { AIFunction } from '../../types'
+import type { AIFunction } from '../../../types'
 
 export const create_new_var: AIFunction = {
 	label: '生成新变量',

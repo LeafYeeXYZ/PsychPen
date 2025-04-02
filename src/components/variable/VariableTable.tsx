@@ -1,5 +1,5 @@
 import { AgGridReact } from 'ag-grid-react'
-import { useData } from '../../lib/hooks/useData'
+import { useData } from '../../hooks/useData'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 

@@ -2,7 +2,7 @@ import {
 	type AIFunction,
 	ALLOWED_INTERPOLATION_METHODS,
 	ALL_VARS_IDENTIFIER,
-} from '../../types'
+} from '../../../types'
 
 export const define_interpolate: AIFunction = {
 	label: '设置插值方法',

@@ -3,7 +3,7 @@ import {
 	type PLOTS_SUB_PAGES_LABELS,
 	PLOTS_SUB_PAGES_MAP,
 	useNav,
-} from '../lib/hooks/useNav'
+} from '../../hooks/useNav'
 
 export function PlotsView() {
 	const activePlotsViewSubPage = useNav((state) => state.activePlotsViewSubPage)

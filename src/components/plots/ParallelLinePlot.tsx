@@ -2,8 +2,8 @@ import { Button, ColorPicker, Form, InputNumber, Select, Space } from 'antd'
 import * as echarts from 'echarts'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../lib/hooks/useData'
-import { useStates } from '../../lib/hooks/useStates'
+import { useData } from '../../hooks/useData'
+import { useStates } from '../../hooks/useStates'
 import { downloadImage, sleep } from '../../lib/utils'
 
 type Option = {

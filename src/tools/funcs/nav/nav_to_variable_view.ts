@@ -1,5 +1,5 @@
-import type { AIFunction } from '../../types'
-import { VARIABLE_SUB_PAGES_LABELS } from '../hooks/useNav'
+import { VARIABLE_SUB_PAGES_LABELS } from '../../../hooks/useNav'
+import type { AIFunction } from '../../../types'
 
 export const nav_to_variable_view: AIFunction = {
 	label: '将页面导航到变量视图的指定页面',

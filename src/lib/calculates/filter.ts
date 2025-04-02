@@ -22,7 +22,9 @@ export function filter(
 		try {
 			return booleanExpression(filter, dataCols, row)
 		} catch (e) {
-			throw new Error(`过滤器发生错误: ${e instanceof Error ? e.message : String(e)}`)
+			throw new Error(
+				`过滤器发生错误: ${e instanceof Error ? e.message : String(e)}`,
+			)
 		}
 	})
 	return { updatedCols: dataCols, updatedRows }

@@ -3,10 +3,10 @@
 		color: white;
 	}
 	table {
-		border-top: 2px solid #ffffff!important;
-		border-bottom: 2px solid #ffffff!important;
+		border-top: 2px solid #ffffff !important;
+		border-bottom: 2px solid #ffffff !important;
 		& thead:after {
-			border-top: 1px solid #ffffff!important;
+			border-top: 1px solid #ffffff !important;
 		}
 	}
 }

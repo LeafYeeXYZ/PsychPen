@@ -1,11 +1,11 @@
 import { del, get, set } from 'idb-keyval'
 import { create } from 'zustand'
-import type { Variable } from '../../types'
-import { derive } from '../calculates/derive'
-import { describe } from '../calculates/describe'
-import { filter } from '../calculates/filter'
-import { missing } from '../calculates/misssing'
-import { computeExpression, validateExpression } from '../utils'
+import { derive } from '../lib/calculates/derive'
+import { describe } from '../lib/calculates/describe'
+import { filter } from '../lib/calculates/filter'
+import { missing } from '../lib/calculates/misssing'
+import { computeExpression, validateExpression } from '../lib/utils'
+import type { Variable } from '../types'
 
 type DataState = {
 	/**

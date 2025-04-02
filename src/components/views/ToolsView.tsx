@@ -1,5 +1,5 @@
 import { Cascader } from 'antd'
-import { TOOLS_VIEW_SUB_PAGES_LABELS, useNav } from '../lib/hooks/useNav'
+import { TOOLS_VIEW_SUB_PAGES_LABELS, useNav } from '../../hooks/useNav'
 
 export function ToolsView() {
 	const activeToolsViewSubPage = useNav((state) => state.activeToolsViewSubPage)

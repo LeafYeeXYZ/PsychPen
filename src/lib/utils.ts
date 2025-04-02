@@ -82,7 +82,9 @@ export function booleanExpression(
 	data: Record<string, unknown>,
 ): boolean {
 	try {
-		const value = eval(`Boolean(${embedValues(expression, variables, data, true)})`)
+		const value = eval(
+			`Boolean(${embedValues(expression, variables, data, true)})`,
+		)
 		return value
 	} catch (e) {
 		throw new Error(

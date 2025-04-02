@@ -1,4 +1,4 @@
-import { type AIFunction, ALL_VARS_IDENTIFIER } from '../../types'
+import { type AIFunction, ALL_VARS_IDENTIFIER } from '../../../types'
 
 export const define_missing_value: AIFunction = {
 	label: '定义缺失值',

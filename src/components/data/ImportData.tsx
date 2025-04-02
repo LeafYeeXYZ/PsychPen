@@ -8,8 +8,8 @@ import { ImportTypes, importSheet } from '@psych/sheet'
 import { Button, Popover, Tag, Upload } from 'antd'
 import { flushSync } from 'react-dom'
 import { version } from '../../../package.json'
-import { useData } from '../../lib/hooks/useData'
-import { useStates } from '../../lib/hooks/useStates'
+import { useData } from '../../hooks/useData'
+import { useStates } from '../../hooks/useStates'
 import { sleep } from '../../lib/utils'
 
 /** 数据量较大的阈值 */

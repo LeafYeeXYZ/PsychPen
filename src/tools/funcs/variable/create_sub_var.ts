@@ -1,5 +1,5 @@
-import type { AIFunction } from '../../types'
-import { ALLOWED_DISCRETE_METHODS } from '../../types'
+import type { AIFunction } from '../../../types'
+import { ALLOWED_DISCRETE_METHODS } from '../../../types'
 
 export const create_sub_var: AIFunction = {
 	label: '生成子变量',

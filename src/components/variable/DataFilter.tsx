@@ -1,8 +1,8 @@
 import { Button, Form, Input, Select, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../lib/hooks/useData'
-import { useStates } from '../../lib/hooks/useStates'
+import { useData } from '../../hooks/useData'
+import { useStates } from '../../hooks/useStates'
 import { sleep } from '../../lib/utils'
 import { Expression } from '../widgets/Expression'
 

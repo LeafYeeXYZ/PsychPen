@@ -1,5 +1,5 @@
-import type { AIFunction } from '../../types'
-import { STATISTICS_SUB_PAGES_LABELS } from '../hooks/useNav'
+import { STATISTICS_SUB_PAGES_LABELS } from '../../../hooks/useNav'
+import type { AIFunction } from '../../../types'
 
 export const nav_to_statistics_view: AIFunction = {
 	label: '将页面导航到统计视图的指定页面',

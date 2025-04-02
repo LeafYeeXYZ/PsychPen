@@ -7,7 +7,7 @@ import { mean as m, randomNormal, std as s } from '@psych/lib'
 import { Button, InputNumber, Space, Tag } from 'antd'
 import * as echarts from 'echarts'
 import { useEffect, useRef, useState } from 'react'
-import { useStates } from '../../lib/hooks/useStates'
+import { useStates } from '../../hooks/useStates'
 
 const DEFAULT_MEAN = 0
 const DEFAULT_STD = 2

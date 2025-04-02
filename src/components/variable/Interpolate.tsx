@@ -1,7 +1,7 @@
 import { Button, Form, Select } from 'antd'
 import { flushSync } from 'react-dom'
-import { useData } from '../../lib/hooks/useData'
-import { useStates } from '../../lib/hooks/useStates'
+import { useData } from '../../hooks/useData'
+import { useStates } from '../../hooks/useStates'
 import { sleep } from '../../lib/utils'
 import { ALLOWED_INTERPOLATION_METHODS } from '../../types'
 

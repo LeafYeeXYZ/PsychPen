@@ -1,4 +1,4 @@
-import type { AIFunction } from '../../types'
+import type { AIFunction } from '../../../types'
 
 export const apply_filter: AIFunction = {
 	label: '设置数据筛选规则',

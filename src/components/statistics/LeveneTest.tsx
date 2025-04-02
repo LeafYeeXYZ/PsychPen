@@ -3,9 +3,10 @@ import { LeveneTest as T } from '@psych/lib'
 import { Button, Form, Popover, Radio, Select } from 'antd'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../lib/hooks/useData'
-import { useStates } from '../../lib/hooks/useStates'
-import { markP, markS, renderStatResult, sleep } from '../../lib/utils'
+import { useData } from '../../hooks/useData'
+import { useStates } from '../../hooks/useStates'
+import { markP, markS, sleep } from '../../lib/utils'
+import { Result } from '../widgets/Result'
 
 type Option = {
 	/** 类别 */
@@ -275,11 +276,7 @@ ${m.groups
 			<div className='component-result'>
 				{statResult ? (
 					<div className='w-full h-full overflow-auto'>
-						<iframe
-							srcDoc={renderStatResult(statResult)}
-							className='w-full h-full'
-							title='statResult'
-						/>
+						<Result result={statResult} />
 					</div>
 				) : (
 					<div className='w-full h-full flex justify-center items-center'>

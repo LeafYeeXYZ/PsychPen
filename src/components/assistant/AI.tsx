@@ -9,9 +9,9 @@ import type {
 } from 'openai/resources/index.mjs'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
-import readme from '../../README.md?raw'
-import { useAssistant } from '../lib/hooks/useAssistant'
-import { useData } from '../lib/hooks/useData'
+import readme from '../../../README.md?raw'
+import { useAssistant } from '../../hooks/useAssistant'
+import { useData } from '../../hooks/useData'
 import {
 	MAIN_PAGES_LABELS,
 	PLOTS_SUB_PAGES_LABELS,
@@ -19,12 +19,12 @@ import {
 	TOOLS_VIEW_SUB_PAGES_LABELS,
 	VARIABLE_SUB_PAGES_LABELS,
 	useNav,
-} from '../lib/hooks/useNav'
-import { useStates } from '../lib/hooks/useStates'
-import type { Variable } from '../types'
-import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../types'
-import { Messages } from './assistant/Messages'
-import { funcs } from './assistant/funcs'
+} from '../../hooks/useNav'
+import { useStates } from '../../hooks/useStates'
+import { funcs } from '../../tools/tools'
+import type { Variable } from '../../types'
+import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../../types'
+import { Messages } from './Messages'
 
 const GREETTING =
 	'你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果等. 请问有什么可以帮你的?'
