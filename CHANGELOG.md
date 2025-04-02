@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.4.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.3.0...v2.4.0) (2025-04-02)
+
+
+### Features
+
+* 导入数据界面新增使用手册链接 ([8b5327e](https://github.com/LeafYeeXYZ/PsychPen/commit/8b5327e0a8f09e806de0de0a0facf28af905a4ec))
+* 统计分析界面新增导出结果按钮 ([6a96822](https://github.com/LeafYeeXYZ/PsychPen/commit/6a968222229ef81e29261aaa948a1fc59a15f036))
+* AI助手现在可以看到变量的q1和q3 ([6b2f059](https://github.com/LeafYeeXYZ/PsychPen/commit/6b2f059e3ace8df403ee3f8bcc90865e07f4fd51))
+
+
+### Bug Fixes
+
+* 现在过滤表达式错误后将直接抛出错误而不是过滤掉数据 ([cf16648](https://github.com/LeafYeeXYZ/PsychPen/commit/cf16648e672fd7f7bdb0691fe1a24e2b43b9ca96))
+* 现在过滤表达式中的变量值可以为缺失值 ([4a3fb74](https://github.com/LeafYeeXYZ/PsychPen/commit/4a3fb74b1203203b67bdbfcfdde2704fead2e7ea))
+* 修复暗色模式下部分颜色错误 ([99406a6](https://github.com/LeafYeeXYZ/PsychPen/commit/99406a60fadf58912ec161247fbca71c6f8ea79b))
+* 修复AI助手应用过滤变量之后加载提示未消除的问题 ([3f87490](https://github.com/LeafYeeXYZ/PsychPen/commit/3f8749018d353490988c9917c23e1d99e65d6627))
+
+
+### Refactoring
+
+* 重构项目文件结构, 为加入更多AI功能做准备 ([68aa1c6](https://github.com/LeafYeeXYZ/PsychPen/commit/68aa1c6e3e6f51fdb1efb9a6f53e04bf9f81edb1))
+
 ## [2.3.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.2.0...v2.3.0) (2025-03-30)
 
 
