@@ -7,7 +7,7 @@ import type {
 	ChatCompletionMessageToolCall,
 	ChatCompletionUserMessageParam,
 } from 'openai/resources/index.mjs'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import readme from '../../../README.md?raw'
 import { useAssistant } from '../../hooks/useAssistant'
@@ -84,7 +84,7 @@ export function AI() {
 	const [loading, setLoading] = useState(false)
 	const [showLoading, setShowLoading] = useState(false)
 	const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
-	
+
 	// 数据被清除时重置对话
 	useEffect(() => {
 		if (!data) {
@@ -92,7 +92,7 @@ export function AI() {
 			setMessages([])
 		}
 	}, [data])
-	
+
 	const abortRef = useRef<boolean>(false)
 	const onCancel = async () => {
 		if (!abortRef.current) {
@@ -477,9 +477,12 @@ export function AI() {
 				messages={messages}
 				showLoading={showLoading}
 				greeting={GREETTING}
+				setInput={setInput}
+				setMessages={setMessages}
+				loading={loading}
 			/>
 			<Sender
-			  onCancel={onCancel}
+				onCancel={onCancel}
 				onSubmit={onSubmit}
 				disabled={disabled}
 				loading={loading}
