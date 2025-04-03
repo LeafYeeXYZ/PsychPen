@@ -1,4 +1,4 @@
-import { Sender } from '@ant-design/x'
+import { Sender, Prompts } from '@ant-design/x'
 import parseThink from '@leaf/parse-think'
 import { ExportTypes } from '@psych/sheet'
 import { Space } from 'antd'
@@ -25,9 +25,11 @@ import { funcs } from '../../tools/tools'
 import type { Variable } from '../../types'
 import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../../types'
 import { Messages } from './Messages'
+import { BankOutlined, ExportOutlined, FilterOutlined, InfoCircleOutlined, MoreOutlined } from '@ant-design/icons'
+import type { SenderRef } from '@ant-design/x/es/sender'
 
 const GREETTING =
-	'你好, 我是 PsychPen 的 AI 助手, 可以帮你讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果等. 请问有什么可以帮你的?'
+	'你好, 我是 PsychPen 的 AI 助手, 可以帮你**讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果等**. 请问有什么可以帮你的?'
 const INSTRUCTION =
 	'你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. \n\n你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具 (函数) 信息. \n\n你的任务是按照用户的要求, 对用户进行回复, 或调用工具 (函数). 在调用工具 (函数) 前, 请确保你已经明确知晓了用户的意图, 否则请通过进一步和用户对话来确认细节. \n\n你的回复中如果包含数学公式和符号, 请使用 TeX 语法, 并将行内公式用 `$` 包裹 (类似于 Markdown 的行内代码), 将块级公式用 `$$` 包裹 (类似于 Markdown 的代码块).'
 function GET_PROMPT(vars: Variable[], page: string, stat: string): string {
@@ -470,7 +472,9 @@ export function AI() {
 			setLoading(false)
 		}
 	}
-
+	// 给 <Prompts /> 用的
+  const senderRef = useRef<SenderRef>(null)
+	const numberCol = dataCols.find((col) => col.type === '等距或等比数据')
 	return (
 		<div className='w-full h-full flex flex-col justify-between items-center'>
 			<Messages
@@ -481,7 +485,26 @@ export function AI() {
 				setMessages={setMessages}
 				loading={loading}
 			/>
+			{messages.length === 0 && (
+				<Prompts
+				  className='w-full mb-3'
+					onItemClick={({ data }) => {
+            setInput(data.description?.toString() || '')
+						senderRef.current?.focus()
+					}}
+					items={[
+						{ key: 'intro', icon: <InfoCircleOutlined />, label: '自我介绍', description: '你能为我做什么?' },
+						...(numberCol ? [
+              { key: 'filter', icon: <FilterOutlined />, label: '处理数据', description: `请帮我筛选出"${numberCol.name}"在三个标准差以内的数据` },
+						] : []),
+            { key: 'education', icon: <BankOutlined />, label: '讲解概念', description: '请问什么是最小二乘法?' },
+						{ key: 'jump', icon: <MoreOutlined />, label: '跳转页面', description: '我想去做个中介效应分析' },
+						{ key: 'export', icon: <ExportOutlined />, label: '导出数据', description: '帮我导出 Excel 格式的数据' },
+					]}
+				/>
+			)}
 			<Sender
+				ref={senderRef}
 				onCancel={onCancel}
 				onSubmit={onSubmit}
 				disabled={disabled}
