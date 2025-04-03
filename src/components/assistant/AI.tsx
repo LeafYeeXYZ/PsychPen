@@ -7,7 +7,7 @@ import type {
 	ChatCompletionMessageToolCall,
 	ChatCompletionUserMessageParam,
 } from 'openai/resources/index.mjs'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { flushSync } from 'react-dom'
 import readme from '../../../README.md?raw'
 import { useAssistant } from '../../hooks/useAssistant'
@@ -84,7 +84,7 @@ export function AI() {
 	const [loading, setLoading] = useState(false)
 	const [showLoading, setShowLoading] = useState(false)
 	const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
-
+	
 	// 数据被清除时重置对话
 	useEffect(() => {
 		if (!data) {
@@ -92,8 +92,16 @@ export function AI() {
 			setMessages([])
 		}
 	}, [data])
-
+	
+	const abortRef = useRef<boolean>(false)
+	const onCancel = async () => {
+		if (!abortRef.current) {
+			messageApi?.loading('正在取消...', 0)
+			abortRef.current = true
+		}
+	}
 	const onSubmit = async () => {
+		abortRef.current = false
 		const old = JSON.parse(JSON.stringify(messages))
 		const snapshot = input
 		try {
@@ -120,17 +128,24 @@ export function AI() {
 			let hasToolCall = true
 			// 使用while循环处理连续的函数调用
 			while (hasToolCall) {
+				if (abortRef.current) {
+					throw new Error('已取消本次请求')
+				}
 				const stream = await ai.chat.completions.create({
 					model: model,
 					messages: [{ role: 'system', content: system }, ...currentMessages],
 					stream: true,
 					tools: funcs.map((func) => func.tool),
 				})
-
+				if (abortRef.current) {
+					throw new Error('已取消本次请求')
+				}
 				let rawResponse = ''
 				let toolCall: ChatCompletionMessageToolCall | null = null
-
 				for await (const chunk of stream) {
+					if (abortRef.current) {
+						throw new Error('已取消本次请求')
+					}
 					const delta = chunk.choices[0].delta
 					if (delta.tool_calls?.length) {
 						if (toolCall) {
@@ -160,7 +175,10 @@ export function AI() {
 						})
 					}
 				}
-				// 如果有工具调用，处理它
+				if (abortRef.current) {
+					throw new Error('已取消本次请求')
+				}
+				// 处理函数调用
 				if (toolCall) {
 					const newMessages: ChatCompletionMessageParam[] = [
 						{ role: 'assistant', content: '', tool_calls: [toolCall] },
@@ -443,6 +461,7 @@ export function AI() {
 				}
 			}
 		} catch (error) {
+			messageApi?.destroy()
 			messageApi?.error(error instanceof Error ? error.message : String(error))
 			setMessages(old)
 			setInput(snapshot)
@@ -460,6 +479,7 @@ export function AI() {
 				greeting={GREETTING}
 			/>
 			<Sender
+			  onCancel={onCancel}
 				onSubmit={onSubmit}
 				disabled={disabled}
 				loading={loading}
