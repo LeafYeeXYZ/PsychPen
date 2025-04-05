@@ -4,7 +4,11 @@ import { derive } from '../lib/calculates/derive'
 import { describe } from '../lib/calculates/describe'
 import { filter } from '../lib/calculates/filter'
 import { missing } from '../lib/calculates/misssing'
-import { computeExpression, validateExpression } from '../lib/utils'
+import {
+	computeExpression,
+	transformData,
+	validateExpression,
+} from '../lib/utils'
 import type { DataRow, Variable } from '../types'
 
 type DataState = {
@@ -87,44 +91,34 @@ let localIsLargeData = (await get<boolean>(STORE_KEYS.IS_LARGE_DATA)) || false
 let localFilterExpression =
 	(await get<string>(STORE_KEYS.FILTER_EXPRESSION)) || ''
 
-const TARGET_DATA_VERSION = '3'
+const TARGET_DATA_VERSION = '2025-04-06'
 if (localStorage.getItem('data_version') !== TARGET_DATA_VERSION) {
-	localData = localData
-		? (localData.map((row) => {
-				return Object.fromEntries(
-					Object.entries(row).map(([key, value]) => [
-						key,
-						value === null
-							? undefined
-							: !Number.isNaN(Number(value))
-								? Number(value)
-								: String(value),
-					]),
-				)
-			}) as DataRow[])
-		: null
-	await set(STORE_KEYS.DATA, localData)
-	try {
-		localDataRows = localDataRows
-			? calculator(
-					localDataCols.filter((col) => col.derived !== true),
-					localData || [],
-					localFilterExpression,
-				).calculatedRows
-			: []
-		await set(STORE_KEYS.DATA_ROWS, localDataRows)
-	} catch (e) {
-		console.error('自动升级数据版本失败:', e)
-		localData = null
-		localDataCols = []
-		localDataRows = []
-		localIsLargeData = false
-		localFilterExpression = ''
-		await del(STORE_KEYS.DATA)
-		await del(STORE_KEYS.DATA_COLS)
-		await del(STORE_KEYS.DATA_ROWS)
-		await del(STORE_KEYS.IS_LARGE_DATA)
-		await del(STORE_KEYS.FILTER_EXPRESSION)
+	if (localData?.length && localDataCols.length && localDataRows.length) {
+		try {
+			localData = localData.map((row) => transformData(row))
+			const { calculatedCols, calculatedRows } = calculator(
+				localDataCols.filter((col) => col.derived !== true),
+				localData,
+				localFilterExpression,
+			)
+			localDataCols = calculatedCols
+			localDataRows = calculatedRows
+			await set(STORE_KEYS.DATA, localData)
+			await set(STORE_KEYS.DATA_COLS, localDataCols)
+			await set(STORE_KEYS.DATA_ROWS, localDataRows)
+		} catch (e) {
+			console.error('自动升级数据版本失败:', e)
+			localData = null
+			localDataCols = []
+			localDataRows = []
+			localIsLargeData = false
+			localFilterExpression = ''
+			await del(STORE_KEYS.DATA)
+			await del(STORE_KEYS.DATA_COLS)
+			await del(STORE_KEYS.DATA_ROWS)
+			await del(STORE_KEYS.IS_LARGE_DATA)
+			await del(STORE_KEYS.FILTER_EXPRESSION)
+		}
 	}
 	localStorage.setItem('data_version', TARGET_DATA_VERSION)
 }
@@ -158,18 +152,7 @@ export const useData = create<DataState>()((setState, getState) => {
 		},
 		setData: async (rawRows, isLarge) => {
 			if (rawRows) {
-				const rows = rawRows.map((row) => {
-					return Object.fromEntries(
-						Object.entries(row).map(([key, value]) => [
-							key,
-							value === null
-								? undefined
-								: !Number.isNaN(Number(value))
-									? Number(value)
-									: String(value),
-						]),
-					)
-				}) as DataRow[]
+				const rows = rawRows.map((row) => transformData(row))
 				const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
 				const { calculatedCols, calculatedRows } = calculator(cols, rows)
 				await set(STORE_KEYS.DATA, rows)

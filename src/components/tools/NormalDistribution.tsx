@@ -8,6 +8,7 @@ import { Button, InputNumber, Space, Tag } from 'antd'
 import * as echarts from 'echarts'
 import { useEffect, useRef, useState } from 'react'
 import { useStates } from '../../hooks/useStates'
+import { markS } from '../../lib/utils'
 
 const DEFAULT_MEAN = 0
 const DEFAULT_STD = 2
@@ -120,13 +121,21 @@ export function NormalDistribution() {
 								<td>
 									<Tag color='pink'>样本</Tag>均值
 								</td>
-								<td>{data.length ? m(data).toFixed(3) : ''}</td>
+								<td
+									dangerouslySetInnerHTML={{
+										__html: data.length ? markS(m(data)) : '',
+									}}
+								/>
 							</tr>
 							<tr>
 								<td>
 									<Tag color='pink'>样本</Tag>标准差
 								</td>
-								<td>{data.length ? s(data).toFixed(3) : ''}</td>
+								<td
+									dangerouslySetInnerHTML={{
+										__html: data.length ? markS(s(data)) : '',
+									}}
+								/>
 							</tr>
 							<tr>
 								<td>

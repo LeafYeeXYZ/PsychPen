@@ -8,6 +8,7 @@ import { Button, InputNumber, Space, Tag } from 'antd'
 import * as echarts from 'echarts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useStates } from '../../hooks/useStates'
+import { markS } from '../../lib/utils'
 
 const DEFAULT_MEAN = 0
 const DEFAULT_STD = 2
@@ -129,25 +130,35 @@ export function TDistribution() {
 								<td>
 									<Tag color='pink'>样本均值</Tag>的均值
 								</td>
-								<td>
-									{data.length ? m(data.map((v) => v.mean)).toFixed(3) : ''}
-								</td>
+								<td
+									dangerouslySetInnerHTML={{
+										__html: data.length
+											? markS(m(data.map((v) => v.mean)))
+											: '',
+									}}
+								/>
 							</tr>
 							<tr>
 								<td>
 									<Tag color='pink'>样本均值</Tag>标准差
 								</td>
-								<td>
-									{data.length ? s(data.map((v) => v.mean)).toFixed(3) : ''}
-								</td>
+								<td
+									dangerouslySetInnerHTML={{
+										__html: data.length
+											? markS(s(data.map((v) => v.mean)))
+											: '',
+									}}
+								/>
 							</tr>
 							<tr>
 								<td>
 									<Tag color='pink'>估计标准误</Tag>均值
 								</td>
-								<td>
-									{data.length ? m(data.map((v) => v.sem)).toFixed(3) : ''}
-								</td>
+								<td
+									dangerouslySetInnerHTML={{
+										__html: data.length ? markS(m(data.map((v) => v.sem))) : '',
+									}}
+								/>
 							</tr>
 							<tr>
 								<td>
@@ -165,7 +176,11 @@ export function TDistribution() {
 								<td>
 									<Tag color='blue'>真实标准误</Tag>
 								</td>
-								<td>{(std / Math.sqrt(n)).toFixed(3)}</td>
+								<td
+									dangerouslySetInnerHTML={{
+										__html: markS(std / Math.sqrt(n)),
+									}}
+								/>
 							</tr>
 							<tr>
 								<td>

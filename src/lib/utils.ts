@@ -4,6 +4,28 @@ import { marked } from 'marked'
 import themeCss from '../styles/statResult.css?raw'
 import type { DataRow, Variable } from '../types'
 
+const MAX_VALUE = Number.MAX_SAFE_INTEGER / 10000
+const MIN_VALUE = Number.MIN_SAFE_INTEGER / 10000
+/**
+ * 把数据转换为 DataRow
+ * @param data 数据
+ * @returns DataRow
+ */
+export function transformData(data: Record<string, unknown>): DataRow {
+	return Object.fromEntries(
+		Object.entries(data).map(([key, value]) => {
+			if (value === null) {
+				return [key, undefined]
+			}
+			const num = Number(value)
+			if (Number.isNaN(num) || num > MAX_VALUE || num < MIN_VALUE) {
+				return [key, String(value)]
+			}
+			return [key, num]
+		}),
+	)
+}
+
 /**
  * 把统计结果渲染为 HTML
  * @param result 统计结果
@@ -29,18 +51,6 @@ export function renderStatResult(result: string): string {
     </body>
     </html>
 	`
-}
-
-/**
- * 生成 UUID
- * @returns UUID
- */
-export function uuid(): string {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-		const r = (Math.random() * 16) | 0
-		const v = c == 'x' ? r : (r & 0x3) | 0x8
-		return v.toString(16)
-	})
 }
 
 /**
