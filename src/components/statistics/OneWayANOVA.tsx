@@ -71,15 +71,15 @@ export function OneWayANOVA() {
 
 | 样本量 | 水平数 | 自由度 (组间/组内) | F | p | η² | Conhen's f |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| ${m.dfT + 1} | ${m.dfB + 1} | ${m.dfB} / ${m.dfW} | ${markS(m.f, m.p)} | ${markP(m.p)} | ${m.r2.toFixed(3)} | ${m.cohenF.toFixed(3)} |
+| ${m.dfT + 1} | ${m.dfB + 1} | ${m.dfB} / ${m.dfW} | ${markS(m.f, m.p)} | ${markP(m.p)} | ${markS(m.r2)} | ${markS(m.cohenF)} |
 
 > 表 2 - 分析细节
 
 | 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
 | :---: | :---: | :---: | :---: |
-| 总和 (T) | ${m.dfT} | ${m.SSt.toFixed(3)} | ${m.MSt.toFixed(3)} |
-| 组间 (B) | ${m.dfB} | ${m.SSb.toFixed(3)} | ${m.MSb.toFixed(3)} |
-| 组内 (W) | ${m.dfW} | ${m.SSw.toFixed(3)} | ${m.MSw.toFixed(3)} |
+| 总和 (T) | ${m.dfT} | ${markS(m.SSt)} | ${markS(m.MSt)} |
+| 组间 (B) | ${m.dfB} | ${markS(m.SSb)} | ${markS(m.MSb)} |
+| 组内 (W) | ${m.dfW} | ${markS(m.SSw)} | ${markS(m.MSw)} |
 
 ## 2 描述统计
 
@@ -94,11 +94,9 @@ export function OneWayANOVA() {
 ${m.groups
 	.map(
 		(group, index) =>
-			`| ${group} | ${m.groupsCount[index]} | ${m.groupsMean[index].toFixed(3)} | ${std(
-				m.values[index],
-				true,
-				m.groupsMean[index],
-			).toFixed(3)} | ${m.groupsSum[index].toFixed(3)} |`,
+			`| ${group} | ${m.groupsCount[index]} | ${markS(m.groupsMean[index])} | ${markS(
+				std(m.values[index], true, m.groupsMean[index]),
+			)} | ${markS(m.groupsSum[index])} |`,
 	)
 	.join('\n')}
 
@@ -115,7 +113,7 @@ ${m.groups
 ${m.cohenD
 	.map(
 		(row) =>
-			`| ${row.groupA} | ${row.groupB} | ${row.diff.toFixed(3)} | ${row.d.toFixed(3)} |`,
+			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.d)} |`,
 	)
 	.join('\n')}
 
@@ -135,7 +133,7 @@ ${
 ${scheffe
 	.map(
 		(row) =>
-			`| ${row.groupA} | ${row.groupB} | ${row.diff.toFixed(3)} | ${row.f.toFixed(3)} | ${markP(
+			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.f)} | ${markP(
 				row.p,
 			)} |`,
 	)
@@ -149,7 +147,7 @@ ${
 		? `
 ## ${scheffe ? '5' : '4'} Bonferroni 事后检验
 
-对被试间变量"${value}" (分组变量: "${group}") 进行 Bonferroni 事后检验. 使用 MS<sub>within</sub> 代替 S<sub>p</sub><sup>2</sup> (检验更严格). 临界显著性水平应为 ${bonferroni[0].sig.toFixed(4)} (即 0.05 除以成对比较次数).
+对被试间变量"${value}" (分组变量: "${group}") 进行 Bonferroni 事后检验. 使用 MS<sub>within</sub> 代替 S<sub>p</sub><sup>2</sup> (检验更严格). 临界显著性水平应为 ${bonferroni[0].sig.toFixed(4).slice(1)} (即 0.05 除以成对比较次数).
 
 结果如表 ${scheffe ? '6' : '5'} 所示.
 
@@ -160,9 +158,9 @@ ${
 ${bonferroni
 	.map(
 		(row) =>
-			`| ${row.groupA} | ${row.groupB} | ${row.diff.toFixed(3)} | ${row.t.toFixed(3)} | ${
+			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.t)} | ${
 				row.p < row.sig ? '<span style="color: red;">' : ''
-			}${row.p.toFixed(4)}${row.p < row.sig ? '</span>' : ''} |`,
+			}${markS(row.p)}${row.p < row.sig ? '</span>' : ''} |`,
 	)
 	.join('\n')}
 `
@@ -174,7 +172,7 @@ ${
 		? `
 ## ${scheffe && bonferroni ? '6' : (scheffe || bonferroni) ? '5' : '4'} Tukey's HSD 事后检验
 
-对被试间变量"${value}" (分组变量: "${group}") 进行 Tukey's HSD 事后检验. 均值差异显著的临界值 HSD = ${tukey[0].HSD.toFixed(3)}.
+对被试间变量"${value}" (分组变量: "${group}") 进行 Tukey's HSD 事后检验. 均值差异显著的临界值 HSD = ${markS(tukey[0].HSD)}.
 
 结果如表 ${scheffe && bonferroni ? '7' : (scheffe || bonferroni) ? '6' : '5'} 所示.
 
@@ -185,7 +183,7 @@ ${
 ${tukey
 	.map(
 		(row) =>
-			`| ${row.groupA} | ${row.groupB} | ${row.diff.toFixed(3)} | ${markS(row.q, row.p)} | ${markP(
+			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.q, row.p)} | ${markP(
 				row.p,
 			)} |`,
 	)

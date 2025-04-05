@@ -60,11 +60,11 @@ export function SimpleMediatorTest() {
 
 | 参数 | 值 | 统计量 (t) | 显著性 (p) | 95%置信区间 |
 | :---: | :---: | :---: | :---: | :---: |
-| c (x 对 y 的总效应) | ${model.c.toFixed(3)} | ${markS(model.cT, model.cP)} | ${markP(model.cP)} | [${bs.c[0].toFixed(3)}, ${bs.c[1].toFixed(3)}) |
-| c' (控制 m 后 x 对 y 的效应 / x 对 y 的直接效应) | ${model.cPrime.toFixed(3)} | ${markS(model.cPrimeT, model.cPrimeP)} | ${markP(model.cPrimeP)} | [${bs.cPrime[0].toFixed(3)}, ${bs.cPrime[1].toFixed(3)}) |
-| a (x 对 m 的效应) | ${model.a.toFixed(3)} | ${markS(model.aT, model.aP)} | ${markP(model.aP)} | [${bs.a[0].toFixed(3)}, ${bs.a[1].toFixed(3)}) |
-| b (控制 x 后 m 对 y 的效应) | ${model.b.toFixed(3)} | ${markS(model.bT, model.bP)} | ${markP(model.bP)} | [${bs.b[0].toFixed(3)}, ${bs.b[1].toFixed(3)}) |
-| ab (x 对 y 的中介效应) | ${model.ab.toFixed(3)} | - | - | [${bs.ab[0].toFixed(3)}, ${bs.ab[1].toFixed(3)}) |
+| c (x 对 y 的总效应) | ${markS(model.c)} | ${markS(model.cT, model.cP)} | ${markP(model.cP)} | [${markS(bs.c[0])}, ${markS(bs.c[1])}) |
+| c' (控制 m 后 x 对 y 的效应 / x 对 y 的直接效应) | ${markS(model.cPrime)} | ${markS(model.cPrimeT, model.cPrimeP)} | ${markP(model.cPrimeP)} | [${markS(bs.cPrime[0])}, ${markS(bs.cPrime[1])}) |
+| a (x 对 m 的效应) | ${markS(model.a)} | ${markS(model.aT, model.aP)} | ${markP(model.aP)} | [${markS(bs.a[0])}, ${markS(bs.a[1])}) |
+| b (控制 x 后 m 对 y 的效应) | ${markS(model.b)} | ${markS(model.bT, model.bP)} | ${markP(model.bP)} | [${markS(bs.b[0])}, ${markS(bs.b[1])}) |
+| ab (x 对 y 的中介效应) | ${markS(model.ab)} | - | - | [${markS(bs.ab[0])}, ${markS(bs.ab[1])}) |
 
 ## 2 中介效应显著性检验
 
@@ -76,10 +76,10 @@ export function SimpleMediatorTest() {
 
 | 方法 | H<sub>0</sub> | 统计量 | 结果 |
 | :---: | :---: | :---: | :---: |
-| 依次检验法 | a = 0 或 b = 0 | p<sub>a</sub>: ${model.aP.toFixed(3)}, p<sub>b</sub>: ${model.bP.toFixed(3)} | ${
+| 依次检验法 | a = 0 或 b = 0 | p<sub>a</sub>: ${markS(model.aP)}, p<sub>b</sub>: ${markS(model.bP)} | ${
 				model.aP < 0.025 && model.bP < 0.025 ? '拒绝原假设' : '不通过'
 			} |
-| 非参数 Bootstrap 检验 | ab = 0 | 95%置信区间: [${bs.ab[0].toFixed(3)}, ${bs.ab[1].toFixed(3)}) | ${
+| 非参数 Bootstrap 检验 | ab = 0 | 95%置信区间: [${markS(bs.ab[0])}, ${markS(bs.ab[1])}) | ${
 				bs.ab[0] > 0 || bs.ab[1] < 0 ? '拒绝原假设' : '不通过'
 			} |
 
@@ -91,10 +91,10 @@ export function SimpleMediatorTest() {
 
 | 方法 | 结果 |
 | :---: | :---: |
-| P<sub>M</sub> = ab / c (中介效应占总效应的比例) | ${es.PM.toFixed(3)} |
-| R<sub>M</sub> = ab / c' (中介效应与直接效应之比) | ${es.RM.toFixed(3)} |
-| v<sup>2</sup> = a<sup>2</sup>b<sup>2</sup> | ${es.v2.toFixed(3)} |
-| 标准化的 ab | ${es.standarizedAB().toFixed(3)} |
+| P<sub>M</sub> = ab / c (中介效应占总效应的比例) | ${markS(es.PM)} |
+| R<sub>M</sub> = ab / c' (中介效应与直接效应之比) | ${markS(es.RM)} |
+| v<sup>2</sup> = a<sup>2</sup>b<sup>2</sup> | ${markS(es.v2)} |
+| 标准化的 ab | ${markS(es.standarizedAB())} |
 			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)

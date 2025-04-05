@@ -46,7 +46,7 @@ export function OneLinearRegression() {
 			setStatResult(`
 ## 1 一元线性回归
 
-对自变量 (x) "${x}"和因变量 (y) "${y}"进行一元线性回归分析. 原假设 (H<sub>0</sub>) 为"斜率 = 0"; 显著性水平 (α) 为 0.05. 最终模型为 y = ${m.b0.toFixed(4)} + ${m.b1.toFixed(4)} * x.
+对自变量 (x) "${x}"和因变量 (y) "${y}"进行一元线性回归分析. 原假设 (H<sub>0</sub>) 为"斜率 = 0"; 显著性水平 (α) 为 0.05. 最终模型为 y = ${markS(m.b0)} + ${markS(m.b1)} * x.
 
 结果如表 1 和表 2 所示.
 
@@ -54,15 +54,15 @@ export function OneLinearRegression() {
 
 | a (截距) | b (斜率) | F | t | p | 测定系数 (R²) |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| ${m.b0.toFixed(4)} | ${m.b1.toFixed(4)} | ${markS(m.F, m.p)} | ${markS(m.t, m.p)} | ${markP(m.p)} | ${m.r2.toFixed(4)} |
+| ${markS(m.b0)} | ${markS(m.b1)} | ${markS(m.F, m.p)} | ${markS(m.t, m.p)} | ${markP(m.p)} | ${markS(m.r2)} |
 
 > 表 2 - 模型细节
 
 | 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
 | :---: | :---: | :---: | :---: |
-| 总和 (T) | ${m.dfT} | ${m.SSt.toFixed(4)} | ${(m.SSt / m.dfT).toFixed(4)} |
-| 回归 (R) | ${m.dfR} | ${m.SSr.toFixed(4)} | ${(m.SSr / m.dfR).toFixed(4)} |
-| 残差 (E) | ${m.dfE} | ${m.SSe.toFixed(4)} | ${(m.SSe / m.dfE).toFixed(4)} |
+| 总和 (T) | ${m.dfT} | ${markS(m.SSt)} | ${markS(m.SSt / m.dfT)} |
+| 回归 (R) | ${m.dfR} | ${markS(m.SSr)} | ${markS(m.SSr / m.dfR)} |
+| 残差 (E) | ${m.dfE} | ${markS(m.SSe)} | ${markS(m.SSe / m.dfE)} |
 
 ## 2 描述统计
 
@@ -74,8 +74,8 @@ export function OneLinearRegression() {
 
 | 变量 | 均值 | 标准差 |
 | :---: | :---: | :---: |
-| ${x} | ${m.xMean.toFixed(4)} | ${m.xStd.toFixed(4)} |
-| ${y} | ${m.yMean.toFixed(4)} | ${m.yStd.toFixed(4)} |
+| ${x} | ${markS(m.xMean)} | ${markS(m.xStd)} |
+| ${y} | ${markS(m.yMean)} | ${markS(m.yStd)} |
 			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)

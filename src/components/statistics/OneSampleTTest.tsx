@@ -51,9 +51,9 @@ export function OneSampleTTest() {
 
 > 表 1 - 单样本T检验结果
 
-| 样本均值 | 自由度 | t | p | ${(100 - alpha * 100).toFixed(3)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
+| 样本均值 | 自由度 | t | p | ${markS(100 - alpha * 100)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| ${m.mean.toFixed(3)} | ${m.df.toFixed(3)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${m.ci[0].toFixed(3)}, ${m.ci[1].toFixed(3)}) | ${m.cohenD.toFixed(3)} | ${m.r2.toFixed(3)} |
+| ${markS(m.mean)} | ${markS(m.df)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${markS(m.ci[0])}, ${markS(m.ci[1])}) | ${markS(m.cohenD)} | ${markS(m.r2)} |
 
 ## 2 描述统计
 
@@ -65,7 +65,7 @@ export function OneSampleTTest() {
 
 | 均值 | 标准差 | 样本量 | 自由度 |
 | :---: | :---: | :---: | :---: |
-| ${m.mean.toFixed(3)} | ${m.std.toFixed(3)} | ${m.df + 1} | ${m.df} |
+| ${markS(m.mean)} | ${markS(m.std)} | ${m.df + 1} | ${m.df} |
 			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)

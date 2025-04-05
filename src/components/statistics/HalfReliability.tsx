@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData'
 import { useStates } from '../../hooks/useStates'
-import { sleep } from '../../lib/utils'
+import { markS, sleep } from '../../lib/utils'
 import { Result } from '../widgets/Result'
 
 type Option = {
@@ -72,7 +72,7 @@ export function HalfReliability() {
 | :---: | :---: | :---: | :---: |
 ${m.r
 	.map((r, i) => {
-		return `| ${m.group[i]} | ${variablesA.length} | ${variablesB.length} | ${r.toFixed(3)} |`
+		return `| ${m.group[i]} | ${variablesA.length} | ${variablesB.length} | ${markS(r)} |`
 	})
 	.join('\n')}
 			`)

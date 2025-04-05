@@ -65,7 +65,7 @@ export function PearsonCorrelationTest() {
 						t: markS(result.t, result.p),
 						p: markP(result.p),
 						df: result.df,
-						ci: `[${result.ci[0].toFixed(3)}, ${result.ci[1].toFixed(3)})`,
+						ci: `[${markS(result.ci[0])}, ${markS(result.ci[1])})`,
 					})
 				}
 			}
@@ -78,7 +78,7 @@ export function PearsonCorrelationTest() {
 
 > 表 1 - Pearson 相关系数检验结果
 
-| 变量A | 变量B | 相关系数(r) | 测定系数(r²) | ${(100 - alpha * 100).toFixed(3)}%置信区间 | t | p | 自由度 |
+| 变量A | 变量B | 相关系数(r) | 测定系数(r²) | ${markS(100 - alpha * 100)}%置信区间 | t | p | 自由度 |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 ${results
 	.map(

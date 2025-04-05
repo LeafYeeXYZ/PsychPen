@@ -87,7 +87,7 @@ let localIsLargeData = (await get<boolean>(STORE_KEYS.IS_LARGE_DATA)) || false
 let localFilterExpression =
 	(await get<string>(STORE_KEYS.FILTER_EXPRESSION)) || ''
 
-const TARGET_DATA_VERSION = '2'
+const TARGET_DATA_VERSION = '3'
 if (localStorage.getItem('data_version') !== TARGET_DATA_VERSION) {
 	localData = localData
 		? (localData.map((row) => {

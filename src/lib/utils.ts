@@ -272,29 +272,28 @@ export function jsArrayToRMatrix(arr: number[][], transpose = false): string {
  * @param hideZero 是否隐藏统计量前的 0
  * @returns 统计量
  */
-export function markS(statistic: number, p: number, hideZero = false): string {
+export function markS(statistic: number, p?: number, hideZero = true): string {
+	if (Number.isNaN(statistic)) {
+		return '(无)'
+	}
+	// 格式化统计量
+	let formattedStat = statistic.toFixed(3)
+	// 处理隐藏前导零的情况
 	if (hideZero) {
-		if (p < 0.001) {
-			return `${statistic.toFixed(3).slice(1)}***`
+		if (statistic < 1 && statistic >= 0) {
+			formattedStat = formattedStat.slice(1) // 正数去掉0
 		}
-		if (p < 0.01) {
-			return `${statistic.toFixed(3).slice(1)}**`
+		if (statistic > -1 && statistic < 0) {
+			formattedStat = `-${Math.abs(statistic).toFixed(3).slice(1)}` // 负数特殊处理
 		}
-		if (p < 0.05) {
-			return `${statistic.toFixed(3).slice(1)}*`
-		}
-		return statistic.toFixed(3).slice(1)
 	}
-	if (p < 0.001) {
-		return `${statistic.toFixed(3)}***`
+	// 添加显著性标记
+	if (p !== undefined) {
+		if (p < 0.001) return `${formattedStat}***`
+		if (p < 0.01) return `${formattedStat}**`
+		if (p < 0.05) return `${formattedStat}*`
 	}
-	if (p < 0.01) {
-		return `${statistic.toFixed(3)}**`
-	}
-	if (p < 0.05) {
-		return `${statistic.toFixed(3)}*`
-	}
-	return statistic.toFixed(3)
+	return formattedStat
 }
 
 /**
@@ -303,35 +302,26 @@ export function markS(statistic: number, p: number, hideZero = false): string {
  * @param hideZero 是否隐藏 p 值前的 0
  * @returns p 值
  */
-export function markP(p: number, hideZero = false): string {
-	if (hideZero) {
-		if (p < 0.001) {
-			return '<.001***'
-		}
-		if (p < 0.01) {
-			return `${p.toFixed(3).slice(1)}**`
-		}
-		if (p < 0.05) {
-			return `${p.toFixed(3).slice(1)}*`
-		}
-		if (p < 1) {
-			return p.toFixed(3).slice(1)
-		}
-		return '1'
+export function markP(p: number, hideZero = true): string {
+	if (Number.isNaN(p)) {
+		return '(无)'
 	}
+	// 处理极端情况
+	if (p <= 0) return hideZero ? '<.001***' : '<0.001***'
+	if (p >= 1) return '1'
+	// 处理非常小的p值
 	if (p < 0.001) {
-		return '<0.001***'
+		return hideZero ? '<.001***' : '<0.001***'
 	}
-	if (p < 0.01) {
-		return `${p.toFixed(3)}**`
+	// 格式化p值
+	let formattedP = p.toFixed(3)
+	if (hideZero && p < 1) {
+		formattedP = formattedP.slice(1)
 	}
-	if (p < 0.05) {
-		return `${p.toFixed(3)}*`
-	}
-	if (p < 1) {
-		return p.toFixed(3)
-	}
-	return '1'
+	// 添加显著性标记
+	if (p < 0.01) return `${formattedP}**`
+	if (p < 0.05) return `${formattedP}*`
+	return formattedP
 }
 
 /**

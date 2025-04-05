@@ -99,7 +99,7 @@ export function LeveneTest() {
 ${m.groups
 	.map(
 		(group, index) =>
-			`| ${group} | ${m.groupsCount[index]} | ${m.groupsMeanR[index].toFixed(3)} | ${m.groupsMedianR[index].toFixed(3)} | ${m.groupsMeanC[index].toFixed(3)} | ${m.groupsMedianC[index].toFixed(3)} |`,
+			`| ${group} | ${m.groupsCount[index]} | ${markS(m.groupsMeanR[index])} | ${markS(m.groupsMedianR[index])} | ${markS(m.groupsMeanC[index])} | ${markS(m.groupsMedianC[index])} |`,
 	)
 	.join('\n')}
 			`)

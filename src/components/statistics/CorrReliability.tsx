@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData'
 import { useStates } from '../../hooks/useStates'
-import { sleep } from '../../lib/utils'
+import { markS, sleep } from '../../lib/utils'
 import { Result } from '../widgets/Result'
 
 type Option = {
@@ -55,7 +55,7 @@ export function CorrReliability() {
 
 | 分组 | 相关系数(r<sub>xx</sub>) | 测定系数(r<sub>xx</sub><sup>2</sup>) |
 | :---: | :---: | :---: |
-${m.r.map((_, i) => `| ${m.group[i]} | ${m.r[i].toFixed(3)} | ${m.r2[i].toFixed(3)} |`).join('\n')}
+${m.r.map((_, i) => `| ${m.group[i]} | ${markS(m.r[i])} | ${markS(m.r2[i])} |`).join('\n')}
 			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)

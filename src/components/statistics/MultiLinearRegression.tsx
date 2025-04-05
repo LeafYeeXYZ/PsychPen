@@ -308,23 +308,23 @@ ${result.m.models
 		(model, index) => `| 模型 ${index + 1} | ${model.coefficients
 			.map(
 				(coefficient, i) =>
-					`b${i}: ${coefficient.toFixed(4)}${i === 0 ? ' (截距)' : ''}`,
+					`b${i}: ${markS(coefficient)}${i === 0 ? ' (截距)' : ''}`,
 			)
 			.join(
 				'<br />',
-			)} | ${markS(model.F, model.p)} | ${markP(model.p)} | ${model.r2.toFixed(4)} | ${model.r2adj.toFixed(4)} | ${result.m.r2Changes[index].toFixed(4)} | ${markS(result.m.fChanges[index], result.m.pChanges[index])} | ${markP(result.m.pChanges[index])} |
+			)} | ${markS(model.F, model.p)} | ${markP(model.p)} | ${markS(model.r2)} | ${markS(model.r2adj)} | ${markS(result.m.r2Changes[index])} | ${markS(result.m.fChanges[index], result.m.pChanges[index])} | ${markP(result.m.pChanges[index])} |
 `,
 	)
 	.join('')}
 
 ## 2 最终模型
 
-最终模型为: y = ${result.m.model.coefficients[0].toFixed(4)} + ${result.m.model.coefficients
+最终模型为: y = ${markS(result.m.model.coefficients[0])} + ${result.m.model.coefficients
 		.slice(1)
-		.map((coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`)
+		.map((coefficient, index) => `${markS(coefficient)} * x${index + 1}`)
 		.join(
 			' + ',
-		)}, 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.model.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.model.r2adj.toFixed(4)}.
+		)}, 模型的测定系数 (R<sup>2</sup>) 为 ${markS(result.m.model.r2)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${markS(result.m.model.r2adj)}.
 
 具体参数和细节如表 2 和表 3 所示.
 
@@ -332,7 +332,7 @@ ${result.m.models
 
 | 参数 | 值 | H<sub>0</sub> | 统计量 | 显著性 |
 | :---: | :---: | :---: | :---: | :---: |
-| 模型 | ${result.m.model.coefficients.map((v, i) => `b${i}: ${v.toFixed(4)}${i === 0 ? ' (截距)' : ''}`).join('<br />')} | ${result.m.model.coefficients
+| 模型 | ${result.m.model.coefficients.map((v, i) => `b${i}: ${markS(v)}${i === 0 ? ' (截距)' : ''}`).join('<br />')} | ${result.m.model.coefficients
 		.slice(1)
 		.map((_, index) => `b${index + 1}`)
 		.join(
@@ -342,9 +342,7 @@ ${result.m.model.coefficients
 	.slice(1)
 	.map(
 		(_, index) =>
-			`| b${index + 1} | ${result.m.model.coefficients[index + 1].toFixed(
-				4,
-			)} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+			`| b${index + 1} | ${markS(result.m.model.coefficients[index + 1])} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
 				result.m.model.tValues[index],
 				result.m.model.pValues[index],
 			)} | ${markP(result.m.model.pValues[index])} |`,
@@ -355,9 +353,9 @@ ${result.m.model.coefficients
 
 | 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
 | :---: | :---: | :---: | :---: |
-| 总和 (T) | ${result.m.model.dfT} | ${result.m.model.SSt.toFixed(4)} | ${(result.m.model.SSt / result.m.model.dfT).toFixed(4)} |
-| 回归 (R) | ${result.m.model.dfR} | ${result.m.model.SSr.toFixed(4)} | ${(result.m.model.SSr / result.m.model.dfR).toFixed(4)} |
-| 残差 (E) | ${result.m.model.dfE} | ${result.m.model.SSe.toFixed(4)} | ${(result.m.model.SSe / result.m.model.dfE).toFixed(4)} |
+| 总和 (T) | ${result.m.model.dfT} | ${markS(result.m.model.SSt)} | ${markS(result.m.model.SSt / result.m.model.dfT)} |
+| 回归 (R) | ${result.m.model.dfR} | ${markS(result.m.model.SSr)} | ${markS(result.m.model.SSr / result.m.model.dfR)} |
+| 残差 (E) | ${result.m.model.dfE} | ${markS(result.m.model.SSe)} | ${markS(result.m.model.SSe / result.m.model.dfE)} |
 
 ## 3 描述统计
 
@@ -372,13 +370,15 @@ ${result.m.model.coefficients
 ${result.x
 	.map(
 		(variable, index) =>
-			`| ${variable} (x${index + 1}) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
-				result.m.iv.map((xRow) => xRow[index]),
-				result.m.dv,
-			).toFixed(4)} |`,
+			`| ${variable} (x${index + 1}) | ${markS(result.m.ivMeans[index])} | ${markS(result.m.ivStds[index])} | ${markS(
+				corr(
+					result.m.iv.map((xRow) => xRow[index]),
+					result.m.dv,
+				),
+			)} |`,
 	)
 	.join('\n')}
-| ${result.y} (y) | ${result.m.dvMean.toFixed(4)} | ${result.m.dvStd.toFixed(4)} | 1 |
+| ${result.y} (y) | ${markS(result.m.dvMean)} | ${markS(result.m.dvStd)} | 1 |
 	`
 }
 
@@ -394,14 +394,14 @@ function getStepwiseLinearRegressionResult({
 				: '双向选择'
 	})
 
-最终模型为 y = ${result.m.coefficients[0].toFixed(4)} + ${result.m.coefficients
+最终模型为 y = ${markS(result.m.coefficients[0])} + ${result.m.coefficients
 		.slice(1)
-		.map((coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`)
+		.map((coefficient, index) => `${markS(coefficient)} * x${index + 1}`)
 		.join(' + ')}, 其中${result.m.selectedVariables
 		.map((index, i) => `"${result.x[index]}" (x${i + 1})`)
 		.join(
 			'、',
-		)}为自变量, 因变量为"${result.y}". 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.r2adj.toFixed(4)}.
+		)}为自变量, 因变量为"${result.y}". 模型的测定系数 (R<sup>2</sup>) 为 ${markS(result.m.r2)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${markS(result.m.r2adj)}.
 
 变量${result.x
 		.filter((_, index) => !result.m.selectedVariables.includes(index))
@@ -414,7 +414,7 @@ function getStepwiseLinearRegressionResult({
 
 | 参数 | 值 | H<sub>0</sub> | 统计量 | 显著性 |
 | :---: | :---: | :---: | :---: | :---: |
-| 模型 | b0: ${result.m.coefficients[0].toFixed(4)} | ${result.m.coefficients
+| 模型 | b0: ${markS(result.m.coefficients[0])} | ${result.m.coefficients
 		.slice(1)
 		.map((_, index) => `b${index + 1}`)
 		.join(
@@ -424,9 +424,9 @@ ${result.m.coefficients
 	.slice(1)
 	.map(
 		(_, index) =>
-			`| b${index + 1} (${result.x[result.m.selectedVariables[index]]}) | ${result.m.coefficients[
-				index + 1
-			].toFixed(4)} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+			`| b${index + 1} (${result.x[result.m.selectedVariables[index]]}) | ${markS(
+				result.m.coefficients[index + 1],
+			)} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
 				result.m.tValues[index],
 				result.m.pValues[index],
 			)} | ${markP(result.m.pValues[index])} |`,
@@ -437,9 +437,9 @@ ${result.m.coefficients
 
 | 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
 | :---: | :---: | :---: | :---: |
-| 总和 (T) | ${result.m.dfT} | ${result.m.SSt.toFixed(4)} | ${(result.m.SSt / result.m.dfT).toFixed(4)} |
-| 回归 (R) | ${result.m.dfR} | ${result.m.SSr.toFixed(4)} | ${(result.m.SSr / result.m.dfR).toFixed(4)} |
-| 残差 (E) | ${result.m.dfE} | ${result.m.SSe.toFixed(4)} | ${(result.m.SSe / result.m.dfE).toFixed(4)} |
+| 总和 (T) | ${result.m.dfT} | ${markS(result.m.SSt)} | ${markS(result.m.SSt / result.m.dfT)} |
+| 回归 (R) | ${result.m.dfR} | ${markS(result.m.SSr)} | ${markS(result.m.SSr / result.m.dfR)} |
+| 残差 (E) | ${result.m.dfE} | ${markS(result.m.SSe)} | ${markS(result.m.SSe / result.m.dfE)} |
 
 ## 2 描述统计
 
@@ -458,13 +458,15 @@ ${result.x
 				result.m.selectedVariables.findIndex((i) => i === index) + 1
 					? `x${result.m.selectedVariables.findIndex((i) => i === index) + 1}`
 					: '已剔除'
-			}) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
-				result.m.iv.map((xRow) => xRow[index]),
-				result.m.dv,
-			).toFixed(4)} |`,
+			}) | ${markS(result.m.ivMeans[index])} | ${markS(result.m.ivStds[index])} | ${markS(
+				corr(
+					result.m.iv.map((xRow) => xRow[index]),
+					result.m.dv,
+				),
+			)} |`,
 	)
 	.join('\n')}
-| ${result.y} (y) | ${result.m.dvMean.toFixed(4)} | ${result.m.dvStd.toFixed(4)} | 1 |
+| ${result.y} (y) | ${markS(result.m.dvMean)} | ${markS(result.m.dvStd)} | 1 |
     `
 }
 
@@ -476,11 +478,11 @@ function getStandardLinearRegressionResult({
 
 对自变量${result.x.map((v, i) => `"${v}" (x${i + 1})`).join('、')}和因变量"${result.y}"进行标准多元线性回归分析. 原假设 (H<sub>0</sub>) 为"所有自变量的回归系数均为0", 显著性水平 (α) 为 0.05. 
 
-最终模型为 y = ${result.m.coefficients[0].toFixed(4)} + ${result.m.coefficients
+最终模型为 y = ${markS(result.m.coefficients[0])} + ${result.m.coefficients
 		.slice(1)
-		.map((coefficient, index) => `${coefficient.toFixed(4)} * x${index + 1}`)
+		.map((coefficient, index) => `${markS(coefficient)} * x${index + 1}`)
 		.join(' + ')}
-, 模型的测定系数 (R<sup>2</sup>) 为 ${result.m.r2.toFixed(4)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${result.m.r2adj.toFixed(4)}.
+, 模型的测定系数 (R<sup>2</sup>) 为 ${markS(result.m.r2)}, 调整后测定系数 (R<sup>2</sup><sub>adj</sub>) 为 ${markS(result.m.r2adj)}.
 
 结果如表 1 和表 2 所示.
 
@@ -488,7 +490,7 @@ function getStandardLinearRegressionResult({
 
 | 参数 | 值 | H<sub>0</sub> | 统计量 | 显著性 |
 | :---: | :---: | :---: | :---: | :---: |
-| 模型 | ${result.m.coefficients.map((v, i) => `b${i}: ${v.toFixed(4)}${i === 0 ? ' (截距)' : ''}`).join('<br />')} | ${result.m.coefficients
+| 模型 | ${result.m.coefficients.map((v, i) => `b${i}: ${markS(v)}${i === 0 ? ' (截距)' : ''}`).join('<br />')} | ${result.m.coefficients
 		.slice(1)
 		.map((_, index) => `b${index + 1}`)
 		.join(
@@ -498,9 +500,7 @@ ${result.m.coefficients
 	.slice(1)
 	.map(
 		(_, index) =>
-			`| b${index + 1} | ${result.m.coefficients[index + 1].toFixed(
-				4,
-			)} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+			`| b${index + 1} | ${markS(result.m.coefficients[index + 1])} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
 				result.m.tValues[index],
 				result.m.pValues[index],
 			)} | ${markP(result.m.pValues[index])} |`,
@@ -511,9 +511,9 @@ ${result.m.coefficients
 
 | 误差项 | 自由度 (df) | 平方和 (SS) | 均方 (MS) |
 | :---: | :---: | :---: | :---: |
-| 总和 (T) | ${result.m.dfT} | ${result.m.SSt.toFixed(4)} | ${(result.m.SSt / result.m.dfT).toFixed(4)} |
-| 回归 (R) | ${result.m.dfR} | ${result.m.SSr.toFixed(4)} | ${(result.m.SSr / result.m.dfR).toFixed(4)} |
-| 残差 (E) | ${result.m.dfE} | ${result.m.SSe.toFixed(4)} | ${(result.m.SSe / result.m.dfE).toFixed(4)} |
+| 总和 (T) | ${result.m.dfT} | ${markS(result.m.SSt)} | ${markS(result.m.SSt / result.m.dfT)} |
+| 回归 (R) | ${result.m.dfR} | ${markS(result.m.SSr)} | ${markS(result.m.SSr / result.m.dfR)} |
+| 残差 (E) | ${result.m.dfE} | ${markS(result.m.SSe)} | ${markS(result.m.SSe / result.m.dfE)} |
 
 ## 2 描述统计
 
@@ -528,12 +528,14 @@ ${result.m.coefficients
 ${result.x
 	.map(
 		(variable, index) =>
-			`| ${variable} (x${index + 1}) | ${result.m.ivMeans[index].toFixed(4)} | ${result.m.ivStds[index].toFixed(4)} | ${corr(
-				result.m.iv.map((xRow) => xRow[index]),
-				result.m.dv,
-			).toFixed(4)} |`,
+			`| ${variable} (x${index + 1}) | ${markS(result.m.ivMeans[index])} | ${markS(result.m.ivStds[index])} | ${markS(
+				corr(
+					result.m.iv.map((xRow) => xRow[index]),
+					result.m.dv,
+				),
+			)} |`,
 	)
 	.join('\n')}
-| ${result.y} (y) | ${result.m.dvMean.toFixed(4)} | ${result.m.dvStd.toFixed(4)} | 1 |
+| ${result.y} (y) | ${markS(result.m.dvMean)} | ${markS(result.m.dvStd)} | 1 |
     `
 }

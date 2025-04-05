@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData'
 import { useStates } from '../../hooks/useStates'
-import { sleep } from '../../lib/utils'
+import { markS, sleep } from '../../lib/utils'
 import { Result } from '../widgets/Result'
 
 type Option = {
@@ -68,9 +68,9 @@ export function KolmogorovSmirnovTest() {
 ${result
 	.map(
 		(row) =>
-			`| ${row.name} | ${row.count} | ${row.d?.toFixed(3)} | ${row.decide?.toFixed(3)} | ${
+			`| ${row.name} | ${row.count} | ${markS(row.d)} | ${markS(row.decide)} | ${
 				row.rejected ? '不符合正态分布' : '符合正态分布'
-			} (p: ${row.p?.toFixed(3)}) |`,
+			} (p: ${markS(row.p)}) |`,
 	)
 	.join('\n')}
 				`)
@@ -109,9 +109,9 @@ ${result
 ${result
 	.map(
 		(row) =>
-			`| ${row.name} | ${row.count} | ${row.d?.toFixed(3)} | ${row.decide?.toFixed(3)} | ${
+			`| ${row.name} | ${row.count} | ${markS(row.d)} | ${markS(row.decide)} | ${
 				row.rejected ? '不符合正态分布' : '符合正态分布'
-			} (p: ${row.p?.toFixed(3)}) |`,
+			} (p: ${markS(row.p)}) |`,
 	)
 	.join('\n')}
 				`)

@@ -64,9 +64,9 @@ export function TwoSampleTTest() {
 
 > 表 1 - 独立样本T检验结果
 
-| 均值差异 | 自由度 | t | p | ${(100 - alpha * 100).toFixed(3)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
+| 均值差异 | 自由度 | t | p | ${markS(100 - alpha * 100)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| ${m.meanDiff.toFixed(3)} | ${m.df.toFixed(3)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${m.ci[0].toFixed(3)}, ${m.ci[1].toFixed(3)}) | ${m.cohenD.toFixed(3)} | ${m.r2.toFixed(3)} |
+| ${markS(m.meanDiff)} | ${markS(m.df)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${markS(m.ci[0])}, ${markS(m.ci[1])}) | ${markS(m.cohenD)} | ${markS(m.r2)} |
 
 ## 2 描述统计
 
@@ -78,8 +78,8 @@ export function TwoSampleTTest() {
 
 | 组别 | 均值 | 标准差 | 样本量 | 自由度 |
 | :---: | :---: | :---: | :---: | :---: |
-| ${groups[0]} | ${m.meanA.toFixed(3)} | ${m.stdA.toFixed(3)} | ${m.dfA + 1} | ${m.dfA} |
-| ${groups[1]} | ${m.meanB.toFixed(3)} | ${m.stdB.toFixed(3)} | ${m.dfB + 1} | ${m.dfB} |
+| ${groups[0]} | ${markS(m.meanA)} | ${markS(m.stdA)} | ${m.dfA + 1} | ${m.dfA} |
+| ${groups[1]} | ${markS(m.meanB)} | ${markS(m.stdB)} | ${m.dfB + 1} | ${m.dfB} |
 			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)

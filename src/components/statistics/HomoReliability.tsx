@@ -6,7 +6,7 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData'
 import { useRemoteR } from '../../hooks/useRemoteR'
 import { useStates } from '../../hooks/useStates'
-import { jsArrayToRMatrix, sleep } from '../../lib/utils'
+import { jsArrayToRMatrix, markS, sleep } from '../../lib/utils'
 import { Result } from '../widgets/Result'
 
 type Option = {
@@ -92,7 +92,7 @@ export function HomoReliability() {
 | :---: | :---: | :---: | :---: |
 ${m.group
 	.map((g, i) => {
-		return `| ${g} | ${variables.length} | ${m.alpha[i].toFixed(3)} | ${omega[i].toFixed(3)} |`
+		return `| ${g} | ${variables.length} | ${markS(m.alpha[i])} | ${markS(omega[i])} |`
 	})
 	.join('\n')}
 
@@ -117,7 +117,7 @@ ${m.group
 
 | 量表题目数 | alpha 系数 | omega 系数 |
 | :---: | :---: | :---: |
-| ${variables.length} | ${m.alpha[0].toFixed(3)} | ${omega[0].toFixed(3)} |
+| ${variables.length} | ${markS(m.alpha[0])} | ${markS(omega[0])} |
 
 ##### 参考文献
 
@@ -138,7 +138,7 @@ ${m.group
 | :---: | :---: | :---: |
 ${m.group
 	.map((g, i) => {
-		return `| ${g} | ${variables.length} | ${m.alpha[i].toFixed(3)} |`
+		return `| ${g} | ${variables.length} | ${markS(m.alpha[i])} |`
 	})
 	.join('\n')}
 				`)

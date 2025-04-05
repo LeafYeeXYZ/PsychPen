@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData'
 import { useStates } from '../../hooks/useStates'
-import { sleep } from '../../lib/utils'
+import { markS, sleep } from '../../lib/utils'
 import { Result } from '../widgets/Result'
 
 type AvialableStat =
@@ -95,42 +95,45 @@ export function Description() {
 					const data = statistic.map((stat) => {
 						switch (stat) {
 							case 'total':
-								return { value: +sum(rows).toFixed(4), label: '总和' }
+								return { value: markS(sum(rows)), label: '总和' }
 							case 'min':
-								return { value: +min(rows).toFixed(4), label: '最小值' }
+								return { value: markS(min(rows)), label: '最小值' }
 							case 'max':
-								return { value: +max(rows).toFixed(4), label: '最大值' }
+								return { value: markS(max(rows)), label: '最大值' }
 							case 'mean':
-								return { value: +mean(rows).toFixed(4), label: '均值' }
+								return { value: markS(mean(rows)), label: '均值' }
 							case 'mode':
-								return { value: +mode(rows).toFixed(4), label: '众数' }
+								return { value: markS(mode(rows)), label: '众数' }
 							case 'q1':
 								return {
-									value: +quantile(rows, 0.25).toFixed(4),
+									value: markS(quantile(rows, 0.25)),
 									label: 'Q1(25%分位数)',
 								}
 							case 'q2':
 								return {
-									value: +quantile(rows, 0.5).toFixed(4),
+									value: markS(quantile(rows, 0.5)),
 									label: 'Q2(50%分位数)',
 								}
 							case 'q3':
 								return {
-									value: +quantile(rows, 0.75).toFixed(4),
+									value: markS(quantile(rows, 0.75)),
 									label: 'Q3(75%分位数)',
 								}
 							case 'std':
-								return { value: +std(rows).toFixed(4), label: '标准差' }
+								return { value: markS(std(rows)), label: '标准差' }
 							case 'count':
-								return { value: rows.length, label: '有效值数' }
+								return { value: rows.length.toString(), label: '有效值数' }
 							case 'unique':
-								return { value: new Set(rows).size, label: '唯一值数' }
+								return {
+									value: new Set(rows).size.toString(),
+									label: '唯一值数',
+								}
 							case 'median':
-								return { value: +median(rows).toFixed(4), label: '中位数' }
+								return { value: markS(median(rows)), label: '中位数' }
 							case 'range':
-								return { value: +range(rows).toFixed(4), label: '极差' }
+								return { value: markS(range(rows)), label: '极差' }
 							case 'variance':
-								return { value: +_vari(rows).toFixed(4), label: '方差' }
+								return { value: markS(_vari(rows)), label: '方差' }
 						}
 					})
 					return { var: vari, data }
@@ -164,42 +167,45 @@ ${data
 					const data = statistic.map((stat) => {
 						switch (stat) {
 							case 'total':
-								return { value: +sum(rows).toFixed(4), label: '总和' }
+								return { value: markS(sum(rows)), label: '总和' }
 							case 'min':
-								return { value: +min(rows).toFixed(4), label: '最小值' }
+								return { value: markS(min(rows)), label: '最小值' }
 							case 'max':
-								return { value: +max(rows).toFixed(4), label: '最大值' }
+								return { value: markS(max(rows)), label: '最大值' }
 							case 'mean':
-								return { value: +mean(rows).toFixed(4), label: '均值' }
+								return { value: markS(mean(rows)), label: '均值' }
 							case 'mode':
-								return { value: +mode(rows).toFixed(4), label: '众数' }
+								return { value: markS(mode(rows)), label: '众数' }
 							case 'q1':
 								return {
-									value: +quantile(rows, 0.25).toFixed(4),
+									value: markS(quantile(rows, 0.25)),
 									label: 'Q1(25%分位数)',
 								}
 							case 'q2':
 								return {
-									value: +quantile(rows, 0.5).toFixed(4),
+									value: markS(quantile(rows, 0.5)),
 									label: 'Q2(50%分位数)',
 								}
 							case 'q3':
 								return {
-									value: +quantile(rows, 0.75).toFixed(4),
+									value: markS(quantile(rows, 0.75)),
 									label: 'Q3(75%分位数)',
 								}
 							case 'std':
-								return { value: +std(rows).toFixed(4), label: '标准差' }
+								return { value: markS(std(rows)), label: '标准差' }
 							case 'count':
-								return { value: rows.length, label: '有效值数' }
+								return { value: rows.length.toString(), label: '有效值数' }
 							case 'unique':
-								return { value: new Set(rows).size, label: '唯一值数' }
+								return {
+									value: new Set(rows).size.toString(),
+									label: '唯一值数',
+								}
 							case 'median':
-								return { value: +median(rows).toFixed(4), label: '中位数' }
+								return { value: markS(median(rows)), label: '中位数' }
 							case 'range':
-								return { value: +range(rows).toFixed(4), label: '极差' }
+								return { value: markS(range(rows)), label: '极差' }
 							case 'variance':
-								return { value: +_vari(rows).toFixed(4), label: '方差' }
+								return { value: markS(_vari(rows)), label: '方差' }
 						}
 					})
 					return { var: String(g), data }

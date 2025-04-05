@@ -62,9 +62,9 @@ export function PeerSampleTTest() {
 
 > 表 1 - 配对样本T检验结果
 
-| 均值差异 | 自由度 | t | p | ${(100 - alpha * 100).toFixed(3)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
+| 均值差异 | 自由度 | t | p | ${markS(100 - alpha * 100)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| ${m.meanDiff.toFixed(3)} | ${m.df.toFixed(3)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${m.ci[0].toFixed(3)}, ${m.ci[1].toFixed(3)}) | ${m.cohenD.toFixed(3)} | ${m.r2.toFixed(3)} |
+| ${markS(m.meanDiff)} | ${markS(m.df)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${markS(m.ci[0])}, ${markS(m.ci[1])}) | ${markS(m.cohenD)} | ${markS(m.r2)} |
 
 ## 2 描述统计
 
@@ -76,9 +76,9 @@ export function PeerSampleTTest() {
 
 | 变量 | 均值 | 标准差 | 样本量 | 自由度 |
 | :---: | :---: | :---: | :---: | :---: |
-| ${variable1} | ${m.meanA.toFixed(3)} | ${m.stdA.toFixed(3)} | ${m.df + 1} | ${m.df} |
-| ${variable2} | ${m.meanB.toFixed(3)} | ${m.stdB.toFixed(3)} | ${m.df + 1} | ${m.df} |
-| 差异 | ${m.meanDiff.toFixed(3)} | ${m.stdDiff.toFixed(3)} | ${m.df + 1} | ${m.df} |
+| ${variable1} | ${markS(m.meanA)} | ${markS(m.stdA)} | ${m.df + 1} | ${m.df} |
+| ${variable2} | ${markS(m.meanB)} | ${markS(m.stdB)} | ${m.df + 1} | ${m.df} |
+| 差异 | ${markS(m.meanDiff)} | ${markS(m.stdDiff)} | ${m.df + 1} | ${m.df} |
 			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
