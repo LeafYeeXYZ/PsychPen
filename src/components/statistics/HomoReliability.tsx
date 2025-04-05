@@ -42,15 +42,11 @@ export function HomoReliability() {
 			const { variables, group, calculateOmega, manualNFactors } = values
 			const filteredRows = dataRows
 				.filter((row) =>
-					variables.every(
-						(variable) =>
-							typeof row[variable] !== 'undefined' &&
-							!Number.isNaN(Number(row[variable])),
-					),
+					variables.every((variable) => typeof row[variable] === 'number'),
 				)
 				.filter((row) => !group || typeof row[group] !== 'undefined')
 			const items = variables.map((variable) =>
-				filteredRows.map((row) => Number(row[variable])),
+				filteredRows.map((row) => row[variable] as number),
 			)
 			const m = new AlphaRealiability(
 				items,

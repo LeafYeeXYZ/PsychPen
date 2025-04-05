@@ -37,15 +37,11 @@ export function SimpleMediatorTest() {
 			const { x, m, y, B } = values
 			const timestamp = Date.now()
 			const filteredRows = dataRows.filter((row) =>
-				[x, m, y].every(
-					(variable) =>
-						typeof row[variable] !== 'undefined' &&
-						!Number.isNaN(Number(row[variable])),
-				),
+				[x, m, y].every((variable) => typeof row[variable] === 'number'),
 			)
-			const xData = filteredRows.map((row) => Number(row[x]))
-			const mData = filteredRows.map((row) => Number(row[m]))
-			const yData = filteredRows.map((row) => Number(row[y]))
+			const xData = filteredRows.map((row) => row[x]) as number[]
+			const mData = filteredRows.map((row) => row[m]) as number[]
+			const yData = filteredRows.map((row) => row[y]) as number[]
 			const model = new SimpleMediationModel(xData, mData, yData)
 			const bs = model.bootstrap(B)
 			const es = model.effectSize

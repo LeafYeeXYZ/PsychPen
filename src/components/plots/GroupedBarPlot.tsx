@@ -67,17 +67,13 @@ export function GroupedBarPlot() {
 			const filteredRows = dataRows
 				.filter((row) => row[group] !== undefined)
 				.filter((row) =>
-					variables.every(
-						(variable) =>
-							row[variable] !== undefined &&
-							!Number.isNaN(Number(row[variable])),
-					),
+					variables.every((variable) => typeof row[variable] === 'number'),
 				)
 				.map((row) => ({
 					[group]: String(row[group]),
 					...variables.reduce(
 						(acc, cur) => {
-							acc[cur] = Number(row[cur])
+							acc[cur] = row[cur] as number
 							return acc
 						},
 						{} as Record<string, number>,

@@ -42,11 +42,9 @@ export function OneWayANOVA() {
 			const { value, group, method } = values
 			const filteredRows = dataRows.filter(
 				(row) =>
-					typeof row[value] !== 'undefined' &&
-					!Number.isNaN(Number(row[value])) &&
-					typeof row[group] !== 'undefined',
+					typeof row[value] === 'number' && typeof row[group] !== 'undefined',
 			)
-			const valueData = filteredRows.map((row) => Number(row[value]))
+			const valueData = filteredRows.map((row) => row[value] as number)
 			const groupData = filteredRows.map((row) => String(row[group]))
 			const m = new OneWayAnova(valueData, groupData)
 			const scheffe = method?.includes('Scheffe') ? m.scheffe() : undefined

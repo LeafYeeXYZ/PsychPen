@@ -44,8 +44,7 @@ export function KolmogorovSmirnovTest() {
 				const data: number[][] = variables.map((variable) =>
 					dataRows
 						.map((row) => row[variable])
-						.filter((v) => typeof v !== 'undefined' && !Number.isNaN(Number(v)))
-						.map((v) => Number(v)),
+						.filter((v) => typeof v === 'number'),
 				)
 				const result = data.map((arr, index) => {
 					const m = new OneSampleKSTest(arr)
@@ -85,8 +84,7 @@ ${result
 					dataRows
 						.filter((row) => row[group] === g)
 						.map((row) => row[variable])
-						.filter((v) => typeof v !== 'undefined' && !Number.isNaN(Number(v)))
-						.map((v) => Number(v)),
+						.filter((v) => typeof v === 'number'),
 				)
 				const result = data.map((arr, index) => {
 					const m = new OneSampleKSTest(arr)

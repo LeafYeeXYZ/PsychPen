@@ -53,18 +53,14 @@ export function MultiLinearRegression() {
 			const timestamp = Date.now()
 			const { x, y } = values
 			const filteredRows = dataRows.filter((row) =>
-				[...x, y].every(
-					(variable) =>
-						typeof row[variable] !== 'undefined' &&
-						!Number.isNaN(Number(row[variable])),
-				),
+				[...x, y].every((variable) => typeof row[variable] === 'number'),
 			)
 			const xData: number[][] = []
 			const yData: number[] = []
 			for (const row of filteredRows) {
-				const xRow = x.map((variable) => Number(row[variable]))
+				const xRow = x.map((variable) => row[variable] as number)
 				xData.push(xRow)
-				yData.push(Number(row[y]))
+				yData.push(row[y] as number)
 			}
 			switch (values.method) {
 				case 'standard':

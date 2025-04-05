@@ -34,14 +34,10 @@ export function OneLinearRegression() {
 			const timestamp = Date.now()
 			const { x, y } = values
 			const filteredRows = dataRows.filter((row) =>
-				[x, y].every(
-					(variable) =>
-						typeof row[variable] !== 'undefined' &&
-						!Number.isNaN(Number(row[variable])),
-				),
+				[x, y].every((variable) => typeof row[variable] === 'number'),
 			)
-			const xData = filteredRows.map((row) => Number(row[x]))
-			const yData = filteredRows.map((row) => Number(row[y]))
+			const xData = filteredRows.map((row) => row[x] as number)
+			const yData = filteredRows.map((row) => row[y] as number)
 			const m = new LinearRegressionOne(xData, yData)
 			setStatResult(`
 ## 1 一元线性回归

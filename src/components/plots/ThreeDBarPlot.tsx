@@ -51,14 +51,25 @@ export function ThreeDBarPlot() {
 				throw new Error('无法找到图表容器')
 			}
 			const chart = echarts.init(ele)
-			const x: string[] = Array.from(new Set(dataRows.map((row) => row[xVar])))
+			const filteredRows = dataRows.filter((row) => {
+				return (
+					typeof row[xVar] !== 'undefined' &&
+					typeof row[yVar] !== 'undefined' &&
+					typeof row[zVar] === 'number'
+				)
+			})
+			const x: string[] = Array.from(
+				new Set(filteredRows.map((row) => row[xVar])),
+			)
 				.sort((a, b) => Number(a) - Number(b))
 				.map(String)
-			const y: string[] = Array.from(new Set(dataRows.map((row) => row[yVar])))
+			const y: string[] = Array.from(
+				new Set(filteredRows.map((row) => row[yVar])),
+			)
 				.sort((a, b) => Number(a) - Number(b))
 				.map(String)
 			const z: number[][] = []
-			for (const row of dataRows) {
+			for (const row of filteredRows) {
 				const i = x.indexOf(String(row[xVar]))
 				const j = y.indexOf(String(row[yVar]))
 				if (i !== -1 && j !== -1) {
@@ -77,41 +88,41 @@ export function ThreeDBarPlot() {
 							const prev = z.find((item) => item[0] === i && item[1] === j)
 							if (prev) {
 								// @ts-expect-error 这里为了简便, 混用 number 和 number[]
-								prev[2].push(Number(row[zVar]))
+								prev[2].push(row[zVar] as number)
 								z[z.indexOf(prev)] = prev
 							} else {
 								// @ts-expect-error 这里为了简便, 混用 number 和 number[]
-								z.push([i, j, [Number(row[zVar])]])
+								z.push([i, j, [row[zVar] as number]])
 							}
 							break
 						}
 						case 'sum': {
 							const prev = z.find((item) => item[0] === i && item[1] === j)
 							if (prev) {
-								prev[2] += Number(row[zVar])
+								prev[2] += row[zVar] as number
 								z[z.indexOf(prev)] = prev
 							} else {
-								z.push([i, j, Number(row[zVar])])
+								z.push([i, j, row[zVar] as number])
 							}
 							break
 						}
 						case 'max': {
 							const prev = z.find((item) => item[0] === i && item[1] === j)
 							if (prev) {
-								prev[2] = Math.max(prev[2], Number(row[zVar]))
+								prev[2] = Math.max(prev[2], row[zVar] as number)
 								z[z.indexOf(prev)] = prev
 							} else {
-								z.push([i, j, Number(row[zVar])])
+								z.push([i, j, row[zVar] as number])
 							}
 							break
 						}
 						case 'min': {
 							const prev = z.find((item) => item[0] === i && item[1] === j)
 							if (prev) {
-								prev[2] = Math.min(prev[2], Number(row[zVar]))
+								prev[2] = Math.min(prev[2], row[zVar] as number)
 								z[z.indexOf(prev)] = prev
 							} else {
-								z.push([i, j, Number(row[zVar])])
+								z.push([i, j, row[zVar] as number])
 							}
 							break
 						}
@@ -119,11 +130,11 @@ export function ThreeDBarPlot() {
 							const prev = z.find((item) => item[0] === i && item[1] === j)
 							if (prev) {
 								// @ts-expect-error 这里为了简便, 混用 number 和 number[]
-								prev[2].push(Number(row[zVar]))
+								prev[2].push(row[zVar] as number)
 								z[z.indexOf(prev)] = prev
 							} else {
 								// @ts-expect-error 这里为了简便, 混用 number 和 number[]
-								z.push([i, j, [Number(row[zVar])]])
+								z.push([i, j, [row[zVar] as number]])
 							}
 							break
 						}

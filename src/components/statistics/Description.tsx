@@ -90,8 +90,7 @@ export function Description() {
 				const data = variables.map((vari) => {
 					const rows = dataRows
 						.map((row) => row[vari])
-						.filter((v) => typeof v !== 'undefined' && !Number.isNaN(Number(v)))
-						.map((v) => Number(v))
+						.filter((v) => typeof v === 'number')
 					const data = statistic.map((stat) => {
 						switch (stat) {
 							case 'total':
@@ -162,8 +161,7 @@ ${data
 					const rows = dataRows
 						.filter((row) => row[group] === g)
 						.map((row) => row[variable])
-						.filter((v) => typeof v !== 'undefined' && !Number.isNaN(Number(v)))
-						.map((v) => Number(v))
+						.filter((v) => typeof v === 'number')
 					const data = statistic.map((stat) => {
 						switch (stat) {
 							case 'total':

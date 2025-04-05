@@ -43,13 +43,11 @@ export function PeerSampleTTest() {
 			const data2: number[] = []
 			for (const row of dataRows) {
 				if (
-					typeof row[variable1] !== 'undefined' &&
-					!Number.isNaN(Number(row[variable1])) &&
-					typeof row[variable2] !== 'undefined' &&
-					!Number.isNaN(Number(row[variable2]))
+					typeof row[variable1] === 'number' &&
+					typeof row[variable2] === 'number'
 				) {
-					data1.push(Number(row[variable1]))
-					data2.push(Number(row[variable2]))
+					data1.push(row[variable1])
+					data2.push(row[variable2])
 				}
 			}
 			const m = new T(data1, data2, twoside, expect, alpha)

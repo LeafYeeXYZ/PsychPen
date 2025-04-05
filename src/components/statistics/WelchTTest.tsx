@@ -46,12 +46,11 @@ export function WelchTTest() {
 			)
 			for (const row of dataRows) {
 				if (
-					typeof row[dataVar] !== 'undefined' &&
-					!Number.isNaN(Number(row[dataVar])) &&
+					typeof row[dataVar] === 'number' &&
 					typeof row[groupVar] !== 'undefined'
 				) {
-					row[groupVar] == groups[0] && data1.push(Number(row[dataVar]))
-					row[groupVar] == groups[1] && data2.push(Number(row[dataVar]))
+					row[groupVar] == groups[0] && data1.push(row[dataVar])
+					row[groupVar] == groups[1] && data2.push(row[dataVar])
 				}
 			}
 			const m = new T(data1, data2, twoside, expect, alpha)

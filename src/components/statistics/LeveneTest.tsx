@@ -48,12 +48,10 @@ export function LeveneTest() {
 				}
 				const filteredRows = dataRows.filter(
 					(row) =>
-						row[variable] !== undefined &&
-						!Number.isNaN(Number(row[variable])) &&
-						row[groups] !== undefined,
+						typeof row[variable] === 'number' && row[groups] !== undefined,
 				)
 				group = filteredRows.map((row) => String(row[groups]))
-				value = filteredRows.map((row) => Number(row[variable]))
+				value = filteredRows.map((row) => row[variable] as number)
 			} else {
 				if (!variables?.length) {
 					throw new Error('请选择变量')
@@ -62,13 +60,11 @@ export function LeveneTest() {
 				value = []
 				for (const variable of variables) {
 					const filteredRows = dataRows.filter(
-						(row) =>
-							row[variable] !== undefined &&
-							!Number.isNaN(Number(row[variable])),
+						(row) => typeof row[variable] === 'number',
 					)
 					for (const row of filteredRows) {
 						group.push(String(variable))
-						value.push(Number(row[variable]))
+						value.push(row[variable] as number)
 					}
 				}
 			}

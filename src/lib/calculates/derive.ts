@@ -40,7 +40,10 @@ export function derive(
 				type: col.type,
 			})
 			for (const row of dataRows) {
-				row[`${col.name}_标准化`] = (Number(row[col.name]) - col.mean) / col.std
+				row[`${col.name}_标准化`] =
+					typeof row[col.name] === 'number'
+						? ((row[col.name] as number) - col.mean) / col.std
+						: undefined
 			}
 		}
 		if (col.subVars?.center) {
@@ -60,7 +63,10 @@ export function derive(
 				type: col.type,
 			})
 			for (const row of dataRows) {
-				row[`${col.name}_中心化`] = Number(row[col.name]) - col.mean
+				row[`${col.name}_中心化`] =
+					typeof row[col.name] === 'number'
+						? (row[col.name] as number) - col.mean
+						: undefined
 			}
 		}
 		if (col.subVars?.discrete) {

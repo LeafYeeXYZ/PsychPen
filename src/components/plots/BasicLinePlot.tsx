@@ -86,11 +86,7 @@ export function BasicLinePlot() {
 					dataRows
 						.filter((row) => row[groupVar] === col)
 						.map((row) => row[dataVar])
-						.filter(
-							(value) =>
-								typeof value !== 'undefined' && !Number.isNaN(Number(value)),
-						)
-						.map((value) => Number(value)),
+						.filter((value) => typeof value === 'number'),
 				)
 				rows.map((row) => {
 					switch (statistic) {
@@ -173,12 +169,7 @@ export function BasicLinePlot() {
 							data: variables.map((variable) => {
 								const row = dataRows
 									.map((row) => row[variable])
-									.filter(
-										(value) =>
-											typeof value !== 'undefined' &&
-											!Number.isNaN(Number(value)),
-									)
-									.map((value) => Number(value))
+									.filter((value) => typeof value === 'number')
 								switch (statistic) {
 									case 'mean':
 										return +mean(row).toFixed(4)

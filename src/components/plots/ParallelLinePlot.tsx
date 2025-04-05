@@ -76,9 +76,9 @@ export function ParallelLinePlot() {
 									dataCols.find((col) => col.name === variable)?.type ===
 									'等距或等比数据'
 								) {
-									return Number(row[variable])
+									return row[variable] as number
 								}
-								return String(row[variable])
+								return row[variable] as string
 							}),
 						),
 					},

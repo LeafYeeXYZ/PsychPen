@@ -78,9 +78,7 @@ export function BasicBarPlot() {
 				}
 				const filteredRows = dataRows.filter(
 					(row) =>
-						row[dataVar] !== undefined &&
-						row[groupVar] !== undefined &&
-						!Number.isNaN(Number(row[dataVar])),
+						typeof row[dataVar] === 'number' && row[groupVar] !== undefined,
 				)
 				// 被试间数据处理
 				const cols = Array.from(
@@ -89,7 +87,7 @@ export function BasicBarPlot() {
 				const rows: number[][] = cols.map((col) =>
 					filteredRows
 						.filter((row) => row[groupVar] === col)
-						.map((row) => Number(row[dataVar])),
+						.map((row) => row[dataVar] as number),
 				)
 				rows.map((row, i) => {
 					const _mean = +mean(row).toFixed(4)
@@ -206,17 +204,11 @@ export function BasicBarPlot() {
 					throw new Error('请选择配对变量')
 				}
 				const filteredRows = dataRows.filter((row) =>
-					variables.every(
-						(variable) =>
-							row[variable] !== undefined &&
-							!Number.isNaN(Number(row[variable])),
-					),
+					variables.every((variable) => typeof row[variable] === 'number'),
 				)
 				// 被试内数据处理
 				variables.map((variable, i) => {
-					const row = filteredRows
-						.map((row) => row[variable])
-						.map((value) => Number(value))
+					const row = filteredRows.map((row) => row[variable] as number)
 					const _mean = +mean(row).toFixed(4)
 					const _std = +sd(row).toFixed(4)
 					data.push(_mean)

@@ -38,17 +38,13 @@ export function HalfReliability() {
 			const filteredRows = dataRows.filter((row) =>
 				variablesA
 					.concat(variablesB)
-					.every(
-						(variable) =>
-							typeof row[variable] !== 'undefined' &&
-							!Number.isNaN(Number(row[variable])),
-					),
+					.every((variable) => typeof row[variable] === 'number'),
 			)
 			const firstHalf = variablesA.map((variable) =>
-				filteredRows.map((row) => Number(row[variable])),
+				filteredRows.map((row) => row[variable] as number),
 			)
 			const lastHalf = variablesB.map((variable) =>
-				filteredRows.map((row) => Number(row[variable])),
+				filteredRows.map((row) => row[variable] as number),
 			)
 			const m = new HalfRealiability(
 				firstHalf,

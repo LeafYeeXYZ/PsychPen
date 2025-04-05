@@ -39,8 +39,7 @@ export function OneSampleTTest() {
 			const { variable, expect, twoside, alpha } = values
 			const data = dataRows
 				.map((row) => row[variable])
-				.filter((v) => typeof v !== 'undefined' && !Number.isNaN(Number(v)))
-				.map((v) => Number(v))
+				.filter((v) => typeof v === 'number')
 			const m = new T(data, expect, twoside, alpha)
 			setStatResult(`
 ## 1 单样本T检验

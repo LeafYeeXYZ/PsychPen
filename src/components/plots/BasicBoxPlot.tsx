@@ -183,11 +183,7 @@ export function BasicBoxPlot() {
 				const rows = variables.map((variable) =>
 					dataRows
 						.map((row) => row[variable])
-						.filter(
-							(value) =>
-								typeof value !== 'undefined' && !Number.isNaN(Number(value)),
-						)
-						.map((value) => Number(value)),
+						.filter((value) => typeof value === 'number'),
 				)
 				const option: EChartsOption = {
 					title: [

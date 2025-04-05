@@ -71,12 +71,12 @@ export function ThreeDScatterPlot() {
 						data: dataRows
 							.filter(
 								(row) =>
-									typeof row[xVar] !== 'undefined' &&
-									typeof row[yVar] !== 'undefined' &&
-									typeof row[zVar] !== 'undefined',
+									typeof row[xVar] === 'number' &&
+									typeof row[yVar] === 'number' &&
+									typeof row[zVar] === 'number',
 							)
 							.map((row) => {
-								return [Number(row[xVar]), Number(row[yVar]), Number(row[zVar])]
+								return [row[xVar], row[yVar], row[zVar]]
 							}),
 					},
 				],

@@ -33,14 +33,10 @@ export function CorrReliability() {
 			isLargeData && (await sleep())
 			const timestamp = Date.now()
 			const filteredRows = dataRows.filter((row) =>
-				values.variables.every(
-					(variable) =>
-						typeof row[variable] !== 'undefined' &&
-						!Number.isNaN(Number(row[variable])),
-				),
+				values.variables.every((variable) => typeof row[variable] === 'number'),
 			)
-			const x1 = filteredRows.map((row) => Number(row[values.variables[0]]))
-			const x2 = filteredRows.map((row) => Number(row[values.variables[1]]))
+			const x1 = filteredRows.map((row) => row[values.variables[0]] as number)
+			const x2 = filteredRows.map((row) => row[values.variables[1]] as number)
 			const g = values.group
 			const group = g ? filteredRows.map((row) => String(row[g])) : undefined
 			const m = new CorrRealiability(x1, x2, group)

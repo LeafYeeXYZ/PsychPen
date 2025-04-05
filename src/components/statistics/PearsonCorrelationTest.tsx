@@ -45,17 +45,13 @@ export function PearsonCorrelationTest() {
 			const timestamp = Date.now()
 			const { variable, alpha } = values
 			const filteredRows = dataRows.filter((row) =>
-				variable.every(
-					(variable) =>
-						typeof row[variable] !== 'undefined' &&
-						!Number.isNaN(Number(row[variable])),
-				),
+				variable.every((variable) => typeof row[variable] === 'number'),
 			)
 			const results: Result['data'] = []
 			for (let i = 0; i < variable.length - 1; i++) {
 				for (let j = i + 1; j < variable.length; j++) {
 					const data = [variable[i], variable[j]].map((variable) =>
-						filteredRows.map((row) => Number(row[variable])),
+						filteredRows.map((row) => row[variable] as number),
 					)
 					const result = new PearsonCorrTest(data[0], data[1], alpha)
 					results.push({

@@ -46,10 +46,12 @@ export function QQPlot() {
 			const timestamp = Date.now()
 			const { xVar, yVar, xLabel, yLabel, standardize: std, dotCount } = values
 			const filteredData = dataRows.filter((row) => {
-				if (xVar !== '__stdnorm__' && typeof row[xVar] === 'undefined')
+				if (xVar !== '__stdnorm__' && typeof row[xVar] !== 'number') {
 					return false
-				if (yVar !== '__stdnorm__' && typeof row[yVar] === 'undefined')
+				}
+				if (yVar !== '__stdnorm__' && typeof row[yVar] !== 'number') {
 					return false
+				}
 				return true
 			})
 			const xData =
@@ -57,16 +59,16 @@ export function QQPlot() {
 					? null
 					: sort(
 							std
-								? standardize(filteredData.map((row) => Number(row[xVar])))
-								: filteredData.map((row) => Number(row[xVar])),
+								? standardize(filteredData.map((row) => row[xVar] as number))
+								: filteredData.map((row) => row[xVar] as number),
 						)
 			const yData =
 				yVar === '__stdnorm__'
 					? null
 					: sort(
 							std
-								? standardize(filteredData.map((row) => Number(row[yVar])))
-								: filteredData.map((row) => Number(row[yVar])),
+								? standardize(filteredData.map((row) => row[yVar] as number))
+								: filteredData.map((row) => row[yVar] as number),
 						)
 			const data = new Array(dotCount).fill(0).map((_, i) => {
 				const q = (i + 1) * (1 / (dotCount + 1))

@@ -39,12 +39,10 @@ export function PeerANOVA() {
 			const timestamp = Date.now()
 			const { value, method } = values
 			const filteredRows = dataRows.filter((row) =>
-				value.every(
-					(v) => typeof row[v] !== 'undefined' && !Number.isNaN(Number(row[v])),
-				),
+				value.every((v) => typeof row[v] === 'number'),
 			)
 			const valueData = value.map((v) =>
-				filteredRows.map((row) => Number(row[v])),
+				filteredRows.map((row) => row[v] as number),
 			)
 			const m = new PeerAnova(valueData, value)
 			const scheffe = method?.includes('Scheffe') ? m.scheffe() : undefined

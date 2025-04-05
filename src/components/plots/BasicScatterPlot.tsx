@@ -72,11 +72,11 @@ export function BasicScatterPlot() {
 						source: dataRows
 							.filter(
 								(row) =>
-									typeof row[xVar] !== 'undefined' &&
-									typeof row[yVar] !== 'undefined',
+									typeof row[xVar] === 'number' &&
+									typeof row[yVar] === 'number',
 							)
 							.map((row) => {
-								return [Number(row[xVar]), Number(row[yVar])]
+								return [row[xVar], row[yVar]]
 							}),
 					},
 					{
