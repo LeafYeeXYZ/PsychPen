@@ -89,25 +89,29 @@ let localFilterExpression =
 
 const TARGET_DATA_VERSION = '2'
 if (localStorage.getItem('data_version') !== TARGET_DATA_VERSION) {
-	localData = localData ? localData.map((row) => {
-		return Object.fromEntries(
-			Object.entries(row).map(([key, value]) => [
-				key,
-				value === null
-					? undefined
-					: !Number.isNaN(Number(value))
-						? Number(value)
-						: String(value),
-			]),
-		)
-	}) as DataRow[] : null
+	localData = localData
+		? (localData.map((row) => {
+				return Object.fromEntries(
+					Object.entries(row).map(([key, value]) => [
+						key,
+						value === null
+							? undefined
+							: !Number.isNaN(Number(value))
+								? Number(value)
+								: String(value),
+					]),
+				)
+			}) as DataRow[])
+		: null
 	await set(STORE_KEYS.DATA, localData)
-  try {
-		localDataRows = localDataRows ? calculator(
-			localDataCols.filter((col) => col.derived !== true),
-			localData || [],
-			localFilterExpression,
-		).calculatedRows : []
+	try {
+		localDataRows = localDataRows
+			? calculator(
+					localDataCols.filter((col) => col.derived !== true),
+					localData || [],
+					localFilterExpression,
+				).calculatedRows
+			: []
 		await set(STORE_KEYS.DATA_ROWS, localDataRows)
 	} catch (e) {
 		console.error('自动升级数据版本失败:', e)
@@ -222,8 +226,17 @@ export const useData = create<DataState>()((setState, getState) => {
 				// 故意使用 == 而不是 ===
 				throw new Error(`变量名 ${name} 已存在`)
 			}
+			let rows = dataRows
+			if (rows.length !== data.length) {
+				// 说明数据被过滤了, 需要临时重新计算
+				rows = calculator(
+					dataCols.filter((col) => col.derived !== true),
+					data,
+					'',
+				).calculatedRows
+			}
 			const newData = data.map((row, i) => ({
-				[name]: computeExpression(expression, dataCols, dataRows[i]),
+				[name]: computeExpression(expression, dataCols, rows[i]),
 				...row,
 			}))
 			const newCol = describe([{ name }], newData).updatedCols[0]

@@ -1,4 +1,4 @@
-import type { Variable, DataRow } from '../../types'
+import type { DataRow, Variable } from '../../types'
 import { embedValues } from '../utils'
 
 /**

@@ -82,6 +82,9 @@ export function computeExpression(
 	data: DataRow,
 ): number | string | undefined {
 	try {
+		if (!data) {
+			throw new Error('数据不存在')
+		}
 		const vars = expression.match(/:::.+?:::/g)
 		if (vars) {
 			for (const v of vars) {
