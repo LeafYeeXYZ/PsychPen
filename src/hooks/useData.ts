@@ -5,21 +5,18 @@ import { describe } from '../lib/calculates/describe'
 import { filter } from '../lib/calculates/filter'
 import { missing } from '../lib/calculates/misssing'
 import { computeExpression, validateExpression } from '../lib/utils'
-import type { Variable } from '../types'
+import type { DataRow, Variable } from '../types'
 
 type DataState = {
 	/**
 	 * 原始数据
 	 */
-	data: Record<string, unknown>[] | null
+	data: DataRow[] | null
 	/**
 	 * 设置原始数据
 	 * @param data 原始数据
 	 */
-	setData: (
-		data: Record<string, unknown>[] | null,
-		isLarge?: boolean,
-	) => Promise<void>
+	setData: (data: DataRow[] | null, isLarge?: boolean) => Promise<void>
 	/**
 	 * 更新数据
 	 * @param cols 变量列表
@@ -34,7 +31,7 @@ type DataState = {
 	/**
 	 * 数据列表
 	 */
-	dataRows: { [key: string]: unknown }[]
+	dataRows: DataRow[]
 	/**
 	 * 变量列表
 	 */
@@ -56,17 +53,17 @@ type DataState = {
 
 /**
  * 处理原始数据
- * @param dataCols 数据变量列表, 必须提供 name 字段, 可选提供其他字段
+ * @param dataCols 数据变量列表, 必须提供 name 字段, 可选提供其他字段 (请确保已经过滤掉了 derived 的变量)
  * @param dataRows 原始数据, 不要传入已经处理过的数据
  * @returns 处理后的数据变量列表和数据行
  */
 const calculator = (
 	dataCols: Variable[],
-	dataRows: { [key: string]: unknown }[],
+	dataRows: DataRow[],
 	filterExpression?: string,
 ): {
 	calculatedCols: Variable[]
-	calculatedRows: { [key: string]: unknown }[]
+	calculatedRows: DataRow[]
 } => {
 	const a = missing(dataCols, dataRows)
 	const b = derive(a.updatedCols, a.updatedRows)
@@ -83,14 +80,43 @@ enum STORE_KEYS {
 	FILTER_EXPRESSION = 'filter_expression',
 }
 
-const localData =
-	(await get<Record<string, unknown>[]>(STORE_KEYS.DATA)) || null
-const localDataCols = (await get<Variable[]>(STORE_KEYS.DATA_COLS)) || []
-const localDataRows =
-	(await get<Record<string, unknown>[]>(STORE_KEYS.DATA_ROWS)) || []
-const localIsLargeData = (await get<boolean>(STORE_KEYS.IS_LARGE_DATA)) || false
-const localFilterExpression =
+let localData = (await get<DataRow[]>(STORE_KEYS.DATA)) || null
+let localDataCols = (await get<Variable[]>(STORE_KEYS.DATA_COLS)) || []
+let localDataRows = (await get<DataRow[]>(STORE_KEYS.DATA_ROWS)) || []
+let localIsLargeData = (await get<boolean>(STORE_KEYS.IS_LARGE_DATA)) || false
+let localFilterExpression =
 	(await get<string>(STORE_KEYS.FILTER_EXPRESSION)) || ''
+
+const TARGET_DATA_VERSION = '1'
+if (localStorage.getItem('data_version') !== TARGET_DATA_VERSION) {
+	localData = localData ? localData.map((row) => {
+		return Object.fromEntries(
+			Object.entries(row).map(([key, value]) => [
+				key,
+				value === null
+					? undefined
+					: !Number.isNaN(Number(value))
+						? Number(value)
+						: String(value),
+			]),
+		)
+	}) as DataRow[] : null
+  try {
+		localDataRows = localDataRows ? calculator(
+			localDataCols.filter((col) => col.derived !== true),
+			localData || [],
+			localFilterExpression,
+		).calculatedRows : []
+	} catch (e) {
+		console.error('自动升级数据版本失败:', e)
+		localData = null
+		localDataCols = []
+		localDataRows = []
+		localIsLargeData = false
+		localFilterExpression = ''
+	}
+	localStorage.setItem('data_version', TARGET_DATA_VERSION)
+}
 
 export const useData = create<DataState>()((setState, getState) => {
 	return {
@@ -119,8 +145,20 @@ export const useData = create<DataState>()((setState, getState) => {
 				dataCols: calculatedCols,
 			})
 		},
-		setData: async (rows, isLarge) => {
-			if (rows) {
+		setData: async (rawRows, isLarge) => {
+			if (rawRows) {
+				const rows = rawRows.map((row) => {
+					return Object.fromEntries(
+						Object.entries(row).map(([key, value]) => [
+							key,
+							value === null
+								? undefined
+								: !Number.isNaN(Number(value))
+									? Number(value)
+									: String(value),
+						]),
+					)
+				}) as DataRow[]
 				const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
 				const { calculatedCols, calculatedRows } = calculator(cols, rows)
 				await set(STORE_KEYS.DATA, rows)
@@ -142,7 +180,7 @@ export const useData = create<DataState>()((setState, getState) => {
 				await del(STORE_KEYS.IS_LARGE_DATA)
 				await del(STORE_KEYS.FILTER_EXPRESSION)
 				setState({
-					data: rows,
+					data: null,
 					dataRows: [],
 					dataCols: [],
 					filterExpression: '',

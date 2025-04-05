@@ -1,6 +1,10 @@
 import { max, min } from '@psych/lib'
 import { kmeans } from 'ml-kmeans'
-import { ALLOWED_DISCRETE_METHODS, type Variable } from '../../types'
+import {
+	ALLOWED_DISCRETE_METHODS,
+	type DataRow,
+	type Variable,
+} from '../../types'
 
 /**
  * 生成子变量
@@ -9,10 +13,10 @@ import { ALLOWED_DISCRETE_METHODS, type Variable } from '../../types'
  */
 export function derive(
 	dataCols: Variable[],
-	dataRows: { [key: string]: unknown }[],
+	dataRows: DataRow[],
 ): {
 	updatedCols: Variable[]
-	updatedRows: Record<string, unknown>[]
+	updatedRows: DataRow[]
 } {
 	const derivedCols: Variable[] = []
 	for (const col of dataCols) {
@@ -20,8 +24,11 @@ export function derive(
 			continue
 		}
 		if (col.subVars?.standard) {
+			if (col.type === '称名或等级数据') {
+				throw new Error('称名或等级数据不能进行标准化')
+			}
 			if (!col.mean || !col.std) {
-				throw new Error('仅等距或等比变量可以标准化')
+				throw new Error(`变量 ${col.name} 没有计算均值或标准差, 可能为内部错误`)
 			}
 			derivedCols.push({
 				name: `${col.name}_标准化`,
@@ -37,8 +44,11 @@ export function derive(
 			}
 		}
 		if (col.subVars?.center) {
+			if (col.type === '称名或等级数据') {
+				throw new Error('称名或等级数据不能进行中心化')
+			}
 			if (!col.mean) {
-				throw new Error('仅等距或等比变量可以中心化')
+				throw new Error(`变量 ${col.name} 没有计算均值, 可能为内部错误`)
 			}
 			derivedCols.push({
 				name: `${col.name}_中心化`,
@@ -54,21 +64,22 @@ export function derive(
 			}
 		}
 		if (col.subVars?.discrete) {
+			if (col.type === '称名或等级数据') {
+				throw new Error('称名或等级数据不能进行离散化')
+			}
+			const data = dataRows.map((row) => row[col.name])
+			if (data.some((v) => typeof v === 'string')) {
+				throw new Error(`变量 ${col.name} 含有非数值数据, 可能为内部错误`)
+			}
 			const groups = col.subVars.discrete.groups
 			const method = col.subVars.discrete.method
 			const discrete = new Discrete(
-				dataRows
-					.filter((row) => typeof row[col.name] !== 'undefined')
-					.map((row) => Number(row[col.name])),
+				data.filter((v) => typeof v === 'number'),
 				groups,
 				method,
 			)
-			const predictedData = dataRows.map((row) =>
-				discrete.predictor(
-					typeof row[col.name] !== 'undefined'
-						? Number(row[col.name])
-						: undefined,
-				),
+			const predictedData = data.map(
+				(v) => v && discrete.predictor(v as number),
 			)
 			derivedCols.push({
 				name: `${col.name}_${method}离散`,
@@ -110,14 +121,14 @@ class Discrete {
 		switch (methed) {
 			case ALLOWED_DISCRETE_METHODS.EQUAL_WIDTH: {
 				this.predictor = (data: number | undefined) => {
-					if (typeof data === 'undefined') return undefined
+					if (data === undefined || data === null) return undefined
 					return Math.floor((data - this.#min) / (this.#range / this.groups))
 				}
 				break
 			}
 			case ALLOWED_DISCRETE_METHODS.EQUAL_FREQUENCY: {
 				this.predictor = (data: number | undefined) => {
-					if (typeof data === 'undefined') return undefined
+					if (data === undefined || data === null) return undefined
 					return Math.floor(
 						this.#data.findIndex((v) => v >= data) /
 							(this.#count / this.groups),

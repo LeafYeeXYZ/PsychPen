@@ -20,6 +20,7 @@ export enum ALLOWED_DISCRETE_METHODS {
 	CLUSTER = '聚类分析',
 }
 
+export type DataRow = Record<string, string | number | undefined>
 export type Variable = {
 	/** 变量名 */
 	name: string

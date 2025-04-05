@@ -160,6 +160,9 @@ export function DataFilter() {
 					大于变量 b 的数据
 				</p>
 				<p className='intro-text'>
+					如果引用的任意变量有缺失值, 则该行数据将被排除
+				</p>
+				<p className='intro-text'>
 					支持的比较运算符包括: <Tag color='blue'>{'>'}</Tag>
 					<Tag color='blue'>{'<'}</Tag>
 					<Tag color='blue'>{'>='}</Tag>

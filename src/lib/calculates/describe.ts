@@ -1,5 +1,5 @@
 import { max, mean, min, mode, quantile, sort, std } from '@psych/lib'
-import type { Variable } from '../../types'
+import type { DataRow, Variable } from '../../types'
 
 /**
  * 生成描述统计量
@@ -8,10 +8,10 @@ import type { Variable } from '../../types'
  */
 export function describe(
 	dataCols: Variable[],
-	dataRows: { [key: string]: unknown }[],
+	dataRows: DataRow[],
 ): {
 	updatedCols: Variable[]
-	updatedRows: Record<string, unknown>[]
+	updatedRows: DataRow[]
 } {
 	const updatedCols = dataCols.map((col) => {
 		// 原始数据
@@ -23,13 +23,11 @@ export function describe(
 		const unique = new Set(data.filter((v) => v !== undefined)).size
 		let type: '称名或等级数据' | '等距或等比数据' = '称名或等级数据'
 		if (
-			data.every((v) => typeof v === 'undefined' || !Number.isNaN(Number(v))) &&
-			data.some((v) => !Number.isNaN(Number(v)))
+			data.every((v) => v === undefined || typeof v === 'number') &&
+			data.some((v) => typeof v === 'number')
 		) {
 			type = '等距或等比数据'
-			const nums = data
-				.filter((v) => typeof v !== 'undefined')
-				.map((v) => Number(v))
+			const nums = data.filter((v) => typeof v === 'number')
 			sort(nums, true, 'iterativeQuickSort', true)
 			const _mean = mean(nums)
 			return {
@@ -51,6 +49,5 @@ export function describe(
 		}
 		return { ...col, count, missing, valid, unique, type }
 	})
-	const updatedRows = dataRows
-	return { updatedCols, updatedRows }
+	return { updatedCols, updatedRows: dataRows }
 }

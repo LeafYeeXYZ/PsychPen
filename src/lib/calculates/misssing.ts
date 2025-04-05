@@ -1,5 +1,9 @@
 import { mean, median } from '@psych/lib'
-import { ALLOWED_INTERPOLATION_METHODS, type Variable } from '../../types'
+import {
+	ALLOWED_INTERPOLATION_METHODS,
+	type DataRow,
+	type Variable,
+} from '../../types'
 
 /**
  * 缺失值替换和插值
@@ -9,10 +13,10 @@ import { ALLOWED_INTERPOLATION_METHODS, type Variable } from '../../types'
  */
 export function missing(
 	dataCols: Variable[],
-	dataRows: { [key: string]: unknown }[],
+	dataRows: DataRow[],
 ): {
 	updatedCols: Variable[]
-	updatedRows: Record<string, unknown>[]
+	updatedRows: DataRow[]
 } {
 	// 根据定义的缺失值替换数据
 	for (const col of dataCols) {
@@ -26,32 +30,31 @@ export function missing(
 		}
 	}
 	// 插值处理
-	const copy = JSON.parse(JSON.stringify(dataRows)) as {
-		[key: string]: unknown
-	}[] // 为了避免使用插值后的数据进行插值
-	const updatedCols = dataCols.map((col) => {
+	const copy = JSON.parse(JSON.stringify(dataRows)) as DataRow[]
+	for (const col of dataCols) {
 		if (col.missingMethod) {
-			const data = dataRows.map((row) =>
-				typeof row[col.name] !== 'undefined'
-					? Number(row[col.name])
-					: undefined,
-			)
+			const data = copy.map((row) => row[col.name])
+			if (data.some((v) => typeof v === 'string')) {
+				throw new Error(`变量 ${col.name} 不是等距或等比数据, 无法进行插值处理`)
+			}
 			const refer = col.missingRefer
-			const peer = refer
-				? dataRows.map((row) =>
-						typeof row[refer] !== 'undefined' ? Number(row[refer]) : undefined,
-					)
-				: undefined
-			const interpolatedData = new Interpolate(data, col.missingMethod, peer)
-				.interpolatedData
+			const peer = refer ? copy.map((row) => row[refer]) : undefined
+			if (peer?.some((v) => typeof v === 'string')) {
+				throw new Error(
+					`插值参考变量 ${refer} 不是等距或等比数据, 无法进行插值处理`,
+				)
+			}
+			const interpolatedData = new Interpolate(
+				data as (number | undefined)[],
+				col.missingMethod,
+				peer as (number | undefined)[],
+			).interpolatedData
 			copy.forEach((row, i) => {
 				row[col.name] = interpolatedData[i]
 			})
 		}
-		return col
-	})
-	const updatedRows = copy
-	return { updatedCols, updatedRows }
+	}
+	return { updatedCols: dataCols, updatedRows: copy }
 }
 
 /** 插值处理 */
@@ -91,12 +94,12 @@ class Interpolate {
 
 	/** 处理均值插值 */
 	#mean(data: (number | undefined)[]): (number | undefined)[] {
-		const m = mean(data.filter((v) => typeof v !== 'undefined'))
+		const m = mean(data.filter((v) => v !== undefined))
 		return data.map((d) => d ?? m)
 	}
 	/** 处理中位数插值 */
 	#median(data: (number | undefined)[]): (number | undefined)[] {
-		const m = median(data.filter((v) => typeof v !== 'undefined'))
+		const m = median(data.filter((v) => v !== undefined))
 		return data.map((d) => d ?? m)
 	}
 	/** 处理最临近点插值法 */
@@ -106,13 +109,15 @@ class Interpolate {
 	): (number | undefined)[] {
 		const valid = peer
 			.map((v, i) => ({ v, i }))
-			.filter((p) => typeof p.v !== 'undefined')
-			.filter((p) => typeof data[p.i] !== 'undefined') as {
+			.filter((p) => p.v !== undefined)
+			.filter((p) => data[p.i] !== undefined) as {
 			v: number
 			i: number
 		}[]
 		return data.map((v, i, a) => {
-			if (typeof v !== 'undefined' || typeof peer[i] === 'undefined') return v
+			if (v !== undefined || peer[i] === undefined) {
+				return v
+			}
 			const current = peer[i]
 			const nearest = valid.reduce(
 				(acc, cur) =>
@@ -129,10 +134,11 @@ class Interpolate {
 	): (number | undefined)[] {
 		const xy = peer
 			.map((v, i) => [v, data[i]])
-			.filter((p) => typeof p[0] !== 'undefined')
-			.filter((p) => typeof p[1] !== 'undefined')
+			.filter((p) => p[0] !== undefined && p[1] !== undefined)
 		return data.map((v, i) => {
-			if (typeof v !== 'undefined' || typeof peer[i] === 'undefined') return v
+			if (v !== undefined || peer[i] === undefined) {
+				return v
+			}
 			return this.#lagrangeInterpolation(xy as [number, number][], peer[i])
 		})
 	}

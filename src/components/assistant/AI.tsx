@@ -1,4 +1,12 @@
-import { Sender, Prompts } from '@ant-design/x'
+import {
+	BankOutlined,
+	ExportOutlined,
+	FilterOutlined,
+	InfoCircleOutlined,
+	MoreOutlined,
+} from '@ant-design/icons'
+import { Prompts, Sender } from '@ant-design/x'
+import type { SenderRef } from '@ant-design/x/es/sender'
 import parseThink from '@leaf/parse-think'
 import { ExportTypes } from '@psych/sheet'
 import { Space } from 'antd'
@@ -25,8 +33,6 @@ import { funcs } from '../../tools/tools'
 import type { Variable } from '../../types'
 import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../../types'
 import { Messages } from './Messages'
-import { BankOutlined, ExportOutlined, FilterOutlined, InfoCircleOutlined, MoreOutlined } from '@ant-design/icons'
-import type { SenderRef } from '@ant-design/x/es/sender'
 
 const GREETTING =
 	'你好, 我是 PsychPen 的 AI 助手, 可以帮你**讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果等**. 请问有什么可以帮你的?'
@@ -473,7 +479,7 @@ export function AI() {
 		}
 	}
 	// 给 <Prompts /> 用的
-  const senderRef = useRef<SenderRef>(null)
+	const senderRef = useRef<SenderRef>(null)
 	const numberCol = dataCols.find((col) => col.type === '等距或等比数据')
 	return (
 		<div className='w-full h-full flex flex-col justify-between items-center'>
@@ -487,19 +493,46 @@ export function AI() {
 			/>
 			{messages.length === 0 && (
 				<Prompts
-				  className='w-full mb-3'
+					className='w-full mb-3'
 					onItemClick={({ data }) => {
-            setInput(data.description?.toString() || '')
+						setInput(data.description?.toString() || '')
 						senderRef.current?.focus()
 					}}
 					items={[
-						{ key: 'intro', icon: <InfoCircleOutlined />, label: '自我介绍', description: '你能为我做什么?' },
-						...(numberCol ? [
-              { key: 'filter', icon: <FilterOutlined />, label: '处理数据', description: `请帮我筛选出"${numberCol.name}"在三个标准差以内的数据` },
-						] : []),
-            { key: 'education', icon: <BankOutlined />, label: '讲解概念', description: '请问什么是最小二乘法?' },
-						{ key: 'jump', icon: <MoreOutlined />, label: '跳转页面', description: '我想去做个中介效应分析' },
-						{ key: 'export', icon: <ExportOutlined />, label: '导出数据', description: '帮我导出 Excel 格式的数据' },
+						{
+							key: 'intro',
+							icon: <InfoCircleOutlined />,
+							label: '自我介绍',
+							description: '你能为我做什么?',
+						},
+						...(numberCol
+							? [
+									{
+										key: 'filter',
+										icon: <FilterOutlined />,
+										label: '处理数据',
+										description: `请帮我筛选出"${numberCol.name}"在三个标准差以内的数据`,
+									},
+								]
+							: []),
+						{
+							key: 'education',
+							icon: <BankOutlined />,
+							label: '讲解概念',
+							description: '请问什么是最小二乘法?',
+						},
+						{
+							key: 'jump',
+							icon: <MoreOutlined />,
+							label: '跳转页面',
+							description: '我想去做个中介效应分析',
+						},
+						{
+							key: 'export',
+							icon: <ExportOutlined />,
+							label: '导出数据',
+							description: '帮我导出 Excel 格式的数据',
+						},
 					]}
 				/>
 			)}

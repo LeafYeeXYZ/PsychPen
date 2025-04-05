@@ -2,7 +2,7 @@ import html2canvas from 'html2canvas-pro'
 import katexCss from 'katex/dist/katex.min.css?raw'
 import { marked } from 'marked'
 import themeCss from '../styles/statResult.css?raw'
-import type { Variable } from '../types'
+import type { DataRow, Variable } from '../types'
 
 /**
  * 把统计结果渲染为 HTML
@@ -69,31 +69,6 @@ export function sleep(ms = 100): Promise<void> {
 }
 
 /**
- * 将表达式转为布尔值
- * @param expression 表达式
- * @param variables 变量列表
- * @param data 数据
- * @throws 如果表达式不合法, 则抛出异常
- * @returns 布尔值
- */
-export function booleanExpression(
-	expression: string,
-	variables: Variable[],
-	data: Record<string, unknown>,
-): boolean {
-	try {
-		const value = eval(
-			`Boolean(${embedValues(expression, variables, data, true)})`,
-		)
-		return value
-	} catch (e) {
-		throw new Error(
-			`执行表达式失败: ${e instanceof Error ? e.message : String(e)}`,
-		)
-	}
-}
-
-/**
  * 计算变量的表达式 (如果引用的变量有缺失值, 则返回 undefined)
  * @param expression 表达式
  * @param variables 变量列表
@@ -104,7 +79,7 @@ export function booleanExpression(
 export function computeExpression(
 	expression: string,
 	variables: Variable[],
-	data: Record<string, unknown>,
+	data: DataRow,
 ): number | string | undefined {
 	try {
 		const vars = expression.match(/:::.+?:::/g)
@@ -114,18 +89,16 @@ export function computeExpression(
 				if (!variables.find((v) => v.name == name)) {
 					throw new Error(`变量 ${name} 不存在`)
 				}
-			}
-			if (
-				vars.some((v) => {
-					const name = v.slice(3, -3)
-					const value = data[name]
-					return value === undefined || value === null
-				})
-			) {
-				return undefined
+				const value = data[name]
+				if (value === undefined) {
+					return undefined
+				}
 			}
 		}
 		const value = eval(embedValues(expression, variables, data))
+		if (typeof value !== 'number' && typeof value != 'string') {
+			throw new Error('表达式计算结果不是数字或字符串')
+		}
 		return value
 	} catch (e) {
 		throw new Error(
@@ -145,8 +118,7 @@ export function computeExpression(
 export function embedValues(
 	expression: string,
 	variables: Variable[],
-	data: Record<string, unknown>,
-	allowUndefinedAndNull = false,
+	data: DataRow,
 ): string {
 	let exp = expression
 	// min(:::name:::)
@@ -227,17 +199,11 @@ export function embedValues(
 		const variable = variables.find((v) => v.name == name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		const value = data[name]
-		if ((value === undefined || value === null) && !allowUndefinedAndNull) {
+		if (value === undefined) {
 			throw new Error(`变量 ${name} 的值不存在`)
 		}
-		if (value === undefined) {
-			return 'undefined'
-		}
-		if (value === null) {
-			return 'null'
-		}
-		if (!Number.isNaN(Number(value))) {
-			return `${Number(value)}`
+		if (typeof value === 'number') {
+			return String(value)
 		}
 		return `"${String(value)}"`
 	})

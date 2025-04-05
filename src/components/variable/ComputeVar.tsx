@@ -170,6 +170,9 @@ export function ComputeVar() {
 					的和乘以 2
 				</p>
 				<p className='intro-text'>
+					如果引用的任意变量有缺失值, 则计算后的变量的对应行也将是缺失值
+				</p>
+				<p className='intro-text'>
 					支持的比较运算符包括: <Tag color='blue'>{'>'}</Tag>
 					<Tag color='blue'>{'<'}</Tag>
 					<Tag color='blue'>{'>='}</Tag>
