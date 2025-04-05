@@ -101,12 +101,14 @@ if (localStorage.getItem('data_version') !== TARGET_DATA_VERSION) {
 			]),
 		)
 	}) as DataRow[] : null
+	await set(STORE_KEYS.DATA, localData)
   try {
 		localDataRows = localDataRows ? calculator(
 			localDataCols.filter((col) => col.derived !== true),
 			localData || [],
 			localFilterExpression,
 		).calculatedRows : []
+		await set(STORE_KEYS.DATA_ROWS, localDataRows)
 	} catch (e) {
 		console.error('自动升级数据版本失败:', e)
 		localData = null
@@ -114,6 +116,11 @@ if (localStorage.getItem('data_version') !== TARGET_DATA_VERSION) {
 		localDataRows = []
 		localIsLargeData = false
 		localFilterExpression = ''
+		await del(STORE_KEYS.DATA)
+		await del(STORE_KEYS.DATA_COLS)
+		await del(STORE_KEYS.DATA_ROWS)
+		await del(STORE_KEYS.IS_LARGE_DATA)
+		await del(STORE_KEYS.FILTER_EXPRESSION)
 	}
 	localStorage.setItem('data_version', TARGET_DATA_VERSION)
 }
