@@ -289,11 +289,17 @@ export function markS(statistic: number, p?: number, hideZero = true): string {
 	}
 	// 添加显著性标记
 	if (p !== undefined) {
-		if (p < 0.001) return `${formattedStat}***`
-		if (p < 0.01) return `${formattedStat}**`
-		if (p < 0.05) return `${formattedStat}*`
+		if (p < 0.001) {
+			return `<i>${formattedStat}***</i>`
+		}
+		if (p < 0.01) {
+			return `<i>${formattedStat}**</i>`
+		}
+		if (p < 0.05) {
+			return `<i>${formattedStat}*</i>`
+		}
 	}
-	return formattedStat
+	return `<i>${formattedStat}</i>`
 }
 
 /**
@@ -307,11 +313,11 @@ export function markP(p: number, hideZero = true): string {
 		return '(无)'
 	}
 	// 处理极端情况
-	if (p <= 0) return hideZero ? '<.001***' : '<0.001***'
-	if (p >= 1) return '1'
+	if (p <= 0) return hideZero ? '<i><.001***</i>' : '<i><0.001***</i>'
+	if (p >= 1) return '<i>1</i>'
 	// 处理非常小的p值
 	if (p < 0.001) {
-		return hideZero ? '<.001***' : '<0.001***'
+		return hideZero ? '<i><.001***</i>' : '<i><0.001***</i>'
 	}
 	// 格式化p值
 	let formattedP = p.toFixed(3)
@@ -319,9 +325,9 @@ export function markP(p: number, hideZero = true): string {
 		formattedP = formattedP.slice(1)
 	}
 	// 添加显著性标记
-	if (p < 0.01) return `${formattedP}**`
-	if (p < 0.05) return `${formattedP}*`
-	return formattedP
+	if (p < 0.01) return `<i>${formattedP}**</i>`
+	if (p < 0.05) return `<i>${formattedP}*</i>`
+	return `<i>${formattedP}</i>`
 }
 
 /**
