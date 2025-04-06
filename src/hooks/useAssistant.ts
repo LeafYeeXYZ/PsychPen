@@ -11,8 +11,6 @@ type AssistantState = {
 	_DataView_setOpenaiEndpoint: (endpoint: string) => void
 	_DataView_setOpenaiApiKey: (apiKey: string) => void
 	_DataView_setOpenaiEnable: (enable: boolean) => void
-
-	_DataView_clearAI: () => void
 	_DataView_validate: () => Promise<void>
 }
 
@@ -65,9 +63,6 @@ export const useAssistant = create<AssistantState>()((set, get) => {
 			const ai = await getAI(openaiEnable, openaiEndpoint, openaiApiKey, model)
 			set({ ai })
 		},
-		_DataView_clearAI: () => {
-			set({ ai: null })
-		},
 		openaiEndpoint,
 		openaiApiKey,
 		openaiEnable,
@@ -75,19 +70,19 @@ export const useAssistant = create<AssistantState>()((set, get) => {
 		ai,
 		_DataView_setOpenaiEndpoint: (endpoint) => {
 			localStorage.setItem('openaiEndpoint', endpoint)
-			set({ openaiEndpoint: endpoint })
+			set({ openaiEndpoint: endpoint, ai: null })
 		},
 		_DataView_setOpenaiApiKey: (apiKey) => {
 			localStorage.setItem('openaiApiKey', apiKey)
-			set({ openaiApiKey: apiKey })
-		},
-		_DataView_setOpenaiEnable: (enable) => {
-			localStorage.setItem('openaiEnable', enable ? 'true' : 'false')
-			set({ openaiEnable: enable })
+			set({ openaiApiKey: apiKey, ai: null })
 		},
 		_DataView_setModel: (modelName) => {
 			localStorage.setItem('openaiModelName', modelName)
-			set({ model: modelName })
+			set({ model: modelName, ai: null })
+		},
+		_DataView_setOpenaiEnable: (enable) => {
+			localStorage.setItem('openaiEnable', enable ? 'true' : 'false')
+			set({ openaiEnable: enable, ai: null })
 		},
 	}
 })
