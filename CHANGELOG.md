@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.5.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.4.0...v2.5.0) (2025-04-06)
+
+
+### Features
+
+* 统计参数添加斜体效果 ([1c3f68a](https://github.com/LeafYeeXYZ/PsychPen/commit/1c3f68a20fd86b7fa160832274ea16917d6ef4aa))
+* 现在可以在AI助手回答完成前取消本次请求 ([4c181ba](https://github.com/LeafYeeXYZ/PsychPen/commit/4c181ba06bd0556f9df49451ffccb0f5d456a067))
+* 现在统计结果的数字默认显示为APA格式 ([7f88f88](https://github.com/LeafYeeXYZ/PsychPen/commit/7f88f881eeaf5de3cd3e4f672a68061960d2fc50))
+* 允许删除和复制AI助手的消息 ([2519a42](https://github.com/LeafYeeXYZ/PsychPen/commit/2519a4251aae721cfa43cdb9937737a0bc3546e3))
+* AI助手在没有消息时新增示例提示词 ([7d0fc77](https://github.com/LeafYeeXYZ/PsychPen/commit/7d0fc77a42ff852feb67a22aa111f55b90e10e8a))
+
+
+### Bug Fixes
+
+* 修复未将数据格式升级同步到本地存储的问题 ([4d8bfd3](https://github.com/LeafYeeXYZ/PsychPen/commit/4d8bfd38a8704c4b3b37bb18f9eef30ead8cb307))
+* 修复在有变量被过滤时计算变量失败的问题 ([8637103](https://github.com/LeafYeeXYZ/PsychPen/commit/8637103af7366f64d4ac2d233f585758bd2c9ec3))
+
+
+### Refactoring
+
+* 重构数据管理类型判断系统, 提升类型安全性 ([2c66606](https://github.com/LeafYeeXYZ/PsychPen/commit/2c6660653359b72275f473e723a4849e10282232))
+
+
+### Improvements
+
+* 移除不必要的类型转换, 提高计算性能 ([d5885a2](https://github.com/LeafYeeXYZ/PsychPen/commit/d5885a276674ddb61fa5be59af8317083533c600))
+* 优化数据类型转换和判断逻辑 ([62a87ee](https://github.com/LeafYeeXYZ/PsychPen/commit/62a87ee66155455db412ad312fe98e3854b88ad3))
+
 ## [2.4.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.3.0...v2.4.0) (2025-04-02)
 
 
