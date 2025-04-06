@@ -7,6 +7,7 @@ import 'katex/dist/katex.min.css'
 import Bowser from 'bowser'
 import { marked } from 'marked'
 import katex from 'marked-katex-extension'
+import '@ant-design/v5-patch-for-react-19'
 
 const root = document.getElementById('root')
 if (!root) {

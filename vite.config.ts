@@ -17,11 +17,11 @@ export default defineConfig({
 	},
 	build: {
 		target: ['chrome110', 'firefox115', 'safari16', 'edge110'],
-		chunkSizeWarningLimit: 1050,
+		chunkSizeWarningLimit: 1200,
 		rollupOptions: {
 			output: {
 				manualChunks: {
-					antd: ['antd'],
+					antd: ['antd', '@ant-design/v5-patch-for-react-19'],
 					'psych-sheet': ['@psych/sheet'],
 					echarts: ['echarts'],
 					'echarts-extension': [
