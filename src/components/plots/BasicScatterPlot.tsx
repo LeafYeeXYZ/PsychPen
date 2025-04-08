@@ -217,7 +217,7 @@ export function BasicScatterPlot() {
 					>
 						<InputNumber
 							addonBefore='点大小'
-							className='w-52'
+							className='w-full'
 							placeholder='默认10'
 							min={1}
 							step={1}
