@@ -7,6 +7,7 @@ import {
 	SaveOutlined,
 } from '@ant-design/icons'
 import { ExportTypes, downloadSheet } from '@psych/sheet'
+import { colorSchemeDarkBlue, themeQuartz } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { Button, Input, Modal, Popconfirm, Popover, Select, Tag } from 'antd'
 import { useRef } from 'react'
@@ -14,12 +15,11 @@ import { flushSync } from 'react-dom'
 import { useAssistant } from '../../hooks/useAssistant'
 import { useData } from '../../hooks/useData'
 import { useStates } from '../../hooks/useStates'
+import { sleep } from '../../lib/utils'
+import type { DataRow } from '../../types'
 import { Expression } from '../widgets/Expression'
 import { ConfigAI } from './ConfigAI'
 import { ConfigR } from './ConfigR'
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-quartz.min.css'
-import { sleep } from '../../lib/utils'
 
 /** 可导出的文件类型 */
 const EXPORT_FILE_TYPES = Object.values(ExportTypes)
@@ -34,6 +34,7 @@ export function PreviewData() {
 	const disabled = useStates((state) => state.disabled)
 	const setDisabled = useStates((state) => state.setDisabled)
 	const messageApi = useStates((state) => state.messageApi)
+	const isDarkMode = useStates((state) => state.isDarkMode)
 	const [modalApi, contextHolder] = Modal.useModal()
 	// 导出数据相关
 	const handleExport = (filename: string, type: string) => {
@@ -193,18 +194,21 @@ export function PreviewData() {
 				</div>
 			</div>
 			{/* 数据表格 */}
-			<AgGridReact
-				className='ag-theme-quartz-auto-dark w-full h-full overflow-auto'
-				// @ts-expect-error 使用 valueFormatter 之后类型报错
-				rowData={dataRows}
-				// @ts-expect-error 使用 valueFormatter 之后类型报错
-				columnDefs={dataCols.map((col) => ({
-					field: col.name,
-					headerName: col.name,
-					valueFormatter: (params) =>
-						col.type === '等距或等比数据' ? params.value : String(params.value),
-				}))}
-			/>
+			<div className='w-full h-full'>
+				<AgGridReact<DataRow>
+					theme={
+						isDarkMode ? themeQuartz.withPart(colorSchemeDarkBlue) : themeQuartz
+					}
+					rowData={dataRows}
+					columnDefs={dataCols.map((col) => ({
+						field: col.name,
+						headerName:
+							col.type === '等距或等比数据'
+								? `${col.name} [数值]`
+								: `${col.name} [分类]`,
+					}))}
+				/>
+			</div>
 			{contextHolder}
 		</div>
 	)

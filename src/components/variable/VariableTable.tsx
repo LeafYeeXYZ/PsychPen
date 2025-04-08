@@ -1,14 +1,17 @@
+import { colorSchemeDarkBlue, themeQuartz } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { useData } from '../../hooks/useData'
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-quartz.css'
+import { useStates } from '../../hooks/useStates'
 
 export function VariableTable() {
 	const dataCols = useData((state) => state.dataCols)
+	const isDarkMode = useStates((state) => state.isDarkMode)
 	return (
 		<div className='w-full h-full grid grid-rows-[1fr_35%] gap-4'>
 			<AgGridReact
-				className='ag-theme-quartz-auto-dark w-full h-full overflow-auto'
+				theme={
+					isDarkMode ? themeQuartz.withPart(colorSchemeDarkBlue) : themeQuartz
+				}
 				rowData={dataCols
 					.filter((col) => col.derived !== true)
 					.map((col) => ({
@@ -51,7 +54,9 @@ export function VariableTable() {
 				]}
 			/>
 			<AgGridReact
-				className='ag-theme-quartz-auto-dark w-full h-full overflow-auto'
+				theme={
+					isDarkMode ? themeQuartz.withPart(colorSchemeDarkBlue) : themeQuartz
+				}
 				overlayNoRowsTemplate='如果定义了标准化/中心化/离散化子变量, 将显示在这里'
 				rowData={dataCols
 					.filter((col) => col.derived === true)

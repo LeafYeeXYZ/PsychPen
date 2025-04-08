@@ -8,6 +8,7 @@ import Bowser from 'bowser'
 import { marked } from 'marked'
 import katex from 'marked-katex-extension'
 import '@ant-design/v5-patch-for-react-19'
+import { ClientSideRowModelModule, ModuleRegistry } from 'ag-grid-community'
 
 const root = document.getElementById('root')
 if (!root) {
@@ -27,6 +28,7 @@ if (!valid) {
 	)
 }
 
+ModuleRegistry.registerModules([ClientSideRowModelModule])
 marked.use(katex({ throwOnError: false }))
 
 ReactDOM.createRoot(root).render(

@@ -29,7 +29,7 @@ export default defineConfig({
 						'echarts-stat',
 						'echarts-wordcloud',
 					],
-					'ag-grid': ['ag-grid-react'],
+					'ag-grid': ['ag-grid-react', 'ag-grid-community'],
 					'utils-a': [
 						'html2canvas-pro',
 						'bowser',
