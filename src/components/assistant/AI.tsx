@@ -143,7 +143,11 @@ export function AI() {
 			const system = GET_PROMPT({
 				vars: dataCols,
 				page: currentPageInfo(),
-				stat: statResult || (activeMainPage === MAIN_PAGES_LABELS.STATISTICS ? '(还未进行统计分析)' : '(无)'),
+				stat:
+					statResult ||
+					(activeMainPage === MAIN_PAGES_LABELS.STATISTICS
+						? '(还未进行统计分析)'
+						: '(无)'),
 				filterExpression: filterExpression,
 				totalCount: data?.length || Number.NaN,
 				usableCount: dataRows.length,

@@ -13,7 +13,7 @@ import type {
 } from 'openai/resources/index.mjs'
 import { useEffect, useRef } from 'react'
 import { useStates } from '../../hooks/useStates'
-import { md5 } from '../../lib/utils'
+import { shortId } from '../../lib/utils'
 import { ToolCall } from './ToolCall'
 
 export function Messages({
@@ -57,7 +57,7 @@ export function Messages({
 					.tool_calls
 				return (
 					<Bubble
-						key={md5(JSON.stringify(message))}
+						key={shortId()}
 						className='w-full'
 						placement={message.role === 'user' ? 'end' : 'start'}
 						content={

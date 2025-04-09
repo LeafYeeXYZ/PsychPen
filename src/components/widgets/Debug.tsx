@@ -1,6 +1,8 @@
 import { CodeOutlined } from '@ant-design/icons'
 import { Button, Popover } from 'antd'
 import { useState } from 'react'
+import { useStates } from '../../hooks/useStates'
+import { shortId } from '../../lib/utils'
 
 export function Debug() {
 	return (
@@ -16,6 +18,7 @@ export function Debug() {
 }
 
 function _Debug() {
+	const messageApi = useStates((state) => state.messageApi)
 	const [bug, setBug] = useState<{ test: string } | undefined>({ test: 'bug' })
 	return (
 		<div className='flex flex-col items-center gap-2'>
@@ -32,6 +35,23 @@ function _Debug() {
 				}}
 			>
 				隐藏本组件5秒
+			</Button>
+			<Button
+				block
+				onClick={() => {
+					const results: string[] = []
+					for (let i = 0; i < 100000; i++) {
+						results.push(shortId())
+					}
+					const set = new Set(results)
+					if (results.length !== set.size) {
+						messageApi?.error(`短id冲突 (${results.length - set.size})`)
+					} else {
+						messageApi?.success(`短id无冲突 (${results.length})`)
+					}
+				}}
+			>
+				测试短id冲突
 			</Button>
 			<Button
 				block

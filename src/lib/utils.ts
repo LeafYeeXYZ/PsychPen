@@ -54,19 +54,11 @@ export function renderStatResult(result: string): string {
 }
 
 /**
- * 生成给定字符串的 MD5 哈希值
- * @param str 字符串
- * @returns MD5 哈希值
+ * 生成随机 ID
+ * @returns 随机 ID
  */
-export function md5(str: string): string {
-	let hash = 0
-	if (str.length == 0) return hash.toString()
-	for (let i = 0; i < str.length; i++) {
-		const char = str.charCodeAt(i)
-		hash = (hash << 5) - hash + char
-		hash = hash & hash
-	}
-	return hash.toString()
+export function shortId(): string {
+	return Math.random().toString(36).slice(2, 10)
 }
 
 /**
