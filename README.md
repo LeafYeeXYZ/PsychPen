@@ -9,10 +9,11 @@
 
 ## 引用信息
 
-- `最新版本`: `叶一杉. (2025). PsychPen: 在线统计分析和数据可视化工具 [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen`
-- `v1.2.0`: `叶一杉. (2024). PsychPen: 在线统计分析和数据可视化工具 (v1.2.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v1.2.0`
-- `v1.7.0`: `叶一杉. (2024). PsychPen: 在线统计分析和数据可视化工具 (v1.7.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v1.7.0`
-- `v2.0.0`: `叶一杉. (2025). PsychPen: 在线统计分析和数据可视化工具 (v2.0.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v2.0.0`
+如果你在学术论文中使用了 PsychPen, 请引用以下信息 (APA格式) (请注意年份和版本号区别)
+
+- `v2.0.0-最新版本`: `叶一杉. (2025). PsychPen: AI加持的在线统计分析和数据可视化工具 (v2.x.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v2.x.0`
+- `v1.9.0`: `叶一杉. (2025). PsychPen: 在线统计分析和数据可视化工具 (v1.9.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v1.9.0`
+- `v1.0.0-v1.8.0`: `叶一杉. (2024). PsychPen: 在线统计分析和数据可视化工具 (v1.x.0) [Computer software]. GitHub. https://github.com/LeafYeeXYZ/PsychPen/tree/v1.x.0`
 
 ## 目录
 
