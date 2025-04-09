@@ -37,8 +37,22 @@ import { Messages } from './Messages'
 const GREETTING =
 	'你好, 我是 PsychPen 的 AI 助手, 可以帮你**讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果等**. 请问有什么可以帮你的?'
 const INSTRUCTION =
-	'你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. \n\n你将收到用户的提问、当前用户导入到软件中的数据集中的变量的信息、PsychPen的使用和开发文档、可以供你调用的工具 (函数) 信息. \n\n你的任务是按照用户的要求, 对用户进行回复, 或调用工具 (函数). 在调用工具 (函数) 前, 请确保你已经明确知晓了用户的意图, 否则请通过进一步和用户对话来确认细节. \n\n你的回复中如果包含数学公式和符号, 请使用 TeX 语法, 并将行内公式用 `$` 包裹 (类似于 Markdown 的行内代码), 将块级公式用 `$$` 包裹 (类似于 Markdown 的代码块).'
-function GET_PROMPT(vars: Variable[], page: string, stat: string): string {
+	'你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. \n\n你将收到用户的提问、当前用户导入到软件中的数据集中的变量和数据的信息、PsychPen的文档、可以供你调用的工具 (函数) 信息. \n\n你的任务是按照用户的要求, 对用户进行回复或调用工具 (函数). 在调用工具 (函数) 前, 请确保你已经明确知晓了用户的意图, 否则请通过进一步和用户对话来确认细节. \n\n你的回复中如果包含数学公式和符号, 请使用 TeX 语法, 并将行内公式用 `$` 包裹 (类似于 Markdown 的行内代码), 将块级公式用 `$$` 包裹 (类似于 Markdown 的代码块).'
+function GET_PROMPT({
+	vars,
+	page,
+	stat,
+	filterExpression,
+	totalCount,
+	usableCount,
+}: {
+	vars: Variable[]
+	page: string
+	stat: string
+	filterExpression: string
+	totalCount: number
+	usableCount: number
+}) {
 	const varsInfo = vars.map((col) => {
 		if (col.type === '称名或等级数据') {
 			return `| ${col.name} | ${col.type} | ${col.valid} | ${col.missing} | ${col.missingValues ? col.missingValues.map((v) => `"${v}"`).join('、') : '(未定义缺失值)'} | ${col.unique} | - | - | - | - | - | - | - | - |`
@@ -58,8 +72,9 @@ function GET_PROMPT(vars: Variable[], page: string, stat: string): string {
 	})
 	const userText = `\n\n# 用户信息\n\n用户当前所处的页面为: ${page}${stat && `, 当前统计结果为: \n\n\`\`\`markdown\n${stat}\n\`\`\``}`
 	const varsText = `\n\n# 变量信息\n\n| 变量名 | 变量类型 | 有效值数量 | 缺失值数量 | 缺失值定义 | 唯一值数量 | 均值 | 标准差 | 中位数 (q2) | q1 | q3 | 最小值 | 最大值 | 子变量信息 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n${varsInfo.join('\n')}`
+	const dataText = `\n\n# 数据信息\n\n用户原始数据共包含 ${totalCount} 行数据, 经过筛选后剩余 ${usableCount} 行数据. 当前生效的筛选表达式为: \n\n\`\`\`markdown\n${filterExpression || '(无)'}\n\`\`\``
 	const docsText = `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\``
-	return INSTRUCTION + userText + varsText + docsText
+	return INSTRUCTION + userText + varsText + dataText + docsText
 }
 
 export function AI() {
@@ -76,6 +91,8 @@ export function AI() {
 
 	const data = useData((state) => state.data)
 	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const filterExpression = useData((state) => state.filterExpression)
 	const messageApi = useStates((state) => state.messageApi)
 	const statResult = useStates((state) => state.statResult)
 	const disabled = useStates((state) => state.disabled)
@@ -123,14 +140,14 @@ export function AI() {
 				setMessages([...old, user])
 				setInput('')
 			})
-			const system = GET_PROMPT(
-				dataCols,
-				currentPageInfo(),
-				statResult ||
-					(activeMainPage === MAIN_PAGES_LABELS.STATISTICS
-						? '(还未进行统计分析)'
-						: ''),
-			)
+			const system = GET_PROMPT({
+				vars: dataCols,
+				page: currentPageInfo(),
+				stat: statResult || (activeMainPage === MAIN_PAGES_LABELS.STATISTICS ? '(还未进行统计分析)' : '(无)'),
+				filterExpression: filterExpression,
+				totalCount: data?.length || Number.NaN,
+				usableCount: dataRows.length,
+			})
 			// 初始化消息数组和当前状态
 			let currentMessages: ChatCompletionMessageParam[] = [...old, user]
 			let hasToolCall = true
