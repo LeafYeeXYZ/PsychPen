@@ -18,7 +18,6 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { version } from '../package.json'
 import { AI } from './components/assistant/AI'
 import { Debug } from './components/widgets/Debug'
-import { useAssistant } from './hooks/useAssistant'
 import { useData } from './hooks/useData'
 import { MAIN_PAGES_LABELS, useNav } from './hooks/useNav'
 import { useStates } from './hooks/useStates'
@@ -132,7 +131,6 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 	const disabled = useStates((state) => state.disabled)
 	const activeMainPage = useNav((state) => state.activeMainPage)
 	const setMainPage = useNav((state) => state.setMainPage)
-	const ai = useAssistant((state) => state.ai)
 	return (
 		<header className='flex justify-center items-center relative py-3 px-4 bg-gray-100 shadow-md dark:bg-gray-900'>
 			<nav className='space-x-4'>
@@ -210,7 +208,7 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 				<Button
 					type='text'
 					icon={<CommentOutlined />}
-					disabled={data === null || disabled || ai === null}
+					disabled={disabled}
 					onClick={() => setShowAI(true)}
 				>
 					Ask AI

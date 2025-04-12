@@ -64,7 +64,7 @@ table.three-line-table {
 	--ag-active-color: #450d1a;
 }
 
-p.intro-text {
+.intro-text {
 	@apply text-base text-gray-700 leading-8 w-full text-center dark:text-white;
 }
 
