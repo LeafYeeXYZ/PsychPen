@@ -1,4 +1,4 @@
-import type { ChatCompletionMessageToolCall } from 'openai/resources/index.mjs'
+import type OpenAI from 'openai'
 import { useEffect, useState } from 'react'
 import { ExportDataTool } from '../../tools/components/data/ExportDataTool'
 import { NavToPageTool } from '../../tools/components/nav/NavToPageTool'
@@ -18,7 +18,7 @@ import type {
 export function ToolCall({
 	toolCall,
 }: {
-	toolCall: ChatCompletionMessageToolCall
+	toolCall: OpenAI.ChatCompletionMessageToolCall
 }) {
 	const id = toolCall.id
 	const name = toolCall.function.name

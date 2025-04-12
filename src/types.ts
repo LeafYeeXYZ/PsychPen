@@ -1,10 +1,10 @@
-import type { ChatCompletionTool } from 'openai/resources/index.mjs'
+import type OpenAI from 'openai'
 
 export const ALL_VARS_IDENTIFIER = '__ALL_VARIABLES__'
 
 export type AIFunction = {
 	label: string
-	tool: ChatCompletionTool
+	tool: OpenAI.ChatCompletionTool
 }
 
 export enum ALLOWED_INTERPOLATION_METHODS {

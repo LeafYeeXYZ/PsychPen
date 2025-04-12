@@ -10,11 +10,7 @@ import type { SenderRef } from '@ant-design/x/es/sender'
 import parseThink from '@leaf/parse-think'
 import { ExportTypes } from '@psych/sheet'
 import { Space } from 'antd'
-import type {
-	ChatCompletionMessageParam,
-	ChatCompletionMessageToolCall,
-	ChatCompletionUserMessageParam,
-} from 'openai/resources/index.mjs'
+import type OpenAI from 'openai'
 import { useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import readme from '../../../README.md?raw'
@@ -108,7 +104,7 @@ export function AI() {
 	const [input, setInput] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [showLoading, setShowLoading] = useState(false)
-	const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([])
+	const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>([])
 
 	// 数据被清除时重置对话
 	useEffect(() => {
@@ -130,7 +126,7 @@ export function AI() {
 		const old = JSON.parse(JSON.stringify(messages))
 		const snapshot = input
 		try {
-			const user: ChatCompletionUserMessageParam = {
+			const user: OpenAI.ChatCompletionUserMessageParam = {
 				role: 'user',
 				content: snapshot,
 			}
@@ -153,7 +149,7 @@ export function AI() {
 				usableCount: dataRows.length,
 			})
 			// 初始化消息数组和当前状态
-			let currentMessages: ChatCompletionMessageParam[] = [...old, user]
+			let currentMessages: OpenAI.ChatCompletionMessageParam[] = [...old, user]
 			let hasToolCall = true
 			// 使用while循环处理连续的函数调用
 			while (hasToolCall) {
@@ -170,7 +166,7 @@ export function AI() {
 					throw new Error('已取消本次请求')
 				}
 				let rawResponse = ''
-				let toolCall: ChatCompletionMessageToolCall | null = null
+				let toolCall: OpenAI.ChatCompletionMessageToolCall | null = null
 				for await (const chunk of stream) {
 					if (abortRef.current) {
 						throw new Error('已取消本次请求')
@@ -209,7 +205,7 @@ export function AI() {
 				}
 				// 处理函数调用
 				if (toolCall) {
-					const newMessages: ChatCompletionMessageParam[] = [
+					const newMessages: OpenAI.ChatCompletionMessageParam[] = [
 						{ role: 'assistant', content: '', tool_calls: [toolCall] },
 						{ role: 'tool', content: '', tool_call_id: toolCall.id },
 					]
