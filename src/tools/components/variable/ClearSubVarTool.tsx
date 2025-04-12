@@ -3,7 +3,8 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../../hooks/useData'
 import { useStates } from '../../../hooks/useStates'
 import { sleep } from '../../../lib/utils'
-import { funcs } from '../../../tools/tools'
+import { funcsLabel } from '../../../tools/tools'
+import { Funcs } from '../../enum'
 
 export function ClearSubVarTool({
 	done,
@@ -12,7 +13,7 @@ export function ClearSubVarTool({
 	variable_names,
 }: {
 	done: boolean
-	setDone: (done: boolean) => void
+	setDone?: (done: boolean) => void
 	id: string
 	variable_names: string[]
 }) {
@@ -27,10 +28,7 @@ export function ClearSubVarTool({
 			<div>
 				执行函数{' '}
 				<Tag color='blue' style={{ margin: 0 }}>
-					{
-						funcs.find((func) => func.tool.function.name === 'clear_sub_var')
-							?.label
-					}
+					{funcsLabel.get(Funcs.CLEAR_SUB_VAR)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}清除变量
 				{variable_names.map((name) => (
@@ -65,7 +63,7 @@ export function ClearSubVarTool({
 									return col
 								}),
 							)
-							setDone(true)
+							setDone?.(true)
 							sessionStorage.setItem(id, 'done')
 							messageApi?.destroy()
 							messageApi?.success(

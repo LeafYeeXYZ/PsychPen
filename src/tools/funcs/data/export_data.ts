@@ -1,12 +1,14 @@
 import { ExportTypes } from '@psych/sheet'
 import type { AIFunction } from '../../../types'
+import { Funcs } from '../../enum'
 
 export const export_data: AIFunction = {
+	name: Funcs.EXPORT_DATA,
 	label: '导出数据',
 	tool: {
 		type: 'function',
 		function: {
-			name: 'export_data',
+			name: Funcs.EXPORT_DATA,
 			description:
 				'你可以调用这个函数来帮助用户导出数据. 调用成功后, 浏览器会自动下载文件.',
 			parameters: {

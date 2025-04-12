@@ -3,13 +3,15 @@ import {
 	ALLOWED_INTERPOLATION_METHODS,
 	ALL_VARS_IDENTIFIER,
 } from '../../../types'
+import { Funcs } from '../../enum'
 
 export const define_interpolate: AIFunction = {
+	name: Funcs.DEFINE_INTERPOLATE,
 	label: '设置插值方法',
 	tool: {
 		type: 'function',
 		function: {
-			name: 'define_interpolate',
+			name: Funcs.DEFINE_INTERPOLATE,
 			description: '你可以调用这个函数来帮助用户设置插值方法',
 			parameters: {
 				type: 'object',
@@ -40,11 +42,12 @@ export const define_interpolate: AIFunction = {
 }
 
 export const clear_interpolate: AIFunction = {
+	name: Funcs.CLEAR_INTERPOLATE,
 	label: '清除插值方法',
 	tool: {
 		type: 'function',
 		function: {
-			name: 'clear_interpolate',
+			name: Funcs.CLEAR_INTERPOLATE,
 			description:
 				'你可以调用这个函数来帮助用户清除指定变量的插值方法 (即还原为默认方法-直接删除缺失值)',
 			parameters: {

@@ -1,8 +1,10 @@
 import type OpenAI from 'openai'
+import type { Funcs } from './tools/enum'
 
 export const ALL_VARS_IDENTIFIER = '__ALL_VARIABLES__'
 
 export type AIFunction = {
+	name: Funcs
 	label: string
 	tool: OpenAI.ChatCompletionTool
 }

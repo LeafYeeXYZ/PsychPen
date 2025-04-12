@@ -25,7 +25,8 @@ import {
 	useNav,
 } from '../../hooks/useNav'
 import { useStates } from '../../hooks/useStates'
-import { funcs } from '../../tools/tools'
+import { Funcs } from '../../tools/enum'
+import { funcsTools } from '../../tools/tools'
 import type { Variable } from '../../types'
 import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../../types'
 import { Messages } from './Messages'
@@ -104,7 +105,9 @@ export function AI() {
 	const [input, setInput] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [showLoading, setShowLoading] = useState(false)
-	const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>([])
+	const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>(
+		[],
+	)
 
 	// 数据被清除时重置对话
 	useEffect(() => {
@@ -160,7 +163,7 @@ export function AI() {
 					model: model,
 					messages: [{ role: 'system', content: system }, ...currentMessages],
 					stream: true,
-					tools: funcs.map((func) => func.tool),
+					tools: funcsTools,
 				})
 				if (abortRef.current) {
 					throw new Error('已取消本次请求')
@@ -211,7 +214,7 @@ export function AI() {
 					]
 					try {
 						switch (toolCall.function.name) {
-							case 'define_interpolate': {
+							case Funcs.DEFINE_INTERPOLATE: {
 								const { variable_names, method, reference_variable } =
 									JSON.parse(toolCall.function.arguments)
 								if (
@@ -249,7 +252,7 @@ export function AI() {
 									'已请求为指定变量设置插值方法, 等待用户手动确认'
 								break
 							}
-							case 'clear_interpolate': {
+							case Funcs.CLEAR_INTERPOLATE: {
 								const { variable_names } = JSON.parse(
 									toolCall.function.arguments,
 								)
@@ -271,7 +274,7 @@ export function AI() {
 									'已请求清除指定变量的插值方法, 等待用户手动确认'
 								break
 							}
-							case 'define_missing_value': {
+							case Funcs.DEFINE_MISSING_VALUE: {
 								const { variable_names, missing_values } = JSON.parse(
 									toolCall.function.arguments,
 								)
@@ -293,7 +296,7 @@ export function AI() {
 									'已请求为指定变量设置缺失值, 等待用户手动确认'
 								break
 							}
-							case 'clear_missing_value': {
+							case Funcs.CLEAR_MISSING_VALUE: {
 								const { variable_names } = JSON.parse(
 									toolCall.function.arguments,
 								)
@@ -312,7 +315,7 @@ export function AI() {
 									'已请求清除指定变量的缺失值定义, 等待用户手动确认'
 								break
 							}
-							case 'apply_filter': {
+							case Funcs.APPLY_FILTER: {
 								const { filter_expression } = JSON.parse(
 									toolCall.function.arguments,
 								)
@@ -323,7 +326,7 @@ export function AI() {
 									'已请求设置数据筛选规则, 等待用户手动确认'
 								break
 							}
-							case 'clear_sub_var': {
+							case Funcs.CLEAR_SUB_VAR: {
 								const { variable_names } = JSON.parse(
 									toolCall.function.arguments,
 								)
@@ -343,7 +346,7 @@ export function AI() {
 								newMessages[1].content = `已请求清除变量 ${(variable_names as string[]).map((name) => `"${name}"`).join('、')} 的所有子变量, 等待用户手动确认`
 								break
 							}
-							case 'create_sub_var': {
+							case Funcs.CREATE_SUB_VAR: {
 								const { variable_names, standardize, centralize, discretize } =
 									JSON.parse(toolCall.function.arguments)
 								if (
@@ -378,7 +381,7 @@ export function AI() {
 									.join('、')}子变量, 等待用户手动确认`
 								break
 							}
-							case 'create_new_var': {
+							case Funcs.CREATE_NEW_VAR: {
 								const { variable_name, calc_expression } = JSON.parse(
 									toolCall.function.arguments,
 								)
@@ -391,7 +394,7 @@ export function AI() {
 								newMessages[1].content = `已请求生成新变量"${variable_name}", 等待用户手动确认`
 								break
 							}
-							case 'export_data': {
+							case Funcs.EXPORT_DATA: {
 								const { file_name, file_type } = JSON.parse(
 									toolCall.function.arguments,
 								)
@@ -405,12 +408,12 @@ export function AI() {
 								newMessages[1].content = `已请求导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}", 等待用户手动确认`
 								break
 							}
-							case 'nav_to_data_view': {
+							case Funcs.NAV_TO_DATA_VIEW: {
 								setMainPage(MAIN_PAGES_LABELS.DATA)
 								newMessages[1].content = '已成功跳转到数据视图'
 								break
 							}
-							case 'nav_to_variable_view': {
+							case Funcs.NAV_TO_VARIABLE_VIEW: {
 								const { page } = JSON.parse(toolCall.function.arguments)
 								if (
 									!page ||
@@ -423,7 +426,7 @@ export function AI() {
 								newMessages[1].content = `已成功跳转到变量视图的${page}页面`
 								break
 							}
-							case 'nav_to_plots_view': {
+							case Funcs.NAV_TO_PLOTS_VIEW: {
 								const { page } = JSON.parse(toolCall.function.arguments)
 								if (
 									!page ||
@@ -436,7 +439,7 @@ export function AI() {
 								newMessages[1].content = `已成功跳转到绘图视图的${page}页面`
 								break
 							}
-							case 'nav_to_statistics_view': {
+							case Funcs.NAV_TO_STATISTICS_VIEW: {
 								const { page } = JSON.parse(toolCall.function.arguments)
 								if (
 									!page ||
@@ -449,7 +452,7 @@ export function AI() {
 								newMessages[1].content = `已成功跳转到统计视图的${page}页面`
 								break
 							}
-							case 'nav_to_tools_view': {
+							case Funcs.NAV_TO_TOOLS_VIEW: {
 								const { page } = JSON.parse(toolCall.function.arguments)
 								if (
 									!page ||

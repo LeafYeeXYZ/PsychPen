@@ -3,8 +3,9 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../../hooks/useData'
 import { useStates } from '../../../hooks/useStates'
 import { sleep } from '../../../lib/utils'
-import { funcs } from '../../../tools/tools'
+import { funcsLabel } from '../../../tools/tools'
 import { ALLOWED_DISCRETE_METHODS } from '../../../types'
+import { Funcs } from '../../enum'
 
 export function CreateSubVarTool({
 	done,
@@ -16,7 +17,7 @@ export function CreateSubVarTool({
 	discretize,
 }: {
 	done: boolean
-	setDone: (done: boolean) => void
+	setDone?: (done: boolean) => void
 	id: string
 	variable_names: string[]
 	standardize: boolean | undefined
@@ -46,10 +47,7 @@ export function CreateSubVarTool({
 			<div>
 				执行函数{' '}
 				<Tag color='blue' style={{ margin: 0 }}>
-					{
-						funcs.find((func) => func.tool.function.name === 'create_sub_var')
-							?.label
-					}
+					{funcsLabel.get(Funcs.CREATE_SUB_VAR)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}生成变量
 				{variable_names.map((name) => (
@@ -105,7 +103,7 @@ export function CreateSubVarTool({
 									return col
 								}),
 							)
-							setDone(true)
+							setDone?.(true)
 							sessionStorage.setItem(id, 'done')
 							messageApi?.destroy()
 							messageApi?.success(

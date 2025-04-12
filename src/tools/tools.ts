@@ -1,4 +1,5 @@
 import type { AIFunction } from '../types'
+import type { Funcs } from './enum'
 import { export_data } from './funcs/data/export_data'
 import { nav_to_data_view } from './funcs/nav/nav_to_data_view'
 import { nav_to_plots_view } from './funcs/nav/nav_to_plots_view'
@@ -17,7 +18,7 @@ import {
 	define_missing_value,
 } from './funcs/variable/missing_value'
 
-export const funcs: AIFunction[] = [
+const funcs: AIFunction[] = [
 	export_data,
 	nav_to_data_view,
 	nav_to_variable_view,
@@ -33,3 +34,7 @@ export const funcs: AIFunction[] = [
 	define_interpolate,
 	clear_interpolate,
 ]
+export const funcsTools = funcs.map((func) => func.tool)
+export const funcsLabel: Map<Funcs, AIFunction['label']> = new Map(
+	funcs.map((func) => [func.name, func.label]),
+)

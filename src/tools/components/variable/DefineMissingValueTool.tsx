@@ -3,8 +3,9 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../../hooks/useData'
 import { useStates } from '../../../hooks/useStates'
 import { sleep } from '../../../lib/utils'
-import { funcs } from '../../../tools/tools'
+import { funcsLabel } from '../../../tools/tools'
 import { ALL_VARS_IDENTIFIER } from '../../../types'
+import { Funcs } from '../../enum'
 
 export function DefineMissingValueTool({
 	done,
@@ -14,7 +15,7 @@ export function DefineMissingValueTool({
 	missing_values,
 }: {
 	done: boolean
-	setDone: (done: boolean) => void
+	setDone?: (done: boolean) => void
 	id: string
 	variable_names: string[]
 	missing_values: unknown[]
@@ -30,11 +31,7 @@ export function DefineMissingValueTool({
 			<div>
 				执行函数{' '}
 				<Tag color='blue' style={{ margin: 0 }}>
-					{
-						funcs.find(
-							(func) => func.tool.function.name === 'define_missing_value',
-						)?.label
-					}
+					{funcsLabel.get(Funcs.DEFINE_MISSING_VALUE)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}定义变量
 				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
@@ -82,7 +79,7 @@ export function DefineMissingValueTool({
 										missingValues: missing_values,
 									})),
 								)
-								setDone(true)
+								setDone?.(true)
 								sessionStorage.setItem(id, 'done')
 								messageApi?.destroy()
 								messageApi?.success(
@@ -100,7 +97,7 @@ export function DefineMissingValueTool({
 										return col
 									}),
 								)
-								setDone(true)
+								setDone?.(true)
 								sessionStorage.setItem(id, 'done')
 								messageApi?.destroy()
 								messageApi?.success(

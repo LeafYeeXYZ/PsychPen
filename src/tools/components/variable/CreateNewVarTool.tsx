@@ -4,7 +4,8 @@ import { Expression } from '../../../components/widgets/Expression'
 import { useData } from '../../../hooks/useData'
 import { useStates } from '../../../hooks/useStates'
 import { sleep } from '../../../lib/utils'
-import { funcs } from '../../../tools/tools'
+import { funcsLabel } from '../../../tools/tools'
+import { Funcs } from '../../enum'
 
 export function CreateNewVarTool({
 	done,
@@ -14,7 +15,7 @@ export function CreateNewVarTool({
 	calc_expression,
 }: {
 	done: boolean
-	setDone: (done: boolean) => void
+	setDone?: (done: boolean) => void
 	id: string
 	variable_name: string
 	calc_expression: string
@@ -29,10 +30,7 @@ export function CreateNewVarTool({
 			<div>
 				执行函数{' '}
 				<Tag color='blue' style={{ margin: 0 }}>
-					{
-						funcs.find((func) => func.tool.function.name === 'create_new_var')
-							?.label
-					}
+					{funcsLabel.get(Funcs.CREATE_NEW_VAR)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}生成新变量{' '}
 				<Tag style={{ margin: 0 }} color='blue'>
@@ -54,7 +52,7 @@ export function CreateNewVarTool({
 							isLargeData && (await sleep())
 							const timestamp = Date.now()
 							await addNewVar(variable_name, calc_expression)
-							setDone(true)
+							setDone?.(true)
 							sessionStorage.setItem(id, 'done')
 							messageApi?.destroy()
 							messageApi?.success(

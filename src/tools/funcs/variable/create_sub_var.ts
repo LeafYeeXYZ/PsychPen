@@ -1,12 +1,14 @@
 import type { AIFunction } from '../../../types'
 import { ALLOWED_DISCRETE_METHODS } from '../../../types'
+import { Funcs } from '../../enum'
 
 export const create_sub_var: AIFunction = {
+	name: Funcs.CREATE_SUB_VAR,
 	label: '生成子变量',
 	tool: {
 		type: 'function',
 		function: {
-			name: 'create_sub_var',
+			name: Funcs.CREATE_SUB_VAR,
 			description:
 				'你可以调用这个函数来帮助用户把指定变量的标准化/中心化/离散化子变量',
 			parameters: {
@@ -54,11 +56,12 @@ export const create_sub_var: AIFunction = {
 }
 
 export const clear_sub_var: AIFunction = {
+	name: Funcs.CLEAR_SUB_VAR,
 	label: '清除子变量',
 	tool: {
 		type: 'function',
 		function: {
-			name: 'clear_sub_var',
+			name: Funcs.CLEAR_SUB_VAR,
 			description: '你可以调用这个函数来帮助用户清除指定变量的所有子变量',
 			parameters: {
 				type: 'object',

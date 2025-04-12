@@ -3,8 +3,9 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../../hooks/useData'
 import { useStates } from '../../../hooks/useStates'
 import { sleep } from '../../../lib/utils'
-import { funcs } from '../../../tools/tools'
+import { funcsLabel } from '../../../tools/tools'
 import { ALL_VARS_IDENTIFIER } from '../../../types'
+import { Funcs } from '../../enum'
 
 export function ClearInterpolateTool({
 	done,
@@ -13,7 +14,7 @@ export function ClearInterpolateTool({
 	variable_names,
 }: {
 	done: boolean
-	setDone: (done: boolean) => void
+	setDone?: (done: boolean) => void
 	id: string
 	variable_names: string[]
 }) {
@@ -28,11 +29,7 @@ export function ClearInterpolateTool({
 			<div>
 				执行函数{' '}
 				<Tag color='blue' style={{ margin: 0 }}>
-					{
-						funcs.find(
-							(func) => func.tool.function.name === 'clear_interpolate',
-						)?.label
-					}
+					{funcsLabel.get(Funcs.CLEAR_INTERPOLATE)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}清除变量
 				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
@@ -77,7 +74,7 @@ export function ClearInterpolateTool({
 										return col
 									}),
 								)
-								setDone(true)
+								setDone?.(true)
 								sessionStorage.setItem(id, 'done')
 								messageApi?.destroy()
 								messageApi?.success(
@@ -96,7 +93,7 @@ export function ClearInterpolateTool({
 										return col
 									}),
 								)
-								setDone(true)
+								setDone?.(true)
 								sessionStorage.setItem(id, 'done')
 								messageApi?.destroy()
 								messageApi?.success(

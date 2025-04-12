@@ -1,11 +1,13 @@
 import { type AIFunction, ALL_VARS_IDENTIFIER } from '../../../types'
+import { Funcs } from '../../enum'
 
 export const define_missing_value: AIFunction = {
+	name: Funcs.DEFINE_MISSING_VALUE,
 	label: '定义缺失值',
 	tool: {
 		type: 'function',
 		function: {
-			name: 'define_missing_value',
+			name: Funcs.DEFINE_MISSING_VALUE,
 			description: '你可以调用这个函数来帮助用户定义缺失值',
 			parameters: {
 				type: 'object',
@@ -37,11 +39,12 @@ export const define_missing_value: AIFunction = {
 }
 
 export const clear_missing_value: AIFunction = {
+	name: Funcs.CLEAR_MISSING_VALUE,
 	label: '清除缺失值定义',
 	tool: {
 		type: 'function',
 		function: {
-			name: 'clear_missing_value',
+			name: Funcs.CLEAR_MISSING_VALUE,
 			description: '你可以调用这个函数来帮助用户清除指定变量的所有缺失值定义',
 			parameters: {
 				type: 'object',

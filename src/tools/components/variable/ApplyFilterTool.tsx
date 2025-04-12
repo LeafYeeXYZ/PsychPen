@@ -4,7 +4,8 @@ import { Expression } from '../../../components/widgets/Expression'
 import { useData } from '../../../hooks/useData'
 import { useStates } from '../../../hooks/useStates'
 import { sleep } from '../../../lib/utils'
-import { funcs } from '../../../tools/tools'
+import { funcsLabel } from '../../../tools/tools'
+import { Funcs } from '../../enum'
 
 export function ApplyFilterTool({
 	done,
@@ -13,7 +14,7 @@ export function ApplyFilterTool({
 	filter_expression,
 }: {
 	done: boolean
-	setDone: (done: boolean) => void
+	setDone?: (done: boolean) => void
 	id: string
 	filter_expression: string
 }) {
@@ -27,10 +28,7 @@ export function ApplyFilterTool({
 			<div>
 				执行函数{' '}
 				<Tag color='blue' style={{ margin: 0 }}>
-					{
-						funcs.find((func) => func.tool.function.name === 'apply_filter')
-							?.label
-					}
+					{funcsLabel.get(Funcs.APPLY_FILTER)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}设置数据筛选规则, 表达式如下:
 			</div>
@@ -48,7 +46,7 @@ export function ApplyFilterTool({
 							isLargeData && (await sleep())
 							const timestamp = Date.now()
 							await setFilterExpression(filter_expression)
-							setDone(true)
+							setDone?.(true)
 							sessionStorage.setItem(id, 'done')
 							messageApi?.destroy()
 							messageApi?.success(

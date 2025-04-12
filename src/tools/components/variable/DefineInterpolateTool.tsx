@@ -3,11 +3,12 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../../hooks/useData'
 import { useStates } from '../../../hooks/useStates'
 import { sleep } from '../../../lib/utils'
-import { funcs } from '../../../tools/tools'
+import { funcsLabel } from '../../../tools/tools'
 import {
 	type ALLOWED_INTERPOLATION_METHODS,
 	ALL_VARS_IDENTIFIER,
 } from '../../../types'
+import { Funcs } from '../../enum'
 
 export function DefineInterpolateTool({
 	done,
@@ -18,7 +19,7 @@ export function DefineInterpolateTool({
 	reference_variable,
 }: {
 	done: boolean
-	setDone: (done: boolean) => void
+	setDone?: (done: boolean) => void
 	id: string
 	variable_names: string[]
 	method: ALLOWED_INTERPOLATION_METHODS
@@ -35,11 +36,7 @@ export function DefineInterpolateTool({
 			<div>
 				执行函数{' '}
 				<Tag color='blue' style={{ margin: 0 }}>
-					{
-						funcs.find(
-							(func) => func.tool.function.name === 'define_interpolate',
-						)?.label
-					}
+					{funcsLabel.get(Funcs.DEFINE_INTERPOLATE)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}设置变量
 				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
@@ -95,7 +92,7 @@ export function DefineInterpolateTool({
 										return col
 									}),
 								)
-								setDone(true)
+								setDone?.(true)
 								sessionStorage.setItem(id, 'done')
 								messageApi?.destroy()
 								messageApi?.success(
@@ -114,7 +111,7 @@ export function DefineInterpolateTool({
 										return col
 									}),
 								)
-								setDone(true)
+								setDone?.(true)
 								sessionStorage.setItem(id, 'done')
 								messageApi?.destroy()
 								messageApi?.success(

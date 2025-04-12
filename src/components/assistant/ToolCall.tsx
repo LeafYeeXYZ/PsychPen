@@ -1,5 +1,5 @@
 import type OpenAI from 'openai'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ExportDataTool } from '../../tools/components/data/ExportDataTool'
 import { NavToPageTool } from '../../tools/components/nav/NavToPageTool'
 import { ApplyFilterTool } from '../../tools/components/variable/ApplyFilterTool'
@@ -10,6 +10,7 @@ import { CreateNewVarTool } from '../../tools/components/variable/CreateNewVarTo
 import { CreateSubVarTool } from '../../tools/components/variable/CreateSubVarTool'
 import { DefineInterpolateTool } from '../../tools/components/variable/DefineInterpolateTool'
 import { DefineMissingValueTool } from '../../tools/components/variable/DefineMissingValueTool'
+import { Funcs } from '../../tools/enum'
 import type {
 	ALLOWED_DISCRETE_METHODS,
 	ALLOWED_INTERPOLATION_METHODS,
@@ -27,35 +28,35 @@ export function ToolCall({
 	let element: React.ReactElement | null = null
 	const initDone = sessionStorage.getItem(id) === 'done'
 	switch (name) {
-		case 'apply_filter': {
+		case Funcs.APPLY_FILTER: {
 			const { filter_expression } = JSON.parse(args) as {
 				filter_expression: string
 			}
 			element = (
 				<ApplyFilterTool
-					done={done}
-					setDone={setDone}
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
 					id={id}
 					filter_expression={filter_expression}
 				/>
 			)
 			break
 		}
-		case 'clear_sub_var': {
+		case Funcs.CLEAR_SUB_VAR: {
 			const { variable_names } = JSON.parse(args) as {
 				variable_names: string[]
 			}
 			element = (
 				<ClearSubVarTool
-					done={done}
-					setDone={setDone}
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
 					id={id}
 					variable_names={variable_names}
 				/>
 			)
 			break
 		}
-		case 'create_sub_var': {
+		case Funcs.CREATE_SUB_VAR: {
 			const { variable_names, standardize, centralize, discretize } =
 				JSON.parse(args) as {
 					variable_names: string[]
@@ -70,8 +71,8 @@ export function ToolCall({
 				}
 			element = (
 				<CreateSubVarTool
-					done={done}
-					setDone={setDone}
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
 					id={id}
 					variable_names={variable_names}
 					standardize={standardize}
@@ -81,15 +82,15 @@ export function ToolCall({
 			)
 			break
 		}
-		case 'create_new_var': {
+		case Funcs.CREATE_NEW_VAR: {
 			const { variable_name, calc_expression } = JSON.parse(args) as {
 				variable_name: string
 				calc_expression: string
 			}
 			element = (
 				<CreateNewVarTool
-					done={done}
-					setDone={setDone}
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
 					id={id}
 					variable_name={variable_name}
 					calc_expression={calc_expression}
@@ -97,15 +98,15 @@ export function ToolCall({
 			)
 			break
 		}
-		case 'export_data': {
+		case Funcs.EXPORT_DATA: {
 			const { file_name, file_type } = JSON.parse(args) as {
 				file_name: string
 				file_type: string
 			}
 			element = (
 				<ExportDataTool
-					done={done}
-					setDone={setDone}
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
 					id={id}
 					file_name={file_name}
 					file_type={file_type}
@@ -113,39 +114,39 @@ export function ToolCall({
 			)
 			break
 		}
-		case 'nav_to_data_view': {
+		case Funcs.NAV_TO_DATA_VIEW: {
 			element = <NavToPageTool mainPageName='数据视图' />
 			break
 		}
-		case 'nav_to_variable_view': {
+		case Funcs.NAV_TO_VARIABLE_VIEW: {
 			const { page } = JSON.parse(args) as { page: string }
 			element = <NavToPageTool mainPageName='变量视图' subPageName={page} />
 			break
 		}
-		case 'nav_to_plots_view': {
+		case Funcs.NAV_TO_PLOTS_VIEW: {
 			const { page } = JSON.parse(args) as { page: string }
 			element = <NavToPageTool mainPageName='绘图视图' subPageName={page} />
 			break
 		}
-		case 'nav_to_statistics_view': {
+		case Funcs.NAV_TO_STATISTICS_VIEW: {
 			const { page } = JSON.parse(args) as { page: string }
 			element = <NavToPageTool mainPageName='统计视图' subPageName={page} />
 			break
 		}
-		case 'nav_to_tools_view': {
+		case Funcs.NAV_TO_TOOLS_VIEW: {
 			const { page } = JSON.parse(args) as { page: string }
 			element = <NavToPageTool mainPageName='工具视图' subPageName={page} />
 			break
 		}
-		case 'define_missing_value': {
+		case Funcs.DEFINE_MISSING_VALUE: {
 			const { variable_names, missing_values } = JSON.parse(args) as {
 				variable_names: string[]
 				missing_values: unknown[]
 			}
 			element = (
 				<DefineMissingValueTool
-					done={done}
-					setDone={setDone}
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
 					id={id}
 					variable_names={variable_names}
 					missing_values={missing_values}
@@ -153,21 +154,21 @@ export function ToolCall({
 			)
 			break
 		}
-		case 'clear_missing_value': {
+		case Funcs.CLEAR_MISSING_VALUE: {
 			const { variable_names } = JSON.parse(args) as {
 				variable_names: string[]
 			}
 			element = (
 				<ClearMissingValueTool
-					done={done}
-					setDone={setDone}
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
 					id={id}
 					variable_names={variable_names}
 				/>
 			)
 			break
 		}
-		case 'define_interpolate': {
+		case Funcs.DEFINE_INTERPOLATE: {
 			const { variable_names, method, reference_variable } = JSON.parse(
 				args,
 			) as {
@@ -177,8 +178,8 @@ export function ToolCall({
 			}
 			element = (
 				<DefineInterpolateTool
-					done={done}
-					setDone={setDone}
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
 					id={id}
 					variable_names={variable_names}
 					method={method}
@@ -187,14 +188,14 @@ export function ToolCall({
 			)
 			break
 		}
-		case 'clear_interpolate': {
+		case Funcs.CLEAR_INTERPOLATE: {
 			const { variable_names } = JSON.parse(args) as {
 				variable_names: string[]
 			}
 			element = (
 				<ClearInterpolateTool
-					done={done}
-					setDone={setDone}
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
 					id={id}
 					variable_names={variable_names}
 				/>
@@ -205,11 +206,5 @@ export function ToolCall({
 			throw new Error(`未知函数 (${toolCall.function.name})`)
 		}
 	}
-	// biome-ignore lint/correctness/useExhaustiveDependencies: 用于初始化, 无需持续监听
-	useEffect(() => {
-		if (initDone) {
-			setDone(true)
-		}
-	}, [])
 	return <div className='flex flex-col gap-3'>{element}</div>
 }

@@ -2,7 +2,8 @@ import { ExportTypes, downloadSheet } from '@psych/sheet'
 import { Button, Tag } from 'antd'
 import { useData } from '../../../hooks/useData'
 import { useStates } from '../../../hooks/useStates'
-import { funcs } from '../../../tools/tools'
+import { funcsLabel } from '../../../tools/tools'
+import { Funcs } from '../../enum'
 
 export function ExportDataTool({
 	done,
@@ -12,7 +13,7 @@ export function ExportDataTool({
 	file_type,
 }: {
 	done: boolean
-	setDone: (done: boolean) => void
+	setDone?: (done: boolean) => void
 	id: string
 	file_name: string
 	file_type: string
@@ -25,10 +26,7 @@ export function ExportDataTool({
 			<div>
 				执行函数{' '}
 				<Tag color='blue' style={{ margin: 0 }}>
-					{
-						funcs.find((func) => func.tool.function.name === 'export_data')
-							?.label
-					}
+					{funcsLabel.get(Funcs.EXPORT_DATA)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}导出数据到文件{' '}
 				<Tag style={{ margin: 0 }} color='blue'>
@@ -47,7 +45,7 @@ export function ExportDataTool({
 								: ExportTypes.XLSX,
 							file_name || undefined,
 						)
-						setDone(true)
+						setDone?.(true)
 						sessionStorage.setItem(id, 'done')
 						messageApi?.success(
 							`已成功导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}"`,

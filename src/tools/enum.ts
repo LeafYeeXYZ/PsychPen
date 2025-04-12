@@ -1,0 +1,16 @@
+export enum Funcs {
+	EXPORT_DATA = 'export_data',
+	NAV_TO_DATA_VIEW = 'nav_to_data_view',
+	NAV_TO_VARIABLE_VIEW = 'nav_to_variable_view',
+	NAV_TO_PLOTS_VIEW = 'nav_to_plots_view',
+	NAV_TO_STATISTICS_VIEW = 'nav_to_statistics_view',
+	NAV_TO_TOOLS_VIEW = 'nav_to_tools_view',
+	CREATE_NEW_VAR = 'create_new_var',
+	CREATE_SUB_VAR = 'create_sub_var',
+	CLEAR_SUB_VAR = 'clear_sub_var',
+	APPLY_FILTER = 'apply_filter',
+	DEFINE_MISSING_VALUE = 'define_missing_value',
+	CLEAR_MISSING_VALUE = 'clear_missing_value',
+	DEFINE_INTERPOLATE = 'define_interpolate',
+	CLEAR_INTERPOLATE = 'clear_interpolate',
+}

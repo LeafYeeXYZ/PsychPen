@@ -1,11 +1,13 @@
 import type { AIFunction } from '../../../types'
+import { Funcs } from '../../enum'
 
 export const create_new_var: AIFunction = {
+	name: Funcs.CREATE_NEW_VAR,
 	label: '生成新变量',
 	tool: {
 		type: 'function',
 		function: {
-			name: 'create_new_var',
+			name: Funcs.CREATE_NEW_VAR,
 			description: '你可以调用这个函数来帮助用户生成新变量',
 			parameters: {
 				type: 'object',
