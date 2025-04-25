@@ -13,4 +13,5 @@ export enum Funcs {
 	CLEAR_MISSING_VALUE = 'clear_missing_value',
 	DEFINE_INTERPOLATE = 'define_interpolate',
 	CLEAR_INTERPOLATE = 'clear_interpolate',
+	SIMPLE_MEDIATOR_TEST = 'simple_mediator_test',
 }

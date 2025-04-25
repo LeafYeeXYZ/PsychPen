@@ -1,5 +1,6 @@
 import type OpenAI from 'openai'
 import { useState } from 'react'
+import { DefaultTool } from '../../tools/components/DefaultTool'
 import { ExportDataTool } from '../../tools/components/data/ExportDataTool'
 import { NavToPageTool } from '../../tools/components/nav/NavToPageTool'
 import { ApplyFilterTool } from '../../tools/components/variable/ApplyFilterTool'
@@ -11,6 +12,7 @@ import { CreateSubVarTool } from '../../tools/components/variable/CreateSubVarTo
 import { DefineInterpolateTool } from '../../tools/components/variable/DefineInterpolateTool'
 import { DefineMissingValueTool } from '../../tools/components/variable/DefineMissingValueTool'
 import { Funcs } from '../../tools/enum'
+import { funcsLabel } from '../../tools/tools'
 import type {
 	ALLOWED_DISCRETE_METHODS,
 	ALLOWED_INTERPOLATION_METHODS,
@@ -203,7 +205,10 @@ export function ToolCall({
 			break
 		}
 		default: {
-			throw new Error(`未知函数 (${toolCall.function.name})`)
+			element = (
+				<DefaultTool label={funcsLabel.get(name as Funcs) ?? '未知函数'} />
+			)
+			break
 		}
 	}
 	return <div className='flex flex-col gap-3'>{element}</div>

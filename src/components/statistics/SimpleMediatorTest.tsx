@@ -19,6 +19,69 @@ type Option = {
 	B: number
 }
 
+export function simpleMediationTestCalculator(config: {
+	x: string
+	m: string
+	y: string
+	B: number
+	N: number
+	xData: number[]
+	mData: number[]
+	yData: number[]
+}): string {
+	const { x, m, y, B, N, xData, mData, yData } = config
+	const model = new SimpleMediationModel(xData, mData, yData)
+	const bs = model.bootstrap(B)
+	const es = model.effectSize
+	return `
+## 1 简单中介效应模型
+
+以"${x}"为自变量，"${m}"为中介变量，"${y}"为因变量构建简单中介效应模型.
+
+结果如表 1 所示.
+
+> 表 1 - 简单中介效应模型
+
+| 参数 | 值 | 统计量 (t) | 显著性 (p) | 95%置信区间 |
+| :---: | :---: | :---: | :---: | :---: |
+| c (x 对 y 的总效应) | ${markS(model.c)} | ${markS(model.cT, model.cP)} | ${markP(model.cP)} | [${markS(bs.c[0])}, ${markS(bs.c[1])}) |
+| c' (控制 m 后 x 对 y 的效应 / x 对 y 的直接效应) | ${markS(model.cPrime)} | ${markS(model.cPrimeT, model.cPrimeP)} | ${markP(model.cPrimeP)} | [${markS(bs.cPrime[0])}, ${markS(bs.cPrime[1])}) |
+| a (x 对 m 的效应) | ${markS(model.a)} | ${markS(model.aT, model.aP)} | ${markP(model.aP)} | [${markS(bs.a[0])}, ${markS(bs.a[1])}) |
+| b (控制 x 后 m 对 y 的效应) | ${markS(model.b)} | ${markS(model.bT, model.bP)} | ${markP(model.bP)} | [${markS(bs.b[0])}, ${markS(bs.b[1])}) |
+| ab (x 对 y 的中介效应) | ${markS(model.ab)} | - | - | [${markS(bs.ab[0])}, ${markS(bs.ab[1])}) |
+
+## 2 中介效应显著性检验
+
+样本量为 ${N}，Bootstrap 抽样次数为 ${B}. 依次检验法中 a、b 的显著性阈值为 0.025.
+
+结果如表 2 所示.
+
+> 表 2 - 中介效应显著性检验
+
+| 方法 | H<sub>0</sub> | 统计量 | 结果 |
+| :---: | :---: | :---: | :---: |
+| 依次检验法 | a = 0 或 b = 0 | p<sub>a</sub>: ${markS(model.aP)}, p<sub>b</sub>: ${markS(model.bP)} | ${
+		model.aP < 0.025 && model.bP < 0.025 ? '拒绝原假设' : '不通过'
+	} |
+| 非参数 Bootstrap 检验 | ab = 0 | 95%置信区间: [${markS(bs.ab[0])}, ${markS(bs.ab[1])}) | ${
+		bs.ab[0] > 0 || bs.ab[1] < 0 ? '拒绝原假设' : '不通过'
+	} |
+
+## 3 中介效应的效应量
+
+结果如表 3 所示.
+
+> 表 3 - 中介效应的效应量
+
+| 方法 | 结果 |
+| :---: | :---: |
+| P<sub>M</sub> = ab / c (中介效应占总效应的比例) | ${markS(es.PM)} |
+| R<sub>M</sub> = ab / c' (中介效应与直接效应之比) | ${markS(es.RM)} |
+| v<sup>2</sup> = a<sup>2</sup>b<sup>2</sup> | ${markS(es.v2)} |
+| 标准化的 ab | ${markS(es.standarizedAB())} |
+	`
+}
+
 export function SimpleMediatorTest() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
@@ -42,56 +105,18 @@ export function SimpleMediatorTest() {
 			const xData = filteredRows.map((row) => row[x]) as number[]
 			const mData = filteredRows.map((row) => row[m]) as number[]
 			const yData = filteredRows.map((row) => row[y]) as number[]
-			const model = new SimpleMediationModel(xData, mData, yData)
-			const bs = model.bootstrap(B)
-			const es = model.effectSize
-			setStatResult(`
-## 1 简单中介效应模型
-
-以"${x}"为自变量，"${m}"为中介变量，"${y}"为因变量构建简单中介效应模型.
-
-结果如表 1 所示.
-
-> 表 1 - 简单中介效应模型
-
-| 参数 | 值 | 统计量 (t) | 显著性 (p) | 95%置信区间 |
-| :---: | :---: | :---: | :---: | :---: |
-| c (x 对 y 的总效应) | ${markS(model.c)} | ${markS(model.cT, model.cP)} | ${markP(model.cP)} | [${markS(bs.c[0])}, ${markS(bs.c[1])}) |
-| c' (控制 m 后 x 对 y 的效应 / x 对 y 的直接效应) | ${markS(model.cPrime)} | ${markS(model.cPrimeT, model.cPrimeP)} | ${markP(model.cPrimeP)} | [${markS(bs.cPrime[0])}, ${markS(bs.cPrime[1])}) |
-| a (x 对 m 的效应) | ${markS(model.a)} | ${markS(model.aT, model.aP)} | ${markP(model.aP)} | [${markS(bs.a[0])}, ${markS(bs.a[1])}) |
-| b (控制 x 后 m 对 y 的效应) | ${markS(model.b)} | ${markS(model.bT, model.bP)} | ${markP(model.bP)} | [${markS(bs.b[0])}, ${markS(bs.b[1])}) |
-| ab (x 对 y 的中介效应) | ${markS(model.ab)} | - | - | [${markS(bs.ab[0])}, ${markS(bs.ab[1])}) |
-
-## 2 中介效应显著性检验
-
-样本量为 ${filteredRows.length}，Bootstrap 抽样次数为 ${B}. 依次检验法中 a、b 的显著性阈值为 0.025.
-
-结果如表 2 所示.
-
-> 表 2 - 中介效应显著性检验
-
-| 方法 | H<sub>0</sub> | 统计量 | 结果 |
-| :---: | :---: | :---: | :---: |
-| 依次检验法 | a = 0 或 b = 0 | p<sub>a</sub>: ${markS(model.aP)}, p<sub>b</sub>: ${markS(model.bP)} | ${
-				model.aP < 0.025 && model.bP < 0.025 ? '拒绝原假设' : '不通过'
-			} |
-| 非参数 Bootstrap 检验 | ab = 0 | 95%置信区间: [${markS(bs.ab[0])}, ${markS(bs.ab[1])}) | ${
-				bs.ab[0] > 0 || bs.ab[1] < 0 ? '拒绝原假设' : '不通过'
-			} |
-
-## 3 中介效应的效应量
-
-结果如表 3 所示.
-
-> 表 3 - 中介效应的效应量
-
-| 方法 | 结果 |
-| :---: | :---: |
-| P<sub>M</sub> = ab / c (中介效应占总效应的比例) | ${markS(es.PM)} |
-| R<sub>M</sub> = ab / c' (中介效应与直接效应之比) | ${markS(es.RM)} |
-| v<sup>2</sup> = a<sup>2</sup>b<sup>2</sup> | ${markS(es.v2)} |
-| 标准化的 ab | ${markS(es.standarizedAB())} |
-			`)
+			setStatResult(
+				simpleMediationTestCalculator({
+					x,
+					m,
+					y,
+					B,
+					N: filteredRows.length,
+					xData,
+					mData,
+					yData,
+				}),
+			)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {

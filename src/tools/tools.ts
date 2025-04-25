@@ -6,6 +6,7 @@ import { nav_to_plots_view } from './funcs/nav/nav_to_plots_view'
 import { nav_to_statistics_view } from './funcs/nav/nav_to_statistics_view'
 import { nav_to_tools_view } from './funcs/nav/nav_to_tools_view'
 import { nav_to_variable_view } from './funcs/nav/nav_to_variable_view'
+import { simple_mediator_test } from './funcs/statistics/simple_mediator_test'
 import { apply_filter } from './funcs/variable/apply_filter'
 import { create_new_var } from './funcs/variable/create_new_var'
 import { clear_sub_var, create_sub_var } from './funcs/variable/create_sub_var'
@@ -33,6 +34,7 @@ const funcs: AIFunction[] = [
 	clear_missing_value,
 	define_interpolate,
 	clear_interpolate,
+	simple_mediator_test,
 ]
 export const funcsTools = funcs.map((func) => func.tool)
 export const funcsLabel: Map<Funcs, AIFunction['label']> = new Map(

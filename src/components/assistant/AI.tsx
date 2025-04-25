@@ -9,7 +9,7 @@ import { Prompts, Sender } from '@ant-design/x'
 import type { SenderRef } from '@ant-design/x/es/sender'
 import parseThink from '@leaf/parse-think'
 import { ExportTypes } from '@psych/sheet'
-import { Space, Tag } from 'antd'
+import { Popover, Space, Tag } from 'antd'
 import type OpenAI from 'openai'
 import { useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -25,10 +25,12 @@ import {
 	useNav,
 } from '../../hooks/useNav'
 import { useStates } from '../../hooks/useStates'
+import { shortId, sleep } from '../../lib/utils'
 import { Funcs } from '../../tools/enum'
 import { funcsTools } from '../../tools/tools'
 import type { Variable } from '../../types'
 import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../../types'
+import { simpleMediationTestCalculator } from '../statistics/SimpleMediatorTest'
 import { Messages } from './Messages'
 
 const GREETTING =
@@ -96,9 +98,10 @@ export function AI() {
 	const [input, setInput] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [showLoading, setShowLoading] = useState(false)
-	const [messages, setMessages] = useState<OpenAI.ChatCompletionMessageParam[]>(
-		[],
-	)
+	const [messages, setMessages] = useState<
+		(OpenAI.ChatCompletionMessageParam & { id: string })[]
+	>([])
+	const [tokenUsage, setTokenUsage] = useState<number>(0)
 
 	// 数据被清除时重置对话
 	useEffect(() => {
@@ -117,12 +120,15 @@ export function AI() {
 	}
 	const onSubmit = async () => {
 		abortRef.current = false
-		const old = JSON.parse(JSON.stringify(messages))
+		const old = JSON.parse(
+			JSON.stringify(messages),
+		) as (OpenAI.ChatCompletionMessageParam & { id: string })[]
 		const snapshot = input
 		try {
-			const user: OpenAI.ChatCompletionUserMessageParam = {
+			const user: OpenAI.ChatCompletionUserMessageParam & { id: string } = {
 				role: 'user',
 				content: snapshot,
+				id: shortId(),
 			}
 			flushSync(() => {
 				setLoading(true)
@@ -143,7 +149,7 @@ export function AI() {
 				usableCount: dataRows.length,
 			})
 			// 初始化消息数组和当前状态
-			let currentMessages: OpenAI.ChatCompletionMessageParam[] = [...old, user]
+			let currentMessages = [...old, user]
 			let hasToolCall = true
 			// 使用while循环处理连续的函数调用
 			while (hasToolCall) {
@@ -155,9 +161,19 @@ export function AI() {
 				}
 				const stream = await ai.chat.completions.create({
 					model: model,
-					messages: [{ role: 'system', content: system }, ...currentMessages],
+					messages: [
+						{ role: 'system', content: system },
+						...(currentMessages.map((message) =>
+							Object.fromEntries(
+								Object.entries(message).filter(([key]) => key !== 'id'),
+							),
+						) as OpenAI.ChatCompletionMessageParam[]),
+					],
 					stream: true,
 					tools: funcsTools,
+					stream_options: {
+						include_usage: true,
+					}
 				})
 				if (abortRef.current) {
 					throw new Error('已取消本次请求')
@@ -167,6 +183,10 @@ export function AI() {
 				for await (const chunk of stream) {
 					if (abortRef.current) {
 						throw new Error('已取消本次请求')
+					}
+					if (chunk.usage) {
+						setTokenUsage(chunk.usage.total_tokens)
+						break
 					}
 					const delta = chunk.choices[0].delta
 					if (delta.tool_calls?.length) {
@@ -192,7 +212,7 @@ export function AI() {
 							setShowLoading(false)
 							setMessages([
 								...currentMessages,
-								{ role: 'assistant', content: rawResponse },
+								{ role: 'assistant', content: rawResponse, id: shortId() },
 							])
 						})
 					}
@@ -202,12 +222,76 @@ export function AI() {
 				}
 				// 处理函数调用
 				if (toolCall) {
-					const newMessages: OpenAI.ChatCompletionMessageParam[] = [
-						{ role: 'assistant', content: '', tool_calls: [toolCall] },
-						{ role: 'tool', content: '', tool_call_id: toolCall.id },
+					const newMessages: (OpenAI.ChatCompletionMessageParam & {
+						id: string
+					})[] = [
+						{
+							role: 'assistant',
+							content: '',
+							tool_calls: [toolCall],
+							id: shortId(),
+						},
+						{
+							role: 'tool',
+							content: '',
+							tool_call_id: toolCall.id,
+							id: shortId(),
+						},
 					]
 					try {
 						switch (toolCall.function.name) {
+							case Funcs.SIMPLE_MEDIATOR_TEST: {
+								const { x, m, y, B } = JSON.parse(toolCall.function.arguments)
+								if (
+									typeof x !== 'string' ||
+									typeof m !== 'string' ||
+									typeof y !== 'string' ||
+									typeof B !== 'number'
+								) {
+									throw new Error('参数错误')
+								}
+								if (
+									!dataCols.some((col) => col.name === x) ||
+									!dataCols.some((col) => col.name === m) ||
+									!dataCols.some((col) => col.name === y)
+								) {
+									throw new Error('变量名参数错误')
+								}
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const filteredRows = dataRows.filter((row) =>
+										[x, m, y].every(
+											(variable) => typeof row[variable] === 'number',
+										),
+									)
+									const xData = filteredRows.map((row) => row[x]) as number[]
+									const mData = filteredRows.map((row) => row[m]) as number[]
+									const yData = filteredRows.map((row) => row[y]) as number[]
+									const result = simpleMediationTestCalculator({
+										x,
+										m,
+										y,
+										B,
+										N: filteredRows.length,
+										xData,
+										mData,
+										yData,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
+							}
 							case Funcs.DEFINE_INTERPOLATE: {
 								const { variable_names, method, reference_variable } =
 									JSON.parse(toolCall.function.arguments)
@@ -478,7 +562,10 @@ export function AI() {
 				} else {
 					// 如果没有工具调用，处理普通响应
 					const { content } = parseThink(rawResponse)
-					setMessages([...currentMessages, { role: 'assistant', content }])
+					setMessages([
+						...currentMessages,
+						{ role: 'assistant', content, id: shortId() },
+					])
 					hasToolCall = false // 结束循环
 				}
 			}
@@ -638,10 +725,19 @@ export function AI() {
 					const { SendButton, LoadingButton, ClearButton } = info.components
 					return (
 						<Space size='small'>
+							<Popover
+							  trigger={['hover', 'click']}
+							  content={<span>
+								  上次 Tokens 使用量<Tag style={{ marginLeft: '0.3rem', marginRight: '0' }}>{tokenUsage}</Tag>
+								</span>}
+							>
+								<InfoCircleOutlined />
+							</Popover>
 							<ClearButton
 								disabled={loading || disabled || !messages.length}
 								onClick={() => {
 									setInput('')
+									setTokenUsage(0)
 									setMessages([])
 									messageApi?.success('已清空历史对话')
 								}}

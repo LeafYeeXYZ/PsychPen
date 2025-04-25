@@ -13,7 +13,7 @@ import type {
 } from 'openai/resources/index.mjs'
 import { useEffect, useRef } from 'react'
 import { useStates } from '../../hooks/useStates'
-import { shortId } from '../../lib/utils'
+import { Result } from '../widgets/Result'
 import { ToolCall } from './ToolCall'
 
 export function Messages({
@@ -24,12 +24,12 @@ export function Messages({
 	setMessages,
 	loading,
 }: {
-	messages: ChatCompletionMessageParam[]
+	messages: (ChatCompletionMessageParam & { id: string })[]
 	greeting: string
 	showLoading: boolean
 	setInput: React.Dispatch<React.SetStateAction<string>>
 	setMessages: React.Dispatch<
-		React.SetStateAction<ChatCompletionMessageParam[]>
+		React.SetStateAction<(ChatCompletionMessageParam & { id: string })[]>
 	>
 	loading: boolean
 }) {
@@ -42,9 +42,14 @@ export function Messages({
 	}, [messages])
 
 	const messagesToShow = [
-		{ role: 'assistant', content: greeting },
-		...messages.filter((message) => message.role !== 'tool'),
-		...(showLoading ? [{ role: 'assistant', content: '__loading__' }] : []),
+		{ role: 'assistant', content: greeting, id: 'messages_greeting' },
+		...messages.filter(
+			(message) =>
+				message.role !== 'tool' ||
+				(typeof message.content === 'string' &&
+					message.content.startsWith('##### 统计结果')),
+		),
+		...(showLoading ? [{ role: 'assistant', content: '__loading__', id: 'messages_loading' }] : []),
 	]
 
 	return (
@@ -57,12 +62,37 @@ export function Messages({
 					.tool_calls
 				return (
 					<Bubble
-						key={shortId()}
+						key={message.id}
 						className='w-full'
 						placement={message.role === 'user' ? 'end' : 'start'}
 						content={
 							tool_calls?.length ? (
 								<ToolCall toolCall={tool_calls[0]} />
+							) : message.role === 'tool' ? (
+								<div className='overflow-hidden'>
+									<div className='w-full'>
+										<Result result={message.content as string} fitHeight />
+									</div>
+									<div className='w-full mt-2'>
+										<Button
+											block
+											autoInsertSpace={false}
+											onClick={() => {
+												navigator.clipboard
+													.writeText(message.content as string)
+													.then(() => messageApi?.success('已复制结果到剪贴板'))
+													.catch((e) =>
+														messageApi?.error(
+															`复制失败: ${e instanceof Error ? e.message : String(e)}`,
+														),
+													)
+											}}
+										>
+											复制结果的 Markdown 文本
+										</Button>
+									</div>
+									<hr className='w-dvw opacity-0 h-0 p-0 m-0' />
+								</div>
 							) : (
 								<Typography>
 									<div
