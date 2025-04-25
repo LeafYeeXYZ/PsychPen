@@ -13,7 +13,7 @@ import { Popover, Space, Tag } from 'antd'
 import type OpenAI from 'openai'
 import { useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import readme from '../../../README.md?raw'
+import readme from '../../../README_FOR_AI.md?raw'
 import { useAssistant } from '../../hooks/useAssistant'
 import { useData } from '../../hooks/useData'
 import {
@@ -72,7 +72,9 @@ function GET_PROMPT({
 	const userText = `\n\n# 用户信息\n\n用户当前所处的页面为: ${page}${stat && `, 当前统计结果为: \n\n\`\`\`markdown\n${stat}\n\`\`\``}`
 	const varsText = `\n\n# 变量信息\n\n| 变量名 | 变量类型 | 有效值数量 | 缺失值数量 | 缺失值定义 | 唯一值数量 | 均值 | 标准差 | 中位数 (q2) | q1 | q3 | 最小值 | 最大值 | 子变量信息 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n${varsInfo.join('\n')}`
 	const dataText = `\n\n# 数据信息\n\n用户原始数据共包含 ${totalCount} 行数据, 经过筛选后剩余 ${usableCount} 行数据. 当前生效的筛选表达式为: \n\n\`\`\`markdown\n${filterExpression || '(无)'}\n\`\`\``
-	const docsText = `\n\n# 使用文档\n\n\`\`\`markdown\n${readme}\n\`\`\``
+	const docsText = `\n\n# 使用文档\n\n\`\`\`markdown\n${
+		readme.replace(/`/g, '\\`')
+	}\n\`\`\``
 	return INSTRUCTION + userText + varsText + dataText + docsText
 }
 
