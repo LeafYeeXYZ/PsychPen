@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.6.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.5.0...v2.6.0) (2025-04-26)
+
+
+### Features
+
+* 提供更详细的AI助手设置指引 ([6f5effa](https://github.com/LeafYeeXYZ/PsychPen/commit/6f5effa2eaaa9358d2f07f9195d0731e0224b069))
+* 优化表达式显示, 并将检查小括号匹配情况 ([755abf1](https://github.com/LeafYeeXYZ/PsychPen/commit/755abf19a5c147a07873bc9aa403283302c1d53e))
+* AI助手现在可以获取到过滤器信息 ([932690e](https://github.com/LeafYeeXYZ/PsychPen/commit/932690e39f42bead1a39211664b9295ee5fee75c))
+* AI助手现在可以直接操作简单中介效应分析, 并在聊天界面显示结果 ([95d70c0](https://github.com/LeafYeeXYZ/PsychPen/commit/95d70c08521302f6a039ffa2a8d2db63c50ce05c))
+* AI助手现在可以直接操作四种T检验 ([638e959](https://github.com/LeafYeeXYZ/PsychPen/commit/638e95983be125d60aa8c7172854d5ef37061625))
+
+
+### Bug Fixes
+
+* 修复部分图表的点大小设置宽度问题 ([03964e4](https://github.com/LeafYeeXYZ/PsychPen/commit/03964e49fc7d493c0e969340d76237dfac98d28d))
+
+
+### Improvements
+
+* 更新表格组件, 降低打包体积 ([0829dac](https://github.com/LeafYeeXYZ/PsychPen/commit/0829dace765d632548d81e1661d3c00368529836))
+* 减少函数调用组件的Effect ([5e963e1](https://github.com/LeafYeeXYZ/PsychPen/commit/5e963e1a8ca0514895e75b2d1d50923f314ee195))
+* 使用Ant Design兼容包恢复按钮波纹效果 ([56d69e6](https://github.com/LeafYeeXYZ/PsychPen/commit/56d69e6bdb628a2c8fcb5d3fc8af0ad81f2edd90))
+* 提升设置组件的稳定性 ([110a267](https://github.com/LeafYeeXYZ/PsychPen/commit/110a267bdc9487c45e9f00d536eedd56ea809813))
+* 优化输入给AI助手的文档, 降低推理成本 ([922ca98](https://github.com/LeafYeeXYZ/PsychPen/commit/922ca98aae592e40cb5d8534dac72aaeb904b54e))
+
 ## [2.5.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.4.0...v2.5.0) (2025-04-06)
 
 
