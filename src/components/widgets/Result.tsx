@@ -1,7 +1,10 @@
-import { renderStatResult } from '../../lib/utils'
 import { useRef } from 'react'
+import { renderStatResult } from '../../lib/utils'
 
-export function Result({ result, fitHeight }: { result: string, fitHeight?: boolean }) {
+export function Result({
+	result,
+	fitHeight,
+}: { result: string; fitHeight?: boolean }) {
 	const iframeRef = useRef<HTMLIFrameElement>(null)
 	return (
 		<iframe
@@ -10,7 +13,11 @@ export function Result({ result, fitHeight }: { result: string, fitHeight?: bool
 			className='w-full h-full'
 			title='statResult'
 			onLoad={() => {
-				if (fitHeight && iframeRef.current && iframeRef.current.parentElement instanceof HTMLElement) {
+				if (
+					fitHeight &&
+					iframeRef.current &&
+					iframeRef.current.parentElement instanceof HTMLElement
+				) {
 					iframeRef.current.parentElement.style.height = `calc(${iframeRef.current.contentWindow?.document.body.scrollHeight}px + 2rem)`
 					iframeRef.current.parentElement.style.overflow = 'hidden'
 				}

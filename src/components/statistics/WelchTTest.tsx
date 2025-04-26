@@ -21,6 +21,57 @@ type Option = {
 	alpha: number
 }
 
+export function welchTTestCalculator(config: {
+	dataVar: string
+	groupVar: string
+	expect: number
+	twoside: boolean
+	alpha: number
+	group1data: number[]
+	group2data: number[]
+	group1label: string
+	group2label: string
+}): string {
+	const {
+		dataVar,
+		groupVar,
+		expect,
+		twoside,
+		alpha,
+		group1data,
+		group2data,
+		group1label,
+		group2label,
+	} = config
+	const m = new T(group1data, group2data, twoside, expect, alpha)
+	return `
+## 1 Welch's T Test
+
+对被试间变量"${dataVar}" (分组变量: "${groupVar}") 进行${twoside ? '双尾' : '单尾'} Welch's T Test. 原假设 (H<sub>0</sub>) 为"均值差异 = ${expect}"; 显著性水平 (α) 为 ${alpha}.
+
+结果如表 1 所示.
+
+> 表 1 - Welch's T Test 结果
+
+| 均值差异 | 自由度 | t | p | ${markS(100 - alpha * 100)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| ${markS(m.meanDiff)} | ${markS(m.df)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${markS(m.ci[0])}, ${markS(m.ci[1])}) | ${markS(m.cohenD)} | ${markS(m.r2)} |
+
+## 2 描述统计
+
+对被试间变量"${dataVar}" (分组变量: "${groupVar}") 进行描述统计.
+
+结果如表 2 所示.
+
+> 表 2 - 描述统计结果
+
+| 组别 | 均值 | 标准差 | 样本量 | 自由度 |
+| :---: | :---: | :---: | :---: | :---: |
+| ${group1label} | ${markS(m.meanA)} | ${markS(m.stdA)} | ${m.dfA + 1} | ${m.dfA} |
+| ${group2label} | ${markS(m.meanB)} | ${markS(m.stdB)} | ${m.dfB + 1} | ${m.dfB} |
+	`
+}
+
 export function WelchTTest() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
@@ -53,33 +104,19 @@ export function WelchTTest() {
 					row[groupVar] == groups[1] && data2.push(row[dataVar])
 				}
 			}
-			const m = new T(data1, data2, twoside, expect, alpha)
-			setStatResult(`
-## 1 Welch's T Test
-
-对被试间变量"${dataVar}" (分组变量: "${groupVar}") 进行${twoside ? '双尾' : '单尾'} Welch's T Test. 原假设 (H<sub>0</sub>) 为"均值差异 = ${expect}"; 显著性水平 (α) 为 ${alpha}.
-
-结果如表 1 所示.
-
-> 表 1 - Welch's T Test 结果
-
-| 均值差异 | 自由度 | t | p | ${markS(100 - alpha * 100)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| ${markS(m.meanDiff)} | ${markS(m.df)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${markS(m.ci[0])}, ${markS(m.ci[1])}) | ${markS(m.cohenD)} | ${markS(m.r2)} |
-
-## 2 描述统计
-
-对被试间变量"${dataVar}" (分组变量: "${groupVar}") 进行描述统计.
-
-结果如表 2 所示.
-
-> 表 2 - 描述统计结果
-
-| 组别 | 均值 | 标准差 | 样本量 | 自由度 |
-| :---: | :---: | :---: | :---: | :---: |
-| ${groups[0]} | ${markS(m.meanA)} | ${markS(m.stdA)} | ${m.dfA + 1} | ${m.dfA} |
-| ${groups[1]} | ${markS(m.meanB)} | ${markS(m.stdB)} | ${m.dfB + 1} | ${m.dfB} |
-			`)
+			setStatResult(
+				welchTTestCalculator({
+					dataVar,
+					groupVar,
+					expect,
+					twoside,
+					alpha,
+					group1data: data1,
+					group2data: data2,
+					group1label: String(groups[0]),
+					group2label: String(groups[1]),
+				}),
+			)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {

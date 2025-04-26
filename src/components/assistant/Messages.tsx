@@ -49,7 +49,9 @@ export function Messages({
 				(typeof message.content === 'string' &&
 					message.content.startsWith('##### 统计结果')),
 		),
-		...(showLoading ? [{ role: 'assistant', content: '__loading__', id: 'messages_loading' }] : []),
+		...(showLoading
+			? [{ role: 'assistant', content: '__loading__', id: 'messages_loading' }]
+			: []),
 	]
 
 	return (

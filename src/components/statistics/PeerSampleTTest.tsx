@@ -21,6 +21,46 @@ type Option = {
 	alpha: number
 }
 
+export function peerSampleTTestCalculator(config: {
+	variable1: string
+	variable2: string
+	expect: number
+	twoside: boolean
+	alpha: number
+	data1: number[]
+	data2: number[]
+}): string {
+	const { variable1, variable2, expect, twoside, alpha, data1, data2 } = config
+	const m = new T(data1, data2, twoside, expect, alpha)
+	return `
+## 1 配对样本T检验
+
+对被试内变量"${variable1}"和"${variable2}"进行${twoside ? '双尾' : '单尾'}配对样本T检验 (Student's T Test). 原假设 (H<sub>0</sub>) 为"均值差异 = ${expect}"; 显著性水平 (α) 为 ${alpha}.
+
+结果如表 1 所示.
+
+> 表 1 - 配对样本T检验结果
+
+| 均值差异 | 自由度 | t | p | ${markS(100 - alpha * 100)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| ${markS(m.meanDiff)} | ${markS(m.df)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${markS(m.ci[0])}, ${markS(m.ci[1])}) | ${markS(m.cohenD)} | ${markS(m.r2)} |
+
+## 2 描述统计
+
+对被试内变量"${variable1}"和"${variable2}"进行描述统计.
+
+结果如表 2 所示.
+
+> 表 2 - 描述统计结果
+
+| 变量 | 均值 | 标准差 | 样本量 | 自由度 |
+| :---: | :---: | :---: | :---: | :---: |
+| ${variable1} | ${markS(m.meanA)} | ${markS(m.stdA)} | ${m.df + 1} | ${m.df} |
+| ${variable2} | ${markS(m.meanB)} | ${markS(m.stdB)} | ${m.df + 1} | ${m.df} |
+| 差异 | ${markS(m.meanDiff)} | ${markS(m.stdDiff)} | ${m.df + 1} | ${m.df} |
+	`
+}
+
 export function PeerSampleTTest() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
@@ -50,34 +90,17 @@ export function PeerSampleTTest() {
 					data2.push(row[variable2])
 				}
 			}
-			const m = new T(data1, data2, twoside, expect, alpha)
-			setStatResult(`
-## 1 配对样本T检验
-
-对被试内变量"${variable1}"和"${variable2}"进行${twoside ? '双尾' : '单尾'}配对样本T检验 (Student's T Test). 原假设 (H<sub>0</sub>) 为"均值差异 = ${expect}"; 显著性水平 (α) 为 ${alpha}.
-
-结果如表 1 所示.
-
-> 表 1 - 配对样本T检验结果
-
-| 均值差异 | 自由度 | t | p | ${markS(100 - alpha * 100)}%置信区间 | 效应量 (Cohen's d) | 测定系数 (R<sup>2</sup>) |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| ${markS(m.meanDiff)} | ${markS(m.df)} | ${markS(m.t, m.p)} | ${markP(m.p)} | [${markS(m.ci[0])}, ${markS(m.ci[1])}) | ${markS(m.cohenD)} | ${markS(m.r2)} |
-
-## 2 描述统计
-
-对被试内变量"${variable1}"和"${variable2}"进行描述统计.
-
-结果如表 2 所示.
-
-> 表 2 - 描述统计结果
-
-| 变量 | 均值 | 标准差 | 样本量 | 自由度 |
-| :---: | :---: | :---: | :---: | :---: |
-| ${variable1} | ${markS(m.meanA)} | ${markS(m.stdA)} | ${m.df + 1} | ${m.df} |
-| ${variable2} | ${markS(m.meanB)} | ${markS(m.stdB)} | ${m.df + 1} | ${m.df} |
-| 差异 | ${markS(m.meanDiff)} | ${markS(m.stdDiff)} | ${m.df + 1} | ${m.df} |
-			`)
+			setStatResult(
+				peerSampleTTestCalculator({
+					variable1,
+					variable2,
+					expect,
+					twoside,
+					alpha,
+					data1,
+					data2,
+				}),
+			)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {

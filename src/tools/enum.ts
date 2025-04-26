@@ -14,4 +14,8 @@ export enum Funcs {
 	DEFINE_INTERPOLATE = 'define_interpolate',
 	CLEAR_INTERPOLATE = 'clear_interpolate',
 	SIMPLE_MEDIATOR_TEST = 'simple_mediator_test',
+	WELCH_T_TEST = 'welch_t_test',
+	ONE_SAMPLE_T_TEST = 'one_sample_t_test',
+	PEER_SAMPLE_T_TEST = 'peer_sample_t_test',
+	TWO_SAMPLE_T_TEST = 'two_sample_t_test',
 }

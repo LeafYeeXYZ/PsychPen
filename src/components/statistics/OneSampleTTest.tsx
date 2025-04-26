@@ -19,29 +19,16 @@ type Option = {
 	alpha: number
 }
 
-export function OneSampleTTest() {
-	const dataCols = useData((state) => state.dataCols)
-	const dataRows = useData((state) => state.dataRows)
-	const isLargeData = useData((state) => state.isLargeData)
-	const messageApi = useStates((state) => state.messageApi)
-	const statResult = useStates((state) => state.statResult)
-	const setStatResult = useStates((state) => state.setStatResult)
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
-		setStatResult('')
-	}, [])
-	const [disabled, setDisabled] = useState<boolean>(false)
-	const handleCalculate = async (values: Option) => {
-		try {
-			messageApi?.loading('正在处理数据...', 0)
-			isLargeData && (await sleep())
-			const timestamp = Date.now()
-			const { variable, expect, twoside, alpha } = values
-			const data = dataRows
-				.map((row) => row[variable])
-				.filter((v) => typeof v === 'number')
-			const m = new T(data, expect, twoside, alpha)
-			setStatResult(`
+export function oneSampleTTestCalculator(config: {
+	variable: string
+	expect: number
+	twoside: boolean
+	alpha: number
+	data: number[]
+}): string {
+	const { variable, expect, twoside, alpha, data } = config
+	const m = new T(data, expect, twoside, alpha)
+	return `
 ## 1 单样本T检验
 
 对变量"${variable}"进行${twoside ? '双尾' : '单尾'}单样本T检验 (Student's T Test). 原假设 (H<sub>0</sub>) 为"均值 = ${expect}"; 显著性水平 (α) 为 ${alpha}.
@@ -65,7 +52,33 @@ export function OneSampleTTest() {
 | 均值 | 标准差 | 样本量 | 自由度 |
 | :---: | :---: | :---: | :---: |
 | ${markS(m.mean)} | ${markS(m.std)} | ${m.df + 1} | ${m.df} |
-			`)
+	`
+}
+
+export function OneSampleTTest() {
+	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		setStatResult('')
+	}, [])
+	const [disabled, setDisabled] = useState<boolean>(false)
+	const handleCalculate = async (values: Option) => {
+		try {
+			messageApi?.loading('正在处理数据...', 0)
+			isLargeData && (await sleep())
+			const timestamp = Date.now()
+			const { variable, expect, twoside, alpha } = values
+			const data = dataRows
+				.map((row) => row[variable])
+				.filter((v) => typeof v === 'number')
+			setStatResult(
+				oneSampleTTestCalculator({ variable, expect, twoside, alpha, data }),
+			)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {

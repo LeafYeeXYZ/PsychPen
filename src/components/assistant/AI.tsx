@@ -1,5 +1,6 @@
 import {
 	BankOutlined,
+	BoxPlotOutlined,
 	ExportOutlined,
 	FilterOutlined,
 	InfoCircleOutlined,
@@ -30,7 +31,11 @@ import { Funcs } from '../../tools/enum'
 import { funcsTools } from '../../tools/tools'
 import type { Variable } from '../../types'
 import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../../types'
+import { oneSampleTTestCalculator } from '../statistics/OneSampleTTest'
+import { peerSampleTTestCalculator } from '../statistics/PeerSampleTTest'
 import { simpleMediationTestCalculator } from '../statistics/SimpleMediatorTest'
+import { twoSampleTTestCalculator } from '../statistics/TwoSampleTTest'
+import { welchTTestCalculator } from '../statistics/WelchTTest'
 import { Messages } from './Messages'
 
 const GREETTING =
@@ -72,9 +77,10 @@ function GET_PROMPT({
 	const userText = `\n\n# 用户信息\n\n用户当前所处的页面为: ${page}${stat && `, 当前统计结果为: \n\n\`\`\`markdown\n${stat}\n\`\`\``}`
 	const varsText = `\n\n# 变量信息\n\n| 变量名 | 变量类型 | 有效值数量 | 缺失值数量 | 缺失值定义 | 唯一值数量 | 均值 | 标准差 | 中位数 (q2) | q1 | q3 | 最小值 | 最大值 | 子变量信息 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n${varsInfo.join('\n')}`
 	const dataText = `\n\n# 数据信息\n\n用户原始数据共包含 ${totalCount} 行数据, 经过筛选后剩余 ${usableCount} 行数据. 当前生效的筛选表达式为: \n\n\`\`\`markdown\n${filterExpression || '(无)'}\n\`\`\``
-	const docsText = `\n\n# 使用文档\n\n\`\`\`markdown\n${
-		readme.replace(/`/g, '\\`')
-	}\n\`\`\``
+	const docsText = `\n\n# 使用文档\n\n\`\`\`markdown\n${readme.replace(
+		/`/g,
+		'\\`',
+	)}\n\`\`\``
 	return INSTRUCTION + userText + varsText + dataText + docsText
 }
 
@@ -112,6 +118,12 @@ export function AI() {
 			setMessages([])
 		}
 	}, [data])
+	// 对话被清除时重置Tokens用量
+	useEffect(() => {
+		if (messages.length === 0) {
+			setTokenUsage(0)
+		}
+	}, [messages])
 
 	const abortRef = useRef<boolean>(false)
 	const onCancel = async () => {
@@ -175,7 +187,7 @@ export function AI() {
 					tools: funcsTools,
 					stream_options: {
 						include_usage: true,
-					}
+					},
 				})
 				if (abortRef.current) {
 					throw new Error('已取消本次请求')
@@ -242,6 +254,199 @@ export function AI() {
 					]
 					try {
 						switch (toolCall.function.name) {
+							case Funcs.PEER_SAMPLE_T_TEST: {
+								const { variable1, variable2, expect, twoside, alpha } =
+									JSON.parse(toolCall.function.arguments)
+								if (
+									typeof variable1 !== 'string' ||
+									typeof variable2 !== 'string' ||
+									typeof expect !== 'number' ||
+									typeof twoside !== 'boolean' ||
+									typeof alpha !== 'number'
+								) {
+									throw new Error('参数错误')
+								}
+								if (
+									!dataCols.some(
+										(col) =>
+											col.name === variable1 && col.type === '等距或等比数据',
+									) ||
+									!dataCols.some(
+										(col) =>
+											col.name === variable2 && col.type === '等距或等比数据',
+									)
+								) {
+									throw new Error('变量名参数错误')
+								}
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const filteredRows = dataRows.filter((row) =>
+										[variable1, variable2].every(
+											(variable) => typeof row[variable] === 'number',
+										),
+									)
+									const data1 = filteredRows.map(
+										(row) => row[variable1],
+									) as number[]
+									const data2 = filteredRows.map(
+										(row) => row[variable2],
+									) as number[]
+									const result = peerSampleTTestCalculator({
+										variable1,
+										variable2,
+										expect,
+										twoside,
+										alpha,
+										data1,
+										data2,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
+							}
+							case Funcs.WELCH_T_TEST:
+							case Funcs.TWO_SAMPLE_T_TEST: {
+								const { dataVar, groupVar, expect, twoside, alpha } =
+									JSON.parse(toolCall.function.arguments)
+								if (
+									typeof dataVar !== 'string' ||
+									typeof groupVar !== 'string' ||
+									typeof expect !== 'number' ||
+									typeof twoside !== 'boolean' ||
+									typeof alpha !== 'number'
+								) {
+									throw new Error('参数错误')
+								}
+								if (
+									!dataCols.some(
+										(col) =>
+											col.name === dataVar && col.type === '等距或等比数据',
+									) ||
+									!dataCols.some(
+										(col) => col.name === groupVar && col.unique === 2,
+									)
+								) {
+									throw new Error('变量名参数错误')
+								}
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const group1data: number[] = []
+									const group2data: number[] = []
+									const [group1label, group2label] = Array.from(
+										new Set(
+											dataRows
+												.map((value) => value[groupVar])
+												.filter((v) => v !== undefined),
+										).values(),
+									)
+									for (const row of dataRows) {
+										if (
+											typeof row[dataVar] === 'number' &&
+											typeof row[groupVar] !== 'undefined'
+										) {
+											row[groupVar] == group1label &&
+												group1data.push(row[dataVar])
+											row[groupVar] == group2label &&
+												group2data.push(row[dataVar])
+										}
+									}
+									const result =
+										toolCall.function.name === Funcs.WELCH_T_TEST
+											? welchTTestCalculator({
+													dataVar,
+													groupVar,
+													expect,
+													twoside,
+													alpha,
+													group1data,
+													group2data,
+													group1label: String(group1label),
+													group2label: String(group2label),
+												})
+											: twoSampleTTestCalculator({
+													dataVar,
+													groupVar,
+													expect,
+													twoside,
+													alpha,
+													group1data,
+													group2data,
+													group1label: String(group1label),
+													group2label: String(group2label),
+												})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
+							}
+							case Funcs.ONE_SAMPLE_T_TEST: {
+								const { variable, expect, twoside, alpha } = JSON.parse(
+									toolCall.function.arguments,
+								)
+								if (
+									typeof variable !== 'string' ||
+									typeof expect !== 'number' ||
+									typeof twoside !== 'boolean' ||
+									typeof alpha !== 'number'
+								) {
+									throw new Error('参数错误')
+								}
+								if (
+									!dataCols.some(
+										(col) =>
+											col.name === variable && col.type === '等距或等比数据',
+									)
+								) {
+									throw new Error('变量名参数错误')
+								}
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const data = dataRows
+										.map((row) => row[variable])
+										.filter((v) => typeof v === 'number')
+									const result = oneSampleTTestCalculator({
+										variable,
+										expect,
+										twoside,
+										alpha,
+										data,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
+							}
 							case Funcs.SIMPLE_MEDIATOR_TEST: {
 								const { x, m, y, B } = JSON.parse(toolCall.function.arguments)
 								if (
@@ -253,9 +458,15 @@ export function AI() {
 									throw new Error('参数错误')
 								}
 								if (
-									!dataCols.some((col) => col.name === x) ||
-									!dataCols.some((col) => col.name === m) ||
-									!dataCols.some((col) => col.name === y)
+									!dataCols.some(
+										(col) => col.name === x && col.type === '等距或等比数据',
+									) ||
+									!dataCols.some(
+										(col) => col.name === m && col.type === '等距或等比数据',
+									) ||
+									!dataCols.some(
+										(col) => col.name === y && col.type === '等距或等比数据',
+									)
 								) {
 									throw new Error('变量名参数错误')
 								}
@@ -584,6 +795,7 @@ export function AI() {
 	// 给 <Prompts /> 用的
 	const senderRef = useRef<SenderRef>(null)
 	const numberCol = dataCols.find((col) => col.type === '等距或等比数据')
+
 	return !data ? (
 		<div className='w-full h-full flex items-center justify-center text-base font-bold'>
 			<InfoCircleOutlined style={{ marginRight: '0.3rem' }} />
@@ -690,6 +902,12 @@ export function AI() {
 										label: '处理数据',
 										description: `请帮我筛选出"${numberCol.name}"在三个标准差以内的数据`,
 									},
+									{
+										key: 'ttest',
+										icon: <BoxPlotOutlined />,
+										label: '统计检验',
+										description: `请帮我进行对变量"${numberCol.name}"进行单样本t检验`,
+									},
 								]
 							: []),
 						{
@@ -702,7 +920,7 @@ export function AI() {
 							key: 'jump',
 							icon: <MoreOutlined />,
 							label: '跳转页面',
-							description: '我想去做个中介效应分析',
+							description: '我想去体验一下T分布动态演示',
 						},
 						{
 							key: 'export',
@@ -728,10 +946,15 @@ export function AI() {
 					return (
 						<Space size='small'>
 							<Popover
-							  trigger={['hover', 'click']}
-							  content={<span>
-								  上次 Tokens 使用量<Tag style={{ marginLeft: '0.3rem', marginRight: '0' }}>{tokenUsage}</Tag>
-								</span>}
+								trigger={['hover', 'click']}
+								content={
+									<span>
+										当前 Tokens 使用量
+										<Tag style={{ marginLeft: '0.3rem', marginRight: '0' }}>
+											{tokenUsage}
+										</Tag>
+									</span>
+								}
 							>
 								<InfoCircleOutlined />
 							</Popover>
@@ -739,7 +962,6 @@ export function AI() {
 								disabled={loading || disabled || !messages.length}
 								onClick={() => {
 									setInput('')
-									setTokenUsage(0)
 									setMessages([])
 									messageApi?.success('已清空历史对话')
 								}}
