@@ -18,50 +18,38 @@ const openaiEndpoint = localStorage.getItem('openaiEndpoint') ?? ''
 const openaiApiKey = localStorage.getItem('openaiApiKey') ?? ''
 const openaiModelName = localStorage.getItem('openaiModelName') ?? ''
 const openaiEnable = localStorage.getItem('openaiEnable') === 'true'
-
-async function getAI(
-	enable: boolean,
-	endpoint: string,
-	apiKey: string,
-	model: string,
-): Promise<OpenAI> {
-	if (!enable) {
-		throw new Error('请先开启AI辅助分析')
-	}
-	if (!endpoint) {
-		throw new Error('请填写AI服务地址')
-	}
-	if (!apiKey) {
-		throw new Error('请填写AI服务密钥')
-	}
-	if (!model) {
-		throw new Error('请填写AI模型ID')
-	}
-	const ai = new OpenAI({
-		baseURL: endpoint,
-		apiKey,
-		dangerouslyAllowBrowser: true,
-	})
-	const models = await ai.models.list()
-	if (!models.data.some((m) => m.id === model)) {
-		throw new Error('AI模型ID不正确')
-	}
-	return ai
-}
-
-let ai: OpenAI | null = null
-try {
-	ai = await getAI(openaiEnable, openaiEndpoint, openaiApiKey, openaiModelName)
-} catch {
-	ai = null
-}
+const ai: OpenAI | null =
+	openaiEnable && openaiApiKey && openaiEndpoint && openaiModelName
+		? new OpenAI({
+				baseURL: openaiEndpoint,
+				apiKey: openaiApiKey,
+				dangerouslyAllowBrowser: true,
+			})
+		: null
 
 export const useAssistant = create<AssistantState>()((set, get) => {
 	return {
 		_DataView_validate: async () => {
 			const { openaiEnable, openaiEndpoint, openaiApiKey, model } = get()
-			const ai = await getAI(openaiEnable, openaiEndpoint, openaiApiKey, model)
-			set({ ai })
+			if (!openaiEnable) {
+				throw new Error('请先开启AI辅助分析')
+			}
+			if (!openaiEndpoint) {
+				throw new Error('请填写要使用的AI服务的API地址')
+			}
+			if (!openaiApiKey) {
+				throw new Error('请填写要使用的AI服务的API密钥')
+			}
+			if (!model) {
+				throw new Error('请填写要使用的AI模型名称ID')
+			}
+			set({
+				ai: new OpenAI({
+					baseURL: openaiEndpoint,
+					apiKey: openaiApiKey,
+					dangerouslyAllowBrowser: true,
+				}),
+			})
 		},
 		openaiEndpoint,
 		openaiApiKey,

@@ -41,35 +41,85 @@ export function ConfigAI() {
 				/>
 			</div>
 			<p className='w-full text-left pl-1'>
-				API 地址 <Tag>baseUrl</Tag>
+				AI 服务提供商 API 地址
 				<Popover
+					trigger={['click', 'hover']}
 					content={
 						<div className='flex flex-col gap-1'>
-							<div>请填写各大模型提供商的 OpenAI 兼容 API 地址</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>DeepSeek</Tag> 是{' '}
-								<Tag style={{ margin: 0 }}>https://api.deepseek.com/v1</Tag>
+								对于 <Tag style={{ margin: 0 }}>DeepSeek开放平台</Tag> 是{' '}
+								<Button
+									type='text'
+									size='small'
+									onClick={() =>
+										_DataView_setOpenaiEndpoint('https://api.deepseek.com/v1')
+									}
+								>
+									<Tag style={{ margin: 0 }} color='blue'>
+										https://api.deepseek.com/v1
+									</Tag>
+								</Button>
+								(点击填入)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>Qwen</Tag> 是{' '}
-								<Tag style={{ margin: 0 }}>
-									https://dashscope.aliyuncs.com/compatible-mode/v1
-								</Tag>
+								对于 <Tag style={{ margin: 0 }}>硅基流动</Tag> 是{' '}
+								<Button
+									type='text'
+									size='small'
+									onClick={() =>
+										_DataView_setOpenaiEndpoint('https://api.siliconflow.cn/v1')
+									}
+								>
+									<Tag style={{ margin: 0 }} color='blue'>
+										https://api.siliconflow.cn/v1
+									</Tag>
+								</Button>
+								(点击填入)
+							</div>
+							<div>
+								对于 <Tag style={{ margin: 0 }}>阿里云百炼</Tag> 是{' '}
+								<Button
+									type='text'
+									size='small'
+									onClick={() =>
+										_DataView_setOpenaiEndpoint(
+											'https://dashscope.aliyuncs.com/compatible-mode/v1',
+										)
+									}
+								>
+									<Tag style={{ margin: 0 }} color='blue'>
+										https://dashscope.aliyuncs.com/compatible-mode/v1
+									</Tag>
+								</Button>
+								(点击填入)
 							</div>
 							<div>
 								对于 <Tag style={{ margin: 0 }}>OpenAI</Tag> 是{' '}
-								<Tag style={{ margin: 0 }}>https://api.openai.com/v1</Tag>
+								<Button
+									type='text'
+									size='small'
+									onClick={() =>
+										_DataView_setOpenaiEndpoint('https://api.openai.com/v1')
+									}
+								>
+									<Tag style={{ margin: 0 }} color='blue'>
+										https://api.openai.com/v1
+									</Tag>
+								</Button>
+								(点击填入)
 							</div>
 						</div>
 					}
 				>
-					<InfoCircleOutlined />
+					<Tag style={{ marginLeft: '0.3rem' }} className='cursor-pointer'>
+						<InfoCircleOutlined /> 常见提供商地址
+					</Tag>
 				</Popover>
 			</p>
 			<div className='mb-2'>
 				<Input
 					placeholder='请输入OpenAI兼容API端点 (baseUrl)'
-					defaultValue={openaiEndpoint}
+					value={openaiEndpoint}
 					disabled={!openaiEnable}
 					onChange={(e) => {
 						_DataView_setOpenaiEndpoint(e.target.value ?? '')
@@ -77,12 +127,83 @@ export function ConfigAI() {
 				/>
 			</div>
 			<p className='w-full text-left pl-1'>
-				API 密钥 <Tag>apiKey</Tag>
+				AI 服务提供商 API 密钥
+				<Popover
+					trigger={['click', 'hover']}
+					content={
+						<div className='flex flex-col gap-1'>
+							<div>
+								对于 <Tag style={{ margin: 0 }}>DeepSeek开放平台</Tag> 是{' '}
+								<a
+									href='https://platform.deepseek.com/api_keys'
+									target='_blank'
+									rel='noreferrer'
+								>
+									<Button type='text' size='small'>
+										<Tag style={{ margin: 0 }} color='blue'>
+											https://platform.deepseek.com/api_keys
+										</Tag>
+									</Button>
+								</a>
+								(点击跳转)
+							</div>
+							<div>
+								对于 <Tag style={{ margin: 0 }}>硅基流动</Tag> 是{' '}
+								<a
+									href='https://cloud.siliconflow.cn/account/ak'
+									target='_blank'
+									rel='noreferrer'
+								>
+									<Button type='text' size='small'>
+										<Tag style={{ margin: 0 }} color='blue'>
+											https://cloud.siliconflow.cn/account/ak
+										</Tag>
+									</Button>
+								</a>
+								(点击跳转)
+							</div>
+							<div>
+								对于 <Tag style={{ margin: 0 }}>阿里云百炼</Tag> 是{' '}
+								<a
+									href='https://bailian.console.aliyun.com/?apiKey=1#/api-key'
+									target='_blank'
+									rel='noreferrer'
+								>
+									<Button type='text' size='small'>
+										<Tag style={{ margin: 0 }} color='blue'>
+											https://bailian.console.aliyun.com/?apiKey=1#/api-key
+										</Tag>
+									</Button>
+								</a>
+								(点击跳转)
+							</div>
+							<div>
+								对于 <Tag style={{ margin: 0 }}>OpenAI</Tag> 是{' '}
+								<a
+									href='https://platform.openai.com/api-keys'
+									target='_blank'
+									rel='noreferrer'
+								>
+									<Button type='text' size='small'>
+										<Tag style={{ margin: 0 }} color='blue'>
+											https://platform.openai.com/api-keys
+										</Tag>
+									</Button>
+								</a>
+								(点击跳转)
+							</div>
+						</div>
+					}
+				>
+					<Tag style={{ marginLeft: '0.3rem' }} className='cursor-pointer'>
+						<InfoCircleOutlined /> 常见密钥获取地址
+					</Tag>
+				</Popover>
 			</p>
 			<div className='mb-2'>
 				<Input.Password
 					placeholder='请输入OpenAI兼容API密钥 (apiKey)'
-					defaultValue={openaiApiKey}
+					value={openaiApiKey}
 					disabled={!openaiEnable}
 					onChange={(e) => {
 						_DataView_setOpenaiApiKey(e.target.value ?? '')
@@ -90,37 +211,76 @@ export function ConfigAI() {
 				/>
 			</div>
 			<p className='w-full text-left pl-1'>
-				AI 模型名称 <Tag>modelId</Tag>
+				AI 模型名称
 				<Popover
 					content={
 						<div className='flex flex-col gap-1'>
 							<div>
-								请填写您所使用的 AI 模型的 ID (模型必须支持{' '}
-								<Tag style={{ margin: 0 }}>Function Calling</Tag> 功能)
+								对于 <Tag style={{ margin: 0 }}>DeepSeek开放平台</Tag> 是{' '}
+								<Button
+									type='text'
+									size='small'
+									onClick={() => _DataView_setModel('deepseek-chat')}
+								>
+									<Tag style={{ margin: 0 }} color='blue'>
+										deepseek-chat
+									</Tag>
+								</Button>
+								(点击填入)
 							</div>
 							<div>
-								如 <Tag style={{ margin: 0 }}>DeepSeek-V3</Tag> (ID 为{' '}
-								<Tag style={{ margin: 0 }}>deepseek-chat</Tag>),{' '}
-								<Tag style={{ margin: 0 }}>Qwen</Tag> (ID 为{' '}
-								<Tag style={{ margin: 0 }}>qwen-max</Tag>),{' '}
-								<Tag style={{ margin: 0 }}>GPT-4o</Tag> (ID 为{' '}
-								<Tag style={{ margin: 0 }}>gpt-4o</Tag>) 等
+								对于 <Tag style={{ margin: 0 }}>硅基流动</Tag> 是{' '}
+								<Button
+									type='text'
+									size='small'
+									onClick={() =>
+										_DataView_setModel('Pro/deepseek-ai/DeepSeek-V3')
+									}
+								>
+									<Tag style={{ margin: 0 }} color='blue'>
+										Pro/deepseek-ai/DeepSeek-V3
+									</Tag>
+								</Button>
+								(点击填入)
 							</div>
 							<div>
-								不建议使用 <Tag style={{ margin: 0 }}>DeepSeek-R1</Tag>,{' '}
-								<Tag style={{ margin: 0 }}>QwQ</Tag>,{' '}
-								<Tag style={{ margin: 0 }}>o3-mini</Tag> 等推理模型
+								对于 <Tag style={{ margin: 0 }}>阿里云百炼</Tag> 是{' '}
+								<Button
+									type='text'
+									size='small'
+									onClick={() => _DataView_setModel('qwen-max')}
+								>
+									<Tag style={{ margin: 0 }} color='blue'>
+										qwen-max
+									</Tag>
+								</Button>
+								(点击填入)
+							</div>
+							<div>
+								对于 <Tag style={{ margin: 0 }}>OpenAI</Tag> 是{' '}
+								<Button
+									type='text'
+									size='small'
+									onClick={() => _DataView_setModel('gpt-4.1')}
+								>
+									<Tag style={{ margin: 0 }} color='blue'>
+										gpt-4.1
+									</Tag>
+								</Button>
+								(点击填入)
 							</div>
 						</div>
 					}
 				>
-					<InfoCircleOutlined />
+					<Tag style={{ marginLeft: '0.3rem' }} className='cursor-pointer'>
+						<InfoCircleOutlined /> 推荐模型名称
+					</Tag>
 				</Popover>
 			</p>
 			<div className='mb-2'>
 				<Input
 					placeholder='请输入AI模型名称 (modelId)'
-					defaultValue={model}
+					value={model}
 					disabled={!openaiEnable}
 					onChange={(e) => {
 						_DataView_setModel(e.target.value ?? '')
@@ -146,7 +306,7 @@ export function ConfigAI() {
 						}
 					}}
 				>
-					确认并检查AI服务是否可用
+					确认
 				</Button>
 			</div>
 			<div className='flex flex-col gap-1'>

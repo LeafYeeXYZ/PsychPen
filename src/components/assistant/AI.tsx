@@ -192,48 +192,61 @@ export function AI() {
 				if (abortRef.current) {
 					throw new Error('已取消本次请求')
 				}
-				let rawResponse = ''
-				let toolCall: OpenAI.ChatCompletionMessageToolCall | null = null
+				let responseText = ''
+				let toolCallId = ''
+				let toolCallName = ''
+				let toolCallArgs = ''
 				for await (const chunk of stream) {
 					if (abortRef.current) {
 						throw new Error('已取消本次请求')
 					}
 					if (chunk.usage) {
 						setTokenUsage(chunk.usage.total_tokens)
-						break
 					}
-					const delta = chunk.choices[0].delta
-					if (delta.tool_calls?.length) {
-						if (toolCall) {
-							toolCall.function.arguments +=
-								delta.tool_calls[0].function?.arguments || ''
-						} else if (
-							delta.tool_calls[0].id &&
-							delta.tool_calls[0].function?.name
+					if (Array.isArray(chunk.choices) && chunk.choices.length > 0) {
+						const delta = chunk.choices[0].delta
+						if (delta.content) {
+							responseText += delta.content
+							flushSync(() => {
+								setShowLoading(false)
+								setMessages([
+									...currentMessages,
+									{ role: 'assistant', content: responseText, id: shortId() },
+								])
+							})
+						}
+						if (
+							Array.isArray(delta.tool_calls) &&
+							delta.tool_calls.length > 0
 						) {
-							toolCall = {
-								id: delta.tool_calls[0].id,
-								type: 'function',
-								function: {
-									name: delta.tool_calls[0].function.name,
-									arguments: delta.tool_calls[0].function?.arguments || '',
-								},
+							const toolCall = delta.tool_calls[0]
+							if (toolCall.id) {
+								toolCallId = toolCall.id
+							}
+							if (toolCall.function?.name) {
+								toolCallName = toolCall.function.name
+							}
+							if (toolCall.function?.arguments) {
+								toolCallArgs += toolCall.function.arguments
 							}
 						}
-					} else if (!toolCall) {
-						rawResponse += delta.content || ''
-						flushSync(() => {
-							setShowLoading(false)
-							setMessages([
-								...currentMessages,
-								{ role: 'assistant', content: rawResponse, id: shortId() },
-							])
-						})
 					}
 				}
 				if (abortRef.current) {
 					throw new Error('已取消本次请求')
 				}
+				const toolCall: OpenAI.ChatCompletionMessageToolCall | null =
+					toolCallId && toolCallName && toolCallArgs
+						? {
+								id: toolCallId,
+								type: 'function',
+								function: {
+									name: toolCallName,
+									arguments: toolCallArgs,
+								},
+							}
+						: null
+
 				// 处理函数调用
 				if (toolCall) {
 					const newMessages: (OpenAI.ChatCompletionMessageParam & {
@@ -774,7 +787,7 @@ export function AI() {
 					currentMessages = [...currentMessages, ...newMessages]
 				} else {
 					// 如果没有工具调用，处理普通响应
-					const { content } = parseThink(rawResponse)
+					const { content } = parseThink(responseText)
 					setMessages([
 						...currentMessages,
 						{ role: 'assistant', content, id: shortId() },
@@ -802,73 +815,9 @@ export function AI() {
 			请先导入数据或打开示例数据
 		</div>
 	) : !ai ? (
-		<div className='w-full h-full flex items-center justify-center gap-3 flex-col'>
-			<div className='text-base font-bold mb-4'>
-				<InfoCircleOutlined style={{ marginRight: '0.3rem' }} />
-				请先按以下步骤设置AI助手
-			</div>
-			<div className='text-center'>
-				1. 鼠标移动到(电脑)或手指点击(手机/平板)数据视图右上角的
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					AI辅助分析设置
-				</Tag>
-				按钮
-			</div>
-			<div className='text-center'>
-				2. 在弹出的设置窗口中, 点击
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					开启AI辅助分析
-				</Tag>
-				按钮
-			</div>
-			<div className='text-center'>
-				3. 在
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					API地址
-				</Tag>
-				文本框中输入AI服务提供商的API地址. 例如 DeepSeek 的API地址为
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					https://api.deepseek.com/v1
-				</Tag>
-			</div>
-			<div className='text-center'>
-				4. 在
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					API密钥
-				</Tag>
-				文本框中输入AI服务提供商的API密钥. 例如 DeepSeek 的API密钥可以在
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					https://platform.deepseek.com/api_keys
-				</Tag>
-				中获取
-			</div>
-			<div className='text-center'>
-				5. 在
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					AI模型名称
-				</Tag>
-				文本框中输入要使用的AI模型名称, 例如 DeepSeek-V3 的模型名称为
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					deepseek-chat
-				</Tag>
-			</div>
-			<div className='text-center'>
-				6. 点击
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					确认并检验AI服务是否可用
-				</Tag>
-				按钮. 如果信息填写正确, 则设置界面上方
-				<Tag style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}>
-					当前状态
-				</Tag>
-				会显示
-				<Tag
-					style={{ marginLeft: '0.3rem', marginRight: '0.3rem' }}
-					color='green'
-				>
-					可用
-				</Tag>
-			</div>
+		<div className='w-full h-full flex items-center justify-center text-base font-bold'>
+			<InfoCircleOutlined style={{ marginRight: '0.3rem' }} />
+			请先在数据页面右上角进行AI设置
 		</div>
 	) : (
 		<div className='w-full h-full flex flex-col justify-between items-center'>

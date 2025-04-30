@@ -211,7 +211,7 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 					disabled={disabled}
 					onClick={() => setShowAI(true)}
 				>
-					Ask AI
+					AI助手
 				</Button>
 			</p>
 		</header>
