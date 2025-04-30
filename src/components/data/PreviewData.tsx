@@ -154,9 +154,9 @@ export function PreviewData() {
 							<span>
 								AI辅助分析设置 {'|'} 当前状态:{' '}
 								{ai ? (
-									<Tag color='green'>可用</Tag>
+									<Tag color='green'>已设置</Tag>
 								) : (
-									<Tag color='red'>不可用</Tag>
+									<Tag color='red'>未设置</Tag>
 								)}
 								<Popover
 									content={

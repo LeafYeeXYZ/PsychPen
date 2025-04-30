@@ -101,9 +101,14 @@ export function Messages({
 										className='markdown -mb-[0.8rem]'
 										dangerouslySetInnerHTML={{
 											__html: marked
-												.parse((message.content as string).trim(), {
-													async: false,
-												})
+												.parse(
+													(message.content as string)
+														.replace(/^__think__(\s+|)/, '')
+														.trim(),
+													{
+														async: false,
+													},
+												)
 												.replace(
 													/<table>/g,
 													'<div class="table-container"><table>',
@@ -164,7 +169,13 @@ export function Messages({
 								</div>
 							) : undefined
 						}
-						header={message.role === 'user' ? 'User' : 'PsychPen'}
+						header={
+							message.role === 'user'
+								? 'User'
+								: (message.content as string).startsWith('__think__')
+									? 'PsychPen [思考中]'
+									: 'PsychPen'
+						}
 						avatar={{
 							icon:
 								message.role === 'user' ? (
