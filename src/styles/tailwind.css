@@ -28,6 +28,7 @@
 	scrollbar-width: thin;
 	scrollbar-color: var(--color-gray-400) var(--color-gray-50);
 }
+
 @media (prefers-color-scheme: dark) {
 	* {
 		scrollbar-color: var(--color-gray-600) var(--color-gray-800);
@@ -54,14 +55,6 @@ table.three-line-table {
 	& > tbody > tr:last-of-type > td {
 		@apply pb-2;
 	}
-}
-
-.ag-theme-quartz {
-	--ag-cell-horizontal-border: solid 1px #dddddd;
-	--ag-row-hover-color: #fbfafa;
-	--ag-header-foreground-color: #450d1a;
-	--ag-foreground-color: #450d1a;
-	--ag-active-color: #450d1a;
 }
 
 .intro-text {

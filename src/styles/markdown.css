@@ -1,6 +1,19 @@
+@media (prefers-color-scheme: dark) {
+	.markdown .table-container table {
+		border-top: 2px solid #ffffff !important;
+		border-bottom: 2px solid #ffffff !important;
+		& thead:after {
+			border-top: 1px solid #ffffff !important;
+		}
+	}
+}
+
 .markdown {
 	position: relative;
 	overflow: hidden;
+	& hr {
+		margin: 1rem auto;
+	}
 	& .table-container {
 		overflow-x: auto;
 		& table {
@@ -8,7 +21,7 @@
 			border-top: 2px solid black;
 			border-bottom: 2px solid black;
 			max-width: 100%;
-			margin: 0 auto;
+			margin: 1rem auto;
 			white-space: nowrap;
 			& th,
 			& td {
