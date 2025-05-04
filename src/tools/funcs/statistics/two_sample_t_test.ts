@@ -1,6 +1,16 @@
+import { z } from 'zod'
 import type { AIFunction } from '../../../types'
 import { Funcs } from '../../enum'
 
+const two_sample_t_test_type = z.object({
+	dataVar: z.string(),
+	groupVar: z.string(),
+	expect: z.number(),
+	twoside: z.boolean(),
+	alpha: z.number(),
+})
+
+export type TwoSampleTTestParams = z.infer<typeof two_sample_t_test_type>
 export const two_sample_t_test: AIFunction = {
 	name: Funcs.TWO_SAMPLE_T_TEST,
 	label: "独立样本T检验 (Student's T Test)",

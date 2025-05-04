@@ -1,5 +1,14 @@
+import { z } from 'zod'
 import type { AIFunction } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const peer_sample_t_test_type = z.object({
+	variable1: z.string(),
+	variable2: z.string(),
+	expect: z.number(),
+	twoside: z.boolean(),
+	alpha: z.number(),
+})
 
 export const peer_sample_t_test: AIFunction = {
 	name: Funcs.PEER_SAMPLE_T_TEST,

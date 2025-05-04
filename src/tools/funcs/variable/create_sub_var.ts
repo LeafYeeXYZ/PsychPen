@@ -1,6 +1,19 @@
+import { z } from 'zod'
 import type { AIFunction } from '../../../types'
 import { ALLOWED_DISCRETE_METHODS } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const create_sub_var_type = z.object({
+	variable_names: z.array(z.string()),
+	standardize: z.boolean().optional(),
+	centralize: z.boolean().optional(),
+	discretize: z
+		.object({
+			method: z.nativeEnum(ALLOWED_DISCRETE_METHODS),
+			groups: z.number(),
+		})
+		.optional(),
+})
 
 export const create_sub_var: AIFunction = {
 	name: Funcs.CREATE_SUB_VAR,
@@ -54,6 +67,10 @@ export const create_sub_var: AIFunction = {
 		},
 	},
 }
+
+export const clear_sub_var_type = z.object({
+	variable_names: z.array(z.string()),
+})
 
 export const clear_sub_var: AIFunction = {
 	name: Funcs.CLEAR_SUB_VAR,

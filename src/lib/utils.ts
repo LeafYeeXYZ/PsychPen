@@ -4,6 +4,17 @@ import { marked } from 'marked'
 import themeCss from '../styles/statResult.css?raw'
 import type { DataRow, Variable } from '../types'
 
+export async function tryCatch<T>(
+	func: (() => Promise<T>) | (() => T),
+	errorMessage: string,
+): Promise<T> {
+	try {
+		return await func()
+	} catch {
+		throw new Error(errorMessage)
+	}
+}
+
 const MAX_VALUE = Number.MAX_SAFE_INTEGER / 10000
 const MIN_VALUE = Number.MIN_SAFE_INTEGER / 10000
 /**

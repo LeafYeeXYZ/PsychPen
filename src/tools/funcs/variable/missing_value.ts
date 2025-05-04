@@ -1,5 +1,11 @@
+import { z } from 'zod'
 import { type AIFunction, ALL_VARS_IDENTIFIER } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const define_missing_value_type = z.object({
+	variable_names: z.array(z.string()),
+	missing_values: z.array(z.string()),
+})
 
 export const define_missing_value: AIFunction = {
 	name: Funcs.DEFINE_MISSING_VALUE,
@@ -37,6 +43,10 @@ export const define_missing_value: AIFunction = {
 		},
 	},
 }
+
+export const clear_missing_value_type = z.object({
+	variable_names: z.array(z.string()),
+})
 
 export const clear_missing_value: AIFunction = {
 	name: Funcs.CLEAR_MISSING_VALUE,

@@ -1,9 +1,16 @@
+import { z } from 'zod'
 import {
 	type AIFunction,
 	ALLOWED_INTERPOLATION_METHODS,
 	ALL_VARS_IDENTIFIER,
 } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const define_interpolate_type = z.object({
+	variable_names: z.array(z.string()),
+	method: z.nativeEnum(ALLOWED_INTERPOLATION_METHODS),
+	reference_variable: z.string().optional(),
+})
 
 export const define_interpolate: AIFunction = {
 	name: Funcs.DEFINE_INTERPOLATE,
@@ -40,6 +47,10 @@ export const define_interpolate: AIFunction = {
 		},
 	},
 }
+
+export const clear_interpolate_type = z.object({
+	variable_names: z.array(z.string()),
+})
 
 export const clear_interpolate: AIFunction = {
 	name: Funcs.CLEAR_INTERPOLATE,

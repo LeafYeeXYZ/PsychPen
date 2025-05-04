@@ -1,5 +1,10 @@
+import { z } from 'zod'
 import type { AIFunction } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const apply_filter_type = z.object({
+	filter_expression: z.string(),
+})
 
 export const apply_filter: AIFunction = {
 	name: Funcs.APPLY_FILTER,

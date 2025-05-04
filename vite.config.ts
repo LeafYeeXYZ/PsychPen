@@ -31,6 +31,7 @@ export default defineConfig({
 					],
 					'ag-grid': ['ag-grid-react', 'ag-grid-community'],
 					'utils-a': [
+						'zod',
 						'html2canvas-pro',
 						'bowser',
 						'@ant-design/icons',

@@ -1,6 +1,11 @@
+import { z } from 'zod'
 import { VARIABLE_SUB_PAGES_LABELS } from '../../../hooks/useNav'
 import type { AIFunction } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const nav_to_variable_view_type = z.object({
+	page: z.nativeEnum(VARIABLE_SUB_PAGES_LABELS),
+})
 
 export const nav_to_variable_view: AIFunction = {
 	name: Funcs.NAV_TO_VARIABLE_VIEW,

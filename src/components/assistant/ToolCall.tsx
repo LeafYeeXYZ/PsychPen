@@ -1,5 +1,7 @@
+// 注: 类型检查已在 AI.tsx 中完成
 import type OpenAI from 'openai'
 import { useState } from 'react'
+import type { z } from 'zod'
 import { DefaultTool } from '../../tools/components/DefaultTool'
 import { ExportDataTool } from '../../tools/components/data/ExportDataTool'
 import { NavToPageTool } from '../../tools/components/nav/NavToPageTool'
@@ -12,11 +14,26 @@ import { CreateSubVarTool } from '../../tools/components/variable/CreateSubVarTo
 import { DefineInterpolateTool } from '../../tools/components/variable/DefineInterpolateTool'
 import { DefineMissingValueTool } from '../../tools/components/variable/DefineMissingValueTool'
 import { Funcs } from '../../tools/enum'
-import { funcsLabel } from '../../tools/tools'
+import type { export_data_type } from '../../tools/funcs/data/export_data'
+import type { nav_to_plots_view_type } from '../../tools/funcs/nav/nav_to_plots_view'
+import type { nav_to_statistics_view_type } from '../../tools/funcs/nav/nav_to_statistics_view'
+import type { nav_to_tools_view_type } from '../../tools/funcs/nav/nav_to_tools_view'
+import type { nav_to_variable_view_type } from '../../tools/funcs/nav/nav_to_variable_view'
+import type { apply_filter_type } from '../../tools/funcs/variable/apply_filter'
+import type { create_new_var_type } from '../../tools/funcs/variable/create_new_var'
 import type {
-	ALLOWED_DISCRETE_METHODS,
-	ALLOWED_INTERPOLATION_METHODS,
-} from '../../types'
+	clear_sub_var_type,
+	create_sub_var_type,
+} from '../../tools/funcs/variable/create_sub_var'
+import type {
+	clear_interpolate_type,
+	define_interpolate_type,
+} from '../../tools/funcs/variable/interpolate'
+import type {
+	clear_missing_value_type,
+	define_missing_value_type,
+} from '../../tools/funcs/variable/missing_value'
+import { funcsLabel } from '../../tools/tools'
 
 export function ToolCall({
 	toolCall,
@@ -31,9 +48,9 @@ export function ToolCall({
 	const initDone = sessionStorage.getItem(id) === 'done'
 	switch (name) {
 		case Funcs.APPLY_FILTER: {
-			const { filter_expression } = JSON.parse(args) as {
-				filter_expression: string
-			}
+			const { filter_expression } = JSON.parse(args) as z.infer<
+				typeof apply_filter_type
+			>
 			element = (
 				<ApplyFilterTool
 					done={initDone || done}
@@ -45,9 +62,9 @@ export function ToolCall({
 			break
 		}
 		case Funcs.CLEAR_SUB_VAR: {
-			const { variable_names } = JSON.parse(args) as {
-				variable_names: string[]
-			}
+			const { variable_names } = JSON.parse(args) as z.infer<
+				typeof clear_sub_var_type
+			>
 			element = (
 				<ClearSubVarTool
 					done={initDone || done}
@@ -60,17 +77,7 @@ export function ToolCall({
 		}
 		case Funcs.CREATE_SUB_VAR: {
 			const { variable_names, standardize, centralize, discretize } =
-				JSON.parse(args) as {
-					variable_names: string[]
-					standardize: boolean | undefined
-					centralize: boolean | undefined
-					discretize:
-						| {
-								method: ALLOWED_DISCRETE_METHODS
-								groups: number
-						  }
-						| undefined
-				}
+				JSON.parse(args) as z.infer<typeof create_sub_var_type>
 			element = (
 				<CreateSubVarTool
 					done={initDone || done}
@@ -85,10 +92,9 @@ export function ToolCall({
 			break
 		}
 		case Funcs.CREATE_NEW_VAR: {
-			const { variable_name, calc_expression } = JSON.parse(args) as {
-				variable_name: string
-				calc_expression: string
-			}
+			const { variable_name, calc_expression } = JSON.parse(args) as z.infer<
+				typeof create_new_var_type
+			>
 			element = (
 				<CreateNewVarTool
 					done={initDone || done}
@@ -101,10 +107,9 @@ export function ToolCall({
 			break
 		}
 		case Funcs.EXPORT_DATA: {
-			const { file_name, file_type } = JSON.parse(args) as {
-				file_name: string
-				file_type: string
-			}
+			const { file_name, file_type } = JSON.parse(args) as z.infer<
+				typeof export_data_type
+			>
 			element = (
 				<ExportDataTool
 					done={initDone || done}
@@ -121,30 +126,37 @@ export function ToolCall({
 			break
 		}
 		case Funcs.NAV_TO_VARIABLE_VIEW: {
-			const { page } = JSON.parse(args) as { page: string }
+			const { page } = JSON.parse(args) as z.infer<
+				typeof nav_to_variable_view_type
+			>
 			element = <NavToPageTool mainPageName='变量视图' subPageName={page} />
 			break
 		}
 		case Funcs.NAV_TO_PLOTS_VIEW: {
-			const { page } = JSON.parse(args) as { page: string }
+			const { page } = JSON.parse(args) as z.infer<
+				typeof nav_to_plots_view_type
+			>
 			element = <NavToPageTool mainPageName='绘图视图' subPageName={page} />
 			break
 		}
 		case Funcs.NAV_TO_STATISTICS_VIEW: {
-			const { page } = JSON.parse(args) as { page: string }
+			const { page } = JSON.parse(args) as z.infer<
+				typeof nav_to_statistics_view_type
+			>
 			element = <NavToPageTool mainPageName='统计视图' subPageName={page} />
 			break
 		}
 		case Funcs.NAV_TO_TOOLS_VIEW: {
-			const { page } = JSON.parse(args) as { page: string }
+			const { page } = JSON.parse(args) as z.infer<
+				typeof nav_to_tools_view_type
+			>
 			element = <NavToPageTool mainPageName='工具视图' subPageName={page} />
 			break
 		}
 		case Funcs.DEFINE_MISSING_VALUE: {
-			const { variable_names, missing_values } = JSON.parse(args) as {
-				variable_names: string[]
-				missing_values: unknown[]
-			}
+			const { variable_names, missing_values } = JSON.parse(args) as z.infer<
+				typeof define_missing_value_type
+			>
 			element = (
 				<DefineMissingValueTool
 					done={initDone || done}
@@ -157,9 +169,9 @@ export function ToolCall({
 			break
 		}
 		case Funcs.CLEAR_MISSING_VALUE: {
-			const { variable_names } = JSON.parse(args) as {
-				variable_names: string[]
-			}
+			const { variable_names } = JSON.parse(args) as z.infer<
+				typeof clear_missing_value_type
+			>
 			element = (
 				<ClearMissingValueTool
 					done={initDone || done}
@@ -173,11 +185,7 @@ export function ToolCall({
 		case Funcs.DEFINE_INTERPOLATE: {
 			const { variable_names, method, reference_variable } = JSON.parse(
 				args,
-			) as {
-				variable_names: string[]
-				method: ALLOWED_INTERPOLATION_METHODS
-				reference_variable?: string
-			}
+			) as z.infer<typeof define_interpolate_type>
 			element = (
 				<DefineInterpolateTool
 					done={initDone || done}
@@ -191,9 +199,9 @@ export function ToolCall({
 			break
 		}
 		case Funcs.CLEAR_INTERPOLATE: {
-			const { variable_names } = JSON.parse(args) as {
-				variable_names: string[]
-			}
+			const { variable_names } = JSON.parse(args) as z.infer<
+				typeof clear_interpolate_type
+			>
 			element = (
 				<ClearInterpolateTool
 					done={initDone || done}

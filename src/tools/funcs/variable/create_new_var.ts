@@ -1,5 +1,11 @@
+import { z } from 'zod'
 import type { AIFunction } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const create_new_var_type = z.object({
+	variable_name: z.string(),
+	calc_expression: z.string(),
+})
 
 export const create_new_var: AIFunction = {
 	name: Funcs.CREATE_NEW_VAR,

@@ -1,6 +1,12 @@
 import { ExportTypes } from '@psych/sheet'
+import { z } from 'zod'
 import type { AIFunction } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const export_data_type = z.object({
+	file_name: z.string(),
+	file_type: z.nativeEnum(ExportTypes),
+})
 
 export const export_data: AIFunction = {
 	name: Funcs.EXPORT_DATA,

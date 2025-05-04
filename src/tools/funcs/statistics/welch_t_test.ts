@@ -1,5 +1,14 @@
+import { z } from 'zod'
 import type { AIFunction } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const welch_t_test_type = z.object({
+	dataVar: z.string(),
+	groupVar: z.string(),
+	expect: z.number(),
+	twoside: z.boolean(),
+	alpha: z.number(),
+})
 
 export const welch_t_test: AIFunction = {
 	name: Funcs.WELCH_T_TEST,

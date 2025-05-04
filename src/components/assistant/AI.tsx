@@ -9,7 +9,6 @@ import {
 import { Prompts, Sender } from '@ant-design/x'
 import type { SenderRef } from '@ant-design/x/es/sender'
 import parseThink from '@leaf/parse-think'
-import { ExportTypes } from '@psych/sheet'
 import { Popover, Space, Tag } from 'antd'
 import type OpenAI from 'openai'
 import { useEffect, useRef, useState } from 'react'
@@ -19,15 +18,34 @@ import { useAssistant } from '../../hooks/useAssistant'
 import { useData } from '../../hooks/useData'
 import {
 	MAIN_PAGES_LABELS,
-	PLOTS_SUB_PAGES_LABELS,
-	STATISTICS_SUB_PAGES_LABELS,
-	TOOLS_VIEW_SUB_PAGES_LABELS,
-	VARIABLE_SUB_PAGES_LABELS,
 	useNav,
 } from '../../hooks/useNav'
 import { useStates } from '../../hooks/useStates'
-import { shortId, sleep } from '../../lib/utils'
+import { shortId, sleep, tryCatch } from '../../lib/utils'
 import { Funcs } from '../../tools/enum'
+import { export_data_type } from '../../tools/funcs/data/export_data'
+import { nav_to_plots_view_type } from '../../tools/funcs/nav/nav_to_plots_view'
+import { nav_to_statistics_view_type } from '../../tools/funcs/nav/nav_to_statistics_view'
+import { nav_to_tools_view_type } from '../../tools/funcs/nav/nav_to_tools_view'
+import { nav_to_variable_view_type } from '../../tools/funcs/nav/nav_to_variable_view'
+import { one_sample_t_test_type } from '../../tools/funcs/statistics/one_sample_t_test'
+import { peer_sample_t_test_type } from '../../tools/funcs/statistics/peer_sample_t_test'
+import { simple_mediator_test_type } from '../../tools/funcs/statistics/simple_mediator_test'
+import { welch_t_test_type } from '../../tools/funcs/statistics/welch_t_test'
+import { apply_filter_type } from '../../tools/funcs/variable/apply_filter'
+import { create_new_var_type } from '../../tools/funcs/variable/create_new_var'
+import {
+	clear_sub_var_type,
+	create_sub_var_type,
+} from '../../tools/funcs/variable/create_sub_var'
+import {
+	clear_interpolate_type,
+	define_interpolate_type,
+} from '../../tools/funcs/variable/interpolate'
+import {
+	clear_missing_value_type,
+	define_missing_value_type,
+} from '../../tools/funcs/variable/missing_value'
 import { funcsTools } from '../../tools/tools'
 import type { Variable } from '../../types'
 import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../../types'
@@ -289,17 +307,15 @@ export function AI() {
 					try {
 						switch (toolCall.function.name) {
 							case Funcs.PEER_SAMPLE_T_TEST: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
 								const { variable1, variable2, expect, twoside, alpha } =
-									JSON.parse(toolCall.function.arguments)
-								if (
-									typeof variable1 !== 'string' ||
-									typeof variable2 !== 'string' ||
-									typeof expect !== 'number' ||
-									typeof twoside !== 'boolean' ||
-									typeof alpha !== 'number'
-								) {
-									throw new Error('参数错误')
-								}
+									await tryCatch(
+										() => peer_sample_t_test_type.parse(raw),
+										'AI助手返回的函数调用参数错误',
+									)
 								if (
 									!dataCols.some(
 										(col) =>
@@ -351,8 +367,15 @@ export function AI() {
 							}
 							case Funcs.WELCH_T_TEST:
 							case Funcs.TWO_SAMPLE_T_TEST: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
 								const { dataVar, groupVar, expect, twoside, alpha } =
-									JSON.parse(toolCall.function.arguments)
+									await tryCatch(
+										() => welch_t_test_type.parse(raw),
+										'AI助手返回的函数调用参数错误',
+									)
 								if (
 									typeof dataVar !== 'string' ||
 									typeof groupVar !== 'string' ||
@@ -435,17 +458,14 @@ export function AI() {
 								}
 							}
 							case Funcs.ONE_SAMPLE_T_TEST: {
-								const { variable, expect, twoside, alpha } = JSON.parse(
-									toolCall.function.arguments,
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
 								)
-								if (
-									typeof variable !== 'string' ||
-									typeof expect !== 'number' ||
-									typeof twoside !== 'boolean' ||
-									typeof alpha !== 'number'
-								) {
-									throw new Error('参数错误')
-								}
+								const { variable, expect, twoside, alpha } = await tryCatch(
+									() => one_sample_t_test_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
 								if (
 									!dataCols.some(
 										(col) =>
@@ -482,15 +502,14 @@ export function AI() {
 								}
 							}
 							case Funcs.SIMPLE_MEDIATOR_TEST: {
-								const { x, m, y, B } = JSON.parse(toolCall.function.arguments)
-								if (
-									typeof x !== 'string' ||
-									typeof m !== 'string' ||
-									typeof y !== 'string' ||
-									typeof B !== 'number'
-								) {
-									throw new Error('参数错误')
-								}
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { x, m, y, B } = await tryCatch(
+									() => simple_mediator_test_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
 								if (
 									!dataCols.some(
 										(col) => col.name === x && col.type === '等距或等比数据',
@@ -540,11 +559,17 @@ export function AI() {
 								}
 							}
 							case Funcs.DEFINE_INTERPOLATE: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
 								const { variable_names, method, reference_variable } =
-									JSON.parse(toolCall.function.arguments)
+									await tryCatch(
+										() => define_interpolate_type.parse(raw),
+										'AI助手返回的函数调用参数错误',
+									)
 								if (
-									!Array.isArray(variable_names) ||
-									(!variable_names.every(
+									!variable_names.every(
 										(name) =>
 											typeof name === 'string' &&
 											dataCols.some(
@@ -552,14 +577,9 @@ export function AI() {
 													col.name === name && col.type === '等距或等比数据',
 											),
 									) &&
-										!variable_names.includes(ALL_VARS_IDENTIFIER))
+									!variable_names.includes(ALL_VARS_IDENTIFIER)
 								) {
 									throw new Error('变量名参数错误')
-								}
-								if (
-									!Object.values(ALLOWED_INTERPOLATION_METHODS).includes(method)
-								) {
-									throw new Error('插值方法参数错误')
 								}
 								if (
 									(method === ALLOWED_INTERPOLATION_METHODS.NEAREST ||
@@ -578,12 +598,16 @@ export function AI() {
 								break
 							}
 							case Funcs.CLEAR_INTERPOLATE: {
-								const { variable_names } = JSON.parse(
-									toolCall.function.arguments,
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { variable_names } = await tryCatch(
+									() => clear_interpolate_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
 								)
 								if (
-									!Array.isArray(variable_names) ||
-									(!variable_names.every(
+									!variable_names.every(
 										(name) =>
 											typeof name === 'string' &&
 											dataCols.some(
@@ -591,7 +615,7 @@ export function AI() {
 													col.name === name && col.type === '等距或等比数据',
 											),
 									) &&
-										!variable_names.includes(ALL_VARS_IDENTIFIER))
+									!variable_names.includes(ALL_VARS_IDENTIFIER)
 								) {
 									throw new Error('变量名参数错误')
 								}
@@ -600,38 +624,41 @@ export function AI() {
 								break
 							}
 							case Funcs.DEFINE_MISSING_VALUE: {
-								const { variable_names, missing_values } = JSON.parse(
-									toolCall.function.arguments,
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { variable_names } = await tryCatch(
+									() => define_missing_value_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
 								)
 								if (
-									!Array.isArray(variable_names) ||
 									!variable_names.every(
 										(name) =>
-											typeof name === 'string' &&
-											(dataCols.some((col) => col.name === name) ||
-												name === ALL_VARS_IDENTIFIER),
+											dataCols.some((col) => col.name === name) ||
+											name === ALL_VARS_IDENTIFIER,
 									)
 								) {
 									throw new Error('变量名参数错误')
-								}
-								if (!Array.isArray(missing_values)) {
-									throw new Error('缺失值参数错误')
 								}
 								newMessages[1].content =
 									'已请求为指定变量设置缺失值, 等待用户手动确认'
 								break
 							}
 							case Funcs.CLEAR_MISSING_VALUE: {
-								const { variable_names } = JSON.parse(
-									toolCall.function.arguments,
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { variable_names } = await tryCatch(
+									() => clear_missing_value_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
 								)
 								if (
-									!Array.isArray(variable_names) ||
 									!variable_names.every(
 										(name) =>
-											typeof name === 'string' &&
-											(dataCols.some((col) => col.name === name) ||
-												name === ALL_VARS_IDENTIFIER),
+											dataCols.some((col) => col.name === name) ||
+											name === ALL_VARS_IDENTIFIER,
 									)
 								) {
 									throw new Error('变量名参数错误')
@@ -641,29 +668,33 @@ export function AI() {
 								break
 							}
 							case Funcs.APPLY_FILTER: {
-								const { filter_expression } = JSON.parse(
-									toolCall.function.arguments,
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
 								)
-								if (typeof filter_expression !== 'string') {
-									throw new Error('筛选表达式参数错误')
-								}
+								await tryCatch(
+									() => apply_filter_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
 								newMessages[1].content =
 									'已请求设置数据筛选规则, 等待用户手动确认'
 								break
 							}
 							case Funcs.CLEAR_SUB_VAR: {
-								const { variable_names } = JSON.parse(
-									toolCall.function.arguments,
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { variable_names } = await tryCatch(
+									() => clear_sub_var_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
 								)
 								if (
-									!Array.isArray(variable_names) ||
-									!variable_names.every(
-										(name) =>
-											typeof name === 'string' &&
-											dataCols.some(
-												(col) =>
-													col.name === name && col.type === '等距或等比数据',
-											),
+									!variable_names.every((name) =>
+										dataCols.some(
+											(col) =>
+												col.name === name && col.type === '等距或等比数据',
+										),
 									)
 								) {
 									throw new Error('变量名参数错误')
@@ -672,17 +703,21 @@ export function AI() {
 								break
 							}
 							case Funcs.CREATE_SUB_VAR: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
 								const { variable_names, standardize, centralize, discretize } =
-									JSON.parse(toolCall.function.arguments)
+									await tryCatch(
+										() => create_sub_var_type.parse(raw),
+										'AI助手返回的函数调用参数错误',
+									)
 								if (
-									!Array.isArray(variable_names) ||
-									!variable_names.every(
-										(name) =>
-											typeof name === 'string' &&
-											dataCols.some(
-												(col) =>
-													col.name === name && col.type === '等距或等比数据',
-											),
+									!variable_names.every((name) =>
+										dataCols.some(
+											(col) =>
+												col.name === name && col.type === '等距或等比数据',
+										),
 									)
 								) {
 									throw new Error('变量名参数错误')
@@ -707,29 +742,26 @@ export function AI() {
 								break
 							}
 							case Funcs.CREATE_NEW_VAR: {
-								const { variable_name, calc_expression } = JSON.parse(
-									toolCall.function.arguments,
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
 								)
-								if (
-									typeof variable_name !== 'string' ||
-									typeof calc_expression !== 'string'
-								) {
-									throw new Error('变量名或计算表达式参数错误')
-								}
+								const { variable_name } = await tryCatch(
+									() => create_new_var_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
 								newMessages[1].content = `已请求生成新变量"${variable_name}", 等待用户手动确认`
 								break
 							}
 							case Funcs.EXPORT_DATA: {
-								const { file_name, file_type } = JSON.parse(
-									toolCall.function.arguments,
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
 								)
-								if (
-									typeof file_name !== 'string' ||
-									typeof file_type !== 'string' ||
-									!Object.values(ExportTypes).includes(file_type as ExportTypes)
-								) {
-									throw new Error('文件名或文件类型参数错误')
-								}
+								const { file_name, file_type } = await tryCatch(
+									() => export_data_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
 								newMessages[1].content = `已请求导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}", 等待用户手动确认`
 								break
 							}
@@ -739,52 +771,56 @@ export function AI() {
 								break
 							}
 							case Funcs.NAV_TO_VARIABLE_VIEW: {
-								const { page } = JSON.parse(toolCall.function.arguments)
-								if (
-									!page ||
-									!Object.values(VARIABLE_SUB_PAGES_LABELS).includes(page)
-								) {
-									throw new Error(`未知的子页面 (${page})`)
-								}
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { page } = await tryCatch(
+									() => nav_to_variable_view_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
 								setMainPage(MAIN_PAGES_LABELS.VARIABLE)
 								setVariableViewSubPage(page)
 								newMessages[1].content = `已成功跳转到变量视图的${page}页面`
 								break
 							}
 							case Funcs.NAV_TO_PLOTS_VIEW: {
-								const { page } = JSON.parse(toolCall.function.arguments)
-								if (
-									!page ||
-									!Object.values(PLOTS_SUB_PAGES_LABELS).includes(page)
-								) {
-									throw new Error(`未知的子页面 (${page})`)
-								}
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { page } = await tryCatch(
+									() => nav_to_plots_view_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
 								setMainPage(MAIN_PAGES_LABELS.PLOTS)
 								setPlotsViewSubPage(page)
 								newMessages[1].content = `已成功跳转到绘图视图的${page}页面`
 								break
 							}
 							case Funcs.NAV_TO_STATISTICS_VIEW: {
-								const { page } = JSON.parse(toolCall.function.arguments)
-								if (
-									!page ||
-									!Object.values(STATISTICS_SUB_PAGES_LABELS).includes(page)
-								) {
-									throw new Error(`未知的子页面 (${page})`)
-								}
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { page } = await tryCatch(
+									() => nav_to_statistics_view_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
 								setMainPage(MAIN_PAGES_LABELS.STATISTICS)
 								setStatisticsViewSubPage(page)
 								newMessages[1].content = `已成功跳转到统计视图的${page}页面`
 								break
 							}
 							case Funcs.NAV_TO_TOOLS_VIEW: {
-								const { page } = JSON.parse(toolCall.function.arguments)
-								if (
-									!page ||
-									!Object.values(TOOLS_VIEW_SUB_PAGES_LABELS).includes(page)
-								) {
-									throw new Error(`未知的子页面 (${page})`)
-								}
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { page } = await tryCatch(
+									() => nav_to_tools_view_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
 								setMainPage(MAIN_PAGES_LABELS.TOOLS)
 								setToolsViewSubPage(page)
 								newMessages[1].content = `已成功跳转到工具视图的${page}页面`

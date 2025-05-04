@@ -1,5 +1,13 @@
+import { z } from 'zod'
 import type { AIFunction } from '../../../types'
 import { Funcs } from '../../enum'
+
+export const simple_mediator_test_type = z.object({
+	x: z.string(),
+	m: z.string(),
+	y: z.string(),
+	B: z.number(),
+})
 
 export const simple_mediator_test: AIFunction = {
 	name: Funcs.SIMPLE_MEDIATOR_TEST,
