@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.7.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.6.0...v2.7.0) (2025-05-05)
+
+
+### Features
+
+* 改用zod进行运行时类型检查 ([7f7e7bf](https://github.com/LeafYeeXYZ/PsychPen/commit/7f7e7bf118a267228e69ebf0969081af225b2f5a))
+* 适配推理模型 ([5679f3a](https://github.com/LeafYeeXYZ/PsychPen/commit/5679f3ade73e2751cb9bc87df33789fbdd9afc35))
+* 新增主流平台的AI辅助设置一键填写 ([c50ce9d](https://github.com/LeafYeeXYZ/PsychPen/commit/c50ce9d3502ca27cca63e665f979924a236ff45a))
+* AI助手支持使用自定义代码生成自定义数据并导出 ([7ae6204](https://github.com/LeafYeeXYZ/PsychPen/commit/7ae6204d562afbe1b005a0bc1ad76c0cf714ccc4))
+
+
+### Bug Fixes
+
+* 修复自定义导出组建的一处描述错误 ([2d13e94](https://github.com/LeafYeeXYZ/PsychPen/commit/2d13e9485af24f41c197895a40663a41e5da7b06))
+
+
+### Improvements
+
+* 抽象函数调用参数检查, 提供更详细的错误信息 ([77c54da](https://github.com/LeafYeeXYZ/PsychPen/commit/77c54da196b8984e23fd527e75e7c67989aa29a9))
+* 精简输入给AI助手的文档, 降低推理成本 ([1acf944](https://github.com/LeafYeeXYZ/PsychPen/commit/1acf944547026398b3410587caa24f5534d698c9))
+* 使用 new Function 代替 eval 以提升性能和安全性 ([dfcb34d](https://github.com/LeafYeeXYZ/PsychPen/commit/dfcb34d35045b810ae7c2e432f24ec964d8afcd6))
+* 优化统计结果的显示格式 ([40d2df8](https://github.com/LeafYeeXYZ/PsychPen/commit/40d2df86a5d84aa1b2de632c97324b44784d2288))
+
 ## [2.6.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.5.0...v2.6.0) (2025-04-26)
 
 

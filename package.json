@@ -1,6 +1,6 @@
 {
 	"name": "psych-pen",
-	"version": "2.6.0",
+	"version": "2.7.0",
 	"description": "Web statistic app for Psychology and Education",
 	"engines": {
 		"bun": "^1.1.32"
