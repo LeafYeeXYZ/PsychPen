@@ -38,7 +38,7 @@ export function CustomExportTool({
 				<div className='bg-white dark:bg-gray-800 rounded-md p-3 border dark:border-black my-2'>
 					<pre className='overflow-x-auto'>{function_code}</pre>
 				</div>
-				并将结果到文件{' '}
+				并将结果下载到文件{' '}
 				<Tag style={{ margin: 0 }} color='blue'>
 					{file_name || 'data'}.{file_type}
 				</Tag>
