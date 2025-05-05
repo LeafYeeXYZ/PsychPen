@@ -21,6 +21,7 @@ import { useStates } from '../../hooks/useStates'
 import { isNumeric, isUniqueNum, isVariable } from '../../lib/checkers'
 import { shortId, sleep, tryCatch } from '../../lib/utils'
 import { Funcs } from '../../tools/enum'
+import { custom_export_type } from '../../tools/funcs/data/custom_export'
 import { export_data_type } from '../../tools/funcs/data/export_data'
 import { nav_to_plots_view_type } from '../../tools/funcs/nav/nav_to_plots_view'
 import { nav_to_statistics_view_type } from '../../tools/funcs/nav/nav_to_statistics_view'
@@ -55,9 +56,9 @@ import { welchTTestCalculator } from '../statistics/WelchTTest'
 import { Messages } from './Messages'
 
 const GREETTING =
-	'你好, 我是 PsychPen 的 AI 助手, 可以帮你**讲解 PsychPen 的使用方法、探索你的数据集、导出数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果等**. 请问有什么可以帮你的?'
+	'你好, 我是 PsychPen 的 AI 助手, 可以**讲解 PsychPen 的使用方法、探索你的数据集、导出当前数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果、生成并执行代码来导出自定义数据等**. 请问有什么可以帮你的?'
 const INSTRUCTION =
-	'你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. \n\n你将收到用户的提问、当前用户导入到软件中的数据集中的变量和数据的信息、PsychPen的文档、可以供你调用的工具 (函数) 信息. \n\n你的任务是按照用户的要求, 对用户进行回复或调用工具 (函数). 在调用工具 (函数) 前, 请确保你已经明确知晓了用户的意图, 否则请通过进一步和用户对话来确认细节. \n\n你的回复中如果包含数学公式和符号, 请使用 TeX 语法, 并将行内公式用 `$` 包裹 (类似于 Markdown 的行内代码), 将块级公式用 `$$` 包裹 (类似于 Markdown 的代码块).'
+	'你是在线统计分析和数据可视化软件"PsychPen"中的AI助手. \n\n你将收到用户的提问、当前用户导入到软件中的数据集中的变量和数据的信息、PsychPen的文档、可以供你调用的工具 (函数) 信息. \n\n你的任务是按照用户的要求, 对用户进行回复或调用工具 (函数). 在调用工具 (函数) 前, 请确保你已经明确知晓了用户的意图, 否则请通过进一步和用户对话来确认细节. 有的工具需要用户确认后才会执行, 你无法知道用户是否已经确认. \n\n你的回复中如果包含数学公式和符号, 请使用 TeX 语法, 并将行内公式用 `$` 包裹 (类似于 Markdown 的行内代码), 将块级公式用 `$$` 包裹 (类似于 Markdown 的代码块).'
 function GET_PROMPT({
 	vars,
 	page,
@@ -304,6 +305,19 @@ export function AI() {
 					]
 					try {
 						switch (toolCall.function.name) {
+							case Funcs.CUSTOM_EXPORT: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								await tryCatch(
+									() => custom_export_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
+								newMessages[1].content =
+									'已请求执行代码并导出结果, 等待用户手动确认'
+								break
+							}
 							case Funcs.PEER_SAMPLE_T_TEST: {
 								const raw = await tryCatch(
 									() => JSON.parse(toolCall.function.arguments),
@@ -537,7 +551,6 @@ export function AI() {
 									() => isNumeric(variable_names, dataCols, true),
 									'AI助手返回的变量名不存在/不是等距或等比数据',
 								)
-
 								if (
 									(method === ALLOWED_INTERPOLATION_METHODS.NEAREST ||
 										method === ALLOWED_INTERPOLATION_METHODS.LAGRANGE) &&
@@ -630,7 +643,8 @@ export function AI() {
 									() => isNumeric(variable_names, dataCols),
 									'AI助手返回的变量名不存在/不是等距或等比数据',
 								)
-								newMessages[1].content = `已请求清除变量 ${(variable_names as string[]).map((name) => `"${name}"`).join('、')} 的所有子变量, 等待用户手动确认`
+								newMessages[1].content =
+									'已请求清除指定变量的所有子变量, 等待用户手动确认'
 								break
 							}
 							case Funcs.CREATE_SUB_VAR: {
@@ -671,11 +685,11 @@ export function AI() {
 									() => JSON.parse(toolCall.function.arguments),
 									'AI助手返回的JSON数据格式错误',
 								)
-								const { variable_name } = await tryCatch(
+								await tryCatch(
 									() => create_new_var_type.parse(raw),
 									'AI助手返回的函数调用参数错误',
 								)
-								newMessages[1].content = `已请求生成新变量"${variable_name}", 等待用户手动确认`
+								newMessages[1].content = '已请求生成新变量, 等待用户手动确认'
 								break
 							}
 							case Funcs.EXPORT_DATA: {
@@ -683,11 +697,11 @@ export function AI() {
 									() => JSON.parse(toolCall.function.arguments),
 									'AI助手返回的JSON数据格式错误',
 								)
-								const { file_name, file_type } = await tryCatch(
+								await tryCatch(
 									() => export_data_type.parse(raw),
 									'AI助手返回的函数调用参数错误',
 								)
-								newMessages[1].content = `已请求导出数据到文件"${file_name || 'data'}.${file_type || 'xlsx'}", 等待用户手动确认`
+								newMessages[1].content = '已请求导出数据, 等待用户手动确认'
 								break
 							}
 							case Funcs.NAV_TO_DATA_VIEW: {

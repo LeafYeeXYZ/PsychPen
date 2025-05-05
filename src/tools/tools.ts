@@ -1,5 +1,6 @@
 import type { AIFunction } from '../types'
 import type { Funcs } from './enum'
+import { custom_export } from './funcs/data/custom_export'
 import { export_data } from './funcs/data/export_data'
 import { nav_to_data_view } from './funcs/nav/nav_to_data_view'
 import { nav_to_plots_view } from './funcs/nav/nav_to_plots_view'
@@ -25,6 +26,7 @@ import {
 
 const funcs: AIFunction[] = [
 	export_data,
+	custom_export,
 	nav_to_data_view,
 	nav_to_variable_view,
 	nav_to_plots_view,

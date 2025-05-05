@@ -16,7 +16,7 @@ export const export_data: AIFunction = {
 		function: {
 			name: Funcs.EXPORT_DATA,
 			description:
-				'你可以调用这个函数来帮助用户导出数据. 调用成功后, 浏览器会自动下载文件.',
+				'你可以调用这个函数来帮助用户导出当前数据. 导出的数据是经过缺失值定义和插值、数据过滤、子变量生成等操作后的数据.',
 			parameters: {
 				type: 'object',
 				properties: {

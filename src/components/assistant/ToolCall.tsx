@@ -3,6 +3,7 @@ import type OpenAI from 'openai'
 import { useState } from 'react'
 import type { z } from 'zod'
 import { DefaultTool } from '../../tools/components/DefaultTool'
+import { CustomExportTool } from '../../tools/components/data/CustomExportTool'
 import { ExportDataTool } from '../../tools/components/data/ExportDataTool'
 import { NavToPageTool } from '../../tools/components/nav/NavToPageTool'
 import { ApplyFilterTool } from '../../tools/components/variable/ApplyFilterTool'
@@ -14,6 +15,7 @@ import { CreateSubVarTool } from '../../tools/components/variable/CreateSubVarTo
 import { DefineInterpolateTool } from '../../tools/components/variable/DefineInterpolateTool'
 import { DefineMissingValueTool } from '../../tools/components/variable/DefineMissingValueTool'
 import { Funcs } from '../../tools/enum'
+import type { custom_export_type } from '../../tools/funcs/data/custom_export'
 import type { export_data_type } from '../../tools/funcs/data/export_data'
 import type { nav_to_plots_view_type } from '../../tools/funcs/nav/nav_to_plots_view'
 import type { nav_to_statistics_view_type } from '../../tools/funcs/nav/nav_to_statistics_view'
@@ -47,6 +49,22 @@ export function ToolCall({
 	let element: React.ReactElement | null = null
 	const initDone = sessionStorage.getItem(id) === 'done'
 	switch (name) {
+		case Funcs.CUSTOM_EXPORT: {
+			const { file_name, file_type, function_code } = JSON.parse(
+				args,
+			) as z.infer<typeof custom_export_type>
+			element = (
+				<CustomExportTool
+					done={initDone || done}
+					setDone={initDone ? undefined : setDone}
+					id={id}
+					file_name={file_name}
+					file_type={file_type}
+					function_code={function_code}
+				/>
+			)
+			break
+		}
 		case Funcs.APPLY_FILTER: {
 			const { filter_expression } = JSON.parse(args) as z.infer<
 				typeof apply_filter_type
