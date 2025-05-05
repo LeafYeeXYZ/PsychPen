@@ -16,11 +16,9 @@ import { flushSync } from 'react-dom'
 import readme from '../../../README_FOR_AI.md?raw'
 import { useAssistant } from '../../hooks/useAssistant'
 import { useData } from '../../hooks/useData'
-import {
-	MAIN_PAGES_LABELS,
-	useNav,
-} from '../../hooks/useNav'
+import { MAIN_PAGES_LABELS, useNav } from '../../hooks/useNav'
 import { useStates } from '../../hooks/useStates'
+import { isNumeric, isUniqueNum, isVariable } from '../../lib/checkers'
 import { shortId, sleep, tryCatch } from '../../lib/utils'
 import { Funcs } from '../../tools/enum'
 import { export_data_type } from '../../tools/funcs/data/export_data'
@@ -48,7 +46,7 @@ import {
 } from '../../tools/funcs/variable/missing_value'
 import { funcsTools } from '../../tools/tools'
 import type { Variable } from '../../types'
-import { ALLOWED_INTERPOLATION_METHODS, ALL_VARS_IDENTIFIER } from '../../types'
+import { ALLOWED_INTERPOLATION_METHODS } from '../../types'
 import { oneSampleTTestCalculator } from '../statistics/OneSampleTTest'
 import { peerSampleTTestCalculator } from '../statistics/PeerSampleTTest'
 import { simpleMediationTestCalculator } from '../statistics/SimpleMediatorTest'
@@ -316,18 +314,10 @@ export function AI() {
 										() => peer_sample_t_test_type.parse(raw),
 										'AI助手返回的函数调用参数错误',
 									)
-								if (
-									!dataCols.some(
-										(col) =>
-											col.name === variable1 && col.type === '等距或等比数据',
-									) ||
-									!dataCols.some(
-										(col) =>
-											col.name === variable2 && col.type === '等距或等比数据',
-									)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isNumeric([variable1, variable2], dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
 								try {
 									messageApi?.loading('正在处理数据...', 0)
 									await sleep()
@@ -376,26 +366,14 @@ export function AI() {
 										() => welch_t_test_type.parse(raw),
 										'AI助手返回的函数调用参数错误',
 									)
-								if (
-									typeof dataVar !== 'string' ||
-									typeof groupVar !== 'string' ||
-									typeof expect !== 'number' ||
-									typeof twoside !== 'boolean' ||
-									typeof alpha !== 'number'
-								) {
-									throw new Error('参数错误')
-								}
-								if (
-									!dataCols.some(
-										(col) =>
-											col.name === dataVar && col.type === '等距或等比数据',
-									) ||
-									!dataCols.some(
-										(col) => col.name === groupVar && col.unique === 2,
-									)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isNumeric([dataVar], dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
+								await tryCatch(
+									() => isUniqueNum(groupVar, dataCols, 2),
+									'AI助手返回的分组变量不存在/水平数不为二',
+								)
 								try {
 									messageApi?.loading('正在处理数据...', 0)
 									await sleep()
@@ -466,14 +444,10 @@ export function AI() {
 									() => one_sample_t_test_type.parse(raw),
 									'AI助手返回的函数调用参数错误',
 								)
-								if (
-									!dataCols.some(
-										(col) =>
-											col.name === variable && col.type === '等距或等比数据',
-									)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isNumeric([variable], dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
 								try {
 									messageApi?.loading('正在处理数据...', 0)
 									await sleep()
@@ -510,19 +484,10 @@ export function AI() {
 									() => simple_mediator_test_type.parse(raw),
 									'AI助手返回的函数调用参数错误',
 								)
-								if (
-									!dataCols.some(
-										(col) => col.name === x && col.type === '等距或等比数据',
-									) ||
-									!dataCols.some(
-										(col) => col.name === m && col.type === '等距或等比数据',
-									) ||
-									!dataCols.some(
-										(col) => col.name === y && col.type === '等距或等比数据',
-									)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isNumeric([x, m, y], dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
 								try {
 									messageApi?.loading('正在处理数据...', 0)
 									await sleep()
@@ -568,30 +533,21 @@ export function AI() {
 										() => define_interpolate_type.parse(raw),
 										'AI助手返回的函数调用参数错误',
 									)
-								if (
-									!variable_names.every(
-										(name) =>
-											typeof name === 'string' &&
-											dataCols.some(
-												(col) =>
-													col.name === name && col.type === '等距或等比数据',
-											),
-									) &&
-									!variable_names.includes(ALL_VARS_IDENTIFIER)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isNumeric(variable_names, dataCols, true),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
+
 								if (
 									(method === ALLOWED_INTERPOLATION_METHODS.NEAREST ||
 										method === ALLOWED_INTERPOLATION_METHODS.LAGRANGE) &&
-									(typeof reference_variable !== 'string' ||
-										!dataCols.some(
-											(col) =>
-												col.name === reference_variable &&
-												col.type === '等距或等比数据',
-										))
+									!dataCols.some(
+										(col) =>
+											col.name === reference_variable &&
+											col.type === '等距或等比数据',
+									)
 								) {
-									throw new Error('插值参考变量参数错误')
+									throw new Error('插值参考变量不存在/不是等距或等比数据')
 								}
 								newMessages[1].content =
 									'已请求为指定变量设置插值方法, 等待用户手动确认'
@@ -606,19 +562,10 @@ export function AI() {
 									() => clear_interpolate_type.parse(raw),
 									'AI助手返回的函数调用参数错误',
 								)
-								if (
-									!variable_names.every(
-										(name) =>
-											typeof name === 'string' &&
-											dataCols.some(
-												(col) =>
-													col.name === name && col.type === '等距或等比数据',
-											),
-									) &&
-									!variable_names.includes(ALL_VARS_IDENTIFIER)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isNumeric(variable_names, dataCols, true),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
 								newMessages[1].content =
 									'已请求清除指定变量的插值方法, 等待用户手动确认'
 								break
@@ -632,15 +579,10 @@ export function AI() {
 									() => define_missing_value_type.parse(raw),
 									'AI助手返回的函数调用参数错误',
 								)
-								if (
-									!variable_names.every(
-										(name) =>
-											dataCols.some((col) => col.name === name) ||
-											name === ALL_VARS_IDENTIFIER,
-									)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isVariable(variable_names, dataCols, true),
+									'AI助手返回的变量名不存在',
+								)
 								newMessages[1].content =
 									'已请求为指定变量设置缺失值, 等待用户手动确认'
 								break
@@ -654,15 +596,10 @@ export function AI() {
 									() => clear_missing_value_type.parse(raw),
 									'AI助手返回的函数调用参数错误',
 								)
-								if (
-									!variable_names.every(
-										(name) =>
-											dataCols.some((col) => col.name === name) ||
-											name === ALL_VARS_IDENTIFIER,
-									)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isVariable(variable_names, dataCols, true),
+									'AI助手返回的变量名不存在',
+								)
 								newMessages[1].content =
 									'已请求清除指定变量的缺失值定义, 等待用户手动确认'
 								break
@@ -689,16 +626,10 @@ export function AI() {
 									() => clear_sub_var_type.parse(raw),
 									'AI助手返回的函数调用参数错误',
 								)
-								if (
-									!variable_names.every((name) =>
-										dataCols.some(
-											(col) =>
-												col.name === name && col.type === '等距或等比数据',
-										),
-									)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isNumeric(variable_names, dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
 								newMessages[1].content = `已请求清除变量 ${(variable_names as string[]).map((name) => `"${name}"`).join('、')} 的所有子变量, 等待用户手动确认`
 								break
 							}
@@ -712,16 +643,10 @@ export function AI() {
 										() => create_sub_var_type.parse(raw),
 										'AI助手返回的函数调用参数错误',
 									)
-								if (
-									!variable_names.every((name) =>
-										dataCols.some(
-											(col) =>
-												col.name === name && col.type === '等距或等比数据',
-										),
-									)
-								) {
-									throw new Error('变量名参数错误')
-								}
+								await tryCatch(
+									() => isNumeric(variable_names, dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
 								if (
 									discretize &&
 									(typeof discretize !== 'object' ||
@@ -730,7 +655,7 @@ export function AI() {
 										typeof discretize.method !== 'string' ||
 										typeof discretize.groups !== 'number')
 								) {
-									throw new Error('离散化参数错误')
+									throw new Error('AI助手返回的离散化参数错误')
 								}
 								newMessages[1].content = `已请求生成变量 ${(variable_names as string[]).map((name) => `"${name}"`).join('、')} 的${[
 									standardize ? '标准化' : '',

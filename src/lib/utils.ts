@@ -4,6 +4,12 @@ import { marked } from 'marked'
 import themeCss from '../styles/statResult.css?raw'
 import type { DataRow, Variable } from '../types'
 
+/**
+ * 尝试执行一个函数, 如果失败则抛出指定的错误
+ * @param func 函数
+ * @param errorMessage 错误信息
+ * @returns 函数返回值
+ */
 export async function tryCatch<T>(
 	func: (() => Promise<T>) | (() => T),
 	errorMessage: string,
@@ -224,36 +230,6 @@ export function embedValues(
 		return `"${String(value)}"`
 	})
 	return exp
-}
-
-/**
- * 检查计算变量的表达式的安全性
- * @param expression 计算变量的表达式
- * @throws 如果表达式不安全, 则抛出异常
- */
-export function validateExpression(expression: string): void {
-	// 先排除变量名
-	const exp = expression.replace(/:::.+?:::/g, '')
-	if (
-		// 阻止数据泄露
-		exp.includes('http://') ||
-		exp.includes('https://') ||
-		exp.includes('//') ||
-		exp.includes('fetch') ||
-		exp.includes('XMLHttpRequest') ||
-		// 阻止外部代码执行
-		exp.includes('import') ||
-		exp.includes('eval') ||
-		exp.includes('Function') ||
-		exp.includes('setTimeout') ||
-		exp.includes('setInterval') ||
-		exp.includes('setImmediate') ||
-		// 阻止本地存储
-		exp.includes('localStorage') ||
-		exp.includes('sessionStorage')
-	) {
-		throw new Error('表达式不安全, 拒绝执行')
-	}
 }
 
 /**

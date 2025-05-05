@@ -4,11 +4,8 @@ import { derive } from '../lib/calculates/derive'
 import { describe } from '../lib/calculates/describe'
 import { filter } from '../lib/calculates/filter'
 import { missing } from '../lib/calculates/misssing'
-import {
-	computeExpression,
-	transformData,
-	validateExpression,
-} from '../lib/utils'
+import { validateExpression } from '../lib/checkers'
+import { computeExpression, transformData } from '../lib/utils'
 import type { DataRow, Variable } from '../types'
 
 type DataState = {
