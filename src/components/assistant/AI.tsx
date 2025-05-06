@@ -27,6 +27,18 @@ import { nav_to_plots_view_type } from '../../tools/funcs/nav/nav_to_plots_view'
 import { nav_to_statistics_view_type } from '../../tools/funcs/nav/nav_to_statistics_view'
 import { nav_to_tools_view_type } from '../../tools/funcs/nav/nav_to_tools_view'
 import { nav_to_variable_view_type } from '../../tools/funcs/nav/nav_to_variable_view'
+import {
+	kolmogorov_smirnov_test_for_independent_vars_type,
+	kolmogorov_smirnov_test_for_paired_vars_type,
+} from '../../tools/funcs/statistics/kolmogorov_smirnov_test'
+import {
+	kurtosis_skewness_test_for_independent_vars_type,
+	kurtosis_skewness_test_for_paired_vars_type,
+} from '../../tools/funcs/statistics/kurtosis_skewness_test'
+import {
+	levene_test_for_independent_vars_type,
+	levene_test_for_paired_vars_type,
+} from '../../tools/funcs/statistics/levene_test'
 import { one_sample_t_test_type } from '../../tools/funcs/statistics/one_sample_t_test'
 import { peer_sample_t_test_type } from '../../tools/funcs/statistics/peer_sample_t_test'
 import { simple_mediator_test_type } from '../../tools/funcs/statistics/simple_mediator_test'
@@ -48,6 +60,9 @@ import {
 import { funcsTools } from '../../tools/tools'
 import type { Variable } from '../../types'
 import { ALLOWED_INTERPOLATION_METHODS } from '../../types'
+import { kolmogorovSmirnovTestCalculator } from '../statistics/KolmogorovSmirnovTest'
+import { kurtosisSkewnessCalculator } from '../statistics/KurtosisSkewness'
+import { leveneTestCalculator } from '../statistics/LeveneTest'
 import { oneSampleTTestCalculator } from '../statistics/OneSampleTTest'
 import { peerSampleTTestCalculator } from '../statistics/PeerSampleTTest'
 import { simpleMediationTestCalculator } from '../statistics/SimpleMediatorTest'
@@ -325,6 +340,301 @@ export function AI() {
 								newMessages[1].content =
 									'已请求执行代码并导出结果, 等待用户手动确认'
 								break
+							}
+							case Funcs.KOLMOGOROV_SMIRNOV_TEST_FOR_INDEPENDENT_VARS: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { dataVar, groupVar } = await tryCatch(
+									() =>
+										kolmogorov_smirnov_test_for_independent_vars_type.parse(
+											raw,
+										),
+									'AI助手返回的函数调用参数错误',
+								)
+								await tryCatch(
+									() => isNumeric([dataVar], dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
+								await tryCatch(
+									() => isVariable([groupVar], dataCols),
+									'AI助手返回的分组变量不存在',
+								)
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const filteredRows = dataRows.filter(
+										(row) =>
+											typeof row[dataVar] === 'number' &&
+											typeof row[groupVar] !== 'undefined',
+									)
+									const groups = Array.from(
+										new Set(filteredRows.map((row) => row[groupVar])),
+									).map((v) => String(v))
+									const data: number[][] = groups.map(
+										(g) =>
+											filteredRows
+												.filter((row) => row[groupVar] === g)
+												.map((row) => row[dataVar]) as number[],
+									)
+									const result = kurtosisSkewnessCalculator({
+										type: 'independent',
+										variable: dataVar,
+										group: groupVar,
+										data,
+										groups,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
+							}
+							case Funcs.KOLMOGOROV_SMIRNOV_TEST_FOR_PAIRED_VARS: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { variables } = await tryCatch(
+									() => kolmogorov_smirnov_test_for_paired_vars_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
+								await tryCatch(
+									() => isNumeric(variables, dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const data: number[][] = variables.map((variable) =>
+										dataRows
+											.map((row) => row[variable])
+											.filter((v) => typeof v === 'number'),
+									)
+									const result = kolmogorovSmirnovTestCalculator({
+										type: 'paired',
+										variables,
+										data,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
+							}
+							case Funcs.KURTOSIS_SKEWNESS_TEST_FOR_PAIRED_VARS: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { variables } = await tryCatch(
+									() => kurtosis_skewness_test_for_paired_vars_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
+								await tryCatch(
+									() => isNumeric(variables, dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const data: number[][] = variables.map((variable) =>
+										dataRows
+											.map((row) => row[variable])
+											.filter((v) => typeof v === 'number'),
+									)
+									const result = kurtosisSkewnessCalculator({
+										type: 'paired',
+										variables,
+										data,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
+							}
+							case Funcs.KURTOSIS_SKEWNESS_TEST_FOR_INDEPENDENT_VARS: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { dataVar, groupVar } = await tryCatch(
+									() =>
+										kurtosis_skewness_test_for_independent_vars_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
+								await tryCatch(
+									() => isNumeric([dataVar], dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
+								await tryCatch(
+									() => isVariable([groupVar], dataCols),
+									'AI助手返回的分组变量不存在',
+								)
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const filteredRows = dataRows.filter(
+										(row) =>
+											typeof row[dataVar] === 'number' &&
+											typeof row[groupVar] !== 'undefined',
+									)
+									const groups = Array.from(
+										new Set(filteredRows.map((row) => row[groupVar])),
+									).map((v) => String(v))
+									const data: number[][] = groups.map(
+										(g) =>
+											filteredRows
+												.filter((row) => row[groupVar] === g)
+												.map((row) => row[dataVar]) as number[],
+									)
+									const result = kurtosisSkewnessCalculator({
+										type: 'independent',
+										variable: dataVar,
+										group: groupVar,
+										data,
+										groups,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
+							}
+							case Funcs.LEVENE_TEST_FOR_INDEPENDENT_VARS: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { dataVar, groupVar, center } = await tryCatch(
+									() => levene_test_for_independent_vars_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
+								await tryCatch(
+									() => isNumeric([dataVar], dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
+								await tryCatch(
+									() => isVariable([groupVar], dataCols),
+									'AI助手返回的分组变量不存在',
+								)
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const filteredRows = dataRows.filter(
+										(row) =>
+											typeof row[dataVar] === 'number' &&
+											typeof row[groupVar] !== 'undefined',
+									)
+									const data = filteredRows.map(
+										(row) => row[dataVar],
+									) as number[]
+									const groups = filteredRows.map((row) =>
+										String(row[groupVar]),
+									)
+									const result = leveneTestCalculator({
+										type: 'independent',
+										variable: dataVar,
+										group: groupVar,
+										center,
+										data,
+										groups,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
+							}
+							case Funcs.LEVENE_TEST_FOR_PAIRED_VARS: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { variables, center } = await tryCatch(
+									() => levene_test_for_paired_vars_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
+								await tryCatch(
+									() => isNumeric(variables, dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const groups: string[] = []
+									const value: number[] = []
+									for (const variable of variables) {
+										const filteredRows = dataRows.filter(
+											(row) => typeof row[variable] === 'number',
+										)
+										for (const row of filteredRows) {
+											groups.push(String(variable))
+											value.push(row[variable] as number)
+										}
+									}
+									const result = leveneTestCalculator({
+										type: 'paired',
+										variables,
+										center,
+										data: value,
+										groups,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
 							}
 							case Funcs.PEER_SAMPLE_T_TEST: {
 								const raw = await tryCatch(

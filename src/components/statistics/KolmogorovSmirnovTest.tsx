@@ -19,6 +19,82 @@ type Option = {
 	group?: string
 }
 
+export function kolmogorovSmirnovTestCalculator(config: {
+	type: 'independent' | 'paired'
+	variables?: string[]
+	variable?: string
+	group?: string
+	data: number[][]
+	groups?: string[]
+}): string {
+	const { type, variables, variable, group, data, groups } = config
+	if (type === 'paired') {
+		if (!variables?.length) {
+			throw new Error('请选择被试内变量')
+		}
+		const result = data.map((arr, index) => {
+			const m = new OneSampleKSTest(arr)
+			return {
+				...m,
+				name: variables[index],
+			}
+		})
+		return `
+## 1 单样本 Kolmogorov-Smirnov 检验
+
+对被试内变量${variables.map((v) => `"${v}"`).join(', ')}进行单样本 Kolmogorov-Smirnov 检验. 原假设 (H<sub>0</sub>) 为"数据符合正态分布"; 显著性水平 (α) 为 0.05. 注意: p值使用渐进估计, 所以样本量较小时可能误差较大, 请以D临界值结果为准.
+
+结果如表 1 所示.
+
+> 表 1 - 单样本 Kolmogorov-Smirnov 检验结果
+
+| 变量 | 样本量 | D | D临界值 | 结果 |
+| :---: | :---: | :---: | :---: | :---: |
+${result
+	.map(
+		(row) =>
+			`| ${row.name} | ${row.count} | ${markS(row.d)} | ${markS(row.decide)} | ${
+				row.rejected ? '不符合正态分布' : '符合正态分布'
+			} (p: ${markS(row.p)}) |`,
+	)
+	.join('\n')}
+
+需要注意的是, 显著性检验在⼩样本中 (n<30) 由于检验⼒的不⾜, 即便是偏态分布也可能⽆法检验出来; 但在很⼤的样本中 (n>1000) 又很敏感, 即便有很⼩的峰度或偏度值也会拒绝正态分布的虚⽆假设, 但从直⽅图或者正态概率图中直观地看, 分布仍然⾮常接近正态分布. 因此在检验时需要结合样本量, 图形检验, 以及峰度或者偏度取值的⼤⼩来综合考虑 (刘红云, 2023).
+		`
+	}
+
+	if (!variable || !group || !groups?.length) {
+		throw new Error('请选择数据变量和分组变量')
+	}
+	const result = data.map((arr, index) => {
+		const m = new OneSampleKSTest(arr)
+		return {
+			...m,
+			name: groups[index],
+		}
+	})
+	return `
+## 1 单样本 Kolmogorov-Smirnov 检验
+
+对被试间变量"${variable}" (分组变量: "${group}") 进行单样本 Kolmogorov-Smirnov 检验. 原假设 (H<sub>0</sub>) 为"数据符合正态分布"; 显著性水平 (α) 为 0.05. 注意: p值使用渐进估计, 所以样本量较小时可能误差较大, 请以D临界值结果为准.
+
+结果如表 1 所示.
+
+> 表 1 - 单样本 Kolmogorov-Smirnov 检验结果
+
+| 组别 | 样本量 | D | D临界值 | 结果 |
+| :---: | :---: | :---: | :---: | :---: |
+${result
+	.map(
+		(row) =>
+			`| ${row.name} | ${row.count} | ${markS(row.d)} | ${markS(row.decide)} | ${
+				row.rejected ? '不符合正态分布' : '符合正态分布'
+			} (p: ${markS(row.p)}) |`,
+	)
+	.join('\n')}
+	`
+}
+
 export function KolmogorovSmirnovTest() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
@@ -46,33 +122,9 @@ export function KolmogorovSmirnovTest() {
 						.map((row) => row[variable])
 						.filter((v) => typeof v === 'number'),
 				)
-				const result = data.map((arr, index) => {
-					const m = new OneSampleKSTest(arr)
-					return {
-						...m,
-						name: variables[index],
-					}
-				})
-				setStatResult(`
-## 1 单样本 Kolmogorov-Smirnov 检验
-
-对被试内变量${variables.map((v) => `"${v}"`).join(', ')}进行单样本 Kolmogorov-Smirnov 检验. 原假设 (H<sub>0</sub>) 为"数据符合正态分布"; 显著性水平 (α) 为 0.05. 注意: p值使用渐进估计, 所以样本量较小时可能误差较大, 请以D临界值结果为准.
-
-结果如表 1 所示.
-
-> 表 1 - 单样本 Kolmogorov-Smirnov 检验结果
-
-| 变量 | 样本量 | D | D临界值 | 结果 |
-| :---: | :---: | :---: | :---: | :---: |
-${result
-	.map(
-		(row) =>
-			`| ${row.name} | ${row.count} | ${markS(row.d)} | ${markS(row.decide)} | ${
-				row.rejected ? '不符合正态分布' : '符合正态分布'
-			} (p: ${markS(row.p)}) |`,
-	)
-	.join('\n')}
-				`)
+				setStatResult(
+					kolmogorovSmirnovTestCalculator({ type, variables, data }),
+				)
 			} else {
 				if (!variable || !group) {
 					throw new Error('请选择数据变量和分组变量')
@@ -86,33 +138,15 @@ ${result
 						.map((row) => row[variable])
 						.filter((v) => typeof v === 'number'),
 				)
-				const result = data.map((arr, index) => {
-					const m = new OneSampleKSTest(arr)
-					return {
-						...m,
-						name: groups[index],
-					}
-				})
-				setStatResult(`
-## 1 单样本 Kolmogorov-Smirnov 检验
-
-对被试间变量"${variable}" (分组变量: "${group}") 进行单样本 Kolmogorov-Smirnov 检验. 原假设 (H<sub>0</sub>) 为"数据符合正态分布"; 显著性水平 (α) 为 0.05. 注意: p值使用渐进估计, 所以样本量较小时可能误差较大, 请以D临界值结果为准.
-
-结果如表 1 所示.
-
-> 表 1 - 单样本 Kolmogorov-Smirnov 检验结果
-
-| 组别 | 样本量 | D | D临界值 | 结果 |
-| :---: | :---: | :---: | :---: | :---: |
-${result
-	.map(
-		(row) =>
-			`| ${row.name} | ${row.count} | ${markS(row.d)} | ${markS(row.decide)} | ${
-				row.rejected ? '不符合正态分布' : '符合正态分布'
-			} (p: ${markS(row.p)}) |`,
-	)
-	.join('\n')}
-				`)
+				setStatResult(
+					kolmogorovSmirnovTestCalculator({
+						type,
+						variable,
+						group,
+						data,
+						groups,
+					}),
+				)
 			}
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)

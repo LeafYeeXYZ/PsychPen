@@ -19,4 +19,10 @@ export enum Funcs {
 	PEER_SAMPLE_T_TEST = 'peer_sample_t_test',
 	TWO_SAMPLE_T_TEST = 'two_sample_t_test',
 	CUSTOM_EXPORT = 'custom_export',
+	LEVENE_TEST_FOR_INDEPENDENT_VARS = 'levene_test_for_independent_vars',
+	LEVENE_TEST_FOR_PAIRED_VARS = 'levene_test_for_paired_vars',
+	KOLMOGOROV_SMIRNOV_TEST_FOR_INDEPENDENT_VARS = 'kolmogorov_smirnov_test_for_independent_vars',
+	KOLMOGOROV_SMIRNOV_TEST_FOR_PAIRED_VARS = 'kolmogorov_smirnov_test_for_paired_vars',
+	KURTOSIS_SKEWNESS_TEST_FOR_INDEPENDENT_VARS = 'kurtosis_skewness_test_for_independent_vars',
+	KURTOSIS_SKEWNESS_TEST_FOR_PAIRED_VARS = 'kurtosis_skewness_test_for_paired_vars',
 }

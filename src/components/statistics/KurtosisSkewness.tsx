@@ -19,6 +19,68 @@ type Option = {
 	group?: string
 }
 
+export function kurtosisSkewnessCalculator(config: {
+	type: 'independent' | 'paired'
+	variables?: string[]
+	variable?: string
+	group?: string
+	data: number[][]
+	groups?: string[]
+}): string {
+	const { type, variables, variable, group, data, groups } = config
+	if (type === 'paired') {
+		if (!variables?.length) {
+			throw new Error('请选择被试内变量')
+		}
+		const k = data.map((arr) => new KurtosisTest(arr))
+		const s = data.map((arr) => new SkewnessTest(arr))
+		return `
+## 1 峰度和偏度检验
+
+对被试内变量${variables.map((v) => `"${v}"`).join(', ')}进行峰度和偏度检验. 原假设 (H<sub>0</sub>) 为"峰度/偏度等于零"; 显著性水平 (α) 为 0.05.
+
+结果如表 1 所示.
+
+> 表 1 - 峰度和偏度检验结果
+
+| 变量 | 样本量 | 峰度 | z | p | 偏度 | z | p |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+${k
+	.map(
+		(k, i) =>
+			`| ${variables[i]} | ${data[i].length} | ${markS(k.kurtosis)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${markS(s[i].skewness)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
+	)
+	.join('\n')}
+    `
+	}
+
+	if (!variable || !group || !groups?.length) {
+		throw new Error('请选择数据变量和分组变量')
+	}
+	const k = data.map((arr) => new KurtosisTest(arr))
+	const s = data.map((arr) => new SkewnessTest(arr))
+	return `
+## 1 峰度和偏度检验
+
+对被试间变量"${variable}" (分组变量: "${group}") 进行峰度和偏度检验. 原假设 (H<sub>0</sub>) 为"峰度/偏度等于零"; 显著性水平 (α) 为 0.05.
+
+结果如表 1 所示.
+
+> 表 1 - 峰度和偏度检验结果
+
+| 组别 | 样本量 | 峰度 | z | p | 偏度 | z | p |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+${k
+	.map(
+		(k, i) =>
+			`| ${groups[i]} | ${data[i].length} | ${markS(k.kurtosis)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${markS(s[i].skewness)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
+	)
+	.join('\n')}
+
+一般来说, 若计算出的偏度或峰度的绝对值大于 1.96, 则说明分布是非正态的; 若偏度显著大于 0, 则说明分布呈正偏态, 反之, 则说明分布呈负偏态; 若峰度显著大于 0, 则说明分布形态尖而高耸, 若峰度显著小于 0, 则说明分布形态较为扁平. 但在实际应用中, 峰度和偏度值的检验容易受样本量的影响, 即样本量大时特别容易拒绝虚无假设. 因此在经验上, 即使虚无假设被拒绝 (即 P 值的绝对值大于 1.96), 若偏度和峰度绝对值较小, 分布仍可近似为正态的 (刘红云, 2023).
+	`
+}
+
 export function KurtosisSkewness() {
 	const dataCols = useData((state) => state.dataCols)
 	const dataRows = useData((state) => state.dataRows)
@@ -46,59 +108,29 @@ export function KurtosisSkewness() {
 						.map((row) => row[variable])
 						.filter((v) => typeof v === 'number'),
 				)
-				const k = data.map((arr) => new KurtosisTest(arr))
-				const s = data.map((arr) => new SkewnessTest(arr))
-				setStatResult(`
-## 1 峰度和偏度检验
-
-对被试内变量${variables.map((v) => `"${v}"`).join(', ')}进行峰度和偏度检验. 原假设 (H<sub>0</sub>) 为"峰度/偏度等于零"; 显著性水平 (α) 为 0.05.
-
-结果如表 1 所示.
-
-> 表 1 - 峰度和偏度检验结果
-
-| 变量 | 样本量 | 峰度 | z | p | 偏度 | z | p |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-${k
-	.map(
-		(k, i) =>
-			`| ${variables[i]} | ${data[i].length} | ${markS(k.kurtosis)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${markS(s[i].skewness)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
-	)
-	.join('\n')}
-        `)
+				setStatResult(kurtosisSkewnessCalculator({ type, variables, data }))
 			} else {
 				if (!variable || !group) {
 					throw new Error('请选择数据变量和分组变量')
 				}
-				const groups = Array.from(
-					new Set(dataRows.map((row) => row[group])),
-				).map(String)
+				const groups = Array.from(new Set(dataRows.map((row) => row[group])))
+					.filter((v) => v !== undefined)
+					.map(String)
 				const data: number[][] = groups.map((g) =>
 					dataRows
 						.filter((row) => row[group] === g)
 						.map((row) => row[variable])
 						.filter((v) => typeof v === 'number'),
 				)
-				const k = data.map((arr) => new KurtosisTest(arr))
-				const s = data.map((arr) => new SkewnessTest(arr))
-				setStatResult(`
-## 1 峰度和偏度检验
-
-对被试间变量"${variable}" (分组变量: "${group}") 进行峰度和偏度检验. 原假设 (H<sub>0</sub>) 为"峰度/偏度等于零"; 显著性水平 (α) 为 0.05.
-
-结果如表 1 所示.
-
-> 表 1 - 峰度和偏度检验结果
-
-| 组别 | 样本量 | 峰度 | z | p | 偏度 | z | p |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-${k
-	.map(
-		(k, i) =>
-			`| ${groups[i]} | ${data[i].length} | ${markS(k.kurtosis)} | ${markS(k.z, k.p)} | ${markP(k.p)} | ${markS(s[i].skewness)} | ${markS(s[i].z, s[i].p)} | ${markP(s[i].p)} |`,
-	)
-	.join('\n')}
-        `)
+				setStatResult(
+					kurtosisSkewnessCalculator({
+						type,
+						variable,
+						group,
+						data,
+						groups,
+					}),
+				)
 			}
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)

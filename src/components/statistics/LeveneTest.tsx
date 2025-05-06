@@ -10,7 +10,7 @@ import { Result } from '../widgets/Result'
 
 type Option = {
 	/** 类别 */
-	type: 'peer' | 'independent'
+	type: 'paired' | 'independent'
 	/** 被试间变量名 */
 	variable?: string
 	/** 被试内变量名 */
@@ -19,6 +19,49 @@ type Option = {
 	group?: string
 	/** 中心化方法 */
 	center: 'mean' | 'median'
+}
+
+export function leveneTestCalculator(config: {
+	type: 'paired' | 'independent'
+	variables?: string[]
+	variable?: string
+	group?: string
+	center: 'mean' | 'median'
+	data: number[]
+	groups: string[]
+}): string {
+	const { type, variables, variable, group, center, data, groups } = config
+	const m = new T(data, groups, center)
+	return `
+## 1 Levene 检验
+
+对被试${type === 'independent' ? '间' : '内'}变量${type === 'independent' ? `"${variable}" (分组变量: "${group}")` : variables?.map((v) => `"${v}"`).join(', ')}进行 Levene's Test (方差齐性检验). 原假设 (H<sub>0</sub>) 为"各${type === 'independent' ? '组' : '变量'}满足方差齐性".
+
+结果如表 1 所示.
+
+> 表 1 - Levene's Test 结果
+
+| 自由度 | F (w) | p |
+| :---: | :---: | :---: |
+| ${m.dfB}, ${m.dfW} | ${markS(m.w, m.p)} | ${markP(m.p)} |
+
+## 2 描述统计
+
+对被试${type === 'independent' ? '间' : '内'}变量${type === 'independent' ? `"${variable}" (分组变量: "${group}")` : variables?.map((v) => `"${v}"`).join(', ')}进行描述统计. 中心化方法为基于${center === 'mean' ? '均值' : '中位数'} (注: 此处中心化指离中心的"距离" (即差异的绝对值)).
+
+结果如表 2 所示.
+
+> 表 2 - 描述统计结果
+
+| ${type === 'independent' ? '组别' : '变量'} | 样本量 | 原始均值 | 原始中位数 | 中心化均值 | 中心化中位数 |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+${m.groups
+	.map(
+		(group, index) =>
+			`| ${group} | ${m.groupsCount[index]} | ${markS(m.groupsMeanR[index])} | ${markS(m.groupsMedianR[index])} | ${markS(m.groupsMeanC[index])} | ${markS(m.groupsMedianC[index])} |`,
+	)
+	.join('\n')}
+  `
 }
 
 export function LeveneTest() {
@@ -38,67 +81,47 @@ export function LeveneTest() {
 			messageApi?.loading('正在处理数据...', 0)
 			isLargeData && (await sleep())
 			const timestamp = Date.now()
-			const { type, variable, variables, group: groups, center } = values
-			let group: string[]
+			const { type, variable, variables, group, center } = values
+			let groups: string[]
 			let value: number[]
 			// 处理被试间变量
 			if (type === 'independent') {
-				if (!variable || !groups) {
+				if (!variable || !group) {
 					throw new Error('请选择数据变量和分组变量')
 				}
 				const filteredRows = dataRows.filter(
 					(row) =>
-						typeof row[variable] === 'number' && row[groups] !== undefined,
+						typeof row[variable] === 'number' && row[group] !== undefined,
 				)
-				group = filteredRows.map((row) => String(row[groups]))
+				groups = filteredRows.map((row) => String(row[group]))
 				value = filteredRows.map((row) => row[variable] as number)
 			} else {
 				if (!variables?.length) {
 					throw new Error('请选择变量')
 				}
-				group = []
+				groups = []
 				value = []
 				for (const variable of variables) {
 					const filteredRows = dataRows.filter(
 						(row) => typeof row[variable] === 'number',
 					)
 					for (const row of filteredRows) {
-						group.push(String(variable))
+						groups.push(String(variable))
 						value.push(row[variable] as number)
 					}
 				}
 			}
-			const m = new T(value, group, center)
-			setStatResult(`
-## 1 Levene 检验
-
-对被试${type === 'independent' ? '间' : '内'}变量${type === 'independent' ? `"${variable}" (分组变量: "${groups}")` : variables?.map((v) => `"${v}"`).join(', ')}进行 Levene's Test (方差齐性检验). 原假设 (H<sub>0</sub>) 为"各${type === 'independent' ? '组' : '变量'}满足方差齐性".
-
-结果如表 1 所示.
-
-> 表 1 - Levene's Test 结果
-
-| 自由度 | F (w) | p |
-| :---: | :---: | :---: |
-| ${m.dfB}, ${m.dfW} | ${markS(m.w, m.p)} | ${markP(m.p)} |
-
-## 2 描述统计
-
-对被试${type === 'independent' ? '间' : '内'}变量${type === 'independent' ? `"${variable}" (分组变量: "${groups}")` : variables?.map((v) => `"${v}"`).join(', ')}进行描述统计. 中心化方法为基于${center === 'mean' ? '均值' : '中位数'} (注: 此处中心化指离中心的"距离" (即差异的绝对值)).
-
-结果如表 2 所示.
-
-> 表 2 - 描述统计结果
-
-| ${type === 'independent' ? '组别' : '变量'} | 样本量 | 原始均值 | 原始中位数 | 中心化均值 | 中心化中位数 |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-${m.groups
-	.map(
-		(group, index) =>
-			`| ${group} | ${m.groupsCount[index]} | ${markS(m.groupsMeanR[index])} | ${markS(m.groupsMedianR[index])} | ${markS(m.groupsMeanC[index])} | ${markS(m.groupsMedianC[index])} |`,
-	)
-	.join('\n')}
-			`)
+			setStatResult(
+				leveneTestCalculator({
+					type,
+					variable,
+					variables,
+					group,
+					center,
+					data: value,
+					groups,
+				}),
+			)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {
@@ -108,7 +131,7 @@ ${m.groups
 			)
 		}
 	}
-	const [formType, setFormType] = useState<'peer' | 'independent'>('peer')
+	const [formType, setFormType] = useState<'paired' | 'independent'>('paired')
 
 	return (
 		<div className='component-main'>
@@ -127,7 +150,7 @@ ${m.groups
 					autoComplete='off'
 					initialValues={{
 						center: 'mean',
-						type: 'peer',
+						type: 'paired',
 					}}
 					disabled={disabled}
 				>
@@ -143,11 +166,11 @@ ${m.groups
 							optionType='button'
 							buttonStyle='solid'
 						>
-							<Radio value='peer'>被试内变量</Radio>
+							<Radio value='paired'>被试内变量</Radio>
 							<Radio value='independent'>被试间变量</Radio>
 						</Radio.Group>
 					</Form.Item>
-					{formType === 'peer' ? (
+					{formType === 'paired' ? (
 						<Form.Item
 							label='选择变量(至少两个)'
 							name='variables'

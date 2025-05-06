@@ -7,6 +7,18 @@ import { nav_to_plots_view } from './funcs/nav/nav_to_plots_view'
 import { nav_to_statistics_view } from './funcs/nav/nav_to_statistics_view'
 import { nav_to_tools_view } from './funcs/nav/nav_to_tools_view'
 import { nav_to_variable_view } from './funcs/nav/nav_to_variable_view'
+import {
+	kolmogorov_smirnov_test_for_independent_vars,
+	kolmogorov_smirnov_test_for_paired_vars,
+} from './funcs/statistics/kolmogorov_smirnov_test'
+import {
+	kurtosis_skewness_test_for_independent_vars,
+	kurtosis_skewness_test_for_paired_vars,
+} from './funcs/statistics/kurtosis_skewness_test'
+import {
+	levene_test_for_independent_vars,
+	levene_test_for_paired_vars,
+} from './funcs/statistics/levene_test'
 import { one_sample_t_test } from './funcs/statistics/one_sample_t_test'
 import { peer_sample_t_test } from './funcs/statistics/peer_sample_t_test'
 import { simple_mediator_test } from './funcs/statistics/simple_mediator_test'
@@ -45,6 +57,12 @@ const funcs: AIFunction[] = [
 	peer_sample_t_test,
 	two_sample_t_test,
 	welch_t_test,
+	levene_test_for_independent_vars,
+	levene_test_for_paired_vars,
+	kurtosis_skewness_test_for_independent_vars,
+	kurtosis_skewness_test_for_paired_vars,
+	kolmogorov_smirnov_test_for_independent_vars,
+	kolmogorov_smirnov_test_for_paired_vars,
 ]
 export const funcsTools = funcs.map((func) => func.tool)
 export const funcsLabel: Map<Funcs, AIFunction['label']> = new Map(
