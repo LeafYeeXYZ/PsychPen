@@ -23,7 +23,7 @@ export const create_sub_var: AIFunction = {
 		function: {
 			name: Funcs.CREATE_SUB_VAR,
 			description:
-				'你可以调用这个函数来帮助用户把指定变量的标准化/中心化/离散化子变量',
+				'你可以调用这个函数来帮助用户把指定变量的标准化/中心化/离散化子变量. 生成的子变量名为 `xxx_标准化`、`xxx_中心化`、`xxx_等宽离散`、`xxx_等频离散`、`xxx_聚类分析离散`, 其中 `xxx` 为原变量名',
 			parameters: {
 				type: 'object',
 				properties: {

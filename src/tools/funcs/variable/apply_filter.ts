@@ -13,7 +13,7 @@ export const apply_filter: AIFunction = {
 		type: 'function',
 		function: {
 			name: Funcs.APPLY_FILTER,
-			description: '你可以调用这个函数来帮助用户设置数据筛选规则',
+			description: '你可以调用这个函数来帮助用户设置数据筛选规则. 筛选所用的表达式中的任意变量为缺失值时, 该行数据会被过滤掉 (如果要保留该行数据, 则需要提前进行缺失值插值)',
 			parameters: {
 				type: 'object',
 				properties: {

@@ -7,6 +7,8 @@
 | ![](readme/intro-1.png) | ![](readme/intro-2.png) | ![](readme/intro-3.png) |
 | ![](readme/data-8.png)  | ![](readme/data-9.png)  | ![](readme/data-10.png) |
 
+> 文档更新可能滞后于软件版本更新, 请以软件实际功能为准
+
 ## 引用信息
 
 如果你在学术论文中使用了 PsychPen, 请引用以下信息 (APA格式) (请注意年份和版本号区别)
