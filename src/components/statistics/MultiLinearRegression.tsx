@@ -335,10 +335,9 @@ ${result.m.models
 			' = ',
 		)} = 0 | F = ${markS(result.m.model.F, result.m.model.p)} | ${markP(result.m.model.p)} |
 ${result.m.model.coefficients
-	.slice(1)
 	.map(
 		(_, index) =>
-			`| b${index + 1} | ${markS(result.m.model.coefficients[index + 1])} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+			`| b${index} | ${markS(result.m.model.coefficients[index])}${index === 0 ? ' (截距)' : ' (偏回归系数)'} | b${index} = 0 | t = ${markS(
 				result.m.model.tValues[index],
 				result.m.model.pValues[index],
 			)} | ${markP(result.m.model.pValues[index])} |`,
@@ -417,12 +416,11 @@ function getStepwiseLinearRegressionResult({
 			' + ',
 		)} = 0 | F = ${markS(result.m.F, result.m.p)} | ${markP(result.m.p)} |
 ${result.m.coefficients
-	.slice(1)
 	.map(
 		(_, index) =>
-			`| b${index + 1} (${result.x[result.m.selectedVariables[index]]}) | ${markS(
-				result.m.coefficients[index + 1],
-			)} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+			`| b${index}${index === 0 ? ' (截距)' : ` (${result.x[result.m.selectedVariables[index - 1]]})`} | ${markS(
+				result.m.coefficients[index],
+			)}${index === 0 ? ' (截距)' : ' (偏回归系数)'} | b${index} = 0 | t = ${markS(
 				result.m.tValues[index],
 				result.m.pValues[index],
 			)} | ${markP(result.m.pValues[index])} |`,
@@ -493,10 +491,9 @@ function getStandardLinearRegressionResult({
 			' + ',
 		)} = 0 | F = ${markS(result.m.F, result.m.p)} | ${markP(result.m.p)} |
 ${result.m.coefficients
-	.slice(1)
 	.map(
 		(_, index) =>
-			`| b${index + 1} | ${markS(result.m.coefficients[index + 1])} (偏回归系数) | b${index + 1} = 0 | t = ${markS(
+			`| b${index} | ${markS(result.m.coefficients[index])}${index === 0 ? ' (截距)' : ' (偏回归系数)'} | b${index} = 0 | t = ${markS(
 				result.m.tValues[index],
 				result.m.pValues[index],
 			)} | ${markP(result.m.pValues[index])} |`,
