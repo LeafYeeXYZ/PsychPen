@@ -23,10 +23,22 @@ import { shortId, sleep, tryCatch } from '../../lib/utils'
 import { Funcs } from '../../tools/enum'
 import { custom_export_type } from '../../tools/funcs/data/custom_export'
 import { export_data_type } from '../../tools/funcs/data/export_data'
-import { nav_to_plots_view_type } from '../../tools/funcs/nav/nav_to_plots_view'
-import { nav_to_statistics_view_type } from '../../tools/funcs/nav/nav_to_statistics_view'
-import { nav_to_tools_view_type } from '../../tools/funcs/nav/nav_to_tools_view'
-import { nav_to_variable_view_type } from '../../tools/funcs/nav/nav_to_variable_view'
+import {
+	nav_to_plots_view_desc,
+	nav_to_plots_view_type,
+} from '../../tools/funcs/nav/nav_to_plots_view'
+import {
+	nav_to_statistics_view_desc,
+	nav_to_statistics_view_type,
+} from '../../tools/funcs/nav/nav_to_statistics_view'
+import {
+	nav_to_tools_view_desc,
+	nav_to_tools_view_type,
+} from '../../tools/funcs/nav/nav_to_tools_view'
+import {
+	nav_to_variable_view_desc,
+	nav_to_variable_view_type,
+} from '../../tools/funcs/nav/nav_to_variable_view'
 import {
 	kolmogorov_smirnov_test_for_independent_vars_type,
 	kolmogorov_smirnov_test_for_paired_vars_type,
@@ -76,7 +88,7 @@ const GREETTING = `
 const INSTRUCTION = `
 你是在线统计分析和数据可视化软件"PsychPen"中的AI助手.
 
-你将收到用户的提问、当前用户导入到软件中的数据集中的变量和数据的信息、PsychPen的文档、可以供你调用的工具 (函数) 信息.
+你将收到用户的提问、当前用户导入到软件中的数据集中的变量和数据的信息、PsychPen的文档 (节选)、可以供你调用的工具 (函数) 信息.
 
 你的任务是按照用户的要求, 对用户进行回复或调用工具 (函数). 在调用工具 (函数) 前, 请确保你已经明确知晓了用户的意图, 否则请通过进一步和用户对话来确认细节. 有的工具需要用户确认后才会执行, 你无法知道用户是否已经确认.
 
@@ -1044,7 +1056,8 @@ export function AI() {
 								)
 								setMainPage(MAIN_PAGES_LABELS.VARIABLE)
 								setVariableViewSubPage(page)
-								newMessages[1].content = `已成功跳转到变量视图的${page}页面`
+								const desc = nav_to_variable_view_desc.get(page)
+								newMessages[1].content = `已成功跳转到变量视图的${page}页面, 其使用方法为:\n\n${desc}`
 								break
 							}
 							case Funcs.NAV_TO_PLOTS_VIEW: {
@@ -1058,7 +1071,8 @@ export function AI() {
 								)
 								setMainPage(MAIN_PAGES_LABELS.PLOTS)
 								setPlotsViewSubPage(page)
-								newMessages[1].content = `已成功跳转到绘图视图的${page}页面`
+								const desc = nav_to_plots_view_desc.get(page)
+								newMessages[1].content = `已成功跳转到绘图视图的${page}页面, 其使用方法为:\n\n${desc}`
 								break
 							}
 							case Funcs.NAV_TO_STATISTICS_VIEW: {
@@ -1072,7 +1086,8 @@ export function AI() {
 								)
 								setMainPage(MAIN_PAGES_LABELS.STATISTICS)
 								setStatisticsViewSubPage(page)
-								newMessages[1].content = `已成功跳转到统计视图的${page}页面`
+								const desc = nav_to_statistics_view_desc.get(page)
+								newMessages[1].content = `已成功跳转到统计视图的${page}页面, 其使用方法为:\n\n${desc}`
 								break
 							}
 							case Funcs.NAV_TO_TOOLS_VIEW: {
@@ -1086,7 +1101,8 @@ export function AI() {
 								)
 								setMainPage(MAIN_PAGES_LABELS.TOOLS)
 								setToolsViewSubPage(page)
-								newMessages[1].content = `已成功跳转到工具视图的${page}页面`
+								const desc = nav_to_tools_view_desc.get(page)
+								newMessages[1].content = `已成功跳转到工具视图的${page}页面, 其使用方法为:\n\n${desc}`
 								break
 							}
 							default: {

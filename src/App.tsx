@@ -18,6 +18,7 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { version } from '../package.json'
 import { AI } from './components/assistant/AI'
 import { Debug } from './components/widgets/Debug'
+import { TestLoader } from './components/widgets/TestLoader'
 import { useData } from './hooks/useData'
 import { MAIN_PAGES_LABELS, useNav } from './hooks/useNav'
 import { useStates } from './hooks/useStates'
@@ -83,6 +84,7 @@ export function App() {
 				</Drawer>
 				{contextHolder}
 				{import.meta.env.DEV && <Debug />}
+				{import.meta.env.DEV && <TestLoader />}
 			</ErrorBoundary>
 		</ConfigProvider>
 	)
