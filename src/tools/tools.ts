@@ -2,6 +2,7 @@ import type { AIFunction } from '../types'
 import type { Funcs } from './enum'
 import { custom_export } from './funcs/data/custom_export'
 import { export_data } from './funcs/data/export_data'
+import { get_user_stat_result } from './funcs/data/get_user_stat_result'
 import { nav_to_data_view } from './funcs/nav/nav_to_data_view'
 import { nav_to_plots_view } from './funcs/nav/nav_to_plots_view'
 import { nav_to_statistics_view } from './funcs/nav/nav_to_statistics_view'
@@ -35,7 +36,6 @@ import {
 	clear_missing_value,
 	define_missing_value,
 } from './funcs/variable/missing_value'
-import { get_user_stat_result } from './funcs/data/get_user_stat_result'
 
 const funcs: AIFunction[] = [
 	export_data,

@@ -341,7 +341,8 @@ export function AI() {
 						switch (toolCall.function.name) {
 							case Funcs.GET_USER_STAT_RESULT: {
 								if (activeMainPage !== MAIN_PAGES_LABELS.STATISTICS) {
-								  newMessages[1].content = '用户当前页面不在统计视图, 无统计结果'
+									newMessages[1].content =
+										'用户当前页面不在统计视图, 无统计结果'
 								} else if (!statResult) {
 									newMessages[1].content = '用户还未进行统计分析, 无统计结果'
 								} else {
