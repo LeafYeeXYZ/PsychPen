@@ -103,14 +103,12 @@ $$
 function GET_PROMPT({
 	vars,
 	page,
-	stat,
 	filterExpression,
 	totalCount,
 	usableCount,
 }: {
 	vars: Variable[]
 	page: string
-	stat: string
 	filterExpression: string
 	totalCount: number
 	usableCount: number
@@ -132,7 +130,7 @@ function GET_PROMPT({
 			: '未定义任何子变量'
 		return `| ${col.name} | ${col.type} | ${col.valid} | ${col.missing} | ${col.missingValues ? col.missingValues.map((v) => `"${v}"`).join('、') : '(未定义缺失值)'} | ${col.unique} | ${col.mean?.toFixed(4) || '-'} | ${col.std?.toFixed(4) || '-'} | ${col.q2?.toFixed(4) || '-'} | ${col.q1?.toFixed(4) || '-'} | ${col.q3?.toFixed(4) || '-'} | ${col.min?.toFixed(4) || '-'} | ${col.max?.toFixed(4) || '-'} | ${subVarInfo} |`
 	})
-	const userText = `\n\n# 用户信息\n\n用户当前所处的页面为: ${page}${stat && `, 当前UI界面中的统计结果为: \n\n\`\`\`markdown\n${stat}\n\`\`\``}`
+	const userText = `\n\n# 用户信息\n\n用户当前所处的页面为: ${page}`
 	const varsText = `\n\n# 变量信息\n\n| 变量名 | 变量类型 | 有效值数量 | 缺失值数量 | 缺失值定义 | 唯一值数量 | 均值 | 标准差 | 中位数 (q2) | q1 | q3 | 最小值 | 最大值 | 子变量信息 |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n${varsInfo.join('\n')}`
 	const dataText = `\n\n# 数据信息\n\n用户原始数据共包含 ${totalCount} 行数据, 经过筛选后剩余 ${usableCount} 行数据. 当前生效的筛选表达式为: \n\n\`\`\`markdown\n${filterExpression || '(无)'}\n\`\`\``
 	const docsText = `\n\n# 使用文档\n\n\`\`\`markdown\n${readme.replace(
@@ -211,11 +209,6 @@ export function AI() {
 			const system = GET_PROMPT({
 				vars: dataCols,
 				page: currentPageInfo(),
-				stat:
-					statResult ||
-					(activeMainPage === MAIN_PAGES_LABELS.STATISTICS
-						? '(还未进行统计分析)'
-						: '(无)'),
 				filterExpression: filterExpression,
 				totalCount: data?.length || Number.NaN,
 				usableCount: dataRows.length,
@@ -346,6 +339,16 @@ export function AI() {
 					]
 					try {
 						switch (toolCall.function.name) {
+							case Funcs.GET_USER_STAT_RESULT: {
+								if (activeMainPage !== MAIN_PAGES_LABELS.STATISTICS) {
+								  newMessages[1].content = '用户当前页面不在统计视图, 无统计结果'
+								} else if (!statResult) {
+									newMessages[1].content = '用户还未进行统计分析, 无统计结果'
+								} else {
+									newMessages[1].content = `##### 统计结果\n\n${statResult}`
+								}
+								break
+							}
 							case Funcs.CUSTOM_EXPORT: {
 								const raw = await tryCatch(
 									() => JSON.parse(toolCall.function.arguments),

@@ -35,6 +35,7 @@ import {
 	clear_missing_value,
 	define_missing_value,
 } from './funcs/variable/missing_value'
+import { get_user_stat_result } from './funcs/data/get_user_stat_result'
 
 const funcs: AIFunction[] = [
 	export_data,
@@ -63,6 +64,7 @@ const funcs: AIFunction[] = [
 	kurtosis_skewness_test_for_paired_vars,
 	kolmogorov_smirnov_test_for_independent_vars,
 	kolmogorov_smirnov_test_for_paired_vars,
+	get_user_stat_result,
 ]
 export const funcsTools = funcs.map((func) => func.tool)
 export const funcsLabel: Map<Funcs, AIFunction['label']> = new Map(

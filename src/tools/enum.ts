@@ -25,4 +25,5 @@ export enum Funcs {
 	KOLMOGOROV_SMIRNOV_TEST_FOR_PAIRED_VARS = 'kolmogorov_smirnov_test_for_paired_vars',
 	KURTOSIS_SKEWNESS_TEST_FOR_INDEPENDENT_VARS = 'kurtosis_skewness_test_for_independent_vars',
 	KURTOSIS_SKEWNESS_TEST_FOR_PAIRED_VARS = 'kurtosis_skewness_test_for_paired_vars',
+	GET_USER_STAT_RESULT = 'get_user_stat_result',
 }
