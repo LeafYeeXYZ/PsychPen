@@ -163,8 +163,10 @@ export function PreviewData() {
 									content={
 										<div className='flex flex-col gap-1'>
 											<div>
-												在输入全部信息后, 请点击确认,
-												系统将自动检查AI服务是否可用
+												在开启AI辅助分析并输入全部信息后, 请点击确认按钮
+											</div>
+											<div>
+												待左侧标志变为绿色的"已设置"后, 即可使用AI助手
 											</div>
 										</div>
 									}
