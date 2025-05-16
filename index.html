@@ -17,6 +17,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-direction: column;
         width: 100dvw;
         height: 100dvh;
         position: fixed;
@@ -24,6 +25,15 @@
         left: 0;
         background-color: #f3f4f6;
         color: black;
+      }
+      #loading-title {
+        font-size: 1.5rem;
+        line-height: 1.3333;
+      }
+      #loading-badge {
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
       @media (prefers-color-scheme: dark) {
         #loading-content {
@@ -48,8 +58,12 @@
       }
     </style>
     <div id="loading-content">
-      <span style="font-size: 1.2rem">加载中</span>
-      <span id="loading-animation"></span>
+      <p id="loading-title">PsychPen: 在线统计分析和数据可视化工具</p>
+      <hr style="width: 15rem">
+      <p id="loading-badge">
+        <span style="font-size: 1.2rem">加载中</span>
+        <span id="loading-animation"></span>
+      </p>
     </div>
     <script id="loading-script">
       window.onload = () => {
