@@ -165,9 +165,7 @@ export function PreviewData() {
 											<div>
 												在开启AI辅助分析并输入全部信息后, 请点击确认按钮
 											</div>
-											<div>
-												待左侧标志变为绿色的"已设置"后, 即可使用AI助手
-											</div>
+											<div>待左侧标志变为绿色的"已设置"后, 即可使用AI助手</div>
 										</div>
 									}
 								>

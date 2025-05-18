@@ -4,7 +4,7 @@ import { Funcs } from '../../enum'
 
 export const custom_export_type = z.object({
 	file_name: z.string(),
-	file_type: z.enum(['json', 'txt', 'csv']),
+	file_type: z.enum(['json', 'txt', 'csv', 'md']),
 	function_code: z.string(),
 })
 
@@ -61,7 +61,7 @@ type Variable = {
 }
 \`\`\`
 
-请注意, 你的代码中返回的结果 (最终使用 return 关键字返回的值) 必须是一个字符串. 你需要根据选择的文件类型, 在代码中把它转换为 JSON / CSV / 其他文本格式的字符串.
+请注意, 你的代码中返回的结果 (最终使用 return 关键字返回的值) 必须是一个字符串. 你需要根据选择的文件类型, 在代码中把它转换为相应格式的字符串.
 `
 
 export const custom_export: AIFunction = {
@@ -80,7 +80,7 @@ export const custom_export: AIFunction = {
 						description: '文件名 (不含扩展名)',
 					},
 					file_type: {
-						enum: ['json', 'txt', 'csv'],
+						enum: ['json', 'txt', 'csv', 'md'],
 						description: '文件类型',
 					},
 					function_code: {

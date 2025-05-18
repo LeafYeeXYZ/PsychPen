@@ -311,16 +311,16 @@ export function ConfigAI() {
 			</div>
 			<div className='flex flex-col gap-1'>
 				<p className='w-full text-sm font-black text-center px-2'>
-          PsychPen 本身不提供任何AI算力服务, 也不含任何付费功能
+					PsychPen 本身不提供任何AI算力服务, 也不含任何付费功能
 				</p>
 				<p className='w-full text-xs text-center px-2'>
-          你可以选择使用任何第三方AI服务提供商, 如阿里云百炼、OpenAI等
+					你可以选择使用任何第三方AI服务提供商, 如阿里云百炼、OpenAI等
 				</p>
 				<p className='w-full text-xs text-center px-2'>
-          这些服务提供商可能会对API请求进行收费
+					这些服务提供商可能会对API请求进行收费
 				</p>
 				<p className='w-full text-xs text-center px-2'>
-          这些服务提供商还可能会收集你的数据信息, 请自行保证数据安全
+					这些服务提供商还可能会收集你的数据信息, 请自行保证数据安全
 				</p>
 			</div>
 		</div>

@@ -18,7 +18,7 @@ export function CustomExportTool({
 	setDone?: (done: boolean) => void
 	id: string
 	file_name: string
-	file_type: 'json' | 'txt' | 'csv'
+	file_type: 'json' | 'txt' | 'csv' | 'md'
 	function_code: string
 }) {
 	const dataRows = useData((state) => state.dataRows)
