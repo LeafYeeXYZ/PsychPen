@@ -211,6 +211,7 @@ export function TDistribution() {
 			<div className='w-full h-8 my-4 flex justify-center items-center gap-4 overflow-auto'>
 				<InputNumber
 					defaultValue={DEFAULT_MEAN}
+					step={0.1}
 					onChange={(value) => {
 						if (timer.current) {
 							clearInterval(timer.current)
