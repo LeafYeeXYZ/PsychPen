@@ -401,7 +401,7 @@ export function AI() {
 												.filter((row) => row[groupVar] === g)
 												.map((row) => row[dataVar]) as number[],
 									)
-									const result = kurtosisSkewnessCalculator({
+									const result = kolmogorovSmirnovTestCalculator({
 										type: 'independent',
 										variable: dataVar,
 										group: groupVar,
