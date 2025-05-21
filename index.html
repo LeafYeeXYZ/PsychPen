@@ -40,6 +40,9 @@
           background-color: #111827;
           color: white;
         }
+        #loading-line {
+          border-color: white;
+        }
       }
       #loading-animation {
         display: inline-block;
@@ -59,7 +62,10 @@
     </style>
     <div id="loading-content">
       <p id="loading-title">PsychPen: 在线统计分析和数据可视化工具</p>
-      <p style="border: 0.5px solid black; width: 15rem; margin: 0.5rem 0" />
+      <p 
+        id="loading-line"
+        style="border: 0.5px solid black; width: 15rem; margin: 0.5rem 0" 
+      />
       <p id="loading-badge">
         <span style="font-size: 1.2rem">加载中</span>
         <span id="loading-animation"></span>
