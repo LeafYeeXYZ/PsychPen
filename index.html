@@ -35,6 +35,11 @@
         justify-content: center;
         align-items: center;
       }
+      #loading-line {
+        border: 0.5px solid black;
+        width: 15rem;
+        margin: 0.5rem 0;
+      }
       @media (prefers-color-scheme: dark) {
         #loading-content {
           background-color: #111827;
@@ -62,10 +67,7 @@
     </style>
     <div id="loading-content">
       <p id="loading-title">PsychPen: 在线统计分析和数据可视化工具</p>
-      <p 
-        id="loading-line"
-        style="border: 0.5px solid black; width: 15rem; margin: 0.5rem 0" 
-      />
+      <p id="loading-line" />
       <p id="loading-badge">
         <span style="font-size: 1.2rem">加载中</span>
         <span id="loading-animation"></span>
