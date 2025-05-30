@@ -21,7 +21,7 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks: {
-					antd: ['antd', '@ant-design/v5-patch-for-react-19'],
+					antd: ['antd'],
 					'psych-sheet': ['@psych/sheet'],
 					echarts: ['echarts'],
 					'echarts-extension': [
@@ -31,10 +31,11 @@ export default defineConfig({
 					],
 					'ag-grid': ['ag-grid-react', 'ag-grid-community'],
 					'utils-a': [
+						'@ant-design/v5-patch-for-react-19',
+						'@ant-design/icons',
 						'zod',
 						'html2canvas-pro',
 						'bowser',
-						'@ant-design/icons',
 						'openai',
 						'@leaf/parse-think',
 					],
