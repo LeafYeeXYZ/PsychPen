@@ -21,7 +21,7 @@ export const apply_filter: AIFunction = {
 					filter_expression: {
 						type: 'string',
 						description:
-							'过滤表达式 (语法见文档), 如果返回空字符串则表示清除过滤器',
+							'过滤表达式 (语法见文档), 如果返回空字符串则表示清除过滤器; 表达式结果为 true 的行会被过滤、结果为 false 的行会被保留',
 					},
 				},
 				required: ['filter_expression'],

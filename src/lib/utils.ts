@@ -119,8 +119,8 @@ export function computeExpression(
 		}
 		const embeded = embedValues(expression, variables, data)
 		const value = new Function(`return ${embeded}`)()
-		if (typeof value !== 'number' && typeof value != 'string') {
-			throw new Error('表达式计算结果不是数字或字符串')
+		if (typeof value !== 'number' && typeof value != 'string' && typeof value != 'undefined') {
+			throw new Error('表达式计算结果不是数字、字符串或缺失值')
 		}
 		return value
 	} catch (e) {
