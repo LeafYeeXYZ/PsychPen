@@ -24,7 +24,8 @@ export const create_new_var: AIFunction = {
 					},
 					calc_expression: {
 						type: 'string',
-						description: '计算表达式 (语法见文档); 表达式结果必须为 number、string、undefined 三种类型之一',
+						description:
+							'计算表达式 (语法见文档); 表达式结果必须为 number、string、undefined 三种类型之一',
 					},
 				},
 				required: ['variable_name', 'calc_expression'],

@@ -290,22 +290,7 @@ export function WordCloudPlot() {
 							</Form.Item>
 						</Space.Compact>
 					</Form.Item>
-					<Form.Item
-						label='内容过滤设置(可输入正则表达式)'
-						name='filter'
-						rules={[
-							({ getFieldValue }) => ({
-								validator(_, value) {
-									if (!getFieldValue('split') && value?.length) {
-										return Promise.reject(
-											'如果需要进行内容过滤, 请启用词语切分',
-										)
-									}
-									return Promise.resolve()
-								},
-							}),
-						]}
-					>
+					<Form.Item label='内容过滤设置(可输入正则表达式)' name='filter'>
 						<Select
 							className='w-full'
 							placeholder='留空则不过滤'
@@ -316,10 +301,10 @@ export function WordCloudPlot() {
 							}))}
 						/>
 					</Form.Item>
-					<Form.Item label='词语切分' name='split'>
+					<Form.Item label='自动词语切分' name='split'>
 						<Select
 							className='w-full'
-							placeholder='请选择是否启用词语切分'
+							placeholder='请选择是否启用自动词语切分'
 							options={[
 								{ label: '启用', value: true },
 								{ label: '不启用', value: false },
