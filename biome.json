@@ -1,27 +1,15 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
 		"useIgnoreFile": true
 	},
-	"organizeImports": {
-		"enabled": true
-	},
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
-			"style": {
-				"noNonNullAssertion": "warn"
-			},
-			"security": {
-				"noGlobalEval": "off",
-				"noDangerouslySetInnerHtml": "off"
-			},
-			"suspicious": {
-				"noDoubleEquals": "off"
-			}
+			"recommended": true
 		}
 	},
 	"javascript": {

@@ -750,8 +750,10 @@ export function AI() {
 											typeof row[dataVar] === 'number' &&
 											typeof row[groupVar] !== 'undefined'
 										) {
+											// biome-ignore lint/suspicious/noDoubleEquals: 故意使用 == 而不是 ===, 因为可能存在字符串和数字的比较
 											row[groupVar] == group1label &&
 												group1data.push(row[dataVar])
+											// biome-ignore lint/suspicious/noDoubleEquals: 故意使用 == 而不是 ===, 因为可能存在字符串和数字的比较
 											row[groupVar] == group2label &&
 												group2data.push(row[dataVar])
 										}

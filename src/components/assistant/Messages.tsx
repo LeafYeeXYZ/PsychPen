@@ -99,6 +99,7 @@ export function Messages({
 								<Typography>
 									<div
 										className='markdown -mb-[0.8rem]'
+										// biome-ignore lint/security/noDangerouslySetInnerHtml: 为了渲染 Markdown, 后期可以改为 iframe (但需要处理样式问题)
 										dangerouslySetInnerHTML={{
 											__html: marked
 												.parse(

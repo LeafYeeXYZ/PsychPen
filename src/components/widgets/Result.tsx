@@ -4,7 +4,10 @@ import { renderStatResult } from '../../lib/utils'
 export function Result({
 	result,
 	fitHeight,
-}: { result: string; fitHeight?: boolean }) {
+}: {
+	result: string
+	fitHeight?: boolean
+}) {
 	const iframeRef = useRef<HTMLIFrameElement>(null)
 	return (
 		<iframe

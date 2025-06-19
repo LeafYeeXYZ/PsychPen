@@ -1,8 +1,8 @@
 import { Button, Form, Input, InputNumber, Select, Space } from 'antd'
-import * as echarts from 'echarts'
 import type { EChartsOption } from 'echarts'
+import * as echarts from 'echarts'
 import ecStat from 'echarts-stat'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData'
 import { useStates } from '../../hooks/useStates'
@@ -42,7 +42,7 @@ export function BasicScatterPlot() {
 	// 图形设置相关
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const [rendered, setRendered] = useState<boolean>(false)
-
+	const plotId = useId()
 	const handleFinish = async (values: Option) => {
 		try {
 			messageApi?.loading('正在处理数据...', 0)
@@ -51,7 +51,7 @@ export function BasicScatterPlot() {
 			const { xVar, yVar, xLabel, yLabel, regression, formula } = values
 			// @ts-expect-error echarts-stat 没有提供正确的类型定义
 			echarts.registerTransform(ecStat.transform.regression)
-			const ele = document.getElementById('echarts-container')
+			const ele = document.getElementById(plotId)
 			if (!ele) {
 				throw new Error('无法找到图表容器')
 			}
@@ -278,7 +278,7 @@ export function BasicScatterPlot() {
 							onClick={async () => {
 								try {
 									flushSync(() => setDisabled(true))
-									await downloadImage()
+									await downloadImage(plotId)
 									messageApi?.success('图片保存成功')
 								} catch (e) {
 									messageApi?.error(
@@ -299,7 +299,7 @@ export function BasicScatterPlot() {
 
 			<div className='component-result'>
 				<div className='w-full h-full overflow-auto'>
-					<div className='w-full h-full' id='echarts-container' />
+					<div className='w-full h-full' id={plotId} />
 				</div>
 				{!rendered && (
 					<div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>

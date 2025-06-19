@@ -32,13 +32,13 @@ export function transformData(data: Record<string, unknown>): DataRow {
 	return Object.fromEntries(
 		Object.entries(data).map(([key, value]) => {
 			if (value === null) {
-				return [key, undefined]
+				return [String(key), undefined]
 			}
 			const num = Number(value)
 			if (Number.isNaN(num) || num > MAX_VALUE || num < MIN_VALUE) {
-				return [key, String(value)]
+				return [String(key), String(value)]
 			}
-			return [key, num]
+			return [String(key), num]
 		}),
 	)
 }
@@ -108,7 +108,7 @@ export function computeExpression(
 		if (vars) {
 			for (const v of vars) {
 				const name = v.slice(3, -3)
-				if (!variables.find((v) => v.name == name)) {
+				if (!variables.find((v) => v.name === name)) {
 					throw new Error(`变量 ${name} 不存在`)
 				}
 				const value = data[name]
@@ -121,8 +121,8 @@ export function computeExpression(
 		const value = new Function(`return ${embeded}`)()
 		if (
 			typeof value !== 'number' &&
-			typeof value != 'string' &&
-			typeof value != 'undefined'
+			typeof value !== 'string' &&
+			typeof value !== 'undefined'
 		) {
 			throw new Error('表达式计算结果不是数字、字符串或缺失值')
 		}
@@ -151,7 +151,7 @@ export function embedValues(
 	// min(:::name:::)
 	exp = exp.replace(/min\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(7, -4)
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		if (variable.min === undefined)
 			throw new Error(`变量 ${name} 没有最小值, 请确认变量类型`)
@@ -160,7 +160,7 @@ export function embedValues(
 	// max(:::name:::)
 	exp = exp.replace(/max\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(7, -4)
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		if (variable.max === undefined)
 			throw new Error(`变量 ${name} 没有最大值, 请确认变量类型`)
@@ -169,7 +169,7 @@ export function embedValues(
 	// mean(:::name:::)
 	exp = exp.replace(/mean\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(8, -4)
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		if (variable.mean === undefined)
 			throw new Error(`变量 ${name} 没有均值, 请确认变量类型`)
@@ -178,7 +178,7 @@ export function embedValues(
 	// mode(:::name:::)
 	exp = exp.replace(/mode\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(8, -4)
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		if (variable.mode === undefined)
 			throw new Error(`变量 ${name} 没有众数, 请确认变量类型`)
@@ -187,7 +187,7 @@ export function embedValues(
 	// q1(:::name:::)
 	exp = exp.replace(/q1\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(6, -4)
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		if (variable.q1 === undefined)
 			throw new Error(`变量 ${name} 没有 25% 分位数, 请确认变量类型`)
@@ -196,7 +196,7 @@ export function embedValues(
 	// q2(:::name:::)
 	exp = exp.replace(/q2\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(6, -4)
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		if (variable.q2 === undefined)
 			throw new Error(`变量 ${name} 没有 50% 分位数, 请确认变量类型`)
@@ -205,7 +205,7 @@ export function embedValues(
 	// q3(:::name:::)
 	exp = exp.replace(/q3\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(6, -4)
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		if (variable.q3 === undefined)
 			throw new Error(`变量 ${name} 没有 75% 分位数, 请确认变量类型`)
@@ -214,7 +214,7 @@ export function embedValues(
 	// std(:::name:::)
 	exp = exp.replace(/std\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(7, -4)
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		if (variable.std === undefined)
 			throw new Error(`变量 ${name} 没有标准差, 请确认变量类型`)
@@ -223,7 +223,7 @@ export function embedValues(
 	// :::name:::
 	exp = exp.replace(/:::.+?:::/g, (v) => {
 		const name = v.slice(3, -3)
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) throw new Error(`变量 ${name} 不存在`)
 		const value = data[name]
 		if (value === undefined) {
@@ -327,8 +327,8 @@ export function markP(p: number, hideZero = true): string {
 /**
  * 把当前 echarts 图表保存为图片
  */
-export async function downloadImage(): Promise<void> {
-	const ele = document.getElementById('echarts-container')?.firstChild
+export async function downloadImage(id: string): Promise<void> {
+	const ele = document.getElementById(id)?.firstChild
 	if (!(ele instanceof HTMLElement)) {
 		throw new Error('图表元素不存在')
 	}

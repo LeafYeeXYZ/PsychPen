@@ -1,23 +1,28 @@
 import { CodeOutlined } from '@ant-design/icons'
 import { Button, Popover } from 'antd'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useStates } from '../../hooks/useStates'
 import { shortId } from '../../lib/utils'
 
 export function Debug() {
+	const debugComtainerRef = useRef<HTMLDivElement>(null)
 	return (
 		<div
 			className='absolute bottom-3 left-3 flex items-center justify-center p-1 rounded-md shadow-2xl border bg-white dark:bg-gray-800 dark:border-gray-700'
-			id='debug-component'
+			ref={debugComtainerRef}
 		>
-			<Popover content={<_Debug />}>
+			<Popover content={<_Debug containerRef={debugComtainerRef} />}>
 				<Button type='text' icon={<CodeOutlined />} />
 			</Popover>
 		</div>
 	)
 }
 
-function _Debug() {
+function _Debug({
+	containerRef,
+}: {
+	containerRef: React.RefObject<HTMLDivElement | null>
+}) {
 	const messageApi = useStates((state) => state.messageApi)
 	const [bug, setBug] = useState<{ test: string } | undefined>({ test: 'bug' })
 	return (
@@ -25,7 +30,7 @@ function _Debug() {
 			<Button
 				block
 				onClick={() => {
-					const ele = document.getElementById('debug-component')
+					const ele = containerRef.current
 					if (ele) {
 						ele.style.display = 'none'
 						setTimeout(() => {

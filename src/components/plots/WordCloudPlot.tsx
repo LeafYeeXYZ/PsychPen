@@ -2,7 +2,7 @@ import * as echarts from 'echarts'
 import 'echarts-wordcloud'
 import { Button, ColorPicker, Form, InputNumber, Select, Space } from 'antd'
 import init, { cut } from 'jieba-wasm'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData'
 import { useStates } from '../../hooks/useStates'
@@ -72,6 +72,7 @@ export function WordCloudPlot() {
 	// 图形设置相关
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const [rendered, setRendered] = useState<boolean>(false)
+	const plotId = useId()
 	const handleFinish = async (values: Option) => {
 		try {
 			messageApi?.loading('正在处理数据...', 0)
@@ -79,7 +80,7 @@ export function WordCloudPlot() {
 			const timestamp = Date.now()
 			const { variable, shape, min, max, rotation, filter, color, split } =
 				values
-			const ele = document.getElementById('echarts-container')
+			const ele = document.getElementById(plotId)
 			if (!ele) {
 				throw new Error('无法找到图表容器')
 			}
@@ -328,7 +329,7 @@ export function WordCloudPlot() {
 							onClick={async () => {
 								try {
 									flushSync(() => setDisabled(true))
-									await downloadImage()
+									await downloadImage(plotId)
 									messageApi?.success('图片保存成功')
 								} catch (e) {
 									messageApi?.error(
@@ -355,7 +356,7 @@ export function WordCloudPlot() {
 
 			<div className='component-result'>
 				<div className='w-full h-full overflow-auto'>
-					<div className='w-full h-full' id='echarts-container' />
+					<div className='w-full h-full' id={plotId} />
 				</div>
 				{!rendered && (
 					<div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>

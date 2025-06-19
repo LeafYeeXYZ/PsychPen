@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import {
 	type AIFunction,
-	ALLOWED_INTERPOLATION_METHODS,
 	ALL_VARS_IDENTIFIER,
+	ALLOWED_INTERPOLATION_METHODS,
 } from '../../../types'
 import { Funcs } from '../../enum'
 

@@ -1,7 +1,7 @@
 import { Button, Form, Input, Radio, Select, Space } from 'antd'
-import * as echarts from 'echarts'
 import type { EChartsOption } from 'echarts'
-import { useState } from 'react'
+import * as echarts from 'echarts'
+import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData'
 import { useStates } from '../../hooks/useStates'
@@ -38,6 +38,7 @@ export function BasicBoxPlot() {
 	// 图形设置相关
 	const [disabled, setDisabled] = useState<boolean>(false)
 	const [rendered, setRendered] = useState<boolean>(false)
+	const plotId = useId()
 	const handleFinish = async (values: Option) => {
 		try {
 			messageApi?.loading('正在处理数据...', 0)
@@ -53,7 +54,7 @@ export function BasicBoxPlot() {
 				peerLabel,
 				dataLabel,
 			} = values
-			const ele = document.getElementById('echarts-container')
+			const ele = document.getElementById(plotId)
 			if (!ele) {
 				throw new Error('无法找到图表容器')
 			}
@@ -449,7 +450,7 @@ export function BasicBoxPlot() {
 							onClick={async () => {
 								try {
 									flushSync(() => setDisabled(true))
-									await downloadImage()
+									await downloadImage(plotId)
 									messageApi?.success('图片保存成功')
 								} catch (e) {
 									messageApi?.error(
@@ -470,7 +471,7 @@ export function BasicBoxPlot() {
 
 			<div className='component-result'>
 				<div className='w-full h-full overflow-auto'>
-					<div className='w-full h-full' id='echarts-container' />
+					<div className='w-full h-full' id={plotId} />
 				</div>
 				{!rendered && (
 					<div className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>

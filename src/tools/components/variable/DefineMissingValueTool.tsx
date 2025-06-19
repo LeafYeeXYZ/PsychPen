@@ -39,17 +39,15 @@ export function DefineMissingValueTool({
 						所有变量
 					</Tag>
 				) : (
-					<>
-						{variable_names.map((name) => (
-							<Tag
-								key={name}
-								style={{ margin: 0, marginLeft: '0.3rem' }}
-								color='blue'
-							>
-								{name}
-							</Tag>
-						))}
-					</>
+					variable_names.map((name) => (
+						<Tag
+							key={name}
+							style={{ margin: 0, marginLeft: '0.3rem' }}
+							color='blue'
+						>
+							{name}
+						</Tag>
+					))
 				)}{' '}
 				的缺失值为:
 				{missing_values.map((value) => (

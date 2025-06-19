@@ -37,17 +37,15 @@ export function ClearInterpolateTool({
 						所有变量
 					</Tag>
 				) : (
-					<>
-						{variable_names.map((name) => (
-							<Tag
-								key={name}
-								style={{ margin: 0, marginLeft: '0.3rem' }}
-								color='blue'
-							>
-								{name}
-							</Tag>
-						))}
-					</>
+					variable_names.map((name) => (
+						<Tag
+							key={name}
+							style={{ margin: 0, marginLeft: '0.3rem' }}
+							color='blue'
+						>
+							{name}
+						</Tag>
+					))
 				)}{' '}
 				的插值方法
 			</div>

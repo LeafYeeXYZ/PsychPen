@@ -6,7 +6,7 @@ import {
 import { mean as m, randomNormal, std as s } from '@psych/lib'
 import { Button, InputNumber, Space, Tag } from 'antd'
 import * as echarts from 'echarts'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { useStates } from '../../hooks/useStates'
 import { markS } from '../../lib/utils'
 
@@ -57,8 +57,9 @@ export function NormalDistribution() {
 		}
 	}, [])
 	// 绘制样本分布图
+	const plotId = useId()
 	useEffect(() => {
-		const ele = document.getElementById('echart-sample-distribution')
+		const ele = document.getElementById(plotId)
 		const chart = echarts.init(ele)
 		const { count, label } = generateDate(data)
 		const option = {
@@ -99,7 +100,7 @@ export function NormalDistribution() {
 			],
 		}
 		chart.setOption(option)
-	}, [data, isDarkMode])
+	}, [data, isDarkMode, plotId])
 
 	return (
 		<div className='w-full h-full flex flex-col justify-center items-center overflow-hidden p-4'>
@@ -122,6 +123,7 @@ export function NormalDistribution() {
 									<Tag color='pink'>样本</Tag>均值
 								</td>
 								<td
+									// biome-ignore lint/security/noDangerouslySetInnerHtml: 为了正常渲染斜体
 									dangerouslySetInnerHTML={{
 										__html: data.length ? markS(m(data)) : '',
 									}}
@@ -132,6 +134,7 @@ export function NormalDistribution() {
 									<Tag color='pink'>样本</Tag>标准差
 								</td>
 								<td
+									// biome-ignore lint/security/noDangerouslySetInnerHtml: 为了正常渲染斜体
 									dangerouslySetInnerHTML={{
 										__html: data.length ? markS(s(data)) : '',
 									}}
@@ -159,7 +162,7 @@ export function NormalDistribution() {
 					</p>
 				</div>
 				<div className='w-[calc(100%-13rem)] h-full flex flex-col justify-center items-center gap-4 overflow-auto'>
-					<div id='echart-sample-distribution' className='w-full h-full' />
+					<div id={plotId} className='w-full h-full' />
 				</div>
 			</div>
 

@@ -5,8 +5,8 @@ import { useStates } from '../../../hooks/useStates'
 import { sleep } from '../../../lib/utils'
 import { funcsLabel } from '../../../tools/tools'
 import {
-	type ALLOWED_INTERPOLATION_METHODS,
 	ALL_VARS_IDENTIFIER,
+	type ALLOWED_INTERPOLATION_METHODS,
 } from '../../../types'
 import { Funcs } from '../../enum'
 
@@ -44,17 +44,15 @@ export function DefineInterpolateTool({
 						所有变量
 					</Tag>
 				) : (
-					<>
-						{variable_names.map((name) => (
-							<Tag
-								key={name}
-								style={{ margin: 0, marginLeft: '0.3rem' }}
-								color='blue'
-							>
-								{name}
-							</Tag>
-						))}
-					</>
+					variable_names.map((name) => (
+						<Tag
+							key={name}
+							style={{ margin: 0, marginLeft: '0.3rem' }}
+							color='blue'
+						>
+							{name}
+						</Tag>
+					))
 				)}{' '}
 				的插值方法为:
 				<Tag style={{ margin: 0, marginLeft: '0.3rem' }} color='yellow'>

@@ -58,7 +58,7 @@
 	},
 	"devDependencies": {
 		"@tailwindcss/vite": "^4.1.8",
-		"@biomejs/biome": "1.9.4",
+		"@biomejs/biome": "2.0.0",
 		"@types/bun": "^1.2.15",
 		"@types/react": "^19.1.6",
 		"@types/react-dom": "^19.1.5",

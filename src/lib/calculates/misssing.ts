@@ -22,7 +22,7 @@ export function missing(
 	for (const col of dataCols) {
 		if (col.missingValues?.length) {
 			for (const row of dataRows) {
-				// 故意使用 == 而不是 ===
+				// biome-ignore lint/suspicious/noDoubleEquals: 故意使用 == 而不是 ===, 因为可能存在字符串和数字的比较
 				row[col.name] = col.missingValues?.some((m) => row[col.name] == m)
 					? undefined
 					: row[col.name]

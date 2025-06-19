@@ -79,7 +79,7 @@ export function WelchTTest() {
 	const messageApi = useStates((state) => state.messageApi)
 	const statResult = useStates((state) => state.statResult)
 	const setStatResult = useStates((state) => state.setStatResult)
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: 仅在组件加载时清空结果
 	useEffect(() => {
 		setStatResult('')
 	}, [])
@@ -100,7 +100,9 @@ export function WelchTTest() {
 					typeof row[dataVar] === 'number' &&
 					typeof row[groupVar] !== 'undefined'
 				) {
+					// biome-ignore lint/suspicious/noDoubleEquals: 故意使用 == 而不是 ===, 因为可能存在字符串和数字的比较
 					row[groupVar] == groups[0] && data1.push(row[dataVar])
+					// biome-ignore lint/suspicious/noDoubleEquals: 故意使用 == 而不是 ===, 因为可能存在字符串和数字的比较
 					row[groupVar] == groups[1] && data2.push(row[dataVar])
 				}
 			}

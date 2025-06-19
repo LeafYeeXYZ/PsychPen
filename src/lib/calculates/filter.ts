@@ -40,7 +40,7 @@ function booleanExpression(
 		if (vars) {
 			for (const v of vars) {
 				const name = v.slice(3, -3)
-				if (!variables.find((v) => v.name == name)) {
+				if (!variables.find((v) => v.name === name)) {
 					throw new Error(`变量 ${name} 不存在`)
 				}
 				const value = data[name]

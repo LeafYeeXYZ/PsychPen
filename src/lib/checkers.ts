@@ -1,5 +1,5 @@
-import { ALL_VARS_IDENTIFIER } from '../types'
 import type { Variable } from '../types'
+import { ALL_VARS_IDENTIFIER } from '../types'
 
 /**
  * 检查变量唯一值数量
@@ -13,7 +13,7 @@ export function isUniqueNum(
 	variables: Variable[],
 	unique: number,
 ): void {
-	const result = variables.find((v) => v.name == variable)
+	const result = variables.find((v) => v.name === variable)
 	if (!result) {
 		throw new Error(`变量 ${variable} 不存在`)
 	}
@@ -35,7 +35,7 @@ export function isVariable(
 	includeAllVars = false,
 ): void {
 	for (const name of variableNames) {
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) {
 			if (includeAllVars && name === ALL_VARS_IDENTIFIER) {
 				continue
@@ -58,7 +58,7 @@ export function isNumeric(
 	includeAllVars = false,
 ): void {
 	for (const name of variableNames) {
-		const variable = variables.find((v) => v.name == name)
+		const variable = variables.find((v) => v.name === name)
 		if (!variable) {
 			if (includeAllVars && name === ALL_VARS_IDENTIFIER) {
 				continue

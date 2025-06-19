@@ -153,7 +153,9 @@ export const useData = create<DataState>()((setState, getState) => {
 		setData: async (rawRows, isLarge) => {
 			if (rawRows) {
 				const rows = rawRows.map((row) => transformData(row))
-				const cols = Object.keys(rows[0] || {}).map((name) => ({ name }))
+				const cols = Object.keys(rows[0] || {}).map((name) => ({
+					name: String(name).trim(),
+				}))
 				const { calculatedCols, calculatedRows } = calculator(cols, rows)
 				await set(STORE_KEYS.DATA, rows)
 				await set(STORE_KEYS.DATA_COLS, calculatedCols)
@@ -201,12 +203,12 @@ export const useData = create<DataState>()((setState, getState) => {
 		},
 		addNewVar: async (name, expression) => {
 			validateExpression(expression) // 检查表达式的安全性
+			name = String(name).trim()
 			const { dataCols, dataRows, data, filterExpression } = getState()
 			if (!data) {
 				throw new Error('数据为空')
 			}
-			if (dataCols.find((col) => col.name == name)) {
-				// 故意使用 == 而不是 ===
+			if (dataCols.find((col) => col.name === name)) {
 				throw new Error(`变量名 ${name} 已存在`)
 			}
 			let rows = dataRows

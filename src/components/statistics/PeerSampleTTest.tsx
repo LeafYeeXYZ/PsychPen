@@ -68,7 +68,7 @@ export function PeerSampleTTest() {
 	const messageApi = useStates((state) => state.messageApi)
 	const statResult = useStates((state) => state.statResult)
 	const setStatResult = useStates((state) => state.setStatResult)
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: 仅在组件加载时清空结果
 	useEffect(() => {
 		setStatResult('')
 	}, [])

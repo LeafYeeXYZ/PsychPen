@@ -1,9 +1,9 @@
 import { ExportOutlined } from '@ant-design/icons'
 import {
+	corr,
 	LinearRegressionSequential,
 	LinearRegressionStandard,
 	LinearRegressionStepwise,
-	corr,
 } from '@psych/lib'
 import { Button, Form, Popover, Select, Tag } from 'antd'
 import { useEffect, useState } from 'react'
@@ -41,7 +41,7 @@ export function MultiLinearRegression() {
 	const messageApi = useStates((state) => state.messageApi)
 	const statResult = useStates((state) => state.statResult)
 	const setStatResult = useStates((state) => state.setStatResult)
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: 仅在组件加载时清空结果
 	useEffect(() => {
 		setStatResult('')
 	}, [])
@@ -287,7 +287,9 @@ export function MultiLinearRegression() {
 
 function getSequenceLinearRegressionResult({
 	result,
-}: { result: Result<'sequence'> }): string {
+}: {
+	result: Result<'sequence'>
+}): string {
 	return `
 ## 1 序列多元线性回归
 
@@ -379,7 +381,9 @@ ${result.x
 
 function getStepwiseLinearRegressionResult({
 	result,
-}: { result: Result<'stepwise'> }): string {
+}: {
+	result: Result<'stepwise'>
+}): string {
 	return `
 ## 1 逐步多元线性回归 (${
 		result.method === 'stepwise-fwd'
@@ -466,7 +470,9 @@ ${result.x
 
 function getStandardLinearRegressionResult({
 	result,
-}: { result: Result<'standard'> }): string {
+}: {
+	result: Result<'standard'>
+}): string {
 	return `
 ## 1 标准多元线性回归
 
