@@ -223,7 +223,7 @@ export function ConfigAI() {
 									onClick={() => _DataView_setModel('deepseek-chat')}
 								>
 									<Tag style={{ margin: 0 }} color='blue'>
-										deepseek-reasoner
+										deepseek-chat
 									</Tag>
 								</Button>
 								(点击填入)
