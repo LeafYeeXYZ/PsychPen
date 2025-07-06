@@ -57,15 +57,14 @@
 		"zustand": "^5.0.6"
 	},
 	"devDependencies": {
-		"@tailwindcss/vite": "^4.1.11",
 		"@biomejs/biome": "^2.0.6",
+		"@tailwindcss/vite": "^4.1.11",
 		"@types/bun": "^1.2.18",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
 		"@vitejs/plugin-react": "^4.6.0",
-		"babel-plugin-react-compiler": "^19.0.0-beta-ebf51a3-20250411",
+		"babel-plugin-react-compiler": "19.1.0-rc.2",
 		"commit-and-tag-version": "^12.5.1",
-		"globals": "^15.15.0",
 		"tailwindcss": "^4.1.11",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.5"
