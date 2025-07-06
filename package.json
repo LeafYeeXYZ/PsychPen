@@ -1,9 +1,9 @@
 {
 	"name": "psych-pen",
 	"version": "2.7.0",
-	"description": "Web statistic app for Psychology and Education",
+	"description": "AI powered web statistic app for Psychology and Education",
 	"engines": {
-		"bun": "^1.1.32"
+		"bun": "^1.2.0"
 	},
 	"private": true,
 	"type": "module",
