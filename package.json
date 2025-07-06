@@ -67,7 +67,7 @@
 		"commit-and-tag-version": "^12.5.1",
 		"tailwindcss": "^4.1.11",
 		"typescript": "^5.8.3",
-		"vite": "^6.3.5"
+		"vite": "^7.0.2"
 	},
 	"commit-and-tag-version": {
 		"types": [
