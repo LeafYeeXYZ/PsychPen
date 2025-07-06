@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.8.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.7.0...v2.8.0) (2025-07-06)
+
+
+### Features
+
+* 不再将统计结果直接包含在AI助手上下文, 而是由AI主动调取 ([f98eb35](https://github.com/LeafYeeXYZ/PsychPen/commit/f98eb354bddf9d334416ca77e7cba7955656c982))
+* 过滤器会同时显示可用和排除数据条数 ([85e3cb3](https://github.com/LeafYeeXYZ/PsychPen/commit/85e3cb370d867da9a68e769924dbcf25de24b677))
+* 将具体页面的操作方法在跳转后再给到AI助手, 降低Token消耗 ([2ade96c](https://github.com/LeafYeeXYZ/PsychPen/commit/2ade96cc4d3cb5a41546545c52ec9bc453cc36c7))
+* 修改默认推荐AI模型 ([e18e063](https://github.com/LeafYeeXYZ/PsychPen/commit/e18e063774deac5c1d5ea4664e8b3f4e84bcd1ab))
+* 自定义导出支持Markdown格式 ([0aab910](https://github.com/LeafYeeXYZ/PsychPen/commit/0aab910abdf1cbcba874a5ef5eae03a9ed3e1161))
+* AI助手现在可以直接操作三种正态分布和方差齐性检验 ([a12006f](https://github.com/LeafYeeXYZ/PsychPen/commit/a12006f117e8e29a169f0198d640ae43adfda4bd))
+
+
+### Bug Fixes
+
+* 新增多条Biome规则，修复循环引用等问题 ([388909e](https://github.com/LeafYeeXYZ/PsychPen/commit/388909ec52de6e669d48e1a14b8d824ad0351e68))
+* 修复多元线性回归t值显示异常的问题 ([d8ac989](https://github.com/LeafYeeXYZ/PsychPen/commit/d8ac989ecec78fa29bd9d6749cb596eff3140fde))
+* 修复计算变量结果无法为缺失值的问题 ([6bd6be7](https://github.com/LeafYeeXYZ/PsychPen/commit/6bd6be7967dbf4566eddd66c2740901733cdab04))
+* 修复夜间模式下加载界面的样式异常 ([1943952](https://github.com/LeafYeeXYZ/PsychPen/commit/1943952216511059474d57312f9c254d40f4dca9))
+* 修复夜间模式下加载界面的样式异常 ([078a35d](https://github.com/LeafYeeXYZ/PsychPen/commit/078a35d262995fc1414fc98c0cd5eb778a44499b))
+* 修复一处推荐模型与描述不一致的问题 ([89ea54a](https://github.com/LeafYeeXYZ/PsychPen/commit/89ea54a96e935f0a13a2bb4e3f1176681482b1dc))
+* 修复KS检验和峰度偏度检验混淆的问题 ([43ffd8f](https://github.com/LeafYeeXYZ/PsychPen/commit/43ffd8fb01879d40267194eadf19c036e9ed7206))
+
+
+### Improvements
+
+* 词云图现在无需开启分词也可以使用过滤器 ([87a0ade](https://github.com/LeafYeeXYZ/PsychPen/commit/87a0adef5e8ddd2a2b4a9bb002c9112e9083c088))
+* 精简输入给AI助手的文档, 降低推理成本 ([388d33a](https://github.com/LeafYeeXYZ/PsychPen/commit/388d33af8eb1b530d0185afb03e7695caeda34fc))
+* 优化加载动画 ([09c355b](https://github.com/LeafYeeXYZ/PsychPen/commit/09c355be8a85cf06a174f0b603956b99cc6ac7c5))
+* 优化提示词 ([ec6b3bc](https://github.com/LeafYeeXYZ/PsychPen/commit/ec6b3bc0a24ce4f297d7fbbd1579a2d7b61232d6))
+* 优化AI设置界面的描述 ([4e4f71a](https://github.com/LeafYeeXYZ/PsychPen/commit/4e4f71a24b0d529854fe4830be2cb0bc8f9822bf))
+* 优化AI助手输出公式效果 ([ae5396b](https://github.com/LeafYeeXYZ/PsychPen/commit/ae5396b6e46c69f95a53a9ad41e373e8784db861))
+* 优化AI助手输出公式效果 ([e5f6933](https://github.com/LeafYeeXYZ/PsychPen/commit/e5f69331ba8fd86b356138bb439f157b6918f7af))
+* 优化AI助手输出公式效果 ([70300da](https://github.com/LeafYeeXYZ/PsychPen/commit/70300da807a523b4664c0b600769dfbff120a385))
+* 优化AI助手输出公式效果 (真) ([2fb3b5f](https://github.com/LeafYeeXYZ/PsychPen/commit/2fb3b5f134e2a3687fa1562af6d92be9b6c382bd))
+* 优化AI助手行内公式显示 ([d691c2b](https://github.com/LeafYeeXYZ/PsychPen/commit/d691c2b318482a213be25b55072406efb74bddc2))
+* 优化T分布动态分布的用户体验 ([4df4f2e](https://github.com/LeafYeeXYZ/PsychPen/commit/4df4f2e131efc6c72febd080d9b47ffd5e5964c2))
+* SEO优化 ([d64712e](https://github.com/LeafYeeXYZ/PsychPen/commit/d64712ecddba5177f43b4883d57082ce66a036a2))
+* SEO优化 ([21843a6](https://github.com/LeafYeeXYZ/PsychPen/commit/21843a6d2e943fb2a940e3148a730f7f62a790c0))
+
 ## [2.7.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.6.0...v2.7.0) (2025-05-05)
 
 
