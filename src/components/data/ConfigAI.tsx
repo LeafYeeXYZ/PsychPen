@@ -2,8 +2,8 @@ import { InfoCircleOutlined } from '@ant-design/icons'
 import { Button, Input, Popover, Segmented, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useAssistant } from '../../hooks/useAssistant'
-import { useStates } from '../../hooks/useStates'
+import { useAssistant } from '../../hooks/useAssistant.ts'
+import { useStates } from '../../hooks/useStates.ts'
 
 export function ConfigAI() {
 	const _DataView_setModel = useAssistant((state) => state._DataView_setModel)
@@ -291,7 +291,7 @@ export function ConfigAI() {
 				<Button
 					block
 					loading={disabled}
-					disabled={!openaiEnable || !openaiEndpoint || !openaiApiKey || !model}
+					disabled={!(openaiEnable && openaiEndpoint && openaiApiKey && model)}
 					onClick={async () => {
 						try {
 							flushSync(() => setDisabled(true))

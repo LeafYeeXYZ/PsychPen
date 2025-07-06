@@ -4,9 +4,9 @@ import * as echarts from 'echarts'
 import ecStat from 'echarts-stat'
 import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { downloadImage, sleep } from '../../lib/utils'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { downloadImage, sleep } from '../../lib/utils.ts'
 
 const REGRESSION_TYPES = [
 	{ value: 'linear', label: '线性回归' },

@@ -4,7 +4,7 @@ import {
 	ALLOWED_DISCRETE_METHODS,
 	type DataRow,
 	type Variable,
-} from '../../types'
+} from '../../types.ts'
 
 /**
  * 生成子变量
@@ -27,7 +27,7 @@ export function derive(
 			if (col.type === '称名或等级数据') {
 				throw new Error('称名或等级数据不能进行标准化')
 			}
-			if (!col.mean || !col.std) {
+			if (!(col.mean && col.std)) {
 				throw new Error(`变量 ${col.name} 没有计算均值或标准差, 可能为内部错误`)
 			}
 			derivedCols.push({
@@ -127,14 +127,18 @@ class Discrete {
 		switch (methed) {
 			case ALLOWED_DISCRETE_METHODS.EQUAL_WIDTH: {
 				this.predictor = (data: number | undefined) => {
-					if (data === undefined || data === null) return undefined
+					if (data === undefined || data === null) {
+						return undefined
+					}
 					return Math.floor((data - this.#min) / (this.#range / this.groups))
 				}
 				break
 			}
 			case ALLOWED_DISCRETE_METHODS.EQUAL_FREQUENCY: {
 				this.predictor = (data: number | undefined) => {
-					if (data === undefined || data === null) return undefined
+					if (data === undefined || data === null) {
+						return undefined
+					}
 					return Math.floor(
 						this.#data.findIndex((v) => v >= data) /
 							(this.#count / this.groups),
@@ -150,7 +154,9 @@ class Discrete {
 				)
 				this.#kmeans = new Map(clusters.map((v, i) => [data[i], v]))
 				this.predictor = (index: number | undefined) => {
-					if (typeof index === 'undefined') return undefined
+					if (typeof index === 'undefined') {
+						return undefined
+					}
 					return this.#kmeans?.get(index)
 				}
 				break

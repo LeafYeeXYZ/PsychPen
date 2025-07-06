@@ -4,9 +4,9 @@ import { Button, ColorPicker, Form, InputNumber, Select, Space } from 'antd'
 import init, { cut } from 'jieba-wasm'
 import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { downloadImage, sleep } from '../../lib/utils'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { downloadImage, sleep } from '../../lib/utils.ts'
 
 const SPAPE_OPTIONS = [
 	{ value: 'circle', label: '圆形' },
@@ -117,7 +117,7 @@ export function WordCloudPlot() {
 					series: [
 						{
 							type: 'wordCloud',
-							shape: shape,
+							shape,
 							left: 'center',
 							top: 'center',
 							width: '80%',

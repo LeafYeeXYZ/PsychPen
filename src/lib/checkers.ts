@@ -1,5 +1,5 @@
-import type { Variable } from '../types'
-import { ALL_VARS_IDENTIFIER } from '../types'
+import type { Variable } from '../types.ts'
+import { ALL_VARS_IDENTIFIER } from '../types.ts'
 
 /**
  * 检查变量唯一值数量

@@ -1,9 +1,9 @@
 import { Button, Form, Select } from 'antd'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { sleep } from '../../lib/utils'
-import { ALLOWED_INTERPOLATION_METHODS } from '../../types'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { sleep } from '../../lib/utils.ts'
+import { ALLOWED_INTERPOLATION_METHODS } from '../../types.ts'
 
 type Option = {
 	/** 变量名 */

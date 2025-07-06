@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { renderStatResult } from '../../lib/utils'
+import { renderStatResult } from '../../lib/utils.ts'
 
 export function Result({
 	result,

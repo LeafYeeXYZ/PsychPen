@@ -11,8 +11,9 @@
 	}
 }
 * {
-	font-family: "Times", "Times New Roman", "宋体", "SimSun", "华文宋体",
-		"STSong", sans-serif; /* 所有数字和英文字体都用 Times New Roman */
+	font-family:
+		"Times", "Times New Roman", "宋体", "SimSun", "华文宋体", "STSong",
+		sans-serif; /* 所有数字和英文字体都用 Times New Roman */
 	line-height: 1.55em; /* 1.5倍行距 */
 	margin: 0;
 }

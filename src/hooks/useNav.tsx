@@ -1,11 +1,5 @@
 import { create } from 'zustand'
 
-import { DataViewElement } from '../components/views/DataView'
-import { PlotsView } from '../components/views/PlotsView'
-import { StatisticsView } from '../components/views/StatisticsView'
-import { ToolsView } from '../components/views/ToolsView'
-import { VariableView } from '../components/views/VariableView'
-
 export enum MAIN_PAGES_LABELS {
 	DATA = '数据',
 	VARIABLE = '变量',
@@ -13,23 +7,13 @@ export enum MAIN_PAGES_LABELS {
 	STATISTICS = '统计',
 	TOOLS = '工具',
 }
-export const MAIN_PAGES_ELEMENTS: Record<
-	MAIN_PAGES_LABELS,
-	React.ReactElement
-> = {
-	[MAIN_PAGES_LABELS.DATA]: <DataViewElement />,
-	[MAIN_PAGES_LABELS.VARIABLE]: <VariableView />,
-	[MAIN_PAGES_LABELS.PLOTS]: <PlotsView />,
-	[MAIN_PAGES_LABELS.STATISTICS]: <StatisticsView />,
-	[MAIN_PAGES_LABELS.TOOLS]: <ToolsView />,
-}
 
-import { ComputeVar } from '../components/variable/ComputeVar'
-import { DataFilter } from '../components/variable/DataFilter'
-import { Interpolate } from '../components/variable/Interpolate'
-import { MissingValue } from '../components/variable/MissingValue'
-import { SubVariables } from '../components/variable/SubVariables'
-import { VariableTable } from '../components/variable/VariableTable'
+import { ComputeVar } from '../components/variable/ComputeVar.tsx'
+import { DataFilter } from '../components/variable/DataFilter.tsx'
+import { Interpolate } from '../components/variable/Interpolate.tsx'
+import { MissingValue } from '../components/variable/MissingValue.tsx'
+import { SubVariables } from '../components/variable/SubVariables.tsx'
+import { VariableTable } from '../components/variable/VariableTable.tsx'
 
 export enum VARIABLE_SUB_PAGES_LABELS {
 	VARIABLE_TABLE = '变量表格',
@@ -51,17 +35,17 @@ export const VARIABLE_SUB_PAGES_ELEMENTS: Record<
 	[VARIABLE_SUB_PAGES_LABELS.COMPUTE_VAR]: <ComputeVar />,
 }
 
-import { BasicBarPlot } from '../components/plots/BasicBarPlot'
-import { BasicBoxPlot } from '../components/plots/BasicBoxPlot'
-import { BasicLinePlot } from '../components/plots/BasicLinePlot'
-import { BasicPiePlot } from '../components/plots/BasicPiePlot'
-import { BasicScatterPlot } from '../components/plots/BasicScatterPlot'
-import { GroupedBarPlot } from '../components/plots/GroupedBarPlot'
-import { ParallelLinePlot } from '../components/plots/ParallelLinePlot'
-import { QQPlot } from '../components/plots/QQPlot'
-import { ThreeDBarPlot } from '../components/plots/ThreeDBarPlot'
-import { ThreeDScatterPlot } from '../components/plots/ThreeDScatterPlot'
-import { WordCloudPlot } from '../components/plots/WordCloudPlot'
+import { BasicBarPlot } from '../components/plots/BasicBarPlot.tsx'
+import { BasicBoxPlot } from '../components/plots/BasicBoxPlot.tsx'
+import { BasicLinePlot } from '../components/plots/BasicLinePlot.tsx'
+import { BasicPiePlot } from '../components/plots/BasicPiePlot.tsx'
+import { BasicScatterPlot } from '../components/plots/BasicScatterPlot.tsx'
+import { GroupedBarPlot } from '../components/plots/GroupedBarPlot.tsx'
+import { ParallelLinePlot } from '../components/plots/ParallelLinePlot.tsx'
+import { QQPlot } from '../components/plots/QQPlot.tsx'
+import { ThreeDBarPlot } from '../components/plots/ThreeDBarPlot.tsx'
+import { ThreeDScatterPlot } from '../components/plots/ThreeDScatterPlot.tsx'
+import { WordCloudPlot } from '../components/plots/WordCloudPlot.tsx'
 
 export enum PLOTS_SUB_PAGES_LABELS {
 	BASIC_BOX_PLOT = '基础箱线图',
@@ -114,23 +98,23 @@ export const PLOTS_SUB_PAGES_MAP: Record<string, PLOTS_SUB_PAGES_LABELS[]> = {
 	],
 }
 
-import { CorrReliability } from '../components/statistics/CorrReliability'
-import { Description } from '../components/statistics/Description'
-import { HalfReliability } from '../components/statistics/HalfReliability'
-import { HomoReliability } from '../components/statistics/HomoReliability'
-import { KolmogorovSmirnovTest } from '../components/statistics/KolmogorovSmirnovTest'
-import { KurtosisSkewness } from '../components/statistics/KurtosisSkewness'
-import { LeveneTest } from '../components/statistics/LeveneTest'
-import { MultiLinearRegression } from '../components/statistics/MultiLinearRegression'
-import { OneLinearRegression } from '../components/statistics/OneLinearRegression'
-import { OneSampleTTest } from '../components/statistics/OneSampleTTest'
-import { OneWayANOVA } from '../components/statistics/OneWayANOVA'
-import { PearsonCorrelationTest } from '../components/statistics/PearsonCorrelationTest'
-import { PeerANOVA } from '../components/statistics/PeerANOVA'
-import { PeerSampleTTest } from '../components/statistics/PeerSampleTTest'
-import { SimpleMediatorTest } from '../components/statistics/SimpleMediatorTest'
-import { TwoSampleTTest } from '../components/statistics/TwoSampleTTest'
-import { WelchTTest } from '../components/statistics/WelchTTest'
+import { CorrReliability } from '../components/statistics/CorrReliability.tsx'
+import { Description } from '../components/statistics/Description.tsx'
+import { HalfReliability } from '../components/statistics/HalfReliability.tsx'
+import { HomoReliability } from '../components/statistics/HomoReliability.tsx'
+import { KolmogorovSmirnovTest } from '../components/statistics/KolmogorovSmirnovTest.tsx'
+import { KurtosisSkewness } from '../components/statistics/KurtosisSkewness.tsx'
+import { LeveneTest } from '../components/statistics/LeveneTest.tsx'
+import { MultiLinearRegression } from '../components/statistics/MultiLinearRegression.tsx'
+import { OneLinearRegression } from '../components/statistics/OneLinearRegression.tsx'
+import { OneSampleTTest } from '../components/statistics/OneSampleTTest.tsx'
+import { OneWayANOVA } from '../components/statistics/OneWayANOVA.tsx'
+import { PearsonCorrelationTest } from '../components/statistics/PearsonCorrelationTest.tsx'
+import { PeerANOVA } from '../components/statistics/PeerANOVA.tsx'
+import { PeerSampleTTest } from '../components/statistics/PeerSampleTTest.tsx'
+import { SimpleMediatorTest } from '../components/statistics/SimpleMediatorTest.tsx'
+import { TwoSampleTTest } from '../components/statistics/TwoSampleTTest.tsx'
+import { WelchTTest } from '../components/statistics/WelchTTest.tsx'
 
 export enum STATISTICS_SUB_PAGES_LABELS {
 	DESCRIPTION = '描述统计',
@@ -212,9 +196,9 @@ export const STATISTICS_SUB_PAGES_MAP: Record<
 	中介效应分析: [STATISTICS_SUB_PAGES_LABELS.SIMPLE_MEDIATOR_TEST],
 }
 
-import { NormalDistribution } from '../components/tools/NormalDistribution'
-import { StatisticToPvalue } from '../components/tools/StatisticToPvalue'
-import { TDistribution } from '../components/tools/TDistribution'
+import { NormalDistribution } from '../components/tools/NormalDistribution.tsx'
+import { StatisticToPvalue } from '../components/tools/StatisticToPvalue.tsx'
+import { TDistribution } from '../components/tools/TDistribution.tsx'
 
 export enum TOOLS_VIEW_SUB_PAGES_LABELS {
 	NORMAL_DISTRIBUTION = '正态分布动态演示',
@@ -233,7 +217,6 @@ export const TOOLS_VIEW_SUB_PAGES_ELEMENTS: Record<
 type NavState = {
 	currentPageInfo: () => string
 
-	mainPage: React.ReactElement
 	activeMainPage: MAIN_PAGES_LABELS
 	setMainPage: (page: MAIN_PAGES_LABELS) => void
 
@@ -278,10 +261,8 @@ export const useNav = create<NavState>()((setState, getState) => ({
 				throw new Error('发现未知页面')
 		}
 	},
-	mainPage: MAIN_PAGES_ELEMENTS[MAIN_PAGES_LABELS.DATA],
 	activeMainPage: MAIN_PAGES_LABELS.DATA,
-	setMainPage: (page) =>
-		setState({ mainPage: MAIN_PAGES_ELEMENTS[page], activeMainPage: page }),
+	setMainPage: (page) => setState({ activeMainPage: page }),
 
 	variableViewSubPage: VARIABLE_SUB_PAGES_ELEMENTS[DEFAULT_VARIABLE_SUB_PAGE],
 	activeVariableViewSubPage: DEFAULT_VARIABLE_SUB_PAGE,

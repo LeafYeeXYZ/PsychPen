@@ -12,9 +12,11 @@ import type {
 	ChatCompletionMessageParam,
 } from 'openai/resources/index.mjs'
 import { useEffect, useRef } from 'react'
-import { useStates } from '../../hooks/useStates'
-import { Result } from '../widgets/Result'
-import { ToolCall } from './ToolCall'
+import { useStates } from '../../hooks/useStates.ts'
+import { Result } from '../widgets/Result.tsx'
+import { ToolCall } from './ToolCall.tsx'
+
+const THINK_IDENTIFIER_REGEX = /^__think__(\s+|)/
 
 export function Messages({
 	messages,
@@ -104,7 +106,7 @@ export function Messages({
 											__html: marked
 												.parse(
 													(message.content as string)
-														.replace(/^__think__(\s+|)/, '')
+														.replace(THINK_IDENTIFIER_REGEX, '')
 														.trim(),
 													{
 														async: false,

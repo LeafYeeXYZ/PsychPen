@@ -1,10 +1,10 @@
 import { Button, Form, Input, Select, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { sleep } from '../../lib/utils'
-import { Expression } from '../widgets/Expression'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { sleep } from '../../lib/utils.ts'
+import { Expression } from '../widgets/Expression.tsx'
 
 type Option = {
 	/**
@@ -84,9 +84,13 @@ export function DataFilter() {
 						rules={[
 							() => ({
 								validator(_, value) {
-									if (typeof value !== 'string') return Promise.resolve()
+									if (typeof value !== 'string') {
+										return Promise.resolve()
+									}
 									const vars = value.match(/:::.+?:::/g)
-									if (!vars) return Promise.resolve()
+									if (!vars) {
+										return Promise.resolve()
+									}
 									const invalid = vars.some(
 										(v) =>
 											!dataCols.find(({ name }) => name === v.slice(3, -3)),
@@ -114,7 +118,7 @@ export function DataFilter() {
 							disabled={
 								disabled ||
 								expression === filterExpression ||
-								(!expression && !filterExpression)
+								!(expression || filterExpression)
 							}
 							block
 						>
@@ -134,7 +138,9 @@ export function DataFilter() {
 								value: name,
 							}))}
 							onChange={async (value) => {
-								if (!value) return
+								if (!value) {
+									return
+								}
 								const expression = `:::${value}:::`
 								try {
 									await navigator.clipboard.writeText(expression)

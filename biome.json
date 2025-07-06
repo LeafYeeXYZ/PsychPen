@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
@@ -9,7 +9,46 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"complexity": {
+				"noForEach": "error",
+				"useWhile": "error"
+			},
+			"correctness": {
+				"noUndeclaredDependencies": "error",
+				"noUndeclaredVariables": "error",
+				"useExhaustiveDependencies": "error",
+				"useHookAtTopLevel": "error",
+				"useImportExtensions": "error",
+				"useJsxKeyInIterable": "error"
+			},
+			"nursery": {
+				"noDestructuredProps": "error",
+				"noGlobalDirnameFilename": "error",
+				"noImportCycles": "error",
+				"noNestedComponentDefinitions": "error",
+				"noProcessGlobal": "error",
+				"noReactPropAssign": "error",
+				"noUselessEscapeInString": "error",
+				"useAdjacentGetterSetter": "error",
+				"useConsistentObjectDefinition": "error",
+				"useExhaustiveSwitchCases": "error",
+				"useUniqueElementIds": "error"
+			},
+			"performance": {
+				"useTopLevelRegex": "error"
+			},
+			"style": {
+				"noCommonJs": "error",
+				"noParameterAssign": "error",
+				"useAtIndex": "error",
+				"useBlockStatements": "error",
+				"useSelfClosingElements": "error",
+				"useSingleVarDeclarator": "error"
+			},
+			"suspicious": {
+				"noVar": "error"
+			}
 		}
 	},
 	"javascript": {

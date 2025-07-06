@@ -1,11 +1,11 @@
 import { Button, Tag } from 'antd'
 import { flushSync } from 'react-dom'
-import { Expression } from '../../../components/widgets/Expression'
-import { useData } from '../../../hooks/useData'
-import { useStates } from '../../../hooks/useStates'
-import { sleep } from '../../../lib/utils'
-import { funcsLabel } from '../../../tools/tools'
-import { Funcs } from '../../enum'
+import { Expression } from '../../../components/widgets/Expression.tsx'
+import { useData } from '../../../hooks/useData.ts'
+import { useStates } from '../../../hooks/useStates.ts'
+import { sleep } from '../../../lib/utils.ts'
+import { funcsLabel } from '../../../tools/tools.ts'
+import { Funcs } from '../../enum.ts'
 
 export function CreateNewVarTool({
 	done,

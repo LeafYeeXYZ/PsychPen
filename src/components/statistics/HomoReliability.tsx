@@ -3,11 +3,11 @@ import { AlphaRealiability } from '@psych/lib'
 import { Button, Form, InputNumber, Popover, Radio, Select } from 'antd'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useRemoteR } from '../../hooks/useRemoteR'
-import { useStates } from '../../hooks/useStates'
-import { jsArrayToRMatrix, markS, sleep } from '../../lib/utils'
-import { Result } from '../widgets/Result'
+import { useData } from '../../hooks/useData.ts'
+import { useRemoteR } from '../../hooks/useRemoteR.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { jsArrayToRMatrix, markS, sleep } from '../../lib/utils.ts'
+import { Result } from '../widgets/Result.tsx'
 
 type Option = {
 	/** 变量名 */

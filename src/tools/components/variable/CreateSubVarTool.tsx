@@ -1,11 +1,11 @@
 import { Button, Tag } from 'antd'
 import { flushSync } from 'react-dom'
-import { useData } from '../../../hooks/useData'
-import { useStates } from '../../../hooks/useStates'
-import { sleep } from '../../../lib/utils'
-import { funcsLabel } from '../../../tools/tools'
-import { ALLOWED_DISCRETE_METHODS } from '../../../types'
-import { Funcs } from '../../enum'
+import { useData } from '../../../hooks/useData.ts'
+import { useStates } from '../../../hooks/useStates.ts'
+import { sleep } from '../../../lib/utils.ts'
+import { funcsLabel } from '../../../tools/tools.ts'
+import { ALLOWED_DISCRETE_METHODS } from '../../../types.ts'
+import { Funcs } from '../../enum.ts'
 
 export function CreateSubVarTool({
 	done,

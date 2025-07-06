@@ -14,10 +14,10 @@ import {
 import { Button, Form, Popover, Radio, Select } from 'antd'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { markS, sleep } from '../../lib/utils'
-import { Result } from '../widgets/Result'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { markS, sleep } from '../../lib/utils.ts'
+import { Result } from '../widgets/Result.tsx'
 
 type AvialableStat =
 	| 'total'
@@ -153,7 +153,7 @@ ${data
 	.join('\n')}
 				`)
 			} else {
-				if (!variable || !group) {
+				if (!(variable && group)) {
 					throw new Error('请选择数据变量和分组变量')
 				}
 				const groups = Array.from(new Set(dataRows.map((row) => row[group])))

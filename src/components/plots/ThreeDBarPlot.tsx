@@ -5,9 +5,9 @@ import { Button, Form, Input, InputNumber, Select, Space } from 'antd'
 import type { EChartsOption } from 'echarts'
 import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { downloadImage, sleep } from '../../lib/utils'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { downloadImage, sleep } from '../../lib/utils.ts'
 
 type Statistic = 'mean' | 'median' | 'max' | 'min' | 'sum' | 'count'
 
@@ -156,6 +156,10 @@ export function ThreeDBarPlot() {
 					}
 					break
 				}
+				default: {
+					// 其他统计量不需要额外处理
+					break
+				}
 			}
 			const option: EChartsOption = {
 				xAxis3D: {
@@ -228,7 +232,7 @@ export function ThreeDBarPlot() {
 							borderWidth: 1,
 						},
 						itemStyle: {
-							opacity: opacity,
+							opacity,
 						},
 						emphasis: {
 							label: {

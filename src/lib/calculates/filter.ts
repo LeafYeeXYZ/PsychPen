@@ -1,5 +1,5 @@
-import type { DataRow, Variable } from '../../types'
-import { embedValues } from '../utils'
+import type { DataRow, Variable } from '../../types.ts'
+import { embedValues } from '../utils.ts'
 
 /**
  * 数据过滤

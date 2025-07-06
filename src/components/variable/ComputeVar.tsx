@@ -1,10 +1,10 @@
 import { Button, Form, Input, Popconfirm, Select, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { sleep } from '../../lib/utils'
-import { Expression } from '../widgets/Expression'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { sleep } from '../../lib/utils.ts'
+import { Expression } from '../widgets/Expression.tsx'
 
 type Option = {
 	/** 新变量名 */
@@ -71,9 +71,12 @@ export function ComputeVar() {
 							{ required: true, message: '请输入新变量名' },
 							() => ({
 								validator(_, value) {
-									if (typeof value !== 'string') return Promise.resolve()
-									if (dataCols.find(({ name }) => name === value))
+									if (typeof value !== 'string') {
+										return Promise.resolve()
+									}
+									if (dataCols.find(({ name }) => name === value)) {
 										return Promise.reject('变量名已存在')
+									}
 									return Promise.resolve()
 								},
 							}),
@@ -88,11 +91,16 @@ export function ComputeVar() {
 						rules={[
 							() => ({
 								validator(_, value) {
-									if (typeof value !== 'string') return Promise.resolve()
-									if (value.replace(/\s/g, '') === '')
+									if (typeof value !== 'string') {
+										return Promise.resolve()
+									}
+									if (value.replace(/\s/g, '') === '') {
 										return Promise.reject('请输入计算表达式')
+									}
 									const vars = value.match(/:::.+?:::/g)
-									if (!vars) return Promise.resolve()
+									if (!vars) {
+										return Promise.resolve()
+									}
 									const invalid = vars.some(
 										(v) =>
 											!dataCols.find(({ name }) => name === v.slice(3, -3)),
@@ -143,7 +151,9 @@ export function ComputeVar() {
 								value: name,
 							}))}
 							onChange={async (value) => {
-								if (!value) return
+								if (!value) {
+									return
+								}
 								const expression = `:::${value}:::`
 								try {
 									await navigator.clipboard.writeText(expression)

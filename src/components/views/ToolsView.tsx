@@ -1,5 +1,5 @@
 import { Cascader } from 'antd'
-import { TOOLS_VIEW_SUB_PAGES_LABELS, useNav } from '../../hooks/useNav'
+import { TOOLS_VIEW_SUB_PAGES_LABELS, useNav } from '../../hooks/useNav.tsx'
 
 export function ToolsView() {
 	const activeToolsViewSubPage = useNav((state) => state.activeToolsViewSubPage)
@@ -18,7 +18,9 @@ export function ToolsView() {
 							(label) => ({ label, value: label }),
 						)}
 						onChange={(value) => {
-							if (value[0] === activeToolsViewSubPage) return
+							if (value[0] === activeToolsViewSubPage) {
+								return
+							}
 							setToolsViewSubPage(value[0])
 						}}
 						expandTrigger='hover'

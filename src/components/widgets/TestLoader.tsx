@@ -4,13 +4,13 @@ import {
 	STATISTICS_SUB_PAGES_LABELS,
 	TOOLS_VIEW_SUB_PAGES_LABELS,
 	VARIABLE_SUB_PAGES_LABELS,
-} from '../../hooks/useNav'
-import { Funcs } from '../../tools/enum'
-import { nav_to_plots_view_desc } from '../../tools/funcs/nav/nav_to_plots_view'
-import { nav_to_statistics_view_desc } from '../../tools/funcs/nav/nav_to_statistics_view'
-import { nav_to_tools_view_desc } from '../../tools/funcs/nav/nav_to_tools_view'
-import { nav_to_variable_view_desc } from '../../tools/funcs/nav/nav_to_variable_view'
-import { funcsLabel, funcsTools } from '../../tools/tools'
+} from '../../hooks/useNav.tsx'
+import { Funcs } from '../../tools/enum.ts'
+import { nav_to_plots_view_desc } from '../../tools/funcs/nav/nav_to_plots_view.ts'
+import { nav_to_statistics_view_desc } from '../../tools/funcs/nav/nav_to_statistics_view.ts'
+import { nav_to_tools_view_desc } from '../../tools/funcs/nav/nav_to_tools_view.ts'
+import { nav_to_variable_view_desc } from '../../tools/funcs/nav/nav_to_variable_view.ts'
+import { funcsLabel, funcsTools } from '../../tools/tools.ts'
 
 export function TestLoader() {
 	useEffect(() => {
@@ -62,5 +62,6 @@ export function TestLoader() {
 			}
 		}
 	}, [])
+	// biome-ignore lint/complexity/noUselessFragments: 该组件仅用于测试加载时的逻辑
 	return <></>
 }

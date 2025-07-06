@@ -1,5 +1,5 @@
 import { Input, Segmented } from 'antd'
-import { useRemoteR } from '../../hooks/useRemoteR'
+import { useRemoteR } from '../../hooks/useRemoteR.ts'
 
 export function ConfigR() {
 	const _DataView_setRurl = useRemoteR((state) => state._DataView_setRurl)

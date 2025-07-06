@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { STATISTICS_SUB_PAGES_LABELS } from '../../../hooks/useNav'
-import type { AIFunction } from '../../../types'
-import { Funcs } from '../../enum'
+import { STATISTICS_SUB_PAGES_LABELS } from '../../../hooks/useNav.tsx'
+import type { AIFunction } from '../../../types.ts'
+import { Funcs } from '../../enum.ts'
 
 export const nav_to_statistics_view_type = z.object({
 	page: z.nativeEnum(STATISTICS_SUB_PAGES_LABELS),

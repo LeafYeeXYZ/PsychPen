@@ -2,7 +2,7 @@ import html2canvas from 'html2canvas-pro'
 import katexCss from 'katex/dist/katex.min.css?raw'
 import { marked } from 'marked'
 import themeCss from '../styles/statResult.css?raw'
-import type { DataRow, Variable } from '../types'
+import type { DataRow, Variable } from '../types.ts'
 
 /**
  * 尝试执行一个函数, 如果失败则抛出指定的错误
@@ -152,79 +152,105 @@ export function embedValues(
 	exp = exp.replace(/min\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(7, -4)
 		const variable = variables.find((v) => v.name === name)
-		if (!variable) throw new Error(`变量 ${name} 不存在`)
-		if (variable.min === undefined)
+		if (!variable) {
+			throw new Error(`变量 ${name} 不存在`)
+		}
+		if (variable.min === undefined) {
 			throw new Error(`变量 ${name} 没有最小值, 请确认变量类型`)
+		}
 		return variable.min.toString()
 	})
 	// max(:::name:::)
 	exp = exp.replace(/max\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(7, -4)
 		const variable = variables.find((v) => v.name === name)
-		if (!variable) throw new Error(`变量 ${name} 不存在`)
-		if (variable.max === undefined)
+		if (!variable) {
+			throw new Error(`变量 ${name} 不存在`)
+		}
+		if (variable.max === undefined) {
 			throw new Error(`变量 ${name} 没有最大值, 请确认变量类型`)
+		}
 		return variable.max.toString()
 	})
 	// mean(:::name:::)
 	exp = exp.replace(/mean\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(8, -4)
 		const variable = variables.find((v) => v.name === name)
-		if (!variable) throw new Error(`变量 ${name} 不存在`)
-		if (variable.mean === undefined)
+		if (!variable) {
+			throw new Error(`变量 ${name} 不存在`)
+		}
+		if (variable.mean === undefined) {
 			throw new Error(`变量 ${name} 没有均值, 请确认变量类型`)
+		}
 		return variable.mean.toString()
 	})
 	// mode(:::name:::)
 	exp = exp.replace(/mode\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(8, -4)
 		const variable = variables.find((v) => v.name === name)
-		if (!variable) throw new Error(`变量 ${name} 不存在`)
-		if (variable.mode === undefined)
+		if (!variable) {
+			throw new Error(`变量 ${name} 不存在`)
+		}
+		if (variable.mode === undefined) {
 			throw new Error(`变量 ${name} 没有众数, 请确认变量类型`)
+		}
 		return variable.mode.toString()
 	})
 	// q1(:::name:::)
 	exp = exp.replace(/q1\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(6, -4)
 		const variable = variables.find((v) => v.name === name)
-		if (!variable) throw new Error(`变量 ${name} 不存在`)
-		if (variable.q1 === undefined)
+		if (!variable) {
+			throw new Error(`变量 ${name} 不存在`)
+		}
+		if (variable.q1 === undefined) {
 			throw new Error(`变量 ${name} 没有 25% 分位数, 请确认变量类型`)
+		}
 		return variable.q1.toString()
 	})
 	// q2(:::name:::)
 	exp = exp.replace(/q2\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(6, -4)
 		const variable = variables.find((v) => v.name === name)
-		if (!variable) throw new Error(`变量 ${name} 不存在`)
-		if (variable.q2 === undefined)
+		if (!variable) {
+			throw new Error(`变量 ${name} 不存在`)
+		}
+		if (variable.q2 === undefined) {
 			throw new Error(`变量 ${name} 没有 50% 分位数, 请确认变量类型`)
+		}
 		return variable.q2.toString()
 	})
 	// q3(:::name:::)
 	exp = exp.replace(/q3\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(6, -4)
 		const variable = variables.find((v) => v.name === name)
-		if (!variable) throw new Error(`变量 ${name} 不存在`)
-		if (variable.q3 === undefined)
+		if (!variable) {
+			throw new Error(`变量 ${name} 不存在`)
+		}
+		if (variable.q3 === undefined) {
 			throw new Error(`变量 ${name} 没有 75% 分位数, 请确认变量类型`)
+		}
 		return variable.q3.toString()
 	})
 	// std(:::name:::)
 	exp = exp.replace(/std\((:::.+?:::)\)/g, (v) => {
 		const name = v.slice(7, -4)
 		const variable = variables.find((v) => v.name === name)
-		if (!variable) throw new Error(`变量 ${name} 不存在`)
-		if (variable.std === undefined)
+		if (!variable) {
+			throw new Error(`变量 ${name} 不存在`)
+		}
+		if (variable.std === undefined) {
 			throw new Error(`变量 ${name} 没有标准差, 请确认变量类型`)
+		}
 		return variable.std.toString()
 	})
 	// :::name:::
 	exp = exp.replace(/:::.+?:::/g, (v) => {
 		const name = v.slice(3, -3)
 		const variable = variables.find((v) => v.name === name)
-		if (!variable) throw new Error(`变量 ${name} 不存在`)
+		if (!variable) {
+			throw new Error(`变量 ${name} 不存在`)
+		}
 		const value = data[name]
 		if (value === undefined) {
 			throw new Error(`变量 ${name} 的值不存在`)
@@ -307,8 +333,12 @@ export function markP(p: number, hideZero = true): string {
 		return '(无)'
 	}
 	// 处理极端情况
-	if (p <= 0) return hideZero ? '<i><.001***</i>' : '<i><0.001***</i>'
-	if (p >= 1) return '<i>1</i>'
+	if (p <= 0) {
+		return hideZero ? '<i><.001***</i>' : '<i><0.001***</i>'
+	}
+	if (p >= 1) {
+		return '<i>1</i>'
+	}
 	// 处理非常小的p值
 	if (p < 0.001) {
 		return hideZero ? '<i><.001***</i>' : '<i><0.001***</i>'
@@ -319,8 +349,12 @@ export function markP(p: number, hideZero = true): string {
 		formattedP = formattedP.slice(1)
 	}
 	// 添加显著性标记
-	if (p < 0.01) return `<i>${formattedP}**</i>`
-	if (p < 0.05) return `<i>${formattedP}*</i>`
+	if (p < 0.01) {
+		return `<i>${formattedP}**</i>`
+	}
+	if (p < 0.05) {
+		return `<i>${formattedP}*</i>`
+	}
 	return `<i>${formattedP}</i>`
 }
 

@@ -1,5 +1,5 @@
 import { max, mean, min, mode, quantile, sort, std } from '@psych/lib'
-import type { DataRow, Variable } from '../../types'
+import type { DataRow, Variable } from '../../types.ts'
 
 /**
  * 生成描述统计量

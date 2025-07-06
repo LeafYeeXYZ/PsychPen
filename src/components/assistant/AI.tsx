@@ -14,73 +14,73 @@ import type OpenAI from 'openai'
 import { useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import readme from '../../../README_FOR_AI.md?raw'
-import { useAssistant } from '../../hooks/useAssistant'
-import { useData } from '../../hooks/useData'
-import { MAIN_PAGES_LABELS, useNav } from '../../hooks/useNav'
-import { useStates } from '../../hooks/useStates'
-import { isNumeric, isUniqueNum, isVariable } from '../../lib/checkers'
-import { shortId, sleep, tryCatch } from '../../lib/utils'
-import { Funcs } from '../../tools/enum'
-import { custom_export_type } from '../../tools/funcs/data/custom_export'
-import { export_data_type } from '../../tools/funcs/data/export_data'
+import { useAssistant } from '../../hooks/useAssistant.ts'
+import { useData } from '../../hooks/useData.ts'
+import { MAIN_PAGES_LABELS, useNav } from '../../hooks/useNav.tsx'
+import { useStates } from '../../hooks/useStates.ts'
+import { isNumeric, isUniqueNum, isVariable } from '../../lib/checkers.ts'
+import { shortId, sleep, tryCatch } from '../../lib/utils.ts'
+import { Funcs } from '../../tools/enum.ts'
+import { custom_export_type } from '../../tools/funcs/data/custom_export.ts'
+import { export_data_type } from '../../tools/funcs/data/export_data.ts'
 import {
 	nav_to_plots_view_desc,
 	nav_to_plots_view_type,
-} from '../../tools/funcs/nav/nav_to_plots_view'
+} from '../../tools/funcs/nav/nav_to_plots_view.ts'
 import {
 	nav_to_statistics_view_desc,
 	nav_to_statistics_view_type,
-} from '../../tools/funcs/nav/nav_to_statistics_view'
+} from '../../tools/funcs/nav/nav_to_statistics_view.ts'
 import {
 	nav_to_tools_view_desc,
 	nav_to_tools_view_type,
-} from '../../tools/funcs/nav/nav_to_tools_view'
+} from '../../tools/funcs/nav/nav_to_tools_view.ts'
 import {
 	nav_to_variable_view_desc,
 	nav_to_variable_view_type,
-} from '../../tools/funcs/nav/nav_to_variable_view'
+} from '../../tools/funcs/nav/nav_to_variable_view.ts'
 import {
 	kolmogorov_smirnov_test_for_independent_vars_type,
 	kolmogorov_smirnov_test_for_paired_vars_type,
-} from '../../tools/funcs/statistics/kolmogorov_smirnov_test'
+} from '../../tools/funcs/statistics/kolmogorov_smirnov_test.ts'
 import {
 	kurtosis_skewness_test_for_independent_vars_type,
 	kurtosis_skewness_test_for_paired_vars_type,
-} from '../../tools/funcs/statistics/kurtosis_skewness_test'
+} from '../../tools/funcs/statistics/kurtosis_skewness_test.ts'
 import {
 	levene_test_for_independent_vars_type,
 	levene_test_for_paired_vars_type,
-} from '../../tools/funcs/statistics/levene_test'
-import { one_sample_t_test_type } from '../../tools/funcs/statistics/one_sample_t_test'
-import { peer_sample_t_test_type } from '../../tools/funcs/statistics/peer_sample_t_test'
-import { simple_mediator_test_type } from '../../tools/funcs/statistics/simple_mediator_test'
-import { welch_t_test_type } from '../../tools/funcs/statistics/welch_t_test'
-import { apply_filter_type } from '../../tools/funcs/variable/apply_filter'
-import { create_new_var_type } from '../../tools/funcs/variable/create_new_var'
+} from '../../tools/funcs/statistics/levene_test.ts'
+import { one_sample_t_test_type } from '../../tools/funcs/statistics/one_sample_t_test.ts'
+import { peer_sample_t_test_type } from '../../tools/funcs/statistics/peer_sample_t_test.ts'
+import { simple_mediator_test_type } from '../../tools/funcs/statistics/simple_mediator_test.ts'
+import { welch_t_test_type } from '../../tools/funcs/statistics/welch_t_test.ts'
+import { apply_filter_type } from '../../tools/funcs/variable/apply_filter.ts'
+import { create_new_var_type } from '../../tools/funcs/variable/create_new_var.ts'
 import {
 	clear_sub_var_type,
 	create_sub_var_type,
-} from '../../tools/funcs/variable/create_sub_var'
+} from '../../tools/funcs/variable/create_sub_var.ts'
 import {
 	clear_interpolate_type,
 	define_interpolate_type,
-} from '../../tools/funcs/variable/interpolate'
+} from '../../tools/funcs/variable/interpolate.ts'
 import {
 	clear_missing_value_type,
 	define_missing_value_type,
-} from '../../tools/funcs/variable/missing_value'
-import { funcsTools } from '../../tools/tools'
-import type { Variable } from '../../types'
-import { ALLOWED_INTERPOLATION_METHODS } from '../../types'
-import { kolmogorovSmirnovTestCalculator } from '../statistics/KolmogorovSmirnovTest'
-import { kurtosisSkewnessCalculator } from '../statistics/KurtosisSkewness'
-import { leveneTestCalculator } from '../statistics/LeveneTest'
-import { oneSampleTTestCalculator } from '../statistics/OneSampleTTest'
-import { peerSampleTTestCalculator } from '../statistics/PeerSampleTTest'
-import { simpleMediationTestCalculator } from '../statistics/SimpleMediatorTest'
-import { twoSampleTTestCalculator } from '../statistics/TwoSampleTTest'
-import { welchTTestCalculator } from '../statistics/WelchTTest'
-import { Messages } from './Messages'
+} from '../../tools/funcs/variable/missing_value.ts'
+import { funcsTools } from '../../tools/tools.ts'
+import type { Variable } from '../../types.ts'
+import { ALLOWED_INTERPOLATION_METHODS } from '../../types.ts'
+import { kolmogorovSmirnovTestCalculator } from '../statistics/KolmogorovSmirnovTest.tsx'
+import { kurtosisSkewnessCalculator } from '../statistics/KurtosisSkewness.tsx'
+import { leveneTestCalculator } from '../statistics/LeveneTest.tsx'
+import { oneSampleTTestCalculator } from '../statistics/OneSampleTTest.tsx'
+import { peerSampleTTestCalculator } from '../statistics/PeerSampleTTest.tsx'
+import { simpleMediationTestCalculator } from '../statistics/SimpleMediatorTest.tsx'
+import { twoSampleTTestCalculator } from '../statistics/TwoSampleTTest.tsx'
+import { welchTTestCalculator } from '../statistics/WelchTTest.tsx'
+import { Messages } from './Messages.tsx'
 
 const GREETTING = `
 你好, 我是 PsychPen 的 AI 助手, 可以**讲解 PsychPen 的使用方法、探索你的数据集、导出当前数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果、生成并执行代码来导出自定义数据等**. 请问有什么可以帮你的?
@@ -215,7 +215,7 @@ export function AI() {
 			const system = GET_PROMPT({
 				vars: dataCols,
 				page: currentPageInfo(),
-				filterExpression: filterExpression,
+				filterExpression,
 				totalCount: data?.length || Number.NaN,
 				usableCount: dataRows.length,
 			})
@@ -231,7 +231,7 @@ export function AI() {
 					throw new Error('AI助手不可用')
 				}
 				const stream = await ai.chat.completions.create({
-					model: model,
+					model,
 					messages: [
 						{ role: 'system', content: system },
 						...(currentMessages.map((message) =>

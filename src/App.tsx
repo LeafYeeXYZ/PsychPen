@@ -13,15 +13,20 @@ import {
 	type ThemeConfig,
 	theme,
 } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { version } from '../package.json'
-import { AI } from './components/assistant/AI'
-import { Debug } from './components/widgets/Debug'
-import { TestLoader } from './components/widgets/TestLoader'
-import { useData } from './hooks/useData'
-import { MAIN_PAGES_LABELS, useNav } from './hooks/useNav'
-import { useStates } from './hooks/useStates'
+import { AI } from './components/assistant/AI.tsx'
+import { DataViewElement } from './components/views/DataView.tsx'
+import { PlotsView } from './components/views/PlotsView.tsx'
+import { StatisticsView } from './components/views/StatisticsView.tsx'
+import { ToolsView } from './components/views/ToolsView.tsx'
+import { VariableView } from './components/views/VariableView.tsx'
+import { Debug } from './components/widgets/Debug.tsx'
+import { TestLoader } from './components/widgets/TestLoader.tsx'
+import { useData } from './hooks/useData.ts'
+import { MAIN_PAGES_LABELS, useNav } from './hooks/useNav.tsx'
+import { useStates } from './hooks/useStates.ts'
 
 const ANTD_THEME_LIGHT: ThemeConfig = {
 	token: {
@@ -42,7 +47,23 @@ export function App() {
 	const isDarkMode = useStates((state) => state.isDarkMode)
 	const setIsDarkMode = useStates((state) => state.setIsDarkMode)
 	const setMessageApi = useStates((state) => state.setMessageApi)
-	const mainPage = useNav((state) => state.mainPage)
+	const activeMainPage = useNav((state) => state.activeMainPage)
+	const mainPage = useMemo(() => {
+		switch (activeMainPage) {
+			case MAIN_PAGES_LABELS.DATA:
+				return <DataViewElement />
+			case MAIN_PAGES_LABELS.VARIABLE:
+				return <VariableView />
+			case MAIN_PAGES_LABELS.PLOTS:
+				return <PlotsView />
+			case MAIN_PAGES_LABELS.STATISTICS:
+				return <StatisticsView />
+			case MAIN_PAGES_LABELS.TOOLS:
+				return <ToolsView />
+			default:
+				throw new Error('未知的主页面')
+		}
+	}, [activeMainPage])
 	// 消息实例
 	const [messageApi, contextHolder] = message.useMessage()
 	useEffect(() => {
@@ -139,7 +160,9 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 				<Button
 					type={activeMainPage === MAIN_PAGES_LABELS.DATA ? 'primary' : 'text'}
 					onClick={() => {
-						if (activeMainPage === MAIN_PAGES_LABELS.DATA) return
+						if (activeMainPage === MAIN_PAGES_LABELS.DATA) {
+							return
+						}
 						setMainPage(MAIN_PAGES_LABELS.DATA)
 					}}
 					autoInsertSpace={false}
@@ -152,7 +175,9 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 						activeMainPage === MAIN_PAGES_LABELS.VARIABLE ? 'primary' : 'text'
 					}
 					onClick={() => {
-						if (activeMainPage === MAIN_PAGES_LABELS.VARIABLE) return
+						if (activeMainPage === MAIN_PAGES_LABELS.VARIABLE) {
+							return
+						}
 						setMainPage(MAIN_PAGES_LABELS.VARIABLE)
 					}}
 					autoInsertSpace={false}
@@ -163,7 +188,9 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 				<Button
 					type={activeMainPage === MAIN_PAGES_LABELS.PLOTS ? 'primary' : 'text'}
 					onClick={() => {
-						if (activeMainPage === MAIN_PAGES_LABELS.PLOTS) return
+						if (activeMainPage === MAIN_PAGES_LABELS.PLOTS) {
+							return
+						}
 						setMainPage(MAIN_PAGES_LABELS.PLOTS)
 					}}
 					autoInsertSpace={false}
@@ -176,7 +203,9 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 						activeMainPage === MAIN_PAGES_LABELS.STATISTICS ? 'primary' : 'text'
 					}
 					onClick={() => {
-						if (activeMainPage === MAIN_PAGES_LABELS.STATISTICS) return
+						if (activeMainPage === MAIN_PAGES_LABELS.STATISTICS) {
+							return
+						}
 						setMainPage(MAIN_PAGES_LABELS.STATISTICS)
 					}}
 					autoInsertSpace={false}
@@ -187,7 +216,9 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 				<Button
 					type={activeMainPage === MAIN_PAGES_LABELS.TOOLS ? 'primary' : 'text'}
 					onClick={() => {
-						if (activeMainPage === MAIN_PAGES_LABELS.TOOLS) return
+						if (activeMainPage === MAIN_PAGES_LABELS.TOOLS) {
+							return
+						}
 						setMainPage(MAIN_PAGES_LABELS.TOOLS)
 					}}
 					autoInsertSpace={false}

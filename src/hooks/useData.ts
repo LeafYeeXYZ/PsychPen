@@ -1,12 +1,12 @@
 import { del, get, set } from 'idb-keyval'
 import { create } from 'zustand'
-import { derive } from '../lib/calculates/derive'
-import { describe } from '../lib/calculates/describe'
-import { filter } from '../lib/calculates/filter'
-import { missing } from '../lib/calculates/misssing'
-import { validateExpression } from '../lib/checkers'
-import { computeExpression, transformData } from '../lib/utils'
-import type { DataRow, Variable } from '../types'
+import { derive } from '../lib/calculates/derive.ts'
+import { describe } from '../lib/calculates/describe.ts'
+import { filter } from '../lib/calculates/filter.ts'
+import { missing } from '../lib/calculates/misssing.ts'
+import { validateExpression } from '../lib/checkers.ts'
+import { computeExpression, transformData } from '../lib/utils.ts'
+import type { DataRow, Variable } from '../types.ts'
 
 type DataState = {
 	/**
@@ -203,13 +203,13 @@ export const useData = create<DataState>()((setState, getState) => {
 		},
 		addNewVar: async (name, expression) => {
 			validateExpression(expression) // 检查表达式的安全性
-			name = String(name).trim()
+			const n = String(name).trim()
 			const { dataCols, dataRows, data, filterExpression } = getState()
 			if (!data) {
 				throw new Error('数据为空')
 			}
-			if (dataCols.find((col) => col.name === name)) {
-				throw new Error(`变量名 ${name} 已存在`)
+			if (dataCols.find((col) => col.name === n)) {
+				throw new Error(`变量名 ${n} 已存在`)
 			}
 			let rows = dataRows
 			if (rows.length !== data.length) {
@@ -221,10 +221,10 @@ export const useData = create<DataState>()((setState, getState) => {
 				).calculatedRows
 			}
 			const newData = data.map((row, i) => ({
-				[name]: computeExpression(expression, dataCols, rows[i]),
+				[n]: computeExpression(expression, dataCols, rows[i]),
 				...row,
 			}))
-			const newCol = describe([{ name }], newData).updatedCols[0]
+			const newCol = describe([{ name: n }], newData).updatedCols[0]
 			const { calculatedCols, calculatedRows } = calculator(
 				[newCol, ...dataCols.filter((col) => col.derived !== true)],
 				newData,

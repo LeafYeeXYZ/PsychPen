@@ -4,9 +4,9 @@ import type { EChartsOption } from 'echarts'
 import * as echarts from 'echarts'
 import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { downloadImage, sleep } from '../../lib/utils'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { downloadImage, sleep } from '../../lib/utils.ts'
 
 type Option = {
 	/** 数据分类 */
@@ -74,7 +74,7 @@ export function BasicBarPlot() {
 			const data: number[] = []
 			const std: [number, number, number, number][] = []
 			if (type === 'independent') {
-				if (!dataVar || !groupVar) {
+				if (!(dataVar && groupVar)) {
 					throw new Error('请选择数据变量和分组变量')
 				}
 				const filteredRows = dataRows.filter(
@@ -114,7 +114,7 @@ export function BasicBarPlot() {
 					series: [
 						{
 							type: 'bar',
-							data: data,
+							data,
 							label: {
 								show: label !== 'none',
 								formatter: (params) => {
@@ -233,7 +233,7 @@ export function BasicBarPlot() {
 					series: [
 						{
 							type: 'bar',
-							data: data,
+							data,
 							label: {
 								show: label !== 'none',
 								formatter: (params) => {

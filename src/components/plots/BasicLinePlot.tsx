@@ -4,9 +4,9 @@ import type { EChartsOption } from 'echarts'
 import * as echarts from 'echarts'
 import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { downloadImage, sleep } from '../../lib/utils'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { downloadImage, sleep } from '../../lib/utils.ts'
 
 type Statistic = 'mean' | 'median' | 'max' | 'min' | 'sum' | 'count'
 
@@ -73,7 +73,7 @@ export function BasicLinePlot() {
 			}
 			const chart = echarts.init(ele)
 			if (type === 'independent') {
-				if (!groupVar || !dataVar) {
+				if (!(groupVar && dataVar)) {
 					throw new Error('请选择分组变量和数据变量')
 				}
 				// 被试间数据处理
@@ -128,8 +128,8 @@ export function BasicLinePlot() {
 					series: [
 						{
 							type: 'line',
-							data: data,
-							smooth: smooth,
+							data,
+							smooth,
 							label: {
 								show: label,
 							},
@@ -186,7 +186,7 @@ export function BasicLinePlot() {
 										return row.length
 								}
 							}),
-							smooth: smooth,
+							smooth,
 							label: {
 								show: label,
 							},

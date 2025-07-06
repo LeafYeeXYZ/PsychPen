@@ -3,10 +3,10 @@ import { OneSampleTTest as T } from '@psych/lib'
 import { Button, Form, Input, InputNumber, Popover, Select, Space } from 'antd'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { markP, markS, sleep } from '../../lib/utils'
-import { Result } from '../widgets/Result'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { markP, markS, sleep } from '../../lib/utils.ts'
+import { Result } from '../widgets/Result.tsx'
 
 type Option = {
 	/** 变量名 */

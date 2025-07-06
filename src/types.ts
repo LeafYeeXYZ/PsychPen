@@ -1,5 +1,5 @@
 import type OpenAI from 'openai'
-import type { Funcs } from './tools/enum'
+import type { Funcs } from './tools/enum.ts'
 
 export const ALL_VARS_IDENTIFIER = '__ALL_VARIABLES__'
 

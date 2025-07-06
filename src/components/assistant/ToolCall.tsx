@@ -2,40 +2,40 @@
 import type OpenAI from 'openai'
 import { useState } from 'react'
 import type { z } from 'zod'
-import { DefaultTool } from '../../tools/components/DefaultTool'
-import { CustomExportTool } from '../../tools/components/data/CustomExportTool'
-import { ExportDataTool } from '../../tools/components/data/ExportDataTool'
-import { NavToPageTool } from '../../tools/components/nav/NavToPageTool'
-import { ApplyFilterTool } from '../../tools/components/variable/ApplyFilterTool'
-import { ClearInterpolateTool } from '../../tools/components/variable/ClearInterpolateTool'
-import { ClearMissingValueTool } from '../../tools/components/variable/ClearMissingValueTool'
-import { ClearSubVarTool } from '../../tools/components/variable/ClearSubVarTool'
-import { CreateNewVarTool } from '../../tools/components/variable/CreateNewVarTool'
-import { CreateSubVarTool } from '../../tools/components/variable/CreateSubVarTool'
-import { DefineInterpolateTool } from '../../tools/components/variable/DefineInterpolateTool'
-import { DefineMissingValueTool } from '../../tools/components/variable/DefineMissingValueTool'
-import { Funcs } from '../../tools/enum'
-import type { custom_export_type } from '../../tools/funcs/data/custom_export'
-import type { export_data_type } from '../../tools/funcs/data/export_data'
-import type { nav_to_plots_view_type } from '../../tools/funcs/nav/nav_to_plots_view'
-import type { nav_to_statistics_view_type } from '../../tools/funcs/nav/nav_to_statistics_view'
-import type { nav_to_tools_view_type } from '../../tools/funcs/nav/nav_to_tools_view'
-import type { nav_to_variable_view_type } from '../../tools/funcs/nav/nav_to_variable_view'
-import type { apply_filter_type } from '../../tools/funcs/variable/apply_filter'
-import type { create_new_var_type } from '../../tools/funcs/variable/create_new_var'
+import { DefaultTool } from '../../tools/components/DefaultTool.tsx'
+import { CustomExportTool } from '../../tools/components/data/CustomExportTool.tsx'
+import { ExportDataTool } from '../../tools/components/data/ExportDataTool.tsx'
+import { NavToPageTool } from '../../tools/components/nav/NavToPageTool.tsx'
+import { ApplyFilterTool } from '../../tools/components/variable/ApplyFilterTool.tsx'
+import { ClearInterpolateTool } from '../../tools/components/variable/ClearInterpolateTool.tsx'
+import { ClearMissingValueTool } from '../../tools/components/variable/ClearMissingValueTool.tsx'
+import { ClearSubVarTool } from '../../tools/components/variable/ClearSubVarTool.tsx'
+import { CreateNewVarTool } from '../../tools/components/variable/CreateNewVarTool.tsx'
+import { CreateSubVarTool } from '../../tools/components/variable/CreateSubVarTool.tsx'
+import { DefineInterpolateTool } from '../../tools/components/variable/DefineInterpolateTool.tsx'
+import { DefineMissingValueTool } from '../../tools/components/variable/DefineMissingValueTool.tsx'
+import { Funcs } from '../../tools/enum.ts'
+import type { custom_export_type } from '../../tools/funcs/data/custom_export.ts'
+import type { export_data_type } from '../../tools/funcs/data/export_data.ts'
+import type { nav_to_plots_view_type } from '../../tools/funcs/nav/nav_to_plots_view.ts'
+import type { nav_to_statistics_view_type } from '../../tools/funcs/nav/nav_to_statistics_view.ts'
+import type { nav_to_tools_view_type } from '../../tools/funcs/nav/nav_to_tools_view.ts'
+import type { nav_to_variable_view_type } from '../../tools/funcs/nav/nav_to_variable_view.ts'
+import type { apply_filter_type } from '../../tools/funcs/variable/apply_filter.ts'
+import type { create_new_var_type } from '../../tools/funcs/variable/create_new_var.ts'
 import type {
 	clear_sub_var_type,
 	create_sub_var_type,
-} from '../../tools/funcs/variable/create_sub_var'
+} from '../../tools/funcs/variable/create_sub_var.ts'
 import type {
 	clear_interpolate_type,
 	define_interpolate_type,
-} from '../../tools/funcs/variable/interpolate'
+} from '../../tools/funcs/variable/interpolate.ts'
 import type {
 	clear_missing_value_type,
 	define_missing_value_type,
-} from '../../tools/funcs/variable/missing_value'
-import { funcsLabel } from '../../tools/tools'
+} from '../../tools/funcs/variable/missing_value.ts'
+import { funcsLabel } from '../../tools/tools.ts'
 
 export function ToolCall({
 	toolCall,

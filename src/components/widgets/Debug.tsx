@@ -1,8 +1,8 @@
 import { CodeOutlined } from '@ant-design/icons'
 import { Button, Popover } from 'antd'
 import { useRef, useState } from 'react'
-import { useStates } from '../../hooks/useStates'
-import { shortId } from '../../lib/utils'
+import { useStates } from '../../hooks/useStates.ts'
+import { shortId } from '../../lib/utils.ts'
 
 export function Debug() {
 	const debugComtainerRef = useRef<HTMLDivElement>(null)

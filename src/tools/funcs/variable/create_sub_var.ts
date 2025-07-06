@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import type { AIFunction } from '../../../types'
-import { ALLOWED_DISCRETE_METHODS } from '../../../types'
-import { Funcs } from '../../enum'
+import type { AIFunction } from '../../../types.ts'
+import { ALLOWED_DISCRETE_METHODS } from '../../../types.ts'
+import { Funcs } from '../../enum.ts'
 
 export const create_sub_var_type = z.object({
 	variable_names: z.array(z.string()),

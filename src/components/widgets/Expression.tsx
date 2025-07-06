@@ -1,5 +1,5 @@
 import { Tag } from 'antd'
-import { shortId } from '../../lib/utils'
+import { shortId } from '../../lib/utils.ts'
 
 const nameReg = /^:::.+?:::$/
 const functionReg =

@@ -3,10 +3,10 @@ import { HalfRealiability } from '@psych/lib'
 import { Button, Form, Popover, Select } from 'antd'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { markS, sleep } from '../../lib/utils'
-import { Result } from '../widgets/Result'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { markS, sleep } from '../../lib/utils.ts'
+import { Result } from '../widgets/Result.tsx'
 
 type Option = {
 	/** 前一半变量名 */

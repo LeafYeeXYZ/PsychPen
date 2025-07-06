@@ -3,7 +3,7 @@ import {
 	type PLOTS_SUB_PAGES_LABELS,
 	PLOTS_SUB_PAGES_MAP,
 	useNav,
-} from '../../hooks/useNav'
+} from '../../hooks/useNav.tsx'
 
 export function PlotsView() {
 	const activePlotsViewSubPage = useNav((state) => state.activePlotsViewSubPage)
@@ -35,7 +35,9 @@ export function PlotsView() {
 							}),
 						)}
 						onChange={(value) => {
-							if (activePlotsViewSubPage === value[1]) return
+							if (activePlotsViewSubPage === value[1]) {
+								return
+							}
 							setPlotsViewSubPage(value[1] as PLOTS_SUB_PAGES_LABELS)
 						}}
 						expandTrigger='hover'

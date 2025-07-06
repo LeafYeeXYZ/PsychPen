@@ -3,9 +3,9 @@ import type { EChartsOption } from 'echarts'
 import * as echarts from 'echarts'
 import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { downloadImage, sleep } from '../../lib/utils'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { downloadImage, sleep } from '../../lib/utils.ts'
 
 type Option = {
 	/** 数据分类 */
@@ -60,7 +60,7 @@ export function BasicBoxPlot() {
 			}
 			const chart = echarts.init(ele)
 			if (type === 'independent') {
-				if (!groupVar || !dataVar) {
+				if (!(groupVar && dataVar)) {
 					throw new Error('请选择分组变量和数据变量')
 				}
 				// 被试间数据处理

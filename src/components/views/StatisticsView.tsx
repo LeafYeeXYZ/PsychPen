@@ -3,7 +3,7 @@ import {
 	type STATISTICS_SUB_PAGES_LABELS,
 	STATISTICS_SUB_PAGES_MAP,
 	useNav,
-} from '../../hooks/useNav'
+} from '../../hooks/useNav.tsx'
 
 export function StatisticsView() {
 	const activeStatisticsViewSubPage = useNav(
@@ -39,7 +39,9 @@ export function StatisticsView() {
 							}),
 						)}
 						onChange={(value) => {
-							if (activeStatisticsViewSubPage === value[1]) return
+							if (activeStatisticsViewSubPage === value[1]) {
+								return
+							}
 							setStatisticsViewSubPage(value[1] as STATISTICS_SUB_PAGES_LABELS)
 						}}
 						expandTrigger='hover'

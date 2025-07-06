@@ -3,7 +3,7 @@ import {
 	ALLOWED_INTERPOLATION_METHODS,
 	type DataRow,
 	type Variable,
-} from '../../types'
+} from '../../types.ts'
 
 /**
  * 缺失值替换和插值
@@ -79,11 +79,15 @@ class Interpolate {
 				this.interpolatedData = this.#median(data)
 				break
 			case ALLOWED_INTERPOLATION_METHODS.NEAREST:
-				if (!peer) throw new Error('缺失插值参考变量')
+				if (!peer) {
+					throw new Error('缺失插值参考变量')
+				}
 				this.interpolatedData = this.#nearest(data, peer)
 				break
 			case ALLOWED_INTERPOLATION_METHODS.LAGRANGE:
-				if (!peer) throw new Error('缺失插值参考变量')
+				if (!peer) {
+					throw new Error('缺失插值参考变量')
+				}
 				this.interpolatedData = this.#lagrange(data, peer)
 				break
 		}
@@ -172,7 +176,9 @@ class Interpolate {
 		const lower = X.toSorted((a, b) => b - a)
 			.filter((v) => v > x)
 			.slice(DOT_COUNT)
-		if (upper.length === 0 && lower.length === 0) return undefined
+		if (upper.length === 0 && lower.length === 0) {
+			return undefined
+		}
 		const useX = [...upper, ...lower]
 		const useY = useX.map((v) => Y[X.indexOf(v)])
 

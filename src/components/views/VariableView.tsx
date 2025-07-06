@@ -7,8 +7,8 @@ import {
 	ZoomOutOutlined,
 } from '@ant-design/icons'
 import { Button } from 'antd'
-import { useNav, VARIABLE_SUB_PAGES_LABELS } from '../../hooks/useNav'
-import { useStates } from '../../hooks/useStates'
+import { useNav, VARIABLE_SUB_PAGES_LABELS } from '../../hooks/useNav.tsx'
+import { useStates } from '../../hooks/useStates.ts'
 
 const ICONS: Record<VARIABLE_SUB_PAGES_LABELS, React.ReactElement> = {
 	变量表格: <TableOutlined />,
@@ -38,7 +38,9 @@ export function VariableView() {
 							icon={ICONS[label]}
 							disabled={disabled}
 							onClick={() => {
-								if (activeVariableViewSubPage === label) return
+								if (activeVariableViewSubPage === label) {
+									return
+								}
 								setVariableViewSubPage(label)
 							}}
 							type={activeVariableViewSubPage === label ? 'primary' : 'default'}

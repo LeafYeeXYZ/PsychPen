@@ -1,7 +1,7 @@
 import { colorSchemeDarkBlue, themeQuartz } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
 
 export function VariableTable() {
 	const dataCols = useData((state) => state.dataCols)

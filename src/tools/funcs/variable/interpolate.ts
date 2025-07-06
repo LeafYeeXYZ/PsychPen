@@ -3,8 +3,8 @@ import {
 	type AIFunction,
 	ALL_VARS_IDENTIFIER,
 	ALLOWED_INTERPOLATION_METHODS,
-} from '../../../types'
-import { Funcs } from '../../enum'
+} from '../../../types.ts'
+import { Funcs } from '../../enum.ts'
 
 export const define_interpolate_type = z.object({
 	variable_names: z.array(z.string()),

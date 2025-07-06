@@ -1,10 +1,10 @@
 import { Button, Form, InputNumber, Select, Space, Tag } from 'antd'
 import { useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { sleep } from '../../lib/utils'
-import { ALLOWED_DISCRETE_METHODS } from '../../types'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { sleep } from '../../lib/utils.ts'
+import { ALLOWED_DISCRETE_METHODS } from '../../types.ts'
 
 type Option = {
 	/** 变量名 */

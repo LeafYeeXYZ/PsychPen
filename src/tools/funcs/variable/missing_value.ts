@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { type AIFunction, ALL_VARS_IDENTIFIER } from '../../../types'
-import { Funcs } from '../../enum'
+import { type AIFunction, ALL_VARS_IDENTIFIER } from '../../../types.ts'
+import { Funcs } from '../../enum.ts'
 
 export const define_missing_value_type = z.object({
 	variable_names: z.array(z.string()),

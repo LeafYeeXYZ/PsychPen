@@ -4,9 +4,9 @@ import type { EChartsOption } from 'echarts'
 import * as echarts from 'echarts'
 import { useId, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { useData } from '../../hooks/useData'
-import { useStates } from '../../hooks/useStates'
-import { downloadImage, sleep } from '../../lib/utils'
+import { useData } from '../../hooks/useData.ts'
+import { useStates } from '../../hooks/useStates.ts'
+import { downloadImage, sleep } from '../../lib/utils.ts'
 
 type Option = {
 	/** 每组显示的被试内变量名 */
@@ -142,11 +142,15 @@ export function GroupedBarPlot() {
 							show: label !== 'none',
 							// @ts-expect-error 套了一层数组后, 类型推断出错
 							formatter: (params) => {
-								if (label === 'mean') return `均值: ${params.value}`
-								if (label === 'std')
+								if (label === 'mean') {
+									return `均值: ${params.value}`
+								}
+								if (label === 'std') {
 									return `标准差: ${std[i][params.dataIndex][3]}`
-								if (label === 'both')
+								}
+								if (label === 'both') {
 									return `均值: ${params.value}\n标准差: ${std[i][params.dataIndex][3]}`
+								}
 								return ''
 							},
 							rotate: 90,

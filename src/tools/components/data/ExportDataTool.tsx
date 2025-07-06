@@ -1,9 +1,9 @@
 import { downloadSheet, ExportTypes } from '@psych/sheet'
 import { Button, Tag } from 'antd'
-import { useData } from '../../../hooks/useData'
-import { useStates } from '../../../hooks/useStates'
-import { funcsLabel } from '../../../tools/tools'
-import { Funcs } from '../../enum'
+import { useData } from '../../../hooks/useData.ts'
+import { useStates } from '../../../hooks/useStates.ts'
+import { funcsLabel } from '../../../tools/tools.ts'
+import { Funcs } from '../../enum.ts'
 
 export function ExportDataTool({
 	done,
