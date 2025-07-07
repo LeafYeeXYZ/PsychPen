@@ -15,8 +15,6 @@
 				"useWhile": "error"
 			},
 			"correctness": {
-				"noUndeclaredDependencies": "error",
-				"noUndeclaredVariables": "error",
 				"useExhaustiveDependencies": "error",
 				"useHookAtTopLevel": "error",
 				"useImportExtensions": "error",
@@ -44,7 +42,8 @@
 				"useAtIndex": "error",
 				"useBlockStatements": "error",
 				"useSelfClosingElements": "error",
-				"useSingleVarDeclarator": "error"
+				"useSingleVarDeclarator": "error",
+				"useNumberNamespace": "error"
 			},
 			"suspicious": {
 				"noVar": "error"
