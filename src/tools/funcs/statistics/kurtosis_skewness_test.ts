@@ -15,7 +15,7 @@ export const kurtosis_skewness_test_for_independent_vars: AIFunction = {
 		function: {
 			name: Funcs.KURTOSIS_SKEWNESS_TEST_FOR_INDEPENDENT_VARS,
 			description:
-				'你可以调用这个函数来帮助用户进行被试间变量的峰度和偏度检验, 验证各组数据是否服从正态分布',
+				'你可以调用这个函数来帮助用户进行被试间变量的峰度和偏度检验, 验证各组数据是否服从正态分布. 注意, 请优先使用单样本 Kolmogorov-Smirnov 检验进行正态分布检验, 本函数仅作为补充',
 			parameters: {
 				type: 'object',
 				properties: {
@@ -48,7 +48,7 @@ export const kurtosis_skewness_test_for_paired_vars: AIFunction = {
 		function: {
 			name: Funcs.KURTOSIS_SKEWNESS_TEST_FOR_PAIRED_VARS,
 			description:
-				'你可以调用这个函数来帮助用户进行被试内变量的峰度和偏度检验, 验证各个变量是否满足正态分布',
+				'你可以调用这个函数来帮助用户进行被试内变量的峰度和偏度检验, 验证各个变量是否满足正态分布. 注意, 请优先使用单样本 Kolmogorov-Smirnov 检验进行正态分布检验, 本函数仅作为补充',
 			parameters: {
 				type: 'object',
 				properties: {
