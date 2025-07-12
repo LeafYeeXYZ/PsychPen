@@ -89,7 +89,7 @@ export function WordCloudPlot() {
 			let data: string[] = []
 			if (split) {
 				await init()
-				data = cut(raw.join('\n'), true)
+				data = raw.flatMap((text) => cut(text, true))
 			} else {
 				data = raw
 			}
