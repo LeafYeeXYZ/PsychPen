@@ -131,7 +131,7 @@ ${
 ${scheffe
 	.map(
 		(row) =>
-			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.f)} | ${markP(
+			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.f, row.p)} | ${markP(
 				row.p,
 			)} |`,
 	)

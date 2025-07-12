@@ -345,7 +345,10 @@ export function markP(p: number, hideZero = true): string {
 	}
 	// 格式化p值
 	let formattedP = p.toFixed(3)
-	if (hideZero && p < 1) {
+	if (+formattedP === 1) {
+		return '<i>1</i>'
+	}
+	if (hideZero) {
 		formattedP = formattedP.slice(1)
 	}
 	// 添加显著性标记

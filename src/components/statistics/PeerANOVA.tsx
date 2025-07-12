@@ -110,7 +110,7 @@ ${
 
 | 组A | 组B | 均值差异 | F | p |
 | :---: | :---: | :---: | :---: | :---: |
-${scheffe.map((row) => `| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.f)} | ${markP(row.p)} |`).join('\n')}
+${scheffe.map((row) => `| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.f, row.p)} | ${markP(row.p)} |`).join('\n')}
 `
 		: ''
 }
