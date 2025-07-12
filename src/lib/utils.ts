@@ -292,7 +292,14 @@ export function jsArrayToRMatrix(arr: number[][], transpose = false): string {
  * @param hideZero 是否隐藏统计量前的 0
  * @returns 统计量
  */
-export function markS(statistic: number, p?: number, hideZero = true): string {
+export function markS(
+	statistic: number | unknown,
+	p?: number | unknown,
+	hideZero = true,
+): string {
+	if (typeof statistic !== 'number') {
+		return '(无)'
+	}
 	if (Number.isNaN(statistic)) {
 		return '(无)'
 	}
@@ -308,7 +315,7 @@ export function markS(statistic: number, p?: number, hideZero = true): string {
 		}
 	}
 	// 添加显著性标记
-	if (p !== undefined) {
+	if (typeof p === 'number' && !Number.isNaN(p)) {
 		if (p < 0.001) {
 			return `<i>${formattedStat}***</i>`
 		}
@@ -328,7 +335,10 @@ export function markS(statistic: number, p?: number, hideZero = true): string {
  * @param hideZero 是否隐藏 p 值前的 0
  * @returns p 值
  */
-export function markP(p: number, hideZero = true): string {
+export function markP(p: number | unknown, hideZero = true): string {
+	if (typeof p !== 'number') {
+		return '(无)'
+	}
 	if (Number.isNaN(p)) {
 		return '(无)'
 	}

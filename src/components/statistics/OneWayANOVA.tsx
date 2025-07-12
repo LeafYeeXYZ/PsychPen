@@ -100,95 +100,48 @@ ${m.groups
 
 ## 3 组间差异
 
-对被试间变量"${value}" (分组变量: "${group}") 进行组间差异分析.
+对被试间变量"${value}" (分组变量: "${group}") 进行组间差异分析${
+				scheffe ? '; 进行 Scheffe 事后检验' : ''
+			}${
+				bonferroni
+					? `; 进行 Bonferroni 事后检验, 使用 MS<sub>within</sub> 代替 S<sub>p</sub><sup>2</sup> (检验更严格), 临界显著性水平应为 ${bonferroni[0].sig.toFixed(4).slice(1)} (即 0.05 除以成对比较次数)`
+					: ''
+			}${
+				tukey
+					? `; 进行 Tukey's HSD 事后检验, 均值差异显著的临界值 HSD = ${markS(tukey[0].HSD)}`
+					: ''
+			}.
 
 结果如表 4 所示.
 
 > 表 4 - 组间差异
 
-| 组A | 组B | 均值差异 | Cohen's d |
-| :---: | :---: | :---: | :---: |
+| 组A | 组B | 均值差异 | Cohen's d |${
+				scheffe ? ' Scheffe F | Scheffe p |' : ''
+			}${bonferroni ? ' Bonferroni t | Bonferroni p |' : ''}${
+				tukey ? ' Tukey q | Tukey p |' : ''
+			}
+| :---: | :---: | :---: | :---: |${scheffe ? ' :---: | :---: |' : ''}${
+				bonferroni ? ' :---: | :---: |' : ''
+			}${tukey ? ' :---: | :---: |' : ''}
 ${m.cohenD
 	.map(
 		(row) =>
-			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.d)} |`,
+			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.d)} |${
+				scheffe
+					? ` ${markS(scheffe.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.f, scheffe.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p)} | ${markP(scheffe.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p)} |`
+					: ''
+			}${
+				bonferroni
+					? ` ${markS(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.t)} | ${(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p ?? Number.POSITIVE_INFINITY) < (bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.sig ?? Number.NEGATIVE_INFINITY) ? '<span style="color: red;">' : ''}${markS(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p)}${(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p ?? Number.POSITIVE_INFINITY) < (bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.sig ?? Number.NEGATIVE_INFINITY) ? '</span>' : ''} |`
+					: ''
+			}${
+				tukey
+					? ` ${markS(tukey.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.q, tukey.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p)} | ${markP(tukey.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p)} |`
+					: ''
+			}`,
 	)
 	.join('\n')}
-
-${
-	scheffe
-		? `
-## 4 Scheffe 事后检验
-
-对被试间变量"${value}" (分组变量: "${group}") 进行 Scheffe 事后检验.
-
-结果如表 5 所示.
-
-> 表 5 - Scheffe 事后检验
-
-| 组A | 组B | 均值差异 | F | p |
-| :---: | :---: | :---: | :---: | :---: |
-${scheffe
-	.map(
-		(row) =>
-			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.f, row.p)} | ${markP(
-				row.p,
-			)} |`,
-	)
-	.join('\n')}
-`
-		: ''
-}
-
-${
-	bonferroni
-		? `
-## ${scheffe ? '5' : '4'} Bonferroni 事后检验
-
-对被试间变量"${value}" (分组变量: "${group}") 进行 Bonferroni 事后检验. 使用 MS<sub>within</sub> 代替 S<sub>p</sub><sup>2</sup> (检验更严格). 临界显著性水平应为 ${bonferroni[0].sig.toFixed(4).slice(1)} (即 0.05 除以成对比较次数).
-
-结果如表 ${scheffe ? '6' : '5'} 所示.
-
-> 表 ${scheffe ? '6' : '5'} - Bonferroni 事后检验
-
-| 组A | 组B | 均值差异 | t | p |
-| :---: | :---: | :---: | :---: | :---: |
-${bonferroni
-	.map(
-		(row) =>
-			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.t)} | ${
-				row.p < row.sig ? '<span style="color: red;">' : ''
-			}${markS(row.p)}${row.p < row.sig ? '</span>' : ''} |`,
-	)
-	.join('\n')}
-`
-		: ''
-}
-
-${
-	tukey
-		? `
-## ${scheffe && bonferroni ? '6' : (scheffe || bonferroni) ? '5' : '4'} Tukey's HSD 事后检验
-
-对被试间变量"${value}" (分组变量: "${group}") 进行 Tukey's HSD 事后检验. 均值差异显著的临界值 HSD = ${markS(tukey[0].HSD)}.
-
-结果如表 ${scheffe && bonferroni ? '7' : (scheffe || bonferroni) ? '6' : '5'} 所示.
-
-> 表 ${scheffe && bonferroni ? '7' : (scheffe || bonferroni) ? '6' : '5'} - Tukey's HSD 事后检验
-
-| 组A | 组B | 均值差异 | q | p |
-| :---: | :---: | :---: | :---: | :---: |
-${tukey
-	.map(
-		(row) =>
-			`| ${row.groupA} | ${row.groupB} | ${markS(row.diff)} | ${markS(row.q, row.p)} | ${markP(
-				row.p,
-			)} |`,
-	)
-	.join('\n')}
-`
-		: ''
-}
 			`)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
