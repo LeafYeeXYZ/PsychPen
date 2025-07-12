@@ -372,6 +372,30 @@ export function markP(p: number | unknown, hideZero = true): string {
 }
 
 /**
+ * 生成 Bonferroni 事后检验的 p 值
+ * @param p 显著性水平
+ * @param sig 显著水平临界值
+ * @hideZero 是否隐藏 p 值前的 0
+ * @returns p 值
+ */
+export function markBonferroniP(
+	p: number | unknown,
+	sig: number,
+	hideZero = true,
+): string {
+	if (typeof p !== 'number') {
+		return '(无)'
+	}
+	let formattedP = ''
+	if (hideZero) {
+		formattedP = p >= 1 ? '1' : p <= 0 ? '0' : p.toFixed(4).slice(1)
+	} else {
+		formattedP = p >= 1 ? '1' : p <= 0 ? '0' : p.toFixed(4)
+	}
+	return p < sig ? `<span style="color: red;">${formattedP}</span>` : formattedP
+}
+
+/**
  * 把当前 echarts 图表保存为图片
  */
 export async function downloadImage(id: string): Promise<void> {

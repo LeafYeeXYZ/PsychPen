@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData.ts'
 import { useStates } from '../../hooks/useStates.ts'
-import { markP, markS, sleep } from '../../lib/utils.ts'
+import { markBonferroniP, markP, markS, sleep } from '../../lib/utils.ts'
 import { Result } from '../widgets/Result.tsx'
 
 type Option = {
@@ -133,7 +133,7 @@ ${m.cohenD
 					: ''
 			}${
 				bonferroni
-					? ` ${markS(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.t)} | ${(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p ?? Number.POSITIVE_INFINITY) < (bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.sig ?? Number.NEGATIVE_INFINITY) ? '<span style="color: red;">' : ''}${markS(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p)}${(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p ?? Number.POSITIVE_INFINITY) < (bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.sig ?? Number.NEGATIVE_INFINITY) ? '</span>' : ''} |`
+					? ` ${markS(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.t)} | ${markBonferroniP(bonferroni.find((v) => v.groupA === row.groupA && v.groupB === row.groupB)?.p, bonferroni[0].sig)} |`
 					: ''
 			}${
 				tukey
