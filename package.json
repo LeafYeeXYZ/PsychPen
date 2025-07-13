@@ -49,15 +49,15 @@
 		"marked": "^15.0.12",
 		"marked-katex-extension": "^5.1.5",
 		"ml-kmeans": "^6.0.0",
-		"openai": "^5.8.2",
+		"openai": "^5.9.0",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"react-error-boundary": "^6.0.0",
-		"zod": "^3.25.75",
+		"zod": "^3.25.76",
 		"zustand": "^5.0.6"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.0.6",
+		"@biomejs/biome": "^2.1.1",
 		"@tailwindcss/vite": "^4.1.11",
 		"@types/bun": "^1.2.18",
 		"@types/react": "^19.1.8",
@@ -67,7 +67,7 @@
 		"commit-and-tag-version": "^12.5.1",
 		"tailwindcss": "^4.1.11",
 		"typescript": "^5.8.3",
-		"vite": "^7.0.2"
+		"vite": "^7.0.4"
 	},
 	"commit-and-tag-version": {
 		"types": [
