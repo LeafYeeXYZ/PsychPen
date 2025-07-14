@@ -134,6 +134,17 @@ export function computeExpression(
 	}
 }
 
+function numToString(num: number): string {
+	if (Number.isNaN(num) || !Number.isFinite(num)) {
+		throw new Error('数值无效')
+	}
+	return num.toString()
+}
+
+function escapeString(str: string): string {
+	return `"${str.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
+}
+
 /**
  * 将数值或统计量嵌入表达式
  * @param expression 表达式
@@ -147,106 +158,39 @@ export function embedValues(
 	variables: Variable[],
 	data: DataRow,
 ): string {
-	let exp = expression
-	// min(:::name:::)
-	exp = exp.replace(/min\((:::.+?:::)\)/g, (v) => {
-		const name = v.slice(7, -4)
-		const variable = variables.find((v) => v.name === name)
-		if (!variable) {
-			throw new Error(`变量 ${name} 不存在`)
-		}
-		if (variable.min === undefined) {
-			throw new Error(`变量 ${name} 没有最小值, 请确认变量类型`)
-		}
-		return variable.min.toString()
-	})
-	// max(:::name:::)
-	exp = exp.replace(/max\((:::.+?:::)\)/g, (v) => {
-		const name = v.slice(7, -4)
-		const variable = variables.find((v) => v.name === name)
-		if (!variable) {
-			throw new Error(`变量 ${name} 不存在`)
-		}
-		if (variable.max === undefined) {
-			throw new Error(`变量 ${name} 没有最大值, 请确认变量类型`)
-		}
-		return variable.max.toString()
-	})
-	// mean(:::name:::)
-	exp = exp.replace(/mean\((:::.+?:::)\)/g, (v) => {
-		const name = v.slice(8, -4)
-		const variable = variables.find((v) => v.name === name)
-		if (!variable) {
-			throw new Error(`变量 ${name} 不存在`)
-		}
-		if (variable.mean === undefined) {
-			throw new Error(`变量 ${name} 没有均值, 请确认变量类型`)
-		}
-		return variable.mean.toString()
-	})
-	// mode(:::name:::)
-	exp = exp.replace(/mode\((:::.+?:::)\)/g, (v) => {
-		const name = v.slice(8, -4)
-		const variable = variables.find((v) => v.name === name)
-		if (!variable) {
-			throw new Error(`变量 ${name} 不存在`)
-		}
-		if (variable.mode === undefined) {
-			throw new Error(`变量 ${name} 没有众数, 请确认变量类型`)
-		}
-		return variable.mode.toString()
-	})
-	// q1(:::name:::)
-	exp = exp.replace(/q1\((:::.+?:::)\)/g, (v) => {
-		const name = v.slice(6, -4)
-		const variable = variables.find((v) => v.name === name)
-		if (!variable) {
-			throw new Error(`变量 ${name} 不存在`)
-		}
-		if (variable.q1 === undefined) {
-			throw new Error(`变量 ${name} 没有 25% 分位数, 请确认变量类型`)
-		}
-		return variable.q1.toString()
-	})
-	// q2(:::name:::)
-	exp = exp.replace(/q2\((:::.+?:::)\)/g, (v) => {
-		const name = v.slice(6, -4)
-		const variable = variables.find((v) => v.name === name)
-		if (!variable) {
-			throw new Error(`变量 ${name} 不存在`)
-		}
-		if (variable.q2 === undefined) {
-			throw new Error(`变量 ${name} 没有 50% 分位数, 请确认变量类型`)
-		}
-		return variable.q2.toString()
-	})
-	// q3(:::name:::)
-	exp = exp.replace(/q3\((:::.+?:::)\)/g, (v) => {
-		const name = v.slice(6, -4)
-		const variable = variables.find((v) => v.name === name)
-		if (!variable) {
-			throw new Error(`变量 ${name} 不存在`)
-		}
-		if (variable.q3 === undefined) {
-			throw new Error(`变量 ${name} 没有 75% 分位数, 请确认变量类型`)
-		}
-		return variable.q3.toString()
-	})
-	// std(:::name:::)
-	exp = exp.replace(/std\((:::.+?:::)\)/g, (v) => {
-		const name = v.slice(7, -4)
-		const variable = variables.find((v) => v.name === name)
-		if (!variable) {
-			throw new Error(`变量 ${name} 不存在`)
-		}
-		if (variable.std === undefined) {
-			throw new Error(`变量 ${name} 没有标准差, 请确认变量类型`)
-		}
-		return variable.std.toString()
-	})
-	// :::name:::
-	exp = exp.replace(/:::.+?:::/g, (v) => {
-		const name = v.slice(3, -3)
+	let exp = expression	
+	const statFunctions = [
+		{ pattern: /mean\((:::.+?:::)\)/g, slice: [8, -4], prop: 'mean', name: '均值' },
+		{ pattern: /mode\((:::.+?:::)\)/g, slice: [8, -4], prop: 'mode', name: '众数' },
+		{ pattern: /min\((:::.+?:::)\)/g, slice: [7, -4], prop: 'min', name: '最小值' },
+		{ pattern: /max\((:::.+?:::)\)/g, slice: [7, -4], prop: 'max', name: '最大值' },
+		{ pattern: /std\((:::.+?:::)\)/g, slice: [7, -4], prop: 'std', name: '标准差' },
+		{ pattern: /q1\((:::.+?:::)\)/g, slice: [6, -4], prop: 'q1', name: '25%分位数' },
+		{ pattern: /q2\((:::.+?:::)\)/g, slice: [6, -4], prop: 'q2', name: '50%分位数' },
+		{ pattern: /q3\((:::.+?:::)\)/g, slice: [6, -4], prop: 'q3', name: '75%分位数' },
+	]
+	for (const func of statFunctions) {
+		exp = exp.replace(func.pattern, (match) => {
+			const name = match.slice(func.slice[0], func.slice[1])
+			const variable = variables.find((v) => v.name === name)
+			if (!variable) {
+				throw new Error(`变量"${name}"不存在`)
+			}
+			const value = variable[func.prop as keyof Variable]
+			if (value === undefined) {
+				throw new Error(`变量"${name}"没有${func.name}, 请确认变量类型`)
+			}
+			if (typeof value === 'number') {
+				return numToString(value)
+			}
+			if (typeof value === 'string') {
+				return escapeString(value)
+			}
+			return String(value)
+		})
+	}
+	exp = exp.replace(/:::.+?:::/g, (match) => {
+		const name = match.slice(3, -3)
 		const variable = variables.find((v) => v.name === name)
 		if (!variable) {
 			throw new Error(`变量 ${name} 不存在`)
@@ -256,9 +200,9 @@ export function embedValues(
 			throw new Error(`变量 ${name} 的值不存在`)
 		}
 		if (typeof value === 'number') {
-			return String(value)
+			return numToString(value)
 		}
-		return `"${String(value)}"`
+		return escapeString(String(value))
 	})
 	return exp
 }
