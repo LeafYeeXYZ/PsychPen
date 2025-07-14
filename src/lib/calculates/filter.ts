@@ -50,7 +50,7 @@ function booleanExpression(
 			}
 		}
 		const embeded = embedValues(expression, variables, data)
-		const value = Boolean(new Function(`return ${embeded}`)())
+		const value = Boolean(new Function(`return (${embeded})`)())
 		return value
 	} catch (e) {
 		throw new Error(

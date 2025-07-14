@@ -118,7 +118,7 @@ export function computeExpression(
 			}
 		}
 		const embeded = embedValues(expression, variables, data)
-		const value = new Function(`return ${embeded}`)()
+		const value = new Function(`return (${embeded})`)()
 		if (
 			typeof value !== 'number' &&
 			typeof value !== 'string' &&
