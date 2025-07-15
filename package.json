@@ -36,7 +36,7 @@
 		"@psych/sheet": "npm:@jsr/psych__sheet",
 		"ag-grid-community": "^33.3.2",
 		"ag-grid-react": "^33.3.2",
-		"antd": "^5.26.4",
+		"antd": "^5.26.5",
 		"bowser": "^2.11.0",
 		"echarts": "^5.6.0",
 		"echarts-gl": "^2.0.9",

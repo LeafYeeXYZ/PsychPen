@@ -63,7 +63,7 @@ export function PreviewData() {
 					okText='确定'
 					cancelText='取消'
 				>
-					<Button icon={<DeleteOutlined />} disabled={disabled}>
+					<Button icon={<DeleteOutlined />} disabled={disabled} danger>
 						清除数据
 					</Button>
 				</Popconfirm>

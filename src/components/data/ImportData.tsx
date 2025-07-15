@@ -159,9 +159,6 @@ export function ImportData() {
 					</Button>
 				</Popover>
 			</div>
-			<p className='text-sm p-4 absolute top-1 w-full text-center opacity-70'>
-				如只须使用小工具, 点击上方的工具按钮即可
-			</p>
 			<p className='text-sm p-4 absolute bottom-0 w-full text-center opacity-70 flex items-center justify-center gap-2'>
 				<span>PsychPen v{version}</span>
 				<span>|</span>
