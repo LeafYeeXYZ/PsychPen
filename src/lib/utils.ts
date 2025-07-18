@@ -158,16 +158,56 @@ export function embedValues(
 	variables: Variable[],
 	data: DataRow,
 ): string {
-	let exp = expression	
+	let exp = expression
 	const statFunctions = [
-		{ pattern: /mean\((:::.+?:::)\)/g, slice: [8, -4], prop: 'mean', name: '均值' },
-		{ pattern: /mode\((:::.+?:::)\)/g, slice: [8, -4], prop: 'mode', name: '众数' },
-		{ pattern: /min\((:::.+?:::)\)/g, slice: [7, -4], prop: 'min', name: '最小值' },
-		{ pattern: /max\((:::.+?:::)\)/g, slice: [7, -4], prop: 'max', name: '最大值' },
-		{ pattern: /std\((:::.+?:::)\)/g, slice: [7, -4], prop: 'std', name: '标准差' },
-		{ pattern: /q1\((:::.+?:::)\)/g, slice: [6, -4], prop: 'q1', name: '25%分位数' },
-		{ pattern: /q2\((:::.+?:::)\)/g, slice: [6, -4], prop: 'q2', name: '50%分位数' },
-		{ pattern: /q3\((:::.+?:::)\)/g, slice: [6, -4], prop: 'q3', name: '75%分位数' },
+		{
+			pattern: /mean\((:::.+?:::)\)/g,
+			slice: [8, -4],
+			prop: 'mean',
+			name: '均值',
+		},
+		{
+			pattern: /mode\((:::.+?:::)\)/g,
+			slice: [8, -4],
+			prop: 'mode',
+			name: '众数',
+		},
+		{
+			pattern: /min\((:::.+?:::)\)/g,
+			slice: [7, -4],
+			prop: 'min',
+			name: '最小值',
+		},
+		{
+			pattern: /max\((:::.+?:::)\)/g,
+			slice: [7, -4],
+			prop: 'max',
+			name: '最大值',
+		},
+		{
+			pattern: /std\((:::.+?:::)\)/g,
+			slice: [7, -4],
+			prop: 'std',
+			name: '标准差',
+		},
+		{
+			pattern: /q1\((:::.+?:::)\)/g,
+			slice: [6, -4],
+			prop: 'q1',
+			name: '25%分位数',
+		},
+		{
+			pattern: /q2\((:::.+?:::)\)/g,
+			slice: [6, -4],
+			prop: 'q2',
+			name: '50%分位数',
+		},
+		{
+			pattern: /q3\((:::.+?:::)\)/g,
+			slice: [6, -4],
+			prop: 'q3',
+			name: '75%分位数',
+		},
 	]
 	for (const func of statFunctions) {
 		exp = exp.replace(func.pattern, (match) => {
