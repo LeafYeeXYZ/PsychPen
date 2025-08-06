@@ -43,6 +43,7 @@ import { BasicScatterPlot } from '../components/plots/BasicScatterPlot.tsx'
 import { GroupedBarPlot } from '../components/plots/GroupedBarPlot.tsx'
 import { ParallelLinePlot } from '../components/plots/ParallelLinePlot.tsx'
 import { QQPlot } from '../components/plots/QQPlot.tsx'
+import { StackLinePlot } from '../components/plots/StackLinePlot.tsx'
 import { ThreeDBarPlot } from '../components/plots/ThreeDBarPlot.tsx'
 import { ThreeDScatterPlot } from '../components/plots/ThreeDScatterPlot.tsx'
 import { WordCloudPlot } from '../components/plots/WordCloudPlot.tsx'
@@ -55,6 +56,7 @@ export enum PLOTS_SUB_PAGES_LABELS {
 	WORD_CLOUD_PLOT = '词云图',
 	THREE_D_BAR_PLOT = '三维柱状图',
 	PARALLEL_LINE_PLOT = '平行折线图',
+	STACK_LINE_PLOT = '堆叠折线图',
 	BASIC_PIE_PLOT = '基础饼图',
 	BASIC_BAR_PLOT = '基础柱状图',
 	GROUPED_BAR_PLOT = '分组柱状图',
@@ -69,6 +71,7 @@ export const PLOTS_SUB_PAGES_ELEMENTS: Record<
 	[PLOTS_SUB_PAGES_LABELS.THREE_D_SCATTER_PLOT]: <ThreeDScatterPlot />,
 	[PLOTS_SUB_PAGES_LABELS.BASIC_LINE_PLOT]: <BasicLinePlot />,
 	[PLOTS_SUB_PAGES_LABELS.WORD_CLOUD_PLOT]: <WordCloudPlot />,
+	[PLOTS_SUB_PAGES_LABELS.STACK_LINE_PLOT]: <StackLinePlot />,
 	[PLOTS_SUB_PAGES_LABELS.THREE_D_BAR_PLOT]: <ThreeDBarPlot />,
 	[PLOTS_SUB_PAGES_LABELS.PARALLEL_LINE_PLOT]: <ParallelLinePlot />,
 	[PLOTS_SUB_PAGES_LABELS.BASIC_PIE_PLOT]: <BasicPiePlot />,
@@ -79,6 +82,7 @@ export const PLOTS_SUB_PAGES_ELEMENTS: Record<
 export const PLOTS_SUB_PAGES_MAP: Record<string, PLOTS_SUB_PAGES_LABELS[]> = {
 	折线图: [
 		PLOTS_SUB_PAGES_LABELS.BASIC_LINE_PLOT,
+		PLOTS_SUB_PAGES_LABELS.STACK_LINE_PLOT,
 		PLOTS_SUB_PAGES_LABELS.PARALLEL_LINE_PLOT,
 	],
 	箱线图: [PLOTS_SUB_PAGES_LABELS.BASIC_BOX_PLOT],
