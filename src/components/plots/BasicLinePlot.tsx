@@ -1,5 +1,5 @@
 import { max, mean, median, min, sum } from '@psych/lib'
-import { Button, Form, Input, Radio, Select, Space } from 'antd'
+import { Button, Form, Input, InputNumber, Radio, Select, Space } from 'antd'
 import type { EChartsOption } from 'echarts'
 import * as echarts from 'echarts'
 import { useId, useState } from 'react'
@@ -38,6 +38,11 @@ type Option = {
 	smooth: boolean
 	/** 是否显示数据标签 */
 	label: boolean
+
+	/** 最大 y 值 */
+	maxY?: number
+	/** 最小 y 值 */
+	minY?: number
 }
 
 export function BasicLinePlot() {
@@ -66,6 +71,8 @@ export function BasicLinePlot() {
 				statistic,
 				smooth,
 				label,
+				maxY,
+				minY,
 			} = values
 			const ele = document.getElementById(plotId)
 			if (!ele) {
@@ -124,6 +131,8 @@ export function BasicLinePlot() {
 						name: yLabel || dataVar,
 						nameLocation: 'middle',
 						nameGap: 35,
+						max: maxY,
+						min: minY,
 					},
 					series: [
 						{
@@ -163,6 +172,8 @@ export function BasicLinePlot() {
 						name: dataLabel || 'Y',
 						nameLocation: 'middle',
 						nameGap: 35,
+						max: maxY,
+						min: minY,
 					},
 					series: [
 						{
@@ -374,6 +385,24 @@ export function BasicLinePlot() {
 									<Select.Option value={true}>显示数据标签</Select.Option>
 									<Select.Option value={false}>隐藏数据标签</Select.Option>
 								</Select>
+							</Form.Item>
+						</Space.Compact>
+					</Form.Item>
+					<Form.Item label='Y轴数值范围'>
+						<Space.Compact className='w-full'>
+							<Form.Item noStyle name='minY'>
+								<InputNumber
+									className='w-full'
+									addonBefore='Y轴最小为'
+									placeholder='默认自动'
+								/>
+							</Form.Item>
+							<Form.Item noStyle name='maxY'>
+								<InputNumber
+									className='w-full'
+									addonBefore='Y轴最大为'
+									placeholder='默认自动'
+								/>
 							</Form.Item>
 						</Space.Compact>
 					</Form.Item>
