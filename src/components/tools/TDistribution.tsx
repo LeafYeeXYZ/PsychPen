@@ -22,11 +22,11 @@ function generateDate(data: number[]): {
 	const lag = 0.1
 	const count: number[] = []
 	const label = new Array(21).fill(0).map((_, i) => (i - 10) * 2 * lag)
-	label.map((value) => {
+	for (const value of label) {
 		const min = value - lag
 		const max = value + lag
 		count.push(data.filter((item) => item >= min && item < max).length)
-	})
+	}
 	return { count, label }
 }
 

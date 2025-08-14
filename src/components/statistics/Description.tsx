@@ -133,6 +133,8 @@ export function Description() {
 								return { value: markS(range(rows)), label: '极差' }
 							case 'variance':
 								return { value: markS(_vari(rows)), label: '方差' }
+							default:
+								throw new Error(`未知统计量: ${stat}`)
 						}
 					})
 					return { var: vari, data }
@@ -204,6 +206,8 @@ ${data
 								return { value: markS(range(rows)), label: '极差' }
 							case 'variance':
 								return { value: markS(_vari(rows)), label: '方差' }
+							default:
+								throw new Error(`未知统计量: ${stat}`)
 						}
 					})
 					return { var: String(g), data }

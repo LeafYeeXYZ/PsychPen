@@ -22,11 +22,11 @@ function generateDate(data: number[]): {
 	const label = [
 		-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 	]
-	label.map((value) => {
+	for (const value of label) {
 		const min = value - 0.5
 		const max = value + 0.5
 		count.push(data.filter((item) => item >= min && item < max).length)
-	})
+	}
 	return { count, label }
 }
 

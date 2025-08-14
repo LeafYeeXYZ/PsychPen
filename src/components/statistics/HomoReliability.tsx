@@ -4,9 +4,9 @@ import { Button, Form, InputNumber, Popover, Radio, Select } from 'antd'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData.ts'
-import { useRemoteR } from '../../hooks/useRemoteR.ts'
 import { useStates } from '../../hooks/useStates.ts'
 import { jsArrayToRMatrix, markS, sleep } from '../../lib/utils.ts'
+import { executeRCode } from '../../lib/webr.ts'
 import { Result } from '../widgets/Result.tsx'
 
 type Option = {
@@ -25,8 +25,6 @@ export function HomoReliability() {
 	const dataRows = useData((state) => state.dataRows)
 	const isLargeData = useData((state) => state.isLargeData)
 	const messageApi = useStates((state) => state.messageApi)
-	const Renable = useRemoteR((state) => state.Renable)
-	const executeRCode = useRemoteR((state) => state.executeRCode)
 	const statResult = useStates((state) => state.statResult)
 	const setStatResult = useStates((state) => state.setStatResult)
 	// biome-ignore lint/correctness/useExhaustiveDependencies: 仅在组件加载时清空结果
@@ -200,7 +198,7 @@ ${m.group
 						name='calculateOmega'
 						rules={[{ required: true, message: '请选择是否计算 Omega 系数' }]}
 					>
-						<Radio.Group block disabled={!Renable} buttonStyle='solid'>
+						<Radio.Group block buttonStyle='solid'>
 							<Radio.Button value={true}>计算</Radio.Button>
 							<Radio.Button value={false}>不计算</Radio.Button>
 						</Radio.Group>
@@ -213,7 +211,6 @@ ${m.group
 							className='w-full'
 							min={1}
 							step={1}
-							disabled={!Renable}
 						/>
 					</Form.Item>
 					<div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
@@ -269,10 +266,10 @@ ${m.group
 						</Popover>
 					</div>
 					<p className='w-full text-center text-xs text-gray-400 mt-5'>
-						如果除了 Alpha 系数外, 还想计算 Omega 系数
+						计算 Omega 系数依赖 webR 项目及 psych 包
 					</p>
 					<p className='w-full text-center text-xs text-gray-400 mt-1'>
-						请在数据视图右上角的设置中启用联网功能
+						首次运行会联网加载相关资源, 请耐心等待
 					</p>
 				</Form>
 			</div>

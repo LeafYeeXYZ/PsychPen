@@ -90,12 +90,12 @@ export function BasicBarPlot() {
 						.filter((row) => row[groupVar] === col)
 						.map((row) => row[dataVar] as number),
 				)
-				rows.map((row, i) => {
+				for (const [i, row] of rows.entries()) {
 					const _mean = +mean(row).toFixed(4)
 					const _std = +sd(row).toFixed(4)
 					data.push(_mean)
 					std.push([i, _mean - error * _std, _mean + error * _std, _std])
-				})
+				}
 				const option: EChartsOption = {
 					xAxis: {
 						name: xLabel || groupVar,
@@ -208,13 +208,13 @@ export function BasicBarPlot() {
 					variables.every((variable) => typeof row[variable] === 'number'),
 				)
 				// 被试内数据处理
-				variables.map((variable, i) => {
+				for (const [i, variable] of variables.entries()) {
 					const row = filteredRows.map((row) => row[variable] as number)
 					const _mean = +mean(row).toFixed(4)
 					const _std = +sd(row).toFixed(4)
 					data.push(_mean)
 					std.push([i, _mean - error * _std, _mean + error * _std, _std])
-				})
+				}
 				const option: EChartsOption = {
 					xAxis: {
 						name: peerLabel || 'X',

@@ -1,5 +1,4 @@
 import {
-	CloudServerOutlined,
 	CommentOutlined,
 	DeleteOutlined,
 	FilterOutlined,
@@ -19,7 +18,6 @@ import { sleep } from '../../lib/utils.ts'
 import type { DataRow } from '../../types.ts'
 import { Expression } from '../widgets/Expression.tsx'
 import { ConfigAI } from './ConfigAI.tsx'
-import { ConfigR } from './ConfigR.tsx'
 
 /** 可导出的文件类型 */
 const EXPORT_FILE_TYPES = Object.values(ExportTypes)
@@ -177,20 +175,6 @@ export function PreviewData() {
 						content={<ConfigAI />}
 					>
 						<Button icon={<CommentOutlined />}>AI辅助分析设置</Button>
-					</Popover>
-					<Popover
-						title={
-							<span>
-								R语言服务器设置{' '}
-								<Popover content='详见使用文档或询问 AI 助手'>
-									<InfoCircleOutlined />
-								</Popover>
-							</span>
-						}
-						trigger={['click', 'hover']}
-						content={<ConfigR />}
-					>
-						<Button icon={<CloudServerOutlined />}>R语言服务器设置</Button>
 					</Popover>
 				</div>
 			</div>

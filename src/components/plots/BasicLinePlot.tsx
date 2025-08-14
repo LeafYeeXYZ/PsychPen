@@ -96,7 +96,7 @@ export function BasicLinePlot() {
 						.map((row) => row[dataVar])
 						.filter((value) => typeof value === 'number'),
 				)
-				rows.map((row) => {
+				for (const row of rows) {
 					switch (statistic) {
 						case 'mean':
 							data.push(+mean(row).toFixed(4))
@@ -117,7 +117,7 @@ export function BasicLinePlot() {
 							data.push(row.length)
 							break
 					}
-				})
+				}
 				const option: EChartsOption = {
 					xAxis: {
 						name: xLabel || groupVar,
@@ -195,6 +195,8 @@ export function BasicLinePlot() {
 										return +sum(row).toFixed(4)
 									case 'count':
 										return row.length
+									default:
+										throw new Error(`未知统计量: ${statistic}`)
 								}
 							}),
 							smooth,

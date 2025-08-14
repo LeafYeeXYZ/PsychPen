@@ -132,7 +132,7 @@ export function StackLinePlot() {
 							.map((row) => row[dataVar])
 							.filter((value) => typeof value === 'number'),
 					)
-					rows.map((row) => {
+					for (const row of rows) {
 						switch (statistic) {
 							case 'mean':
 								data.push(+mean(row).toFixed(4))
@@ -153,7 +153,7 @@ export function StackLinePlot() {
 								data.push(row.length)
 								break
 						}
-					})
+					}
 					lineData.data = data
 				}
 
@@ -194,7 +194,7 @@ export function StackLinePlot() {
 							.map((row) => row[variable])
 							.filter((value) => typeof value === 'number'),
 					)
-					rows.map((row) => {
+					for (const row of rows) {
 						switch (statistic) {
 							case 'mean':
 								data.push(+mean(row).toFixed(4))
@@ -215,7 +215,7 @@ export function StackLinePlot() {
 								data.push(row.length)
 								break
 						}
-					})
+					}
 					lineData.data = data
 				}
 

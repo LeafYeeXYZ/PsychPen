@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
@@ -12,26 +12,24 @@
 			"recommended": true,
 			"complexity": {
 				"noForEach": "error",
-				"useWhile": "error"
+				"useWhile": "error",
+				"noImportantStyles": "off"
 			},
 			"correctness": {
 				"useExhaustiveDependencies": "error",
 				"useHookAtTopLevel": "error",
 				"useImportExtensions": "error",
+				"noGlobalDirnameFilename": "error",
+				"noNestedComponentDefinitions": "error",
+				"noSolidDestructuredProps": "error",
+				"noProcessGlobal": "error",
+				"noReactPropAssignments": "error",
+				"useUniqueElementIds": "error",
 				"useJsxKeyInIterable": "error"
 			},
 			"nursery": {
-				"noDestructuredProps": "error",
-				"noGlobalDirnameFilename": "error",
 				"noImportCycles": "error",
-				"noNestedComponentDefinitions": "error",
-				"noProcessGlobal": "error",
-				"noReactPropAssign": "error",
-				"noUselessEscapeInString": "error",
-				"useAdjacentGetterSetter": "error",
-				"useConsistentObjectDefinition": "error",
-				"useExhaustiveSwitchCases": "error",
-				"useUniqueElementIds": "error"
+				"useExhaustiveSwitchCases": "error"
 			},
 			"performance": {
 				"useTopLevelRegex": "error"
@@ -41,11 +39,14 @@
 				"noParameterAssign": "error",
 				"useBlockStatements": "error",
 				"useSelfClosingElements": "error",
+				"useGroupedAccessorPairs": "error",
+				"useConsistentObjectDefinitions": "error",
 				"useSingleVarDeclarator": "error",
 				"useNumberNamespace": "error"
 			},
 			"suspicious": {
-				"noVar": "error"
+				"noVar": "error",
+				"noUnknownAtRules": "off"
 			}
 		}
 	},

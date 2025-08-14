@@ -453,8 +453,12 @@ ${result.x
 	.map(
 		(variable, index) =>
 			`| ${variable} (${
+				// biome-ignore lint/complexity/useIndexOf: ...
 				result.m.selectedVariables.findIndex((i) => i === index) + 1
-					? `x${result.m.selectedVariables.findIndex((i) => i === index) + 1}`
+					? `x${
+							// biome-ignore lint/complexity/useIndexOf: ...
+							result.m.selectedVariables.findIndex((i) => i === index) + 1
+						}`
 					: '已剔除'
 			}) | ${markS(result.m.ivMeans[index])} | ${markS(result.m.ivStds[index])} | ${markS(
 				corr(
