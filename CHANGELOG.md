@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.9.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.8.0...v2.9.0) (2025-08-14)
+
+
+### Features
+
+* 改变词云图分词方式，支持更大的文本量 ([5133733](https://github.com/LeafYeeXYZ/PsychPen/commit/51337336e3c0d773826fb5dba01b3045079b25bf))
+* 计算Omega系数现在可以在本地进行 ([a18b42b](https://github.com/LeafYeeXYZ/PsychPen/commit/a18b42bb3b41056a2060e05199b1ad6c731c475c))
+* 新增堆叠折线图 ([2ac7f29](https://github.com/LeafYeeXYZ/PsychPen/commit/2ac7f2987c28c88c5c0e1ca0c94e8a01cc68fea1))
+* 优化方差分析事后检验的显示方式 ([3d0ba72](https://github.com/LeafYeeXYZ/PsychPen/commit/3d0ba72af42fe7dc51b7d142540e780835a7e1f3))
+* 允许设置折线图的Y轴范围 ([907351c](https://github.com/LeafYeeXYZ/PsychPen/commit/907351c83204eee90da349a63ca616d40febf23c))
+
+
+### Bug Fixes
+
+* 修复复杂表达式在执行过程中的潜在问题 ([28e7698](https://github.com/LeafYeeXYZ/PsychPen/commit/28e7698edd19a1e77743c67a63719f93cfeb5cf2))
+* 修改特定数值的P值可能显示异常的问题 ([7dec2a7](https://github.com/LeafYeeXYZ/PsychPen/commit/7dec2a7fff2430b8553a246a89738568ec764d3d))
+
+
+### Improvements
+
+* 引导AI助手优先使用单样本KS检验进行正态分布检验 ([17fa8b7](https://github.com/LeafYeeXYZ/PsychPen/commit/17fa8b75d38764bd65d03adfc8c0f48f67190f91))
+* 优化数据界面显示 ([82f0e1b](https://github.com/LeafYeeXYZ/PsychPen/commit/82f0e1b5f02fe4562b5c677e9200b01e5d8b0ca0))
+* 优化值嵌入逻辑 ([877fa22](https://github.com/LeafYeeXYZ/PsychPen/commit/877fa2270ff81654ef211260d924e00d0b0cb597))
+* 优化Bonferroni事后检验的P值显示 ([d13e00e](https://github.com/LeafYeeXYZ/PsychPen/commit/d13e00e3f9eb1387dec77700b1c7342eb042d4c6))
+
 ## [2.8.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.7.0...v2.8.0) (2025-07-06)
 
 
