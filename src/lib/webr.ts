@@ -3,9 +3,8 @@ import type { WebR } from 'webr'
 const PRE_INSTALLED_PACKAGES: string[] = ['jsonlite', 'psych']
 
 let webr: WebR | null = null
-let ready = false
 
-import('webr')
+const ready = import('webr')
 	.then((module) => {
 		webr = new module.WebR()
 		return webr.init()
@@ -14,15 +13,23 @@ import('webr')
 		return webr?.installPackages(PRE_INSTALLED_PACKAGES)
 	})
 	.then(() => {
-		ready = true
+		return webr?.evalRVoid(`${PRE_INSTALLED_PACKAGES.map(pkg => `library(${pkg})`).join('\n')}`)
+	})
+	.then(() => {
+		return
+	})
+	.catch((error) => {
+		console.error('WebR Init Error:', error)
+		return Promise.reject(new Error('R语言模块加载失败, 请刷新网页重试'))
 	})
 
 export async function executeRCode(
 	codeWithOutPackages: string,
 	packages: string[],
 ): Promise<unknown> {
-	if (!webr || !ready) {
-		throw new Error('R语言模块正在加载中, 请稍后再试')
+	await ready
+	if (!webr) {
+		throw new Error('R语言模块加载失败, 请刷新网页重试')
 	}
 	if (packages.some((v) => !PRE_INSTALLED_PACKAGES.includes(v))) {
 		await webr.installPackages(packages)
