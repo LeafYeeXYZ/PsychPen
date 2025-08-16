@@ -248,10 +248,12 @@ export function ConfigAI() {
 								<Button
 									type='text'
 									size='small'
-									onClick={() => _DataView_setModel('qwen-max')}
+									onClick={() =>
+										_DataView_setModel('qwen3-235b-a22b-instruct-2507')
+									}
 								>
 									<Tag style={{ margin: 0 }} color='blue'>
-										qwen-max
+										qwen3-235b-a22b-instruct-2507
 									</Tag>
 								</Button>
 								(点击填入)
@@ -261,10 +263,10 @@ export function ConfigAI() {
 								<Button
 									type='text'
 									size='small'
-									onClick={() => _DataView_setModel('gpt-4.1')}
+									onClick={() => _DataView_setModel('gpt-5')}
 								>
 									<Tag style={{ margin: 0 }} color='blue'>
-										gpt-4.1
+										gpt-5
 									</Tag>
 								</Button>
 								(点击填入)

@@ -69,7 +69,6 @@ export function HomoReliability() {
 						const result = (await executeRCode(code(items), [
 							'psych',
 							'jsonlite',
-							'GPArotation',
 						])) as number[]
 						omega.push(result[0])
 					}
