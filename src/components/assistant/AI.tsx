@@ -83,7 +83,7 @@ import { welchTTestCalculator } from '../statistics/WelchTTest.tsx'
 import { Messages } from './Messages.tsx'
 
 const GREETTING = `
-你好, 我是 PsychPen 的 AI 助手, 可以**讲解 PsychPen 的使用方法、探索你的数据集、导出当前数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、解释你当前的统计结果、生成并执行代码来导出自定义数据等**. 请问有什么可以帮你的?
+你好, 我是 PsychPen 的 AI 助手, 可以帮你**探索数据集、导出当前数据、跳转页面、定义缺失值、缺失值插值、标准化/中心化/离散化变量、生成新变量、筛选数据、执行统计分析或解释你当前的统计结果、生成并执行代码来导出自定义数据等**. 请问有什么可以帮你的?
 `.trim()
 const INSTRUCTION = `
 你是在线统计分析和数据可视化软件"PsychPen"中的AI助手.

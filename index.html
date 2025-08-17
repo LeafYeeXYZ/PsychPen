@@ -18,6 +18,7 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
+        gap: 0.6rem;
         width: 100dvw;
         height: 100dvh;
         position: fixed;
@@ -25,19 +26,14 @@
         left: 0;
         background-color: #f3f4f6;
         color: black;
-      }
-      #loading-title {
-        font-size: 1.5rem;
-        line-height: 1.3333;
-        text-wrap: blance;
-        text-align: center;
-        padding: 2rem;
+        font-size: 1.2rem;
+        font-weight: bold;
       }
       #loading-sign {
-        width: 3rem;
-        height: 3rem;
-        margin-top: 1rem;
-        border: 0.25rem solid black;
+        width: 2rem;
+        height: 2rem;
+        margin-bottom: 1rem;
+        border: 0.2rem solid black;
         border-top-color: transparent;
         border-radius: 50%;
         animation: spin 1s linear infinite;
@@ -62,8 +58,8 @@
       }
     </style>
     <div id="loading-content">
-      <div id="loading-title">PsychPen: AI加持的在线统计分析和数据可视化工具</div>
       <div id="loading-sign"></div>
+      <div>加载中</div>
     </div>
     <script id="loading-script">
       window.onload = () => {

@@ -6,7 +6,7 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData.ts'
 import { useStates } from '../../hooks/useStates.ts'
 import { jsArrayToRMatrix, markS, sleep } from '../../lib/utils.ts'
-import { executeRCode } from '../../lib/webr.ts'
+import { getR } from '../../lib/webr.ts'
 import { Result } from '../widgets/Result.tsx'
 
 type Option = {
@@ -53,7 +53,10 @@ export function HomoReliability() {
 					: undefined,
 			)
 			if (calculateOmega) {
+				const r = await getR()
 				const code = (data: number[][]) => `
+					library(jsonlite)
+					library(psych)
           data <- ${jsArrayToRMatrix(data, true)}
           omega_result <- omega(data${manualNFactors ? `, nfactors = ${manualNFactors}` : ''})
           json_result <- toJSON(omega_result$omega.tot)
@@ -61,16 +64,17 @@ export function HomoReliability() {
         `
 				if (m.group.length > 1 && group) {
 					const omega: number[] = []
+					const n: number[] = []
 					for (const g of m.group) {
 						const rows = filteredRows.filter((row) => row[group] === g)
 						const items = variables.map((variable) =>
 							rows.map((row) => Number(row[variable])),
 						)
-						const result = (await executeRCode(code(items), [
-							'psych',
-							'jsonlite',
-						])) as number[]
+						const result = JSON.parse(
+							await r.evalRString(code(items)),
+						) as number[]
 						omega.push(result[0])
+						n.push(rows.length)
 					}
 					setStatResult(`
 ## 1 同质性信度分析
@@ -81,11 +85,11 @@ export function HomoReliability() {
 
 > 表 1 - 同质性信度分析结果
 
-| 分组 | 量表题目数 | alpha 系数 | omega 系数 |
-| :---: | :---: | :---: | :---: |
+| 分组 | 量表题目数 | 样本量 | alpha 系数 | omega 系数 |
+| :---: | :---: | :---: | :---: | :---: |
 ${m.group
 	.map((g, i) => {
-		return `| ${g} | ${variables.length} | ${markS(m.alpha[i])} | ${markS(omega[i])} |`
+		return `| ${g} | ${variables.length} | ${n[i]} | ${markS(m.alpha[i])} | ${markS(omega[i])} |`
 	})
 	.join('\n')}
 
@@ -94,11 +98,7 @@ ${m.group
 > Hayes, A. F., & Coutts, J. J. (2020). Use Omega Rather than Cronbach’s Alpha for Estimating Reliability. But…. Communication Methods and Measures, 14(1), 1–24. https://doi.org/10.1080/19312458.2020.1718629
 					`)
 				} else {
-					const omega = (await executeRCode(code(items), [
-						'psych',
-						'jsonlite',
-						'GPArotation',
-					])) as number[]
+					const omega = JSON.parse(await r.evalRString(code(items))) as number[]
 					setStatResult(`
 ## 1 同质性信度分析
 

@@ -13,9 +13,12 @@ const ready = import('webr')
 		return webr?.installPackages(PRE_INSTALLED_PACKAGES)
 	})
 	.then(() => {
-		return webr?.evalRVoid(`${PRE_INSTALLED_PACKAGES.map(pkg => `library(${pkg})`).join('\n')}`)
+		return webr?.evalRVoid(
+			`${PRE_INSTALLED_PACKAGES.map((pkg) => `library(${pkg})`).join('\n')}`,
+		)
 	})
 	.then(() => {
+		console.log('WebR Initialized Successfully')
 		return
 	})
 	.catch((error) => {
@@ -23,21 +26,10 @@ const ready = import('webr')
 		return Promise.reject(new Error('R语言模块加载失败, 请刷新网页重试'))
 	})
 
-export async function executeRCode(
-	codeWithOutPackages: string,
-	packages: string[],
-): Promise<unknown> {
+export async function getR(): Promise<WebR> {
 	await ready
 	if (!webr) {
 		throw new Error('R语言模块加载失败, 请刷新网页重试')
 	}
-	if (packages.some((v) => !PRE_INSTALLED_PACKAGES.includes(v))) {
-		await webr.installPackages(packages)
-	}
-	const libraryCode = packages.map((v) => `library(${v})`).join('\n')
-	const result = await webr.evalRString(
-		`${libraryCode}\n${codeWithOutPackages}`,
-	)
-	const data = JSON.parse(result)
-	return data
+	return webr
 }
