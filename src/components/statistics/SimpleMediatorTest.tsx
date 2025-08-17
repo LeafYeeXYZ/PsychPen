@@ -33,7 +33,7 @@ export function simpleMediationTestCalculator(config: {
 	const model = new SimpleMediationModel(xData, mData, yData)
 	const bs = model.bootstrap(B)
 	const es = model.effectSize
-	const includeZero = (bs.ab[0] > 0) || (bs.ab[1] < 0)
+	const includeZero = (bs.ab[0] < 0) && (bs.ab[1] > 0)
 	return `
 ## 1 简单中介效应模型
 
