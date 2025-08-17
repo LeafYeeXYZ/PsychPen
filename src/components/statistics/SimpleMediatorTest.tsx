@@ -33,10 +33,11 @@ export function simpleMediationTestCalculator(config: {
 	const model = new SimpleMediationModel(xData, mData, yData)
 	const bs = model.bootstrap(B)
 	const es = model.effectSize
+	const includeZero = (bs.ab[0] > 0) || (bs.ab[1] < 0)
 	return `
 ## 1 简单中介效应模型
 
-以"${x}"为自变量，"${m}"为中介变量，"${y}"为因变量构建简单中介效应模型. 置信区间通过 Bootstrap 抽样获得, 抽样次数为 ${B}.
+以"${x}"为自变量，"${m}"为中介变量，"${y}"为因变量构建简单中介效应模型; 样本量为 ${N}. 置信区间通过 Bootstrap 抽样获得, 抽样次数为 ${B}. 中介效应的置信区间${includeZero ? '包含零' : '不包含零'}, 中介效应${includeZero ? '不显著' : '显著'}.
 
 结果如表 1 所示.
 
@@ -50,28 +51,11 @@ export function simpleMediationTestCalculator(config: {
 | b (控制 x 后 m 对 y 的效应) | ${markS(model.b)} | ${markS(model.bT, model.bP)} | ${markP(model.bP)} | [${markS(bs.b[0])}, ${markS(bs.b[1])}) |
 | ab (x 对 y 的中介效应) | ${markS(model.ab)} | - | - | [${markS(bs.ab[0])}, ${markS(bs.ab[1])}) |
 
-## 2 中介效应显著性检验
-
-样本量为 ${N}，Bootstrap 抽样次数为 ${B}. 依次检验法中 a、b 的显著性阈值为 0.025.
+## 2 中介效应的效应量
 
 结果如表 2 所示.
 
-> 表 2 - 中介效应显著性检验
-
-| 方法 | H<sub>0</sub> | 统计量 | 结果 |
-| :---: | :---: | :---: | :---: |
-| 依次检验法 | a = 0 或 b = 0 | p<sub>a</sub>: ${markS(model.aP)}, p<sub>b</sub>: ${markS(model.bP)} | ${
-		model.aP < 0.025 && model.bP < 0.025 ? '拒绝原假设' : '不通过'
-	} |
-| 非参数 Bootstrap 检验 | ab = 0 | 95%置信区间: [${markS(bs.ab[0])}, ${markS(bs.ab[1])}) | ${
-		bs.ab[0] > 0 || bs.ab[1] < 0 ? '拒绝原假设' : '不通过'
-	} |
-
-## 3 中介效应的效应量
-
-结果如表 3 所示.
-
-> 表 3 - 中介效应的效应量
+> 表 2 - 中介效应的效应量
 
 | 方法 | 结果 |
 | :---: | :---: |
