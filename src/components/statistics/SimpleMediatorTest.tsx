@@ -36,7 +36,7 @@ export function simpleMediationTestCalculator(config: {
 	return `
 ## 1 简单中介效应模型
 
-以"${x}"为自变量，"${m}"为中介变量，"${y}"为因变量构建简单中介效应模型.
+以"${x}"为自变量，"${m}"为中介变量，"${y}"为因变量构建简单中介效应模型. 置信区间通过 Bootstrap 抽样获得, 抽样次数为 ${B}.
 
 结果如表 1 所示.
 
