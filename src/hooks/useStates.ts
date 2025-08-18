@@ -1,7 +1,13 @@
 import type { MessageInstance } from 'antd/es/message/interface'
+import type { WebR } from 'webr'
 import { create } from 'zustand'
 
 type GlobalState = {
+	getR: () => Promise<WebR>
+	/**
+	 * 顶栏显示的内容
+	 */
+	titleContent: string
 	/**
 	 * 统计结果
 	 */
@@ -40,8 +46,49 @@ type GlobalState = {
 	setDisabled: (disabled: boolean) => void
 }
 
+const PRE_INSTALLED_R_PACKAGES: string[] = ['jsonlite', 'psych']
+const DEFAULT_TITLE_CONTENT = '安装R语言模块'
+const R_ERROR_MESSAGE = 'R语言模块加载失败, 请刷新网页重试'
+
 export const useStates = create<GlobalState>()((setState) => {
+	let webr: WebR | null = null
+	const rReady = import('webr')
+		.then((module) => {
+			setState({ titleContent: '初始化R语言模块' })
+			webr = new module.WebR()
+			return webr.init()
+		})
+		.then(() => {
+			setState({ titleContent: '下载R语言依赖包' })
+			return webr?.installPackages(PRE_INSTALLED_R_PACKAGES)
+		})
+		.then(() => {
+			setState({ titleContent: '安装R语言依赖包' })
+			return webr?.evalRVoid(
+				`${PRE_INSTALLED_R_PACKAGES.map((pkg) => `library(${pkg})`).join('\n')}`,
+			)
+		})
+		.then(() => {
+			console.log('WebR Initialized Successfully')
+			return
+		})
+		.catch((error) => {
+			console.error('WebR Init Error:', error)
+			return Promise.reject(new Error(R_ERROR_MESSAGE))
+		})
+		.finally(() => {
+			setState({ titleContent: '' })
+		})
+
 	return {
+		getR: async () => {
+			await rReady
+			if (!webr) {
+				throw new Error(R_ERROR_MESSAGE)
+			}
+			return webr
+		},
+		titleContent: DEFAULT_TITLE_CONTENT,
 		statResult: '',
 		setStatResult: (statResult) => setState({ statResult }),
 		messageApi: null,

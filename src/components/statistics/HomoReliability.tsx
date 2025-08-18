@@ -6,7 +6,6 @@ import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData.ts'
 import { useStates } from '../../hooks/useStates.ts'
 import { jsArrayToRMatrix, markS, sleep } from '../../lib/utils.ts'
-import { getR } from '../../lib/webr.ts'
 import { Result } from '../widgets/Result.tsx'
 
 type Option = {
@@ -27,6 +26,7 @@ export function HomoReliability() {
 	const messageApi = useStates((state) => state.messageApi)
 	const statResult = useStates((state) => state.statResult)
 	const setStatResult = useStates((state) => state.setStatResult)
+	const getR = useStates((state) => state.getR)
 	// biome-ignore lint/correctness/useExhaustiveDependencies: 仅在组件加载时清空结果
 	useEffect(() => {
 		setStatResult('')
@@ -265,7 +265,7 @@ ${m.group
 						</Popover>
 					</div>
 					<p className='w-full text-center text-xs text-gray-400 mt-5'>
-						计算 Omega 系数依赖 webR 项目及 psych 包
+						计算 Omega 系数依赖 R 语言模块及 psych 包
 					</p>
 					<p className='w-full text-center text-xs text-gray-400 mt-1'>
 						首次运行会联网加载相关资源, 请耐心等待

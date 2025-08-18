@@ -2,6 +2,7 @@ import {
 	BarChartOutlined,
 	CommentOutlined,
 	FrownOutlined,
+	Loading3QuartersOutlined,
 	MailOutlined,
 	RedoOutlined,
 } from '@ant-design/icons'
@@ -152,6 +153,7 @@ function ErrorFallback({ error }: FallbackProps) {
 function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 	const data = useData((state) => state.data)
 	const disabled = useStates((state) => state.disabled)
+	const titleContent = useStates((state) => state.titleContent)
 	const activeMainPage = useNav((state) => state.activeMainPage)
 	const setMainPage = useNav((state) => state.setMainPage)
 	return (
@@ -228,14 +230,20 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 				</Button>
 			</nav>
 			<p className='absolute left-4 text-sm text-rose-950 dark:text-white'>
-				<a
-					href='https://github.com/LeafYeeXYZ/PsychPen'
-					target='_blank'
-					rel='noreferrer'
-					className='hover:underline'
-				>
-					<BarChartOutlined /> PsychPen v{version}
-				</a>
+				{titleContent ? (
+					<span>
+						<Loading3QuartersOutlined spin /> {titleContent}
+					</span>
+				) : (
+					<a
+						href='https://github.com/LeafYeeXYZ/PsychPen'
+						target='_blank'
+						rel='noreferrer'
+						className='hover:underline'
+					>
+						<BarChartOutlined /> PsychPen v{version}
+					</a>
+				)}
 			</p>
 			<p className='absolute right-2 text-sm'>
 				<Button
