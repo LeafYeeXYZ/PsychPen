@@ -22,30 +22,29 @@ export default defineConfig({
 			output: {
 				manualChunks: {
 					antd: ['antd'],
-					'psych-sheet': ['@psych/sheet'],
+					antd_utils: [
+						'@ant-design/icons',
+						'@ant-design/v5-patch-for-react-19',
+						'@ant-design/x',
+					],
 					echarts: ['echarts'],
-					'echarts-extension': [
-						'echarts-gl',
+					echarts_gl: ['echarts-gl'],
+					echarts_utils: [
 						'echarts-stat',
 						'echarts-wordcloud',
-					],
-					'ag-grid': ['ag-grid-react', 'ag-grid-community'],
-					'utils-a': [
-						'@ant-design/v5-patch-for-react-19',
-						'@ant-design/icons',
-						'zod',
 						'html2canvas-pro',
+					],
+					ag_grid: ['ag-grid-community', 'ag-grid-react'],
+					marked: ['katex', 'marked', 'marked-katex-extension'],
+					psych_sheet: ['@psych/sheet'],
+					stats: ['@psych/lib', 'ml-kmeans'],
+					utils: [
+						'jieba-wasm',
+						'zod',
 						'bowser',
 						'openai',
 						'@leaf/parse-think',
-					],
-					'utils-b': [
-						'@psych/lib',
-						'ml-kmeans',
-						'jieba-wasm',
-						'marked',
-						'marked-katex-extension',
-						'katex',
+						'idb-keyval',
 					],
 				},
 			},
