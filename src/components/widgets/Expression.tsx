@@ -47,7 +47,7 @@ export function Expression({ value }: { value: string }) {
 				const key = shortId()
 				if (part.match(nameReg)) {
 					return (
-						<Tag key={key} color='blue' style={{ margin: 0 }}>
+						<Tag key={key} color='blue' className='!m-0'>
 							{part.slice(3, -3)}
 						</Tag>
 					)
@@ -57,7 +57,7 @@ export function Expression({ value }: { value: string }) {
 					const functionName = parts[0].slice(0, -1)
 					const variableName = parts[1]
 					return (
-						<Tag key={key} color='purple' style={{ margin: 0 }}>
+						<Tag key={key} color='purple' className='!m-0'>
 							{functionName}
 							<Tag color='blue' style={{ margin: '0 0 0 4px' }}>
 								{variableName}
@@ -67,7 +67,7 @@ export function Expression({ value }: { value: string }) {
 				}
 				if (part.match(computeReg)) {
 					return (
-						<Tag key={key} color='orange' style={{ margin: 0 }}>
+						<Tag key={key} color='orange' className='!m-0'>
 							{part}
 						</Tag>
 					)
@@ -75,13 +75,13 @@ export function Expression({ value }: { value: string }) {
 				if (part === '(' || part === ')') {
 					const color = unmatchedBrackets.has(index) ? '#ff0000' : 'green'
 					return (
-						<Tag key={key} color={color} style={{ margin: 0 }}>
+						<Tag key={key} color={color} className='!m-0'>
 							{part}
 						</Tag>
 					)
 				}
 				return (
-					<Tag key={key} color='default' style={{ margin: 0 }}>
+					<Tag key={key} color='default' className='!m-0'>
 						{part}
 					</Tag>
 				)

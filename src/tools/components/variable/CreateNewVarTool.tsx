@@ -29,11 +29,11 @@ export function CreateNewVarTool({
 		<>
 			<div>
 				执行函数{' '}
-				<Tag color='blue' style={{ margin: 0 }}>
+				<Tag color='blue' className='!m-0'>
 					{funcsLabel.get(Funcs.CREATE_NEW_VAR)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}生成新变量{' '}
-				<Tag style={{ margin: 0 }} color='blue'>
+				<Tag className='!m-0' color='blue'>
 					{variable_name}
 				</Tag>
 				, 计算表达式为如下:

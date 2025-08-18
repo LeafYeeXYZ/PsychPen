@@ -47,7 +47,7 @@ export function ConfigAI() {
 					content={
 						<div className='flex flex-col gap-1'>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>DeepSeek开放平台</Tag> 是{' '}
+								对于 <Tag className='!m-0'>DeepSeek开放平台</Tag> 是{' '}
 								<Button
 									type='text'
 									size='small'
@@ -55,14 +55,14 @@ export function ConfigAI() {
 										_DataView_setOpenaiEndpoint('https://api.deepseek.com/v1')
 									}
 								>
-									<Tag style={{ margin: 0 }} color='blue'>
+									<Tag className='!m-0' color='blue'>
 										https://api.deepseek.com/v1
 									</Tag>
 								</Button>
 								(点击填入)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>硅基流动</Tag> 是{' '}
+								对于 <Tag className='!m-0'>硅基流动</Tag> 是{' '}
 								<Button
 									type='text'
 									size='small'
@@ -70,14 +70,14 @@ export function ConfigAI() {
 										_DataView_setOpenaiEndpoint('https://api.siliconflow.cn/v1')
 									}
 								>
-									<Tag style={{ margin: 0 }} color='blue'>
+									<Tag className='!m-0' color='blue'>
 										https://api.siliconflow.cn/v1
 									</Tag>
 								</Button>
 								(点击填入)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>阿里云百炼</Tag> 是{' '}
+								对于 <Tag className='!m-0'>阿里云百炼</Tag> 是{' '}
 								<Button
 									type='text'
 									size='small'
@@ -87,14 +87,14 @@ export function ConfigAI() {
 										)
 									}
 								>
-									<Tag style={{ margin: 0 }} color='blue'>
+									<Tag className='!m-0' color='blue'>
 										https://dashscope.aliyuncs.com/compatible-mode/v1
 									</Tag>
 								</Button>
 								(点击填入)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>OpenAI</Tag> 是{' '}
+								对于 <Tag className='!m-0'>OpenAI</Tag> 是{' '}
 								<Button
 									type='text'
 									size='small'
@@ -102,7 +102,7 @@ export function ConfigAI() {
 										_DataView_setOpenaiEndpoint('https://api.openai.com/v1')
 									}
 								>
-									<Tag style={{ margin: 0 }} color='blue'>
+									<Tag className='!m-0' color='blue'>
 										https://api.openai.com/v1
 									</Tag>
 								</Button>
@@ -111,7 +111,7 @@ export function ConfigAI() {
 						</div>
 					}
 				>
-					<Tag style={{ marginLeft: '0.3rem' }} className='cursor-pointer'>
+					<Tag className='cursor-pointer !ml-[0.3rem]'>
 						<InfoCircleOutlined /> 常见提供商地址
 					</Tag>
 				</Popover>
@@ -133,14 +133,14 @@ export function ConfigAI() {
 					content={
 						<div className='flex flex-col gap-1'>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>DeepSeek开放平台</Tag> 是{' '}
+								对于 <Tag className='!m-0'>DeepSeek开放平台</Tag> 是{' '}
 								<a
 									href='https://platform.deepseek.com/api_keys'
 									target='_blank'
 									rel='noreferrer'
 								>
 									<Button type='text' size='small'>
-										<Tag style={{ margin: 0 }} color='blue'>
+										<Tag className='!m-0' color='blue'>
 											https://platform.deepseek.com/api_keys
 										</Tag>
 									</Button>
@@ -148,14 +148,14 @@ export function ConfigAI() {
 								(点击跳转)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>硅基流动</Tag> 是{' '}
+								对于 <Tag className='!m-0'>硅基流动</Tag> 是{' '}
 								<a
 									href='https://cloud.siliconflow.cn/account/ak'
 									target='_blank'
 									rel='noreferrer'
 								>
 									<Button type='text' size='small'>
-										<Tag style={{ margin: 0 }} color='blue'>
+										<Tag className='!m-0' color='blue'>
 											https://cloud.siliconflow.cn/account/ak
 										</Tag>
 									</Button>
@@ -163,14 +163,14 @@ export function ConfigAI() {
 								(点击跳转)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>阿里云百炼</Tag> 是{' '}
+								对于 <Tag className='!m-0'>阿里云百炼</Tag> 是{' '}
 								<a
 									href='https://bailian.console.aliyun.com/?apiKey=1#/api-key'
 									target='_blank'
 									rel='noreferrer'
 								>
 									<Button type='text' size='small'>
-										<Tag style={{ margin: 0 }} color='blue'>
+										<Tag className='!m-0' color='blue'>
 											https://bailian.console.aliyun.com/?apiKey=1#/api-key
 										</Tag>
 									</Button>
@@ -178,14 +178,14 @@ export function ConfigAI() {
 								(点击跳转)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>OpenAI</Tag> 是{' '}
+								对于 <Tag className='!m-0'>OpenAI</Tag> 是{' '}
 								<a
 									href='https://platform.openai.com/api-keys'
 									target='_blank'
 									rel='noreferrer'
 								>
 									<Button type='text' size='small'>
-										<Tag style={{ margin: 0 }} color='blue'>
+										<Tag className='!m-0' color='blue'>
 											https://platform.openai.com/api-keys
 										</Tag>
 									</Button>
@@ -195,7 +195,7 @@ export function ConfigAI() {
 						</div>
 					}
 				>
-					<Tag style={{ marginLeft: '0.3rem' }} className='cursor-pointer'>
+					<Tag className='cursor-pointer !ml-[0.3rem]'>
 						<InfoCircleOutlined /> 常见密钥获取地址
 					</Tag>
 				</Popover>
@@ -216,20 +216,20 @@ export function ConfigAI() {
 					content={
 						<div className='flex flex-col gap-1'>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>DeepSeek开放平台</Tag> 是{' '}
+								对于 <Tag className='!m-0'>DeepSeek开放平台</Tag> 是{' '}
 								<Button
 									type='text'
 									size='small'
 									onClick={() => _DataView_setModel('deepseek-chat')}
 								>
-									<Tag style={{ margin: 0 }} color='blue'>
+									<Tag className='!m-0' color='blue'>
 										deepseek-chat
 									</Tag>
 								</Button>
 								(点击填入)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>硅基流动</Tag> 是{' '}
+								对于 <Tag className='!m-0'>硅基流动</Tag> 是{' '}
 								<Button
 									type='text'
 									size='small'
@@ -237,14 +237,14 @@ export function ConfigAI() {
 										_DataView_setModel('Pro/deepseek-ai/DeepSeek-V3')
 									}
 								>
-									<Tag style={{ margin: 0 }} color='blue'>
+									<Tag className='!m-0' color='blue'>
 										Pro/deepseek-ai/DeepSeek-V3
 									</Tag>
 								</Button>
 								(点击填入)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>阿里云百炼</Tag> 是{' '}
+								对于 <Tag className='!m-0'>阿里云百炼</Tag> 是{' '}
 								<Button
 									type='text'
 									size='small'
@@ -252,20 +252,20 @@ export function ConfigAI() {
 										_DataView_setModel('qwen3-235b-a22b-instruct-2507')
 									}
 								>
-									<Tag style={{ margin: 0 }} color='blue'>
+									<Tag className='!m-0' color='blue'>
 										qwen3-235b-a22b-instruct-2507
 									</Tag>
 								</Button>
 								(点击填入)
 							</div>
 							<div>
-								对于 <Tag style={{ margin: 0 }}>OpenAI</Tag> 是{' '}
+								对于 <Tag className='!m-0'>OpenAI</Tag> 是{' '}
 								<Button
 									type='text'
 									size='small'
 									onClick={() => _DataView_setModel('gpt-5')}
 								>
-									<Tag style={{ margin: 0 }} color='blue'>
+									<Tag className='!m-0' color='blue'>
 										gpt-5
 									</Tag>
 								</Button>
@@ -274,7 +274,7 @@ export function ConfigAI() {
 						</div>
 					}
 				>
-					<Tag style={{ marginLeft: '0.3rem' }} className='cursor-pointer'>
+					<Tag className='cursor-pointer !ml-[0.3rem]'>
 						<InfoCircleOutlined /> 推荐模型名称
 					</Tag>
 				</Popover>

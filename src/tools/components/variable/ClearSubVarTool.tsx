@@ -27,16 +27,12 @@ export function ClearSubVarTool({
 		<>
 			<div>
 				执行函数{' '}
-				<Tag color='blue' style={{ margin: 0 }}>
+				<Tag color='blue' className='!m-0'>
 					{funcsLabel.get(Funcs.CLEAR_SUB_VAR)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}清除变量
 				{variable_names.map((name) => (
-					<Tag
-						key={name}
-						style={{ margin: 0, marginLeft: '0.3rem' }}
-						color='blue'
-					>
+					<Tag key={name} className='!m-0 !ml-[0.3rem]' color='blue'>
 						{name}
 					</Tag>
 				))}{' '}

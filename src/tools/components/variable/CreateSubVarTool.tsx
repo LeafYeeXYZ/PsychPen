@@ -46,16 +46,12 @@ export function CreateSubVarTool({
 		<>
 			<div>
 				执行函数{' '}
-				<Tag color='blue' style={{ margin: 0 }}>
+				<Tag color='blue' className='!m-0'>
 					{funcsLabel.get(Funcs.CREATE_SUB_VAR)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}生成变量
 				{variable_names.map((name) => (
-					<Tag
-						key={name}
-						style={{ margin: 0, marginLeft: '0.3rem' }}
-						color='blue'
-					>
+					<Tag key={name} className='!m-0 !ml-[0.3rem]' color='blue'>
 						{name}
 					</Tag>
 				))}{' '}

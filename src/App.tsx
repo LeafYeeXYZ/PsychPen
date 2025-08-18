@@ -117,7 +117,7 @@ function ErrorFallback({ error }: FallbackProps) {
 	return (
 		<div className='w-dvw h-dvh flex flex-col items-center justify-center gap-6 p-6 bg-white dark:bg-gray-950 dark:text-white'>
 			<div className='text-2xl'>
-				<FrownOutlined style={{ margin: 0, marginRight: '0.3rem' }} />
+				<FrownOutlined className='!m-0 !mr-[0.3rem]' />
 				发生错误
 			</div>
 			<div className='max-w-lg border py-3 px-4 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm'>
@@ -231,8 +231,9 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 			</nav>
 			<p className='absolute left-4 text-sm text-rose-950 dark:text-white'>
 				{titleContent ? (
-					<span>
-						<Loading3QuartersOutlined spin /> {titleContent}
+					<span className='opacity-70'>
+						<Loading3QuartersOutlined spin className='!mr-[0.3rem]' />
+						{titleContent}
 					</span>
 				) : (
 					<a
@@ -241,7 +242,8 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 						rel='noreferrer'
 						className='hover:underline'
 					>
-						<BarChartOutlined /> PsychPen v{version}
+						<BarChartOutlined className='!mr-[0.3rem]' />
+						PsychPen v{version}
 					</a>
 				)}
 			</p>

@@ -228,7 +228,7 @@ export function TDistribution() {
 					addonBefore={
 						<span>
 							总体均值{' '}
-							<Tag color='blue' style={{ marginRight: '0' }}>
+							<Tag color='blue' className='!mr-0'>
 								μ
 							</Tag>
 						</span>
@@ -249,7 +249,7 @@ export function TDistribution() {
 					addonBefore={
 						<span>
 							总体标准差{' '}
-							<Tag color='blue' style={{ marginRight: '0' }}>
+							<Tag color='blue' className='!mr-0'>
 								σ
 							</Tag>
 						</span>
@@ -271,7 +271,7 @@ export function TDistribution() {
 					addonBefore={
 						<span>
 							自由度{' '}
-							<Tag color='blue' style={{ marginRight: '0' }}>
+							<Tag color='blue' className='!mr-0'>
 								df
 							</Tag>
 						</span>
