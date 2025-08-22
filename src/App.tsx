@@ -231,7 +231,7 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 			</nav>
 			<p className='absolute left-4 text-sm text-rose-950 dark:text-white'>
 				{titleContent ? (
-					<span className='opacity-70'>
+					<span className='opacity-60'>
 						<Loading3QuartersOutlined spin className='!mr-[0.3rem]' />
 						{titleContent}
 					</span>
