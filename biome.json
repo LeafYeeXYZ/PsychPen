@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.3.2/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
@@ -56,6 +56,11 @@
 			"trailingCommas": "all",
 			"semicolons": "asNeeded",
 			"quoteStyle": "single"
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
 		}
 	}
 }
