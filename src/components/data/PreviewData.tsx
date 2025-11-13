@@ -187,6 +187,18 @@ export function PreviewData() {
 					rowData={dataRows}
 					columnDefs={dataCols.map((col) => ({
 						field: col.name,
+						valueFormatter: (params) => {
+							if (params.value == null) {
+								return ''
+							}
+							if (col.type === '称名或等级数据') {
+								return params.value
+							}
+							if (params.value % 1 === 0) {
+								return params.value
+							}
+							return +params.value.toFixed(4)
+						},
 						headerName:
 							col.type === '等距或等比数据'
 								? `${col.name} [数值]`
