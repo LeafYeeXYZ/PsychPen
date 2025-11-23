@@ -30,9 +30,11 @@ export default defineConfig({
 						'html2canvas-pro',
 					],
 					ag_grid: ['ag-grid-community', 'ag-grid-react'],
-					marked: ['katex', 'marked', 'marked-katex-extension'],
 					psych_sheet: ['@psych/sheet'],
 					utils: [
+						'katex',
+						'marked',
+						'marked-katex-extension',
 						'@psych/lib',
 						'ml-kmeans',
 						'zod',

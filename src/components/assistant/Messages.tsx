@@ -179,19 +179,22 @@ export function Messages({
 									? 'PsychPen [思考中]'
 									: 'PsychPen'
 						}
-						avatar={{
-							icon:
-								message.role === 'user' ? (
+						avatar={
+							<div
+								className='flex items-center justify-center w-8 h-8 rounded-md'
+								style={{
+									backgroundColor:
+										message.role === 'user' ? '#f0f0ff' : '#fff0f0',
+									color: message.role === 'user' ? '#597ef7' : '#f75959',
+								}}
+							>
+								{message.role === 'user' ? (
 									<UserOutlined />
 								) : (
 									<BarChartOutlined />
-								),
-							style: {
-								backgroundColor:
-									message.role === 'user' ? '#f0f0ff' : '#fff0f0',
-								color: message.role === 'user' ? '#597ef7' : '#f75959',
-							},
-						}}
+								)}
+							</div>
+						}
 					/>
 				)
 			})}

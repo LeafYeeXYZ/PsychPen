@@ -1,6 +1,7 @@
 import {
 	BankOutlined,
 	BoxPlotOutlined,
+	ClearOutlined,
 	ExportOutlined,
 	FilterOutlined,
 	InfoCircleOutlined,
@@ -9,7 +10,7 @@ import {
 import { Prompts, Sender } from '@ant-design/x'
 import type { SenderRef } from '@ant-design/x/es/sender'
 import parseThink from '@leaf/parse-think'
-import { Popover, Space, Tag } from 'antd'
+import { Button, Popover, Space, Tag } from 'antd'
 import type OpenAI from 'openai'
 import { useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -1238,8 +1239,8 @@ export function AI() {
 				onChange={setInput}
 				submitType='shiftEnter'
 				placeholder='按 Shift + Enter 发送消息'
-				actions={(_, info) => {
-					const { SendButton, LoadingButton, ClearButton } = info.components
+				suffix={(_, info) => {
+					const { SendButton, LoadingButton } = info.components
 					return (
 						<Space size='small'>
 							<Popover
@@ -1255,14 +1256,18 @@ export function AI() {
 							>
 								<InfoCircleOutlined />
 							</Popover>
-							<ClearButton
-								disabled={loading || disabled || !messages.length}
-								onClick={() => {
-									setInput('')
-									setMessages([])
-									messageApi?.success('已清空历史对话')
-								}}
-							/>
+							<Popover trigger={['hover', 'click']} content='清空历史对话'>
+								<Button
+									type='text'
+									icon={<ClearOutlined />}
+									disabled={loading || disabled || !messages.length}
+									onClick={() => {
+										setInput('')
+										setMessages([])
+										messageApi?.success('已清空历史对话')
+									}}
+								/>
+							</Popover>
 							{loading ? <LoadingButton /> : <SendButton />}
 						</Space>
 					)

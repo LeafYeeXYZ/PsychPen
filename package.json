@@ -29,7 +29,7 @@
 	},
 	"dependencies": {
 		"@ant-design/icons": "^6.1.0",
-		"@ant-design/x": "^1.6.1",
+		"@ant-design/x": "^2.0.0",
 		"@leaf/parse-think": "npm:@jsr/leaf__parse-think",
 		"@psych/lib": "npm:@jsr/psych__lib",
 		"@psych/sheet": "npm:@jsr/psych__sheet",
