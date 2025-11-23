@@ -73,11 +73,11 @@ export function Messages({
 							tool_calls?.length ? (
 								<ToolCall toolCall={tool_calls[0]} />
 							) : message.role === 'tool' ? (
-								<div className='overflow-hidden'>
-									<div className='w-full'>
+								<div>
+									<div>
 										<Result result={message.content as string} fitHeight />
 									</div>
-									<div className='w-full mt-2'>
+									<div className='mt-2'>
 										<Button
 											block
 											autoInsertSpace={false}
@@ -95,7 +95,9 @@ export function Messages({
 											复制结果的 Markdown 文本
 										</Button>
 									</div>
-									<hr className='w-dvw opacity-0 h-0 p-0 m-0' />
+									<div className='h-0 overflow-hidden opacity-0'>
+										{'0'.repeat(256)}
+									</div>
 								</div>
 							) : (
 								<Typography>
