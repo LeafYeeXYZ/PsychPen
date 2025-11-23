@@ -69,7 +69,7 @@ export function DataFilter() {
 						label={
 							<span>
 								当前过滤表达式{' '}
-								<Tag color='blue'>
+								<Tag variant='outlined' color='blue'>
 									共{dataRows.length}条数据通过过滤器 (
 									{(data?.length ?? Number.NaN) - dataRows.length}条已被排除)
 								</Tag>
@@ -160,53 +160,124 @@ export function DataFilter() {
 			<div className='component-result variable-view'>
 				<p className='intro-text'>定义变量筛选条件, 满足条件的数据将被保留</p>
 				<p className='intro-text'>
-					计算表达式中变量应当通过 <Tag color='blue'>:::name:::</Tag>语法引用
+					计算表达式中变量应当通过{' '}
+					<Tag variant='outlined' color='blue'>
+						:::name:::
+					</Tag>{' '}
+					语法引用
 				</p>
 				<p className='intro-text'>
-					例如 <Tag color='blue'>:::a::: {'>'} :::b:::</Tag>表示筛选出变量 a
-					大于变量 b 的数据
+					例如{' '}
+					<Tag variant='outlined' color='blue'>
+						:::a::: {'>'} :::b:::
+					</Tag>{' '}
+					表示筛选出变量 a 大于变量 b 的数据
 				</p>
 				<p className='intro-text'>
 					如果引用的任意变量有缺失值, 则该行数据将被排除
 				</p>
 				<p className='intro-text'>
-					支持的比较运算符包括: <Tag color='blue'>{'>'}</Tag>
-					<Tag color='blue'>{'<'}</Tag>
-					<Tag color='blue'>{'>='}</Tag>
-					<Tag color='blue'>{'<='}</Tag>
-					<Tag color='blue'>{'=='}</Tag>(等于) <Tag color='blue'>{'!='}</Tag>
+					支持的比较运算符包括:{' '}
+					<Tag variant='outlined' color='blue'>
+						{'>'}
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						{'<'}
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						{'>='}
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						{'<='}
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						{'=='}
+					</Tag>{' '}
+					(等于){' '}
+					<Tag variant='outlined' color='blue'>
+						{'!='}
+					</Tag>{' '}
 					(不等于) 等
 				</p>
 				<p className='intro-text'>
-					支持的算数运算符包括: <Tag color='blue'>+</Tag>
-					<Tag color='blue'>-</Tag>
-					<Tag color='blue'>*</Tag>
-					<Tag color='blue'>/</Tag>
-					<Tag color='blue'>%</Tag>(取余) <Tag color='blue'>**</Tag>(幂运算) 等
+					支持的算数运算符包括:{' '}
+					<Tag variant='outlined' color='blue'>
+						+
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						-
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						*
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						/
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						%
+					</Tag>{' '}
+					(取余){' '}
+					<Tag variant='outlined' color='blue'>
+						**
+					</Tag>{' '}
+					(幂运算) 等
 				</p>
 				<p className='intro-text'>
-					为避免歧义, 请使用小括号 <Tag color='blue'>( )</Tag>明确运算顺序
+					为避免歧义, 请使用小括号{' '}
+					<Tag variant='outlined' color='blue'>
+						( )
+					</Tag>{' '}
+					明确运算顺序
 				</p>
 				<p className='intro-text'>
-					对于等距或等比数据, 可以使用 <Tag color='blue'>mean(:::name:::)</Tag>
+					对于等距或等比数据, 可以使用{' '}
+					<Tag variant='outlined' color='blue'>
+						mean(:::name:::)
+					</Tag>{' '}
 					表示变量的均值 (注意括号和冒号间没有空格)
 				</p>
 				<p className='intro-text'>
-					除均值外, 还可以使用 <Tag color='blue'>min</Tag>
-					<Tag color='blue'>max</Tag>
-					<Tag color='blue'>std</Tag>
-					<Tag color='blue'>mode</Tag>
-					<Tag color='blue'>q1</Tag>
-					<Tag color='blue'>q2</Tag>
-					<Tag color='blue'>q3</Tag>统计量
+					除均值外, 还可以使用{' '}
+					<Tag variant='outlined' color='blue'>
+						min
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						max
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						std
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						mode
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						q1
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						q2
+					</Tag>{' '}
+					<Tag variant='outlined' color='blue'>
+						q3
+					</Tag>{' '}
+					统计量
 				</p>
 				<p className='intro-text'>
-					对数等高级运算请使用 <Tag color='green'>JavaScript</Tag>的{' '}
-					<Tag color='blue'>Math</Tag>对象
+					对数等高级运算请使用{' '}
+					<Tag variant='outlined' color='green'>
+						JavaScript
+					</Tag>{' '}
+					的{' '}
+					<Tag variant='outlined' color='blue'>
+						Math
+					</Tag>{' '}
+					对象
 				</p>
 				<p className='intro-text'>
 					输入的表达式将在替换变量为数值后, 按照{' '}
-					<Tag color='green'>JavaScript</Tag>语法计算
+					<Tag variant='outlined' color='green'>
+						JavaScript
+					</Tag>{' '}
+					语法计算
 				</p>
 			</div>
 		</div>

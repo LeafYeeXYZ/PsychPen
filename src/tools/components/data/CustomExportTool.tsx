@@ -31,7 +31,7 @@ export function CustomExportTool({
 		<>
 			<div>
 				执行函数{' '}
-				<Tag color='blue' className='!m-0'>
+				<Tag color='blue' variant='outlined'>
 					{funcsLabel.get(Funcs.CUSTOM_EXPORT)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}执行以下代码{' '}
@@ -39,7 +39,7 @@ export function CustomExportTool({
 					<pre className='overflow-x-auto'>{function_code}</pre>
 				</div>
 				并将结果下载到文件{' '}
-				<Tag className='!m-0' color='blue'>
+				<Tag variant='outlined' color='blue'>
 					{file_name || 'data'}.{file_type}
 				</Tag>
 			</div>

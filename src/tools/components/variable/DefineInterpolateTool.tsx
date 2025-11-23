@@ -35,29 +35,29 @@ export function DefineInterpolateTool({
 		<>
 			<div>
 				执行函数{' '}
-				<Tag color='blue' className='!m-0'>
+				<Tag color='blue' variant='outlined'>
 					{funcsLabel.get(Funcs.DEFINE_INTERPOLATE)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}设置变量
 				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
-					<Tag className='!m-0 !ml-[0.3rem]' color='blue'>
+					<Tag variant='outlined' className='ml-1!' color='blue'>
 						所有变量
 					</Tag>
 				) : (
 					variable_names.map((name) => (
-						<Tag key={name} className='!m-0 !ml-[0.3rem]' color='blue'>
+						<Tag key={name} variant='outlined' className='ml-1!' color='blue'>
 							{name}
 						</Tag>
 					))
 				)}{' '}
 				的插值方法为:
-				<Tag className='!m-0 !ml-[0.3rem]' color='yellow'>
+				<Tag variant='outlined' className='ml-1!' color='yellow'>
 					{method}
 				</Tag>
 				{reference_variable && (
 					<>
 						, 插值参考变量为:
-						<Tag className='!m-0 !ml-[0.3rem]' color='yellow'>
+						<Tag variant='outlined' className='ml-1!' color='yellow'>
 							{reference_variable}
 						</Tag>
 					</>

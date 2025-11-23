@@ -28,17 +28,17 @@ export function ClearInterpolateTool({
 		<>
 			<div>
 				执行函数{' '}
-				<Tag color='blue' className='!m-0'>
+				<Tag color='blue' variant='outlined'>
 					{funcsLabel.get(Funcs.CLEAR_INTERPOLATE)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}清除变量
 				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
-					<Tag className='!m-0 !ml-[0.3rem]' color='blue'>
+					<Tag variant='outlined' className='ml-1!' color='blue'>
 						所有变量
 					</Tag>
 				) : (
 					variable_names.map((name) => (
-						<Tag key={name} className='!m-0 !ml-[0.3rem]' color='blue'>
+						<Tag key={name} variant='outlined' className='ml-1!' color='blue'>
 							{name}
 						</Tag>
 					))

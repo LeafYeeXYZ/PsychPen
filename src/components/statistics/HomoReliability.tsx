@@ -1,6 +1,6 @@
 import { ExportOutlined } from '@ant-design/icons'
 import { AlphaRealiability } from '@psych/lib'
-import { Button, Form, InputNumber, Popover, Radio, Select } from 'antd'
+import { Button, Form, InputNumber, Popover, Radio, Select, Space } from 'antd'
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useData } from '../../hooks/useData.ts'
@@ -202,15 +202,19 @@ ${m.group
 							<Radio.Button value={false}>不计算</Radio.Button>
 						</Radio.Group>
 					</Form.Item>
-					<Form.Item label='手动指定 Omega 系数的因子数' name='manualNFactors'>
-						<InputNumber
-							addonBefore='提取'
-							addonAfter='个因子'
-							placeholder='留空则自动计算'
-							className='w-full'
-							min={1}
-							step={1}
-						/>
+					<Form.Item label='手动指定 Omega 系数的因子数'>
+						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>提取</Space.Addon>
+							<Form.Item name='manualNFactors' noStyle>
+								<InputNumber
+									placeholder='留空则自动计算'
+									min={1}
+									step={1}
+									className='w-full!'
+								/>
+							</Form.Item>
+							<Space.Addon className='text-nowrap'>个因子</Space.Addon>
+						</Space.Compact>
 					</Form.Item>
 					<div className='flex flex-row flex-nowrap justify-center items-center gap-4'>
 						<Button

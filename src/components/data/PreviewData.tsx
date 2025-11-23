@@ -95,7 +95,15 @@ export function PreviewData() {
 												value: type,
 												label: (
 													<span>
-														导出为 <Tag color='pink'>{type}</Tag>文件
+														导出为
+														<Tag
+															color='pink'
+															variant='outlined'
+															className='mx-1!'
+														>
+															{type}
+														</Tag>
+														文件
 													</span>
 												),
 											}))}
@@ -132,7 +140,7 @@ export function PreviewData() {
 					title={
 						<span>
 							当前过滤表达式{' '}
-							<Tag color='blue'>
+							<Tag color='blue' variant='outlined'>
 								共{dataRows.length}条数据通过过滤器 (
 								{(data?.length ?? Number.NaN) - dataRows.length}条已被排除)
 							</Tag>
@@ -153,10 +161,14 @@ export function PreviewData() {
 							<span>
 								AI辅助分析设置 {'|'} 当前状态:{' '}
 								{ai ? (
-									<Tag color='green'>已设置</Tag>
+									<Tag color='green' variant='outlined'>
+										已设置
+									</Tag>
 								) : (
-									<Tag color='red'>未设置</Tag>
-								)}
+									<Tag color='red' variant='outlined'>
+										未设置
+									</Tag>
+								)}{' '}
 								<Popover
 									content={
 										<div className='flex flex-col gap-1'>

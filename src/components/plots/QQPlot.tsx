@@ -277,20 +277,15 @@ export function QQPlot() {
 									]}
 								/>
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>取</Space.Addon>
 							<Form.Item
 								name='dotCount'
 								noStyle
 								rules={[{ required: true, message: '请输入取点数' }]}
 							>
-								<InputNumber
-									addonBefore='取'
-									addonAfter='个点'
-									className='w-full'
-									min={4}
-									step={1}
-									max={MAX_DOT_COUNT}
-								/>
+								<InputNumber min={4} step={1} max={MAX_DOT_COUNT} />
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>个点</Space.Addon>
 						</Space.Compact>
 					</Form.Item>
 					<Form.Item
@@ -299,8 +294,8 @@ export function QQPlot() {
 						rules={[{ required: true, message: '请输入点大小' }]}
 					>
 						<InputNumber
-							addonBefore='点大小'
-							className='w-full'
+							mode='spinner'
+							className='w-full!'
 							placeholder='默认10'
 							min={1}
 							step={1}

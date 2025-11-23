@@ -57,7 +57,7 @@ export function TDistribution() {
 		setData((draft) => [...draft, ...result])
 	}
 	// 动态演示相关
-	const timer = useRef<number | null>(null)
+	const timer = useRef<ReturnType<typeof setInterval> | null>(null)
 	const [speed, setSpeed] = useState<number>(1)
 	const animate = () => {
 		timer.current = setInterval(() => {
@@ -117,7 +117,7 @@ export function TDistribution() {
 
 	return (
 		<div className='w-full h-full flex flex-col justify-center items-center overflow-hidden p-4'>
-			<div className='w-full max-w-[71rem] h-[calc(100%-6rem)] flex justify-center items-center'>
+			<div className='w-full max-w-284 h-[calc(100%-6rem)] flex justify-center items-center'>
 				<div className='w-56 h-full flex flex-col justify-center items-center'>
 					<table className='three-line-table'>
 						<thead>
@@ -129,7 +129,10 @@ export function TDistribution() {
 						<tbody>
 							<tr>
 								<td>
-									<Tag color='pink'>样本均值</Tag>的均值
+									<Tag variant='outlined' color='pink'>
+										样本均值
+									</Tag>{' '}
+									的均值
 								</td>
 								<td
 									// biome-ignore lint/security/noDangerouslySetInnerHtml: 为了正常渲染斜体
@@ -142,7 +145,10 @@ export function TDistribution() {
 							</tr>
 							<tr>
 								<td>
-									<Tag color='pink'>样本均值</Tag>标准差
+									<Tag variant='outlined' color='pink'>
+										样本均值
+									</Tag>{' '}
+									标准差
 								</td>
 								<td
 									// biome-ignore lint/security/noDangerouslySetInnerHtml: 为了正常渲染斜体
@@ -155,7 +161,10 @@ export function TDistribution() {
 							</tr>
 							<tr>
 								<td>
-									<Tag color='pink'>估计标准误</Tag>均值
+									<Tag variant='outlined' color='pink'>
+										估计标准误
+									</Tag>{' '}
+									均值
 								</td>
 								<td
 									// biome-ignore lint/security/noDangerouslySetInnerHtml: 为了正常渲染斜体
@@ -166,19 +175,27 @@ export function TDistribution() {
 							</tr>
 							<tr>
 								<td>
-									<Tag color='blue'>单个样本</Tag>样本量
+									<Tag variant='outlined' color='blue'>
+										单个样本
+									</Tag>{' '}
+									样本量
 								</td>
 								<td>{n}</td>
 							</tr>
 							<tr>
 								<td>
-									<Tag color='blue'>T分布</Tag>的自由度
+									<Tag variant='outlined' color='blue'>
+										T分布
+									</Tag>{' '}
+									的自由度
 								</td>
 								<td>{df}</td>
 							</tr>
 							<tr>
 								<td>
-									<Tag color='blue'>真实标准误</Tag>
+									<Tag variant='outlined' color='blue'>
+										真实标准误
+									</Tag>
 								</td>
 								<td
 									// biome-ignore lint/security/noDangerouslySetInnerHtml: 为了正常渲染斜体
@@ -189,23 +206,30 @@ export function TDistribution() {
 							</tr>
 							<tr>
 								<td>
-									<Tag color='blue'>总体</Tag>均值
+									<Tag variant='outlined' color='blue'>
+										总体
+									</Tag>{' '}
+									均值
 								</td>
 								<td>{mean}</td>
 							</tr>
 							<tr>
 								<td>
-									<Tag color='blue'>总体</Tag>标准差
+									<Tag variant='outlined' color='blue'>
+										总体
+									</Tag>{' '}
+									标准差
 								</td>
 								<td>{std}</td>
 							</tr>
 						</tbody>
 					</table>
 					<p className='text-sm mt-4 mb-1'>
-						右图中 <Tag>X</Tag>轴刻度指区间
+						右图中 <Tag variant='outlined'>X</Tag> 轴刻度指区间
 					</p>
 					<p className='text-sm'>
-						如 <Tag>0</Tag>指均值在 <Tag>[-0.5,0.5)</Tag>之间
+						如 <Tag variant='outlined'>0</Tag> 指均值在{' '}
+						<Tag variant='outlined'>[-0.5,0.5)</Tag> 之间
 					</p>
 				</div>
 				<div className='w-[calc(100%-13rem)] h-full flex flex-col justify-center items-center gap-4 overflow-auto'>
@@ -214,70 +238,67 @@ export function TDistribution() {
 			</div>
 
 			<div className='w-full h-8 my-4 flex justify-center items-center gap-4 overflow-auto'>
-				<InputNumber
-					defaultValue={DEFAULT_MEAN}
-					step={0.1}
-					onChange={(value) => {
-						if (timer.current) {
-							clearInterval(timer.current)
-							timer.current = null
-						}
-						setMean(typeof value === 'number' ? value : 0)
-						setData([])
-					}}
-					addonBefore={
-						<span>
-							总体均值{' '}
-							<Tag color='blue' className='!mr-0'>
-								μ
-							</Tag>
-						</span>
-					}
-					className='w-44'
-				/>
-				<InputNumber
-					defaultValue={DEFAULT_STD}
-					step={0.1}
-					onChange={(value) => {
-						if (timer.current) {
-							clearInterval(timer.current)
-							timer.current = null
-						}
-						setStd(typeof value === 'number' ? value : 1)
-						setData([])
-					}}
-					addonBefore={
-						<span>
-							总体标准差{' '}
-							<Tag color='blue' className='!mr-0'>
-								σ
-							</Tag>
-						</span>
-					}
-					className='w-52'
-				/>
-				<InputNumber
-					defaultValue={DEFAULT_DF}
-					min={1}
-					step={1}
-					onChange={(value) => {
-						if (timer.current) {
-							clearInterval(timer.current)
-							timer.current = null
-						}
-						setDf(typeof value === 'number' ? value : 1)
-						setData([])
-					}}
-					addonBefore={
-						<span>
-							自由度{' '}
-							<Tag color='blue' className='!mr-0'>
-								df
-							</Tag>
-						</span>
-					}
-					className='w-44'
-				/>
+				<Space.Compact>
+					<Space.Addon className='text-nowrap'>
+						总体均值{' '}
+						<Tag variant='outlined' color='blue' className='ml-1!'>
+							μ
+						</Tag>
+					</Space.Addon>
+					<InputNumber
+						defaultValue={DEFAULT_MEAN}
+						step={0.1}
+						onChange={(value) => {
+							if (timer.current) {
+								clearInterval(timer.current)
+								timer.current = null
+							}
+							setMean(typeof value === 'number' ? value : 0)
+							setData([])
+						}}
+					/>
+				</Space.Compact>
+				<Space.Compact>
+					<Space.Addon className='text-nowrap'>
+						总体标准差{' '}
+						<Tag variant='outlined' color='blue' className='ml-1!'>
+							σ
+						</Tag>
+					</Space.Addon>
+					<InputNumber
+						defaultValue={DEFAULT_STD}
+						step={0.1}
+						onChange={(value) => {
+							if (timer.current) {
+								clearInterval(timer.current)
+								timer.current = null
+							}
+							setStd(typeof value === 'number' ? value : 1)
+							setData([])
+						}}
+					/>
+				</Space.Compact>
+				<Space.Compact>
+					<Space.Addon className='text-nowrap'>
+						自由度{' '}
+						<Tag variant='outlined' color='blue' className='ml-1!'>
+							df
+						</Tag>
+					</Space.Addon>
+					<InputNumber
+						defaultValue={DEFAULT_DF}
+						min={1}
+						step={1}
+						onChange={(value) => {
+							if (timer.current) {
+								clearInterval(timer.current)
+								timer.current = null
+							}
+							setDf(typeof value === 'number' ? value : 1)
+							setData([])
+						}}
+					/>
+				</Space.Compact>
 				<Button
 					onClick={() => {
 						if (timer.current) {
@@ -297,31 +318,32 @@ export function TDistribution() {
 						手动抽样
 					</div>
 					<Button onClick={() => generate(1)}>
-						<Tag className='mx-0' color='pink'>
+						<Tag variant='outlined' color='pink'>
 							1
 						</Tag>{' '}
 						次
 					</Button>
 					<Button onClick={() => generate(10)}>
-						<Tag className='mx-0' color='pink'>
+						<Tag variant='outlined' color='pink'>
 							10
 						</Tag>{' '}
 						次
 					</Button>
 					<Button onClick={() => generate(100)}>
-						<Tag className='mx-0' color='pink'>
+						<Tag variant='outlined' color='pink'>
 							100
 						</Tag>{' '}
 						次
 					</Button>
 					<Button onClick={() => generate(1000)}>
-						<Tag className='mx-0' color='pink'>
+						<Tag variant='outlined' color='pink'>
 							1000
 						</Tag>{' '}
 						次
 					</Button>
 				</Space.Compact>
 				<Space.Compact>
+					<Space.Addon className='text-nowrap'>动态演示</Space.Addon>
 					<InputNumber
 						defaultValue={1}
 						min={1}
@@ -336,10 +358,8 @@ export function TDistribution() {
 							}
 							setSpeed(typeof value === 'number' ? value : 1)
 						}}
-						addonBefore='动态演示'
-						addonAfter='次/半秒'
-						className='w-52'
 					/>
+					<Space.Addon className='text-nowrap'>次/半秒</Space.Addon>
 					<Button
 						onClick={() => {
 							if (timer.current) {

@@ -36,7 +36,6 @@ export const VARIABLE_SUB_PAGES_ELEMENTS: Record<
 }
 
 import { BasicBarPlot } from '../components/plots/BasicBarPlot.tsx'
-import { BasicBoxPlot } from '../components/plots/BasicBoxPlot.tsx'
 import { BasicLinePlot } from '../components/plots/BasicLinePlot.tsx'
 import { BasicPiePlot } from '../components/plots/BasicPiePlot.tsx'
 import { BasicScatterPlot } from '../components/plots/BasicScatterPlot.tsx'
@@ -49,7 +48,6 @@ import { ThreeDScatterPlot } from '../components/plots/ThreeDScatterPlot.tsx'
 import { WordCloudPlot } from '../components/plots/WordCloudPlot.tsx'
 
 export enum PLOTS_SUB_PAGES_LABELS {
-	BASIC_BOX_PLOT = '基础箱线图',
 	BASIC_SCATTER_PLOT = '基础散点图',
 	THREE_D_SCATTER_PLOT = '三维散点图',
 	BASIC_LINE_PLOT = '基础折线图',
@@ -66,7 +64,6 @@ export const PLOTS_SUB_PAGES_ELEMENTS: Record<
 	PLOTS_SUB_PAGES_LABELS,
 	React.ReactElement
 > = {
-	[PLOTS_SUB_PAGES_LABELS.BASIC_BOX_PLOT]: <BasicBoxPlot />,
 	[PLOTS_SUB_PAGES_LABELS.BASIC_SCATTER_PLOT]: <BasicScatterPlot />,
 	[PLOTS_SUB_PAGES_LABELS.THREE_D_SCATTER_PLOT]: <ThreeDScatterPlot />,
 	[PLOTS_SUB_PAGES_LABELS.BASIC_LINE_PLOT]: <BasicLinePlot />,
@@ -85,7 +82,6 @@ export const PLOTS_SUB_PAGES_MAP: Record<string, PLOTS_SUB_PAGES_LABELS[]> = {
 		PLOTS_SUB_PAGES_LABELS.STACK_LINE_PLOT,
 		PLOTS_SUB_PAGES_LABELS.PARALLEL_LINE_PLOT,
 	],
-	箱线图: [PLOTS_SUB_PAGES_LABELS.BASIC_BOX_PLOT],
 	散点图: [
 		PLOTS_SUB_PAGES_LABELS.BASIC_SCATTER_PLOT,
 		PLOTS_SUB_PAGES_LABELS.THREE_D_SCATTER_PLOT,

@@ -128,7 +128,9 @@ export function MissingValue() {
 					而是将缺失值替换为特定的值, 以便于后续的数据处理
 				</p>
 				<p className='intro-text'>
-					例如用 <Tag>-1</Tag>、<Tag>-99</Tag>、<Tag>99</Tag> 表示缺失值
+					例如用 <Tag variant='outlined'>-1</Tag>、
+					<Tag variant='outlined'>-99</Tag>、<Tag variant='outlined'>99</Tag>{' '}
+					表示缺失值
 				</p>
 				<p className='intro-text'>
 					你可以在此页面定义这些缺失值, 以便将它们删除或插值

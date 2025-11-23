@@ -10,14 +10,14 @@ export function NavToPageTool({
 	return (
 		<div>
 			跳转到{' '}
-			<Tag color='blue' className='!m-0'>
+			<Tag color='blue' variant='outlined'>
 				{mainPageName}
 			</Tag>
 			{subPageName && (
 				<>
 					{' '}
 					下的{' '}
-					<Tag color='blue' className='!m-0'>
+					<Tag color='blue' variant='outlined'>
 						{subPageName}
 					</Tag>{' '}
 					页面

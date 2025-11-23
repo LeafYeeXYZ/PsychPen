@@ -396,14 +396,14 @@ export function ThreeDBarPlot() {
 									<Select.Option value='sum'>总和</Select.Option>
 								</Select>
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>透明度</Space.Addon>
 							<Form.Item
 								noStyle
 								name='opacity'
 								rules={[{ required: true, message: '请选择柱状图透明度' }]}
 							>
 								<InputNumber
-									addonBefore='透明度'
-									className='w-full'
+									className='w-full!'
 									min={0}
 									max={1}
 									step={0.1}

@@ -29,7 +29,7 @@ export function ImportData() {
 			<p className='text-sm mb-4'>
 				支持{' '}
 				{ACCEPT_FILE_TYPES.map((type) => (
-					<Tag key={type} color='pink'>
+					<Tag key={type} color='pink' variant='outlined' className='mx-1!'>
 						.{type}
 					</Tag>
 				))}

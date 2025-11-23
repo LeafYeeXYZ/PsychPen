@@ -218,8 +218,8 @@ export function ThreeDScatterPlot() {
 						rules={[{ required: true, message: '请输入点大小' }]}
 					>
 						<InputNumber
-							addonBefore='点大小'
-							className='w-full'
+							mode='spinner'
+							className='w-full!'
 							placeholder='默认8'
 							min={1}
 							step={1}

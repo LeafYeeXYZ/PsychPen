@@ -21,15 +21,10 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks: {
-					antd: ['antd'],
-					antd_utils: [
-						'@ant-design/icons',
-						'@ant-design/v5-patch-for-react-19',
-						'@ant-design/x',
-					],
+					antd: ['antd', '@ant-design/icons', '@ant-design/x'],
 					echarts: ['echarts'],
-					echarts_gl: ['echarts-gl'],
 					echarts_utils: [
+						'echarts-gl',
 						'echarts-stat',
 						'echarts-wordcloud',
 						'html2canvas-pro',
@@ -37,9 +32,9 @@ export default defineConfig({
 					ag_grid: ['ag-grid-community', 'ag-grid-react'],
 					marked: ['katex', 'marked', 'marked-katex-extension'],
 					psych_sheet: ['@psych/sheet'],
-					stats: ['@psych/lib', 'ml-kmeans'],
 					utils: [
-						'jieba-wasm',
+						'@psych/lib',
+						'ml-kmeans',
 						'zod',
 						'bowser',
 						'openai',

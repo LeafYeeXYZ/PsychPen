@@ -202,14 +202,14 @@ export function PeerSampleTTest() {
 									<Select.Option value={false}>单尾检验</Select.Option>
 								</Select>
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>α =</Space.Addon>
 							<Form.Item
 								noStyle
 								name='alpha'
 								rules={[{ required: true, message: '请输入显著性水平' }]}
 							>
 								<InputNumber
-									addonBefore='α ='
-									className='w-full'
+									className='w-full!'
 									placeholder='请输入显著性水平'
 									min={0}
 									max={1}

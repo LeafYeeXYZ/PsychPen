@@ -1,3 +1,5 @@
+- [ ] TODO: `webr v0.5.7+` 与 `vite` 存在兼容性问题, 暂时回退到 `v0.5.6`, 等待 `webr` 修复后再升级
+
 # PsychPen
 
 **AI加持的在线统计分析和数据可视化软件**, 立即体验: <https://psychpen.leafyee.xyz>

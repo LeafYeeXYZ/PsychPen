@@ -1159,12 +1159,12 @@ export function AI() {
 
 	return !data ? (
 		<div className='w-full h-full flex items-center justify-center text-base font-bold'>
-			<InfoCircleOutlined className='!mr-[0.3rem]' />
+			<InfoCircleOutlined className='mr-[0.3rem]!' />
 			请先导入数据或打开示例数据
 		</div>
 	) : !ai ? (
 		<div className='w-full h-full flex items-center justify-center text-base font-bold'>
-			<InfoCircleOutlined className='!mr-[0.3rem]' />
+			<InfoCircleOutlined className='mr-[0.3rem]!' />
 			请先在数据页面右上角进行AI设置
 		</div>
 	) : (
@@ -1247,7 +1247,9 @@ export function AI() {
 								content={
 									<span>
 										当前 Tokens 使用量
-										<Tag className='!ml-[0.3rem] !mr-0'>{tokenUsage}</Tag>
+										<Tag variant='outlined' className='ml-[0.3rem]!'>
+											{tokenUsage}
+										</Tag>
 									</span>
 								}
 							>

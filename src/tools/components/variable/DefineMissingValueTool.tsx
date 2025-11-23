@@ -30,24 +30,29 @@ export function DefineMissingValueTool({
 		<>
 			<div>
 				执行函数{' '}
-				<Tag color='blue' className='!m-0'>
+				<Tag color='blue' variant='outlined'>
 					{funcsLabel.get(Funcs.DEFINE_MISSING_VALUE)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}定义变量
 				{variable_names.includes(ALL_VARS_IDENTIFIER) ? (
-					<Tag className='!m-0 !ml-[0.3rem]' color='blue'>
+					<Tag variant='outlined' className='ml-1!' color='blue'>
 						所有变量
 					</Tag>
 				) : (
 					variable_names.map((name) => (
-						<Tag key={name} className='!m-0 !ml-[0.3rem]' color='blue'>
+						<Tag key={name} variant='outlined' className='ml-1!' color='blue'>
 							{name}
 						</Tag>
 					))
 				)}{' '}
 				的缺失值为:
 				{missing_values.map((value) => (
-					<Tag key={String(value)} className='!m-0 !ml-[0.3rem]' color='yellow'>
+					<Tag
+						key={String(value)}
+						variant='outlined'
+						className='ml-1!'
+						color='yellow'
+					>
 						{String(value)}
 					</Tag>
 				))}

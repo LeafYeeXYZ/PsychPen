@@ -243,14 +243,14 @@ export function WordCloudPlot() {
 								]}
 							>
 								<InputNumber
-									addonAfter='px'
-									className='w-52'
+									className='w-52!'
 									placeholder='最小尺寸'
 									step={1}
 									min={1}
 									max={100}
 								/>
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>px</Space.Addon>
 							<Form.Item
 								noStyle
 								name='max'
@@ -267,14 +267,14 @@ export function WordCloudPlot() {
 								]}
 							>
 								<InputNumber
-									addonAfter='px'
-									className='w-52'
+									className='w-52!'
 									placeholder='最大尺寸'
 									step={1}
 									min={1}
 									max={100}
 								/>
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>px</Space.Addon>
 							<Form.Item
 								noStyle
 								name='rotation'

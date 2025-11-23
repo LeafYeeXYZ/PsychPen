@@ -25,11 +25,11 @@ export function ExportDataTool({
 		<>
 			<div>
 				执行函数{' '}
-				<Tag color='blue' className='!m-0'>
+				<Tag color='blue' variant='outlined'>
 					{funcsLabel.get(Funcs.EXPORT_DATA)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}导出数据到文件{' '}
-				<Tag className='!m-0' color='blue'>
+				<Tag variant='outlined' color='blue'>
 					{file_name || 'data'}.{file_type || 'xlsx'}
 				</Tag>
 			</div>

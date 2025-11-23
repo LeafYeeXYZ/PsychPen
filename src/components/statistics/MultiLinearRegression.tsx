@@ -135,7 +135,10 @@ export function MultiLinearRegression() {
 					<Form.Item
 						label={
 							<span>
-								自变量(可多选) <Tag color='blue'>X</Tag>
+								自变量(可多选){' '}
+								<Tag color='blue' variant='outlined'>
+									X
+								</Tag>
 							</span>
 						}
 						name='x'
@@ -167,7 +170,10 @@ export function MultiLinearRegression() {
 					<Form.Item
 						label={
 							<span>
-								因变量 <Tag color='pink'>Y</Tag>
+								因变量{' '}
+								<Tag color='pink' variant='outlined'>
+									Y
+								</Tag>
 							</span>
 						}
 						name='y'

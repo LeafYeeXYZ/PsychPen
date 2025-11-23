@@ -27,7 +27,7 @@ export function ApplyFilterTool({
 		<>
 			<div>
 				执行函数{' '}
-				<Tag color='blue' className='!m-0'>
+				<Tag color='blue' variant='outlined'>
 					{funcsLabel.get(Funcs.APPLY_FILTER)}
 				</Tag>
 				{done ? ', 已' : ', 是否确认'}设置数据筛选规则, 表达式如下:

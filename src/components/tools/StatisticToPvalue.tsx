@@ -59,47 +59,51 @@ export function StatisticToPvalue() {
 					<Form.Item
 						label={
 							<span>
-								标准正态分布 <Tag color='pink'>p = {z2p(zS).toFixed(6)}</Tag>
+								标准正态分布{' '}
+								<Tag variant='outlined' color='pink'>
+									p = {z2p(zS).toFixed(6)}
+								</Tag>
 							</span>
 						}
 					>
-						<InputNumber
-							className='w-full'
-							addonBefore={
-								<span>
-									统计量{' '}
-									<Tag className='mr-0' color='blue'>
-										Z
-									</Tag>
-								</span>
-							}
-							step={0.01}
-							min={-5}
-							max={5}
-							defaultValue={DEFAULT_VALUES.zS}
-							onChange={(value) => {
-								typeof value === 'number' && setZS(value)
-							}}
-						/>
+						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								统计量
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									Z
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={0.01}
+								min={-5}
+								max={5}
+								defaultValue={DEFAULT_VALUES.zS}
+								onChange={(value) => {
+									typeof value === 'number' && setZS(value)
+								}}
+							/>
+						</Space.Compact>
 					</Form.Item>
 					<Form.Item
 						label={
 							<span>
 								T分布(单尾){' '}
-								<Tag color='pink'>p = {t2p(tS1, tDf1a, false).toFixed(6)}</Tag>
+								<Tag variant='outlined' color='pink'>
+									p = {t2p(tS1, tDf1a, false).toFixed(6)}
+								</Tag>
 							</span>
 						}
 					>
 						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								统计量
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									T
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										统计量{' '}
-										<Tag className='mr-0' color='blue'>
-											T
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={0.01}
 								min={-5}
 								max={5}
@@ -108,15 +112,14 @@ export function StatisticToPvalue() {
 									typeof value === 'number' && setTS1(value)
 								}}
 							/>
+							<Space.Addon className='text-nowrap'>
+								自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										自由度{' '}
-										<Tag className='mr-0' color='blue'>
-											df
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={1}
 								min={1}
 								defaultValue={DEFAULT_VALUES.tDf}
@@ -130,20 +133,21 @@ export function StatisticToPvalue() {
 						label={
 							<span>
 								T分布(双尾){' '}
-								<Tag color='pink'>p = {t2p(tS2, tDf2a).toFixed(6)}</Tag>
+								<Tag variant='outlined' color='pink'>
+									p = {t2p(tS2, tDf2a).toFixed(6)}
+								</Tag>
 							</span>
 						}
 					>
 						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								统计量
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									T
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										统计量{' '}
-										<Tag className='mr-0' color='blue'>
-											T
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={0.01}
 								min={-5}
 								max={5}
@@ -152,15 +156,14 @@ export function StatisticToPvalue() {
 									typeof value === 'number' && setTS2(value)
 								}}
 							/>
+							<Space.Addon className='text-nowrap'>
+								自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										自由度{' '}
-										<Tag className='mr-0' color='blue'>
-											df
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={1}
 								min={1}
 								defaultValue={DEFAULT_VALUES.tDf}
@@ -174,144 +177,145 @@ export function StatisticToPvalue() {
 						label={
 							<span>
 								F分布(单尾){' '}
-								<Tag color='pink'>
+								<Tag variant='outlined' color='pink'>
 									p = {f2p(fS1, fDf1a[0], fDf1a[1], false).toFixed(6)}
 								</Tag>
 							</span>
 						}
 					>
-						<InputNumber
-							className='w-full mb-2'
-							addonBefore={
-								<span>
-									统计量{' '}
-									<Tag className='mr-0' color='blue'>
-										F
-									</Tag>
-								</span>
-							}
-							step={0.01}
-							min={0.0001}
-							defaultValue={DEFAULT_VALUES.fS}
-							onChange={(value) => {
-								typeof value === 'number' && setFS1(value)
-							}}
-						/>
-						<InputNumber
-							className='w-full mb-2'
-							addonBefore={
-								<span>
-									分子(因素)自由度{' '}
-									<Tag className='mr-0' color='blue'>
-										df
-									</Tag>
-								</span>
-							}
-							step={1}
-							min={1}
-							defaultValue={DEFAULT_VALUES.fDf[0]}
-							onChange={(value) => {
-								typeof value === 'number' && setFDf1a([value, fDf1a[1]])
-							}}
-						/>
-						<InputNumber
-							className='w-full'
-							addonBefore={
-								<span>
-									分母(样本)自由度{' '}
-									<Tag className='mr-0' color='blue'>
-										df
-									</Tag>
-								</span>
-							}
-							step={1}
-							min={1}
-							defaultValue={DEFAULT_VALUES.fDf[1]}
-							onChange={(value) => {
-								typeof value === 'number' && setFDf1a([fDf1a[0], value])
-							}}
-						/>
+						<Space.Compact block className='mb-2'>
+							<Space.Addon className='text-nowrap'>
+								统计量
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									F
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={0.01}
+								min={0.0001}
+								defaultValue={DEFAULT_VALUES.fS}
+								onChange={(value) => {
+									typeof value === 'number' && setFS1(value)
+								}}
+							/>
+						</Space.Compact>
+						<Space.Compact block className='mb-2'>
+							<Space.Addon className='text-nowrap'>
+								分子(因素)自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={1}
+								min={1}
+								defaultValue={DEFAULT_VALUES.fDf[0]}
+								onChange={(value) => {
+									typeof value === 'number' && setFDf1a([value, fDf1a[1]])
+								}}
+							/>
+						</Space.Compact>
+						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								分母(样本)自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={1}
+								min={1}
+								defaultValue={DEFAULT_VALUES.fDf[1]}
+								onChange={(value) => {
+									typeof value === 'number' && setFDf1a([fDf1a[0], value])
+								}}
+							/>
+						</Space.Compact>
 					</Form.Item>
 					<Form.Item
 						label={
 							<span>
 								F分布(双尾){' '}
-								<Tag color='pink'>
+								<Tag variant='outlined' color='pink'>
 									p = {f2p(fS2, fDf2a[0], fDf2a[1], true).toFixed(6)}
 								</Tag>
 							</span>
 						}
 					>
-						<InputNumber
-							className='w-full mb-2'
-							addonBefore={
-								<span>
-									统计量{' '}
-									<Tag className='mr-0' color='blue'>
-										F
-									</Tag>
-								</span>
-							}
-							step={0.01}
-							min={0.0001}
-							defaultValue={DEFAULT_VALUES.fS}
-							onChange={(value) => {
-								typeof value === 'number' && setFS2(value)
-							}}
-						/>
-						<InputNumber
-							className='w-full mb-2'
-							addonBefore={
-								<span>
-									分子(因素)自由度{' '}
-									<Tag className='mr-0' color='blue'>
-										df
-									</Tag>
-								</span>
-							}
-							step={1}
-							min={1}
-							defaultValue={DEFAULT_VALUES.fDf[0]}
-							onChange={(value) => {
-								typeof value === 'number' && setFDf2a([value, fDf2a[1]])
-							}}
-						/>
-						<InputNumber
-							className='w-full'
-							addonBefore={
-								<span>
-									分母(样本)自由度{' '}
-									<Tag className='mr-0' color='blue'>
-										df
-									</Tag>
-								</span>
-							}
-							step={1}
-							min={1}
-							defaultValue={DEFAULT_VALUES.fDf[1]}
-							onChange={(value) => {
-								typeof value === 'number' && setFDf2a([fDf2a[0], value])
-							}}
-						/>
+						<Space.Compact block className='mb-2'>
+							<Space.Addon className='text-nowrap'>
+								统计量
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									F
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={0.01}
+								min={0.0001}
+								defaultValue={DEFAULT_VALUES.fS}
+								onChange={(value) => {
+									typeof value === 'number' && setFS2(value)
+								}}
+							/>
+						</Space.Compact>
+						<Space.Compact block className='mb-2'>
+							<Space.Addon className='text-nowrap'>
+								分子(因素)自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={1}
+								min={1}
+								defaultValue={DEFAULT_VALUES.fDf[0]}
+								onChange={(value) => {
+									typeof value === 'number' && setFDf2a([value, fDf2a[1]])
+								}}
+							/>
+						</Space.Compact>
+						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								分母(样本)自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={1}
+								min={1}
+								defaultValue={DEFAULT_VALUES.fDf[1]}
+								onChange={(value) => {
+									typeof value === 'number' && setFDf2a([fDf2a[0], value])
+								}}
+							/>
+						</Space.Compact>
 					</Form.Item>
 					<Form.Item
 						label={
 							<span>
 								卡方分布{' '}
-								<Tag color='pink'>p = {c2p(chi, chiDf).toFixed(6)}</Tag>
+								<Tag variant='outlined' color='pink'>
+									p = {c2p(chi, chiDf).toFixed(6)}
+								</Tag>
 							</span>
 						}
 					>
 						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								统计量
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									χ²
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										统计量{' '}
-										<Tag className='mr-0' color='blue'>
-											χ²
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={0.01}
 								min={0}
 								defaultValue={DEFAULT_VALUES.chi}
@@ -319,15 +323,14 @@ export function StatisticToPvalue() {
 									typeof value === 'number' && setChi(value)
 								}}
 							/>
+							<Space.Addon className='text-nowrap'>
+								自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										自由度{' '}
-										<Tag className='mr-0' color='blue'>
-											df
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={1}
 								min={1}
 								defaultValue={DEFAULT_VALUES.chiDf}
@@ -346,36 +349,36 @@ export function StatisticToPvalue() {
 						label={
 							<span>
 								标准正态分布{' '}
-								<Tag color='pink'>
+								<Tag variant='outlined' color='pink'>
 									Z = {zP === 1 ? '+∞' : zP === 0 ? '-∞' : p2z(zP).toFixed(6)}
 								</Tag>
 							</span>
 						}
 					>
-						<InputNumber
-							className='w-full'
-							addonBefore={
-								<span>
-									累积概率{' '}
-									<Tag className='mr-0' color='blue'>
-										p
-									</Tag>
-								</span>
-							}
-							step={0.01}
-							min={0}
-							max={1}
-							defaultValue={DEFAULT_VALUES.zP}
-							onChange={(value) => {
-								typeof value === 'number' && setZP(value)
-							}}
-						/>
+						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								累积概率
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									p
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={0.01}
+								min={0}
+								max={1}
+								defaultValue={DEFAULT_VALUES.zP}
+								onChange={(value) => {
+									typeof value === 'number' && setZP(value)
+								}}
+							/>
+						</Space.Compact>
 					</Form.Item>
 					<Form.Item
 						label={
 							<span>
 								T分布(单尾){' '}
-								<Tag color='pink'>
+								<Tag variant='outlined' color='pink'>
 									T ={' '}
 									{tP1 === 1
 										? '-∞'
@@ -387,15 +390,14 @@ export function StatisticToPvalue() {
 						}
 					>
 						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								显著性
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									p
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										显著性{' '}
-										<Tag className='mr-0' color='blue'>
-											p
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={0.01}
 								min={0}
 								max={1}
@@ -404,15 +406,14 @@ export function StatisticToPvalue() {
 									typeof value === 'number' && setTP1(value)
 								}}
 							/>
+							<Space.Addon className='text-nowrap'>
+								自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										自由度{' '}
-										<Tag className='mr-0' color='blue'>
-											df
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={1}
 								min={1}
 								defaultValue={DEFAULT_VALUES.tDf}
@@ -426,7 +427,7 @@ export function StatisticToPvalue() {
 						label={
 							<span>
 								T分布(双尾){' '}
-								<Tag color='pink'>
+								<Tag variant='outlined' color='pink'>
 									T ={' '}
 									{tP2 === 1
 										? '-∞'
@@ -438,15 +439,14 @@ export function StatisticToPvalue() {
 						}
 					>
 						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								显著性
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									p
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										显著性{' '}
-										<Tag className='mr-0' color='blue'>
-											p
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={0.01}
 								min={0}
 								max={1}
@@ -455,15 +455,14 @@ export function StatisticToPvalue() {
 									typeof value === 'number' && setTP2(value)
 								}}
 							/>
+							<Space.Addon className='text-nowrap'>
+								自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										自由度{' '}
-										<Tag className='mr-0' color='blue'>
-											df
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={1}
 								min={1}
 								defaultValue={DEFAULT_VALUES.tDf}
@@ -477,7 +476,7 @@ export function StatisticToPvalue() {
 						label={
 							<span>
 								F分布(单尾){' '}
-								<Tag color='pink'>
+								<Tag variant='outlined' color='pink'>
 									F ={' '}
 									{fP1 === 1
 										? '0'
@@ -488,64 +487,64 @@ export function StatisticToPvalue() {
 							</span>
 						}
 					>
-						<InputNumber
-							className='w-full mb-2'
-							addonBefore={
-								<span>
-									显著性{' '}
-									<Tag className='mr-0' color='blue'>
-										p
-									</Tag>
-								</span>
-							}
-							step={0.01}
-							min={0}
-							max={1}
-							defaultValue={DEFAULT_VALUES.fP}
-							onChange={(value) => {
-								typeof value === 'number' && setFP1(value)
-							}}
-						/>
-						<InputNumber
-							className='w-full mb-2'
-							addonBefore={
-								<span>
-									分子(因素)自由度{' '}
-									<Tag className='mr-0' color='blue'>
-										df
-									</Tag>
-								</span>
-							}
-							step={1}
-							min={1}
-							defaultValue={DEFAULT_VALUES.fDf[0]}
-							onChange={(value) => {
-								typeof value === 'number' && setFDf1b([value, fDf1b[1]])
-							}}
-						/>
-						<InputNumber
-							className='w-full'
-							addonBefore={
-								<span>
-									分母(样本)自由度{' '}
-									<Tag className='mr-0' color='blue'>
-										df
-									</Tag>
-								</span>
-							}
-							step={1}
-							min={1}
-							defaultValue={DEFAULT_VALUES.fDf[1]}
-							onChange={(value) => {
-								typeof value === 'number' && setFDf1b([fDf1b[0], value])
-							}}
-						/>
+						<Space.Compact block className='mb-2'>
+							<Space.Addon className='text-nowrap'>
+								显著性
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									p
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={0.01}
+								min={0}
+								max={1}
+								defaultValue={DEFAULT_VALUES.fP}
+								onChange={(value) => {
+									typeof value === 'number' && setFP1(value)
+								}}
+							/>
+						</Space.Compact>
+						<Space.Compact block className='mb-2'>
+							<Space.Addon className='text-nowrap'>
+								分子(因素)自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={1}
+								min={1}
+								defaultValue={DEFAULT_VALUES.fDf[0]}
+								onChange={(value) => {
+									typeof value === 'number' && setFDf1b([value, fDf1b[1]])
+								}}
+							/>
+						</Space.Compact>
+						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								分母(样本)自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={1}
+								min={1}
+								defaultValue={DEFAULT_VALUES.fDf[1]}
+								onChange={(value) => {
+									typeof value === 'number' && setFDf1b([fDf1b[0], value])
+								}}
+							/>
+						</Space.Compact>
 					</Form.Item>
 					<Form.Item
 						label={
 							<span>
 								F分布(双尾){' '}
-								<Tag color='pink'>
+								<Tag variant='outlined' color='pink'>
 									F ={' '}
 									{fP2 === 1
 										? '0'
@@ -556,64 +555,64 @@ export function StatisticToPvalue() {
 							</span>
 						}
 					>
-						<InputNumber
-							className='w-full mb-2'
-							addonBefore={
-								<span>
-									显著性{' '}
-									<Tag className='mr-0' color='blue'>
-										p
-									</Tag>
-								</span>
-							}
-							step={0.01}
-							min={0}
-							max={1}
-							defaultValue={DEFAULT_VALUES.fP}
-							onChange={(value) => {
-								typeof value === 'number' && setFP2(value)
-							}}
-						/>
-						<InputNumber
-							className='w-full mb-2'
-							addonBefore={
-								<span>
-									分子(因素)自由度{' '}
-									<Tag className='mr-0' color='blue'>
-										df
-									</Tag>
-								</span>
-							}
-							step={1}
-							min={1}
-							defaultValue={DEFAULT_VALUES.fDf[0]}
-							onChange={(value) => {
-								typeof value === 'number' && setFDf2b([value, fDf2b[1]])
-							}}
-						/>
-						<InputNumber
-							className='w-full'
-							addonBefore={
-								<span>
-									分母(样本)自由度{' '}
-									<Tag className='mr-0' color='blue'>
-										df
-									</Tag>
-								</span>
-							}
-							step={1}
-							min={1}
-							defaultValue={DEFAULT_VALUES.fDf[1]}
-							onChange={(value) => {
-								typeof value === 'number' && setFDf2b([fDf2b[0], value])
-							}}
-						/>
+						<Space.Compact block className='mb-2'>
+							<Space.Addon className='text-nowrap'>
+								显著性
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									p
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={0.01}
+								min={0}
+								max={1}
+								defaultValue={DEFAULT_VALUES.fP}
+								onChange={(value) => {
+									typeof value === 'number' && setFP2(value)
+								}}
+							/>
+						</Space.Compact>
+						<Space.Compact block className='mb-2'>
+							<Space.Addon className='text-nowrap'>
+								分子(因素)自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={1}
+								min={1}
+								defaultValue={DEFAULT_VALUES.fDf[0]}
+								onChange={(value) => {
+									typeof value === 'number' && setFDf2b([value, fDf2b[1]])
+								}}
+							/>
+						</Space.Compact>
+						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								分母(样本)自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
+							<InputNumber
+								className='w-full!'
+								step={1}
+								min={1}
+								defaultValue={DEFAULT_VALUES.fDf[1]}
+								onChange={(value) => {
+									typeof value === 'number' && setFDf2b([fDf2b[0], value])
+								}}
+							/>
+						</Space.Compact>
 					</Form.Item>
 					<Form.Item
 						label={
 							<span>
 								卡方分布{' '}
-								<Tag color='pink'>
+								<Tag variant='outlined' color='pink'>
 									χ² ={' '}
 									{chiP === 1
 										? '0'
@@ -625,15 +624,14 @@ export function StatisticToPvalue() {
 						}
 					>
 						<Space.Compact block>
+							<Space.Addon className='text-nowrap'>
+								显著性
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									p
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										显著性{' '}
-										<Tag className='mr-0' color='blue'>
-											p
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={0.01}
 								min={0}
 								max={1}
@@ -642,15 +640,14 @@ export function StatisticToPvalue() {
 									typeof value === 'number' && setChiP(value)
 								}}
 							/>
+							<Space.Addon className='text-nowrap'>
+								自由度
+								<Tag variant='outlined' color='blue' className='ml-1!'>
+									df
+								</Tag>
+							</Space.Addon>
 							<InputNumber
-								addonBefore={
-									<span>
-										自由度{' '}
-										<Tag className='mr-0' color='blue'>
-											df
-										</Tag>
-									</span>
-								}
+								className='w-full!'
 								step={1}
 								min={1}
 								defaultValue={DEFAULT_VALUES.chiDf}

@@ -363,19 +363,13 @@ export function GroupedBarPlot() {
 					</Form.Item>
 					<Form.Item label='自定义Y轴最大值和最小值'>
 						<Space.Compact className='w-full'>
+							<Space.Addon className='text-nowrap'>最大值</Space.Addon>
 							<Form.Item noStyle name='maxY'>
-								<InputNumber
-									className='w-full'
-									addonBefore='最大值'
-									placeholder='默认自动设置'
-								/>
+								<InputNumber className='w-full!' placeholder='默认自动设置' />
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>最小值</Space.Addon>
 							<Form.Item noStyle name='minY'>
-								<InputNumber
-									className='w-full'
-									addonBefore='最小值'
-									placeholder='默认自动设置'
-								/>
+								<InputNumber className='w-full!' placeholder='默认自动设置' />
 							</Form.Item>
 						</Space.Compact>
 					</Form.Item>

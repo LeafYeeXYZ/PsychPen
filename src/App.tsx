@@ -87,6 +87,9 @@ export function App() {
 	}, [setIsDarkMode])
 	// AI助手
 	const [showAI, setShowAI] = useState<boolean>(false)
+	const defaultAiDrawerSize = Math.min(window.innerWidth - 200, 720)
+	const maxAiDrawerSize = window.innerWidth - 100
+	const [aiDrawerSize, setAiDrawerSize] = useState<number>(defaultAiDrawerSize)
 
 	return (
 		<ConfigProvider theme={isDarkMode ? ANTD_THEME_DARK : ANTD_THEME_LIGHT}>
@@ -100,7 +103,16 @@ export function App() {
 					open={showAI}
 					onClose={() => setShowAI(false)}
 					closable={false}
-					width={Math.min(window.innerWidth - 200, 720)}
+					size={aiDrawerSize}
+					resizable={{
+						onResize: (newSize) =>
+							setAiDrawerSize(
+								Math.min(
+									Math.max(newSize, defaultAiDrawerSize),
+									maxAiDrawerSize,
+								),
+							),
+					}}
 				>
 					<AI />
 				</Drawer>
@@ -117,7 +129,7 @@ function ErrorFallback({ error }: FallbackProps) {
 	return (
 		<div className='w-dvw h-dvh flex flex-col items-center justify-center gap-6 p-6 bg-white dark:bg-gray-950 dark:text-white'>
 			<div className='text-2xl'>
-				<FrownOutlined className='!m-0 !mr-[0.3rem]' />
+				<FrownOutlined className='m-0! mr-[0.3rem]!' />
 				发生错误
 			</div>
 			<div className='max-w-lg border py-3 px-4 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm'>
@@ -232,7 +244,7 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 			<p className='absolute left-4 text-sm text-rose-950 dark:text-white'>
 				{titleContent ? (
 					<span className='opacity-60'>
-						<Loading3QuartersOutlined spin className='!mr-[0.3rem]' />
+						<Loading3QuartersOutlined spin className='mr-[0.3rem]!' />
 						{titleContent}
 					</span>
 				) : (
@@ -242,7 +254,7 @@ function Nav({ setShowAI }: { setShowAI: (show: boolean) => void }) {
 						rel='noreferrer'
 						className='hover:underline'
 					>
-						<BarChartOutlined className='!mr-[0.3rem]' />
+						<BarChartOutlined className='mr-[0.3rem]!' />
 						PsychPen v{version}
 					</a>
 				)}

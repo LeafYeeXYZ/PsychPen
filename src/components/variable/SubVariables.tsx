@@ -147,20 +147,20 @@ export function SubVariables() {
 										options={DISCRETE_METHODS}
 									/>
 								</Form.Item>
+								<Space.Addon className='text-nowrap'>离散为</Space.Addon>
 								<Form.Item
 									noStyle
 									name='discretizeGroups'
 									rules={[{ required: true, message: '请输入离散化分组数' }]}
 								>
 									<InputNumber
-										className='w-full'
-										addonAfter='组'
-										addonBefore='离散为'
+										className='w-full!'
 										placeholder='请输入'
 										min={2}
 										step={1}
 									/>
 								</Form.Item>
+								<Space.Addon className='text-nowrap'>组</Space.Addon>
 							</Space.Compact>
 						</Form.Item>
 					)}
@@ -180,17 +180,18 @@ export function SubVariables() {
 			<div className='component-result variable-view'>
 				<p className='intro-text'>在数据分析中, 有时需要对原始数据进行处理</p>
 				<p className='intro-text'>
-					标准化是指把 <Tag>x</Tag>转换为 <Tag>(x - μ) / σ</Tag>,
-					从而让数据的均值为0, 方差为1
+					标准化是指把 <Tag variant='outlined'>x</Tag> 转换为{' '}
+					<Tag variant='outlined'>(x - μ) / σ</Tag>, 从而让数据的均值为0,
+					方差为1
 				</p>
 				<p className='intro-text'>
-					中心化是指把 <Tag>x</Tag>转换为 <Tag>x - μ</Tag>, 从而让数据的均值为0,
-					方差不变
+					中心化是指把 <Tag variant='outlined'>x</Tag> 转换为{' '}
+					<Tag variant='outlined'>x - μ</Tag>, 从而让数据的均值为0, 方差不变
 				</p>
 				<p className='intro-text'>两种处理均不会改变数据的分布形状</p>
 				<p className='intro-text'>
 					离散化是指把数据转换为分类数据, 分为等宽、等频和聚类分析{' '}
-					<Tag>k-means</Tag> 三种方法
+					<Tag variant='outlined'>k-means</Tag> 三种方法
 				</p>
 				<p className='intro-text'>
 					进行这些操作时, <b>PsychPen 不会改变原始数据, 而是生成新的子变量</b>

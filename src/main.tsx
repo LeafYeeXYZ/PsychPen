@@ -4,11 +4,10 @@ import { App } from './App.tsx'
 import './styles/tailwind.css'
 import './styles/markdown.css'
 import 'katex/dist/katex.min.css'
+import { ClientSideRowModelModule, ModuleRegistry } from 'ag-grid-community'
 import Bowser from 'bowser'
 import { marked } from 'marked'
 import katex from 'marked-katex-extension'
-import '@ant-design/v5-patch-for-react-19'
-import { ClientSideRowModelModule, ModuleRegistry } from 'ag-grid-community'
 
 const root = document.getElementById('root')
 if (!root) {

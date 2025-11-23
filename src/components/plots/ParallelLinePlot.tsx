@@ -162,13 +162,14 @@ export function ParallelLinePlot() {
 						<Space.Compact block>
 							<Form.Item name='lineWidth' noStyle>
 								<InputNumber
-									className='w-full'
+									mode='spinner'
+									className='w-full!'
 									min={1}
 									max={10}
 									step={1}
-									addonAfter='px'
 								/>
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>px</Space.Addon>
 							<Form.Item name='lineColor' noStyle>
 								<ColorPicker className='w-full' showText format='hex' />
 							</Form.Item>

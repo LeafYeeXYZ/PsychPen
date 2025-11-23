@@ -445,19 +445,13 @@ export function StackLinePlot() {
 					</Form.Item>
 					<Form.Item label='Y轴数值范围'>
 						<Space.Compact className='w-full'>
+							<Space.Addon className='text-nowrap'>Y轴最小为</Space.Addon>
 							<Form.Item noStyle name='minY'>
-								<InputNumber
-									className='w-full'
-									addonBefore='Y轴最小为'
-									placeholder='默认自动'
-								/>
+								<InputNumber className='w-full!' placeholder='默认自动' />
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>Y轴最大为</Space.Addon>
 							<Form.Item noStyle name='maxY'>
-								<InputNumber
-									className='w-full'
-									addonBefore='Y轴最大为'
-									placeholder='默认自动'
-								/>
+								<InputNumber className='w-full!' placeholder='默认自动' />
 							</Form.Item>
 						</Space.Compact>
 					</Form.Item>

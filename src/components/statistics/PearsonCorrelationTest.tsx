@@ -157,13 +157,13 @@ ${variable
 						/>
 					</Form.Item>
 					<Form.Item
-						label='显著性水平'
+						label='显著性水平 (α)'
 						name='alpha'
 						rules={[{ required: true, message: '请输入显著性水平' }]}
 					>
 						<InputNumber
-							addonBefore='α ='
-							className='w-full'
+							mode='spinner'
+							className='w-full!'
 							placeholder='请输入显著性水平'
 							min={0}
 							max={1}

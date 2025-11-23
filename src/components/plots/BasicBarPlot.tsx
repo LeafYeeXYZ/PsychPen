@@ -480,7 +480,7 @@ export function BasicBarPlot() {
 						/>
 					</Form.Item>
 					<Form.Item label='误差棒内容和Y轴最大值'>
-						<Space.Compact className='w-full'>
+						<Space.Compact block>
 							<Form.Item noStyle name='error'>
 								<Select
 									className='w-full'
@@ -495,12 +495,9 @@ export function BasicBarPlot() {
 									]}
 								/>
 							</Form.Item>
+							<Space.Addon className='text-nowrap'>Y轴最大为</Space.Addon>
 							<Form.Item noStyle name='maxY'>
-								<InputNumber
-									className='w-full'
-									addonBefore='Y轴最大为'
-									placeholder='默认自动'
-								/>
+								<InputNumber className='w-full!' placeholder='默认自动' />
 							</Form.Item>
 						</Space.Compact>
 					</Form.Item>
