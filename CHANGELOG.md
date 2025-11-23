@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.10.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.9.0...v2.10.0) (2025-11-23)
+
+
+### Features
+
+* 实时显示R语言模块的加载进度 ([1699e88](https://github.com/LeafYeeXYZ/PsychPen/commit/1699e887b94f9809b44006047d516f0a0e475b5d))
+
+
+### Bug Fixes
+
+* 将 ant-design 升级至 6.0 并修复一系列样式错误 ([7676548](https://github.com/LeafYeeXYZ/PsychPen/commit/7676548d50a077e8576385c8b2331b5d2329ad0d))
+* 将 ant-design-x 升级至 2.0 并修复配置冲突 ([220a88c](https://github.com/LeafYeeXYZ/PsychPen/commit/220a88c6f839bfd2cd982f9725fe55e34ce6a680))
+* 修复主页数据显示的格式问题 ([dbd4a4b](https://github.com/LeafYeeXYZ/PsychPen/commit/dbd4a4b8e56d599617dcfed395a896e778d1ca26))
+
+
+### Improvements
+
+* 改进代码分块以加快加载 ([ebd1471](https://github.com/LeafYeeXYZ/PsychPen/commit/ebd1471137c0f3baa531f7b45eda5200ea6dc928))
+* 减少加载消息的视觉干扰 ([12ce29d](https://github.com/LeafYeeXYZ/PsychPen/commit/12ce29dfad8b4b722b8970bfebd932447c0910a5))
+* 优化简单中介分析的结果说明 ([9362b5a](https://github.com/LeafYeeXYZ/PsychPen/commit/9362b5ae792f37cdff4648ab1ee563e9b735dfc4))
+* 优化简单中介分析的结果说明 ([314ad60](https://github.com/LeafYeeXYZ/PsychPen/commit/314ad6094499ad43932e27e7f2e57f848bd0c15c))
+* 优化简单中介分析的结果说明 ([b8e1416](https://github.com/LeafYeeXYZ/PsychPen/commit/b8e14164cd445858db26dda139ffcadf6c7ee950))
+* 优化同质性信度检验的分组显示 ([7e77170](https://github.com/LeafYeeXYZ/PsychPen/commit/7e77170831b53c6ea35c5676422c74db70510949))
+* 优化webR加载时的错误处理 ([18e0eb5](https://github.com/LeafYeeXYZ/PsychPen/commit/18e0eb5b1aedbb3b042b81e9460bd54b41de8088))
+* 预加载部分R包, 优化使用体验 ([344841b](https://github.com/LeafYeeXYZ/PsychPen/commit/344841b6a0454ab068d2d7f42c6efa568194bfbe))
+
 ## [2.9.0](https://github.com/LeafYeeXYZ/PsychPen/compare/v2.8.0...v2.9.0) (2025-08-14)
 
 
