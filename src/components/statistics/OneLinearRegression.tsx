@@ -15,31 +15,15 @@ type Option = {
 	y: string
 }
 
-export function OneLinearRegression() {
-	const dataCols = useData((state) => state.dataCols)
-	const dataRows = useData((state) => state.dataRows)
-	const isLargeData = useData((state) => state.isLargeData)
-	const messageApi = useStates((state) => state.messageApi)
-	const statResult = useStates((state) => state.statResult)
-	const setStatResult = useStates((state) => state.setStatResult)
-	// biome-ignore lint/correctness/useExhaustiveDependencies: 仅在组件加载时清空结果
-	useEffect(() => {
-		setStatResult('')
-	}, [])
-	const [disabled, setDisabled] = useState<boolean>(false)
-	const handleCalculate = async (values: Option) => {
-		try {
-			messageApi?.loading('正在处理数据...', 0)
-			isLargeData && (await sleep())
-			const timestamp = Date.now()
-			const { x, y } = values
-			const filteredRows = dataRows.filter((row) =>
-				[x, y].every((variable) => typeof row[variable] === 'number'),
-			)
-			const xData = filteredRows.map((row) => row[x] as number)
-			const yData = filteredRows.map((row) => row[y] as number)
-			const m = new LinearRegressionOne(xData, yData)
-			setStatResult(`
+export function oneLinearRegressionCalculator(config: {
+	x: string
+	y: string
+	xData: number[]
+	yData: number[]
+}) {
+	const { x, y, xData, yData } = config
+	const m = new LinearRegressionOne(xData, yData)
+	return `
 ## 1 一元线性回归
 
 对自变量 (x) "${x}"和因变量 (y) "${y}"进行一元线性回归分析. 原假设 (H<sub>0</sub>) 为"斜率 = 0"; 显著性水平 (α) 为 0.05. 最终模型为 y = ${markS(m.b0)} + ${markS(m.b1)} * x.
@@ -72,7 +56,40 @@ export function OneLinearRegression() {
 | :---: | :---: | :---: |
 | ${x} | ${markS(m.xMean)} | ${markS(m.xStd)} |
 | ${y} | ${markS(m.yMean)} | ${markS(m.yStd)} |
-			`)
+			`
+}
+
+export function OneLinearRegression() {
+	const dataCols = useData((state) => state.dataCols)
+	const dataRows = useData((state) => state.dataRows)
+	const isLargeData = useData((state) => state.isLargeData)
+	const messageApi = useStates((state) => state.messageApi)
+	const statResult = useStates((state) => state.statResult)
+	const setStatResult = useStates((state) => state.setStatResult)
+	// biome-ignore lint/correctness/useExhaustiveDependencies: 仅在组件加载时清空结果
+	useEffect(() => {
+		setStatResult('')
+	}, [])
+	const [disabled, setDisabled] = useState<boolean>(false)
+	const handleCalculate = async (values: Option) => {
+		try {
+			messageApi?.loading('正在处理数据...', 0)
+			isLargeData && (await sleep())
+			const timestamp = Date.now()
+			const { x, y } = values
+			const filteredRows = dataRows.filter((row) =>
+				[x, y].every((variable) => typeof row[variable] === 'number'),
+			)
+			const xData = filteredRows.map((row) => row[x] as number)
+			const yData = filteredRows.map((row) => row[y] as number)
+			setStatResult(
+				oneLinearRegressionCalculator({
+					x,
+					y,
+					xData,
+					yData,
+				}),
+			)
 			messageApi?.destroy()
 			messageApi?.success(`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`)
 		} catch (error) {

@@ -20,6 +20,7 @@ import {
 	levene_test_for_independent_vars,
 	levene_test_for_paired_vars,
 } from './funcs/statistics/levene_test.ts'
+import { one_linear_regression } from './funcs/statistics/one_linear_regression.ts'
 import { one_sample_t_test } from './funcs/statistics/one_sample_t_test.ts'
 import { peer_sample_t_test } from './funcs/statistics/peer_sample_t_test.ts'
 import { simple_mediator_test } from './funcs/statistics/simple_mediator_test.ts'
@@ -67,6 +68,7 @@ const funcs: AIFunction[] = [
 	kurtosis_skewness_test_for_paired_vars,
 	kolmogorov_smirnov_test_for_independent_vars,
 	kolmogorov_smirnov_test_for_paired_vars,
+	one_linear_regression,
 	get_user_stat_result,
 ]
 export const funcsTools = funcs.map((func) => func.tool)

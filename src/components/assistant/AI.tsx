@@ -52,6 +52,7 @@ import {
 	levene_test_for_independent_vars_type,
 	levene_test_for_paired_vars_type,
 } from '../../tools/funcs/statistics/levene_test.ts'
+import { one_linear_regression_type } from '../../tools/funcs/statistics/one_linear_regression.ts'
 import { one_sample_t_test_type } from '../../tools/funcs/statistics/one_sample_t_test.ts'
 import { peer_sample_t_test_type } from '../../tools/funcs/statistics/peer_sample_t_test.ts'
 import { simple_mediator_test_type } from '../../tools/funcs/statistics/simple_mediator_test.ts'
@@ -76,6 +77,7 @@ import { ALLOWED_INTERPOLATION_METHODS } from '../../types.ts'
 import { kolmogorovSmirnovTestCalculator } from '../statistics/KolmogorovSmirnovTest.tsx'
 import { kurtosisSkewnessCalculator } from '../statistics/KurtosisSkewness.tsx'
 import { leveneTestCalculator } from '../statistics/LeveneTest.tsx'
+import { oneLinearRegressionCalculator } from '../statistics/OneLinearRegression.tsx'
 import { oneSampleTTestCalculator } from '../statistics/OneSampleTTest.tsx'
 import { peerSampleTTestCalculator } from '../statistics/PeerSampleTTest.tsx'
 import { simpleMediationTestCalculator } from '../statistics/SimpleMediatorTest.tsx'
@@ -369,6 +371,53 @@ export function AI() {
 								newMessages[1].content =
 									'已请求执行代码并导出结果, 等待用户手动确认'
 								break
+							}
+							case Funcs.ONE_LINEAR_REGRESSION: {
+								const raw = await tryCatch(
+									() => JSON.parse(toolCall.function.arguments),
+									'AI助手返回的JSON数据格式错误',
+								)
+								const { independent_var, dependent_var } = await tryCatch(
+									() => one_linear_regression_type.parse(raw),
+									'AI助手返回的函数调用参数错误',
+								)
+								await tryCatch(
+									() => isNumeric([independent_var, dependent_var], dataCols),
+									'AI助手返回的变量名不存在/不是等距或等比数据',
+								)
+								try {
+									messageApi?.loading('正在处理数据...', 0)
+									await sleep()
+									const timestamp = Date.now()
+									const filteredRows = dataRows.filter(
+										(row) =>
+											typeof row[independent_var] === 'number' &&
+											typeof row[dependent_var] === 'number',
+									)
+									const xData = filteredRows.map(
+										(row) => row[independent_var] as number,
+									)
+									const yData = filteredRows.map(
+										(row) => row[dependent_var] as number,
+									)
+									const result = oneLinearRegressionCalculator({
+										x: independent_var,
+										y: dependent_var,
+										xData,
+										yData,
+									})
+									newMessages[1].content = `##### 统计结果\n\n${result}`
+									messageApi?.destroy()
+									messageApi?.success(
+										`数据处理完成, 用时 ${Date.now() - timestamp} 毫秒`,
+									)
+									break
+								} catch (e) {
+									messageApi?.destroy()
+									throw new Error(
+										`数据处理失败: ${e instanceof Error ? e.message : String(e)}`,
+									)
+								}
 							}
 							case Funcs.KOLMOGOROV_SMIRNOV_TEST_FOR_INDEPENDENT_VARS: {
 								const raw = await tryCatch(
